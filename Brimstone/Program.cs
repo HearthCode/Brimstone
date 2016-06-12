@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Brimstone.Cards;
+using System.Diagnostics;
 
 namespace Brimstone.Utils
 {
@@ -88,13 +89,14 @@ namespace Brimstone
 		}
 	}
 
-	class Entity
+	class Entity : ICloneable
 	{
 		public IMinion Card { get; set; }
-		public Dictionary<GameTag, int?> Tags { get; } = new Dictionary<GameTag, int?>((int)GameTag._COUNT);
+		public Dictionary<GameTag, int?> Tags { get; protected set; } = new Dictionary<GameTag, int?>((int)GameTag._COUNT);
 
 		public int? this[GameTag t] {
 			get {
+				// Use TryGetValue for safety
 				return Tags[t];
 			}
 			set {
@@ -106,10 +108,21 @@ namespace Brimstone
 		public Entity() {
 			// set all tags to zero to avoid having to check if keys exist
 			// worsens memory footprint to improve performance
-			var tags = Enum.GetValues(typeof(GameTag));
+			//var tags = Enum.GetValues(typeof(GameTag));
 
-			foreach (var tagValue in tags)
-				Tags.Add((GameTag)tagValue, null);
+			//foreach (var tagValue in tags)
+				//Tags.Add((GameTag)tagValue, null);
+		}
+
+		public object Clone() {
+			// Cards will never change so we can just take pointers
+			var e = new Entity {
+				Card = Card
+			};
+			// Tags should be copied (for now)
+			// This works because the dictionary only uses value types!
+			e.Tags = new Dictionary<GameTag, int?>(Tags);
+			return e;
 		}
 	}
 
@@ -137,13 +150,24 @@ namespace Brimstone
 			}
 			return s;
 		}
+
+		public new object Clone() {
+			// Cards will never change so we can just take pointers
+			var e = new ActiveMinion {
+				Card = Card
+			};
+			// Tags should be copied (for now)
+			// This works because the dictionary only uses value types!
+			e.Tags = new Dictionary<GameTag, int?>(Tags);
+			return e;
+		}
 	}
 
 	class Player : Entity
 	{
 		public Game Game { get; set; }
 		public int Id { get; set; }
-		public int Health { get; } = 30;
+		public int Health { get; private set; } = 30;
 		public List<ActiveMinion> ZoneHand { get; } = new List<ActiveMinion>();
 		public List<ActiveMinion> ZonePlay { get; } = new List<ActiveMinion>();
 		
@@ -159,9 +183,22 @@ namespace Brimstone
 		public override string ToString() {
 			return Id.ToString();
 		}
+
+		public new object Clone() {
+			var p = new Player {
+				Game = Game,
+				Id = Id,
+				Health = Health
+			};
+			foreach (var e in ZoneHand)
+				p.ZoneHand.Add((ActiveMinion) e.Clone());
+			foreach (var e in ZonePlay)
+				p.ZonePlay.Add((ActiveMinion) e.Clone());
+			return p;
+		}
 	}
 
-	class Game : Entity
+	class Game : Entity, ICloneable
 	{
 		private Random rng = new Random();
 		public Player Player1 { get; set; }
@@ -191,6 +228,20 @@ namespace Brimstone
 			return s;
 		}
 
+		public IEnumerable<Entity> Entities() {
+			yield return this;
+			yield return Player1;
+			yield return Player2;
+			foreach (var e in Player1.ZoneHand)
+				yield return e;
+			foreach (var e in Player1.ZonePlay)
+				yield return e;
+			foreach (var e in Player2.ZoneHand)
+				yield return e;
+			foreach (var e in Player2.ZonePlay)
+				yield return e;
+		}
+
 		public ActiveMinion RandomOpponentMinion() {
 			if (Opponent.ZonePlay.Count == 0)
 				return null;
@@ -206,6 +257,19 @@ namespace Brimstone
 				minion[GameTag.ZONE_POSITION] = 0;
 				minion[GameTag.DAMAGE] = 0;
 			}
+		}
+
+		public new Game Clone() {
+			var g = new Game {
+				Player1 = (Player)Player1.Clone(),
+				Player2 = (Player)Player2.Clone()
+			};
+			// Yeah, fix this...
+			g.CurrentPlayer = g.Player1;
+			g.Opponent = g.Player2;
+			g.Player1.Game = g;
+			g.Player2.Game = g;
+			return g;
 		}
 	}
 
@@ -245,6 +309,32 @@ namespace Brimstone
 				fj.Play();
 			}
 			Console.WriteLine(game);
+
+			// Check that cloning works
+			var game2 = game.Clone();
+			Console.WriteLine(game2);
+
+			game.PowerHistory.Clear();
+
+			string gs1 = game.ToString();
+			string gs2 = game2.ToString();
+
+			System.Diagnostics.Debug.Assert(gs1.Equals(gs2));
+
+			game.Player1.ZoneHand[0][GameTag.ZONE_POSITION] = 12345;
+
+			gs1 = game.ToString();
+			gs2 = game2.ToString();
+
+			System.Diagnostics.Debug.Assert(!gs1.Equals(gs2));
+
+			Console.WriteLine("Entities to clone: " + (game.Player1.ZoneHand.Count + game.Player1.ZonePlay.Count + game.Player2.ZoneHand.Count + game.Player2.ZonePlay.Count + 3));
+			// Measure clonimg time
+			Stopwatch s = new Stopwatch();
+			s.Start();
+			for (int i = 0; i < 1000000; i++)
+				game.Clone();
+			Console.WriteLine(s.ElapsedMilliseconds + "ms, " + (s.ElapsedMilliseconds / 1000) + " clones/sec");
 		}
 	}
 }
