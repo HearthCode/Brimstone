@@ -73,7 +73,12 @@ namespace Brimstone
 		_COUNT = 3
 	}
 
-	class Tag
+	class PowerAction
+	{
+		public ActiveMinion Entity { get; set; }
+	}
+
+	class TagChange : PowerAction
 	{
 		public GameTag Key { get; set; }
 		public int? Value { get; set; }
@@ -94,7 +99,7 @@ namespace Brimstone
 			}
 			set {
 				Tags[t] = value;
-				Card.Game.PowerHistory.Add(new Tag { Key = t, Value = value });
+				Card.Game.PowerHistory.Add(new TagChange { Entity = this, Key = t, Value = value });
 			}
 		}
 
@@ -161,7 +166,7 @@ namespace Brimstone
 		public Player CurrentPlayer { get; set; }
 		public Player Opponent { get; set; }
 
-		public List<Tag> PowerHistory = new List<Tag>();
+		public List<PowerAction> PowerHistory = new List<PowerAction>();
 
 		public override string ToString() {
 			string s = "Board state: ";
