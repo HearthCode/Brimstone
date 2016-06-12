@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Brimstone
 {
-	class Program
+	class Brimstone
 	{
 		static void Main(string[] args) {
+			Console.WriteLine("Hello Hearthstone!");
 		}
 	}
 }
