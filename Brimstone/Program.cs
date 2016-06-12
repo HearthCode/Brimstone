@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Brimstone.Cards;
 using System.Diagnostics;
+using System.Linq;
+using System.IO;
 
 namespace Brimstone.Utils
 {
@@ -51,6 +53,21 @@ namespace Brimstone.Cards
 		}
 		public void OnDeath() {
 
+		}
+	}
+
+	class GVG_110t : IMinion
+	{
+		public Game Game { get; set; }
+		public string Id { get; } = "GVG_110t";
+		public string Name { get; } = "Boom Bot";
+		public int Health { get; set; } = 1;
+		public void OnPlay() {
+		}
+		public void OnDeath() {
+			var m = Game.RandomOpponentMinion();
+			if (m != null)
+				m.Damage(new Random().Next(1, 5));
 		}
 	}
 }
@@ -128,33 +145,39 @@ namespace Brimstone
 
 	class ActiveMinion : Entity
 	{
-		public void Play() {
+		public int Health { get; set; }
+
+		public ActiveMinion Play() {
+			Health = Card.Health;
 			Console.WriteLine("Player {0} is playing {1}", Card.Game.CurrentPlayer, Card.Name);
 			Card.Game.CurrentPlayer.ZoneHand.Remove(this);
 			Card.Game.CurrentPlayer.ZonePlay.Add(this);
 			this[GameTag.ZONE] = (int) Zone.PLAY;
 			this[GameTag.ZONE_POSITION] = Card.Game.CurrentPlayer.ZonePlay.Count;
 			Card.OnPlay();
+			return this;
 		}
 
 		public void Damage(int amount) {
-			Card.Health -= amount;
-			this[GameTag.DAMAGE] = 3 - Card.Health;
+			Console.WriteLine("{0} gets hit for {1} points of damage!", this, amount);
+			Health -= amount;
+			this[GameTag.DAMAGE] = Card.Health - Health;
 			Card.Game.CheckForDeath(this);
 		}
 
 		public override string ToString() {
-			string s = Card.Name + " (Health=" + Card.Health + ", ";
+			string s = Card.Name + " (Health=" + Health + ", ";
 			foreach (var tag in Tags) {
-				s += tag.Value + ", ";
+				s += tag.Key + ": " + tag.Value + ", ";
 			}
-			return s;
+			return s.Substring(0, s.Length - 2) + ")";
 		}
 
 		public new object Clone() {
 			// Cards will never change so we can just take pointers
 			var e = new ActiveMinion {
-				Card = Card
+				Card = Card,
+				Health = Health
 			};
 			// Tags should be copied (for now)
 			// This works because the dictionary only uses value types!
@@ -249,7 +272,7 @@ namespace Brimstone
 			return Opponent.ZonePlay[m];
 		}
 		public void CheckForDeath(ActiveMinion minion) {
-			if (minion.Card.Health <= 0) {
+			if (minion.Health <= 0) {
 				Console.WriteLine(minion + " dies!");
 				Opponent.ZonePlay.Remove(minion);
 				minion.Card.OnDeath();
@@ -269,6 +292,14 @@ namespace Brimstone
 			g.Opponent = g.Player2;
 			g.Player1.Game = g;
 			g.Player2.Game = g;
+			foreach (var e in g.Player1.ZoneHand)
+				e.Card.Game = g;
+			foreach (var e in g.Player2.ZoneHand)
+				e.Card.Game = g;
+			foreach (var e in g.Player1.ZonePlay)
+				e.Card.Game = g;
+			foreach (var e in g.Player2.ZonePlay)
+				e.Card.Game = g;
 			return g;
 		}
 	}
@@ -297,24 +328,56 @@ namespace Brimstone
 			Console.WriteLine(game);
 
 			// Fill the board with Flame Jugglers
-			for (int i = 0; i < MaxMinions; i++) {
+			for (int i = 0; i < MaxMinions - 2; i++) {
 				var fj = p1.Give(new AT_094());
 				fj.Play();
 			}
+
 			game.CurrentPlayer = p2;
 			game.Opponent = p1;
-			// Play way too many Flame Jugglers :-)
-			for (int i = 0; i < 100; i++) {
+
+			for (int i = 0; i < MaxMinions - 2; i++) {
 				var fj = p2.Give(new AT_094());
 				fj.Play();
 			}
-			Console.WriteLine(game);
+			// Throw in a couple of Boom Bots
+			p2.Give(new GVG_110t()).Play();
+			p2.Give(new GVG_110t()).Play();
+
+			game.CurrentPlayer = p1;
+			game.Opponent = p2;
+
+			p1.Give(new GVG_110t()).Play();
+			p1.Give(new GVG_110t()).Play();
+
+			// Set off the chain of events
+			var boardStates = new Dictionary<string, int>();
+
+			var cOut = Console.Out;
+			Console.SetOut(TextWriter.Null);
+
+			for (int i = 0; i < 100000; i++) {
+				var clonedGame = game.Clone();
+				var firstboombot = clonedGame.Player1.ZonePlay.First(t => t.Card.Id == "GVG_110t");
+				firstboombot.Damage(1);
+
+				var key = clonedGame.ToString();
+				if (!boardStates.ContainsKey(key))
+					boardStates.Add(key, 1);
+				else
+					boardStates[key]++;
+			}
+			Console.SetOut(cOut);
+			Console.WriteLine("{0} board states found", boardStates.Count);
+
 
 			// Check that cloning works
-			var game2 = game.Clone();
-			Console.WriteLine(game2);
 
+			var game2 = game.Clone();
 			game.PowerHistory.Clear();
+
+			Console.WriteLine(game);
+			Console.WriteLine(game2);
 
 			string gs1 = game.ToString();
 			string gs2 = game2.ToString();
@@ -332,9 +395,9 @@ namespace Brimstone
 			// Measure clonimg time
 			Stopwatch s = new Stopwatch();
 			s.Start();
-			for (int i = 0; i < 1000000; i++)
+			for (int i = 0; i < 100000; i++)
 				game.Clone();
-			Console.WriteLine(s.ElapsedMilliseconds + "ms, " + (s.ElapsedMilliseconds / 1000) + " clones/sec");
+			Console.WriteLine(s.ElapsedMilliseconds + "ms for 100,000 clones");
 		}
 	}
 }
