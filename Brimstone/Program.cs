@@ -75,7 +75,7 @@ namespace Brimstone
 
 	class PowerAction
 	{
-		public ActiveMinion Entity { get; set; }
+		public Entity Entity { get; set; }
 	}
 
 	class TagChange : PowerAction
@@ -88,10 +88,10 @@ namespace Brimstone
 		}
 	}
 
-	class ActiveMinion
+	class Entity
 	{
 		public IMinion Card { get; set; }
-		public Dictionary<GameTag, int?> Tags { get; } = new Dictionary<GameTag, int?>((int) GameTag._COUNT);
+		public Dictionary<GameTag, int?> Tags { get; } = new Dictionary<GameTag, int?>((int)GameTag._COUNT);
 
 		public int? this[GameTag t] {
 			get {
@@ -103,15 +103,18 @@ namespace Brimstone
 			}
 		}
 
-		public ActiveMinion() {
+		public Entity() {
 			// set all tags to zero to avoid having to check if keys exist
 			// worsens memory footprint to improve performance
 			var tags = Enum.GetValues(typeof(GameTag));
 
 			foreach (var tagValue in tags)
-				Tags.Add((GameTag) tagValue, null);
+				Tags.Add((GameTag)tagValue, null);
 		}
+	}
 
+	class ActiveMinion : Entity
+	{
 		public void Play() {
 			Console.WriteLine("Player {0} is playing {1}", Card.Game.CurrentPlayer, Card.Name);
 			Card.Game.CurrentPlayer.ZoneHand.Remove(this);
@@ -136,7 +139,7 @@ namespace Brimstone
 		}
 	}
 
-	class Player
+	class Player : Entity
 	{
 		public Game Game { get; set; }
 		public int Id { get; set; }
@@ -158,7 +161,7 @@ namespace Brimstone
 		}
 	}
 
-	class Game
+	class Game : Entity
 	{
 		private Random rng = new Random();
 		public Player Player1 { get; set; }
