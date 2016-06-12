@@ -44,7 +44,9 @@ namespace Brimstone.Cards
 		public string Name { get; } = "Flame Juggler";
 		public int Health { get; set; } = 3;
 		public void OnPlay() {
-			Game.RandomOpponentMinion().Damage(1);
+			var m = Game.RandomOpponentMinion();
+			if (m != null)
+				m.Damage(1);
 		}
 		public void OnDeath() {
 
@@ -59,26 +61,73 @@ namespace Brimstone
 		ZONE,
 		ZONE_POSITION,
 		ENTITY_ID,
+		DAMAGE,
+		_COUNT
+	}
+
+	enum Zone
+	{
+		PLAY = 1,
+		HAND = 3,
+		GRAVEYARD = 4,
+		_COUNT = 3
+	}
+
+	class Tag
+	{
+		public GameTag Key { get; set; }
+		public int? Value { get; set; }
+
+		public override string ToString() {
+			return "<" + Key.ToString() + ": " + Value + ">, ";
+		}
 	}
 
 	class ActiveMinion
 	{
 		public IMinion Card { get; set; }
-		public Dictionary<GameTag, int> Tags { get; } = new Dictionary<GameTag, int>();
+		public Dictionary<GameTag, int?> Tags { get; } = new Dictionary<GameTag, int?>((int) GameTag._COUNT);
+
+		public int? this[GameTag t] {
+			get {
+				return Tags[t];
+			}
+			set {
+				Tags[t] = value;
+				Card.Game.PowerHistory.Add(new Tag { Key = t, Value = value });
+			}
+		}
+
+		public ActiveMinion() {
+			// set all tags to zero to avoid having to check if keys exist
+			// worsens memory footprint to improve performance
+			var tags = Enum.GetValues(typeof(GameTag));
+
+			foreach (var tagValue in tags)
+				Tags.Add((GameTag) tagValue, null);
+		}
 
 		public void Play() {
 			Console.WriteLine("Player {0} is playing {1}", Card.Game.CurrentPlayer, Card.Name);
 			Card.Game.CurrentPlayer.ZoneHand.Remove(this);
 			Card.Game.CurrentPlayer.ZonePlay.Add(this);
+			this[GameTag.ZONE] = (int) Zone.PLAY;
+			this[GameTag.ZONE_POSITION] = Card.Game.CurrentPlayer.ZonePlay.Count;
 			Card.OnPlay();
 		}
 
 		public void Damage(int amount) {
 			Card.Health -= amount;
+			this[GameTag.DAMAGE] = 3 - Card.Health;
+			Card.Game.CheckForDeath(this);
 		}
 
 		public override string ToString() {
-			return Card.Name + " (Health=" + Card.Health + ")";
+			string s = Card.Name + " (Health=" + Card.Health + ", ";
+			foreach (var tag in Tags) {
+				s += tag.Value + ", ";
+			}
+			return s;
 		}
 	}
 
@@ -94,6 +143,8 @@ namespace Brimstone
 			card.Game = Game;
 			var minion = new ActiveMinion { Card = card };
 			ZoneHand.Add(minion);
+			minion[GameTag.ZONE] = (int) Zone.HAND;
+			minion[GameTag.ZONE_POSITION] = ZoneHand.Count + 1;
 			return minion;
 		}
 
@@ -110,6 +161,8 @@ namespace Brimstone
 		public Player CurrentPlayer { get; set; }
 		public Player Opponent { get; set; }
 
+		public List<Tag> PowerHistory = new List<Tag>();
+
 		public override string ToString() {
 			string s = "Board state: ";
 			var players = new List<Player> { Player1, Player2 };
@@ -124,12 +177,27 @@ namespace Brimstone
 					s += entity.ToString() + ", ";
 				}
 			}
+			s += "\nPower log: ";
+			foreach (var item in PowerHistory)
+				s += item + "\n";
 			return s;
 		}
 
 		public ActiveMinion RandomOpponentMinion() {
+			if (Opponent.ZonePlay.Count == 0)
+				return null;
 			var m = rng.Next(Opponent.ZonePlay.Count);
 			return Opponent.ZonePlay[m];
+		}
+		public void CheckForDeath(ActiveMinion minion) {
+			if (minion.Card.Health <= 0) {
+				Console.WriteLine(minion + " dies!");
+				Opponent.ZonePlay.Remove(minion);
+				minion.Card.OnDeath();
+				minion[GameTag.ZONE] = (int)Zone.GRAVEYARD;
+				minion[GameTag.ZONE_POSITION] = 0;
+				minion[GameTag.DAMAGE] = 0;
+			}
 		}
 	}
 
@@ -150,19 +218,24 @@ namespace Brimstone
 
 			// Put a Piloted Shredder and Flame Juggler in each player's hand
 			p1.Give(new GVG_096());
-			var p1_fj = p1.Give(new AT_094());
+			p1.Give(new AT_094());
 			p2.Give(new GVG_096());
-			var p2_fj = p2.Give(new AT_094());
+			p2.Give(new AT_094());
 
-			// Fill the board with Flame Jugglers leaving one slot each
-			for (int i = 0; i < MaxMinions - 1; i++) {
-				p1.ZonePlay.Add(new ActiveMinion { Card = new AT_094() });
-				p2.ZonePlay.Add(new ActiveMinion { Card = new AT_094() });
-			}
-
-			// Play player 1's flame juggler
 			Console.WriteLine(game);
-			p1_fj.Play();
+
+			// Fill the board with Flame Jugglers
+			for (int i = 0; i < MaxMinions; i++) {
+				var fj = p1.Give(new AT_094());
+				fj.Play();
+			}
+			game.CurrentPlayer = p2;
+			game.Opponent = p1;
+			// Play way too many Flame Jugglers :-)
+			for (int i = 0; i < 100; i++) {
+				var fj = p2.Give(new AT_094());
+				fj.Play();
+			}
 			Console.WriteLine(game);
 		}
 	}
