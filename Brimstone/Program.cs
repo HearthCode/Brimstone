@@ -1,85 +1,249 @@
 ﻿using System;
 using System.Collections.Generic;
-using Brimstone.Cards;
 using System.Diagnostics;
 using System.Linq;
 using System.IO;
 
-namespace Brimstone.Utils
-{
-}
-
-namespace Brimstone.Cards
-{
-	interface ICard
-	{
-		string Id { get; }
-		string Name { get; }
-	}
-
-	interface IMinion : ICard
-	{
-		Game Game { get; set; }
-		int Health { get; set; }
-		void OnPlay();
-		void OnDeath();
-	}
-
-	class GVG_096 : IMinion
-	{
-		public Game Game { get; set; }
-		public string Id { get; } = "GVG_096";
-		public string Name { get; } = "Piloted Shredder";
-		public int Health { get; set; } = 3;
-
-		public void OnPlay() {
-
-		}
-		public void OnDeath() {
-
-		}
-	}
-
-	class AT_094 : IMinion
-	{
-		public Game Game { get; set; }
-		public string Id { get; } = "AT_094";
-		public string Name { get; } = "Flame Juggler";
-		public int Health { get; set; } = 3;
-		public void OnPlay() {
-			var m = Game.RandomOpponentMinion();
-			if (m != null)
-				m.Damage(1);
-		}
-		public void OnDeath() {
-
-		}
-	}
-
-	class GVG_110t : IMinion
-	{
-		public Game Game { get; set; }
-		public string Id { get; } = "GVG_110t";
-		public string Name { get; } = "Boom Bot";
-		public int Health { get; set; } = 1;
-		public void OnPlay() {
-		}
-		public void OnDeath() {
-			var m = Game.RandomOpponentMinion();
-			if (m != null)
-				m.Damage(new Random().Next(1, 5));
-		}
-	}
-}
-
 namespace Brimstone
 {
+	static class RNG
+	{
+		private static Random random = new Random();
+
+		public static int Between(int min, int max) {
+			return random.Next(min, max + 1);
+		}
+	}
+
+	class Card {
+		public virtual string Id { get; set; }
+		public virtual string Name { get; set; }
+		public virtual Dictionary<GameTag, int> Tags { get; set; }
+		public virtual Behaviour Behaviour { get; set; }
+
+		public int? this[GameTag t] {
+			get {
+				// Use TryGetValue for safety
+				return Tags[t];
+			}
+		}
+	}
+
+	abstract class QueueAction {
+		public Game Game { get; set; }
+		public List<ActionGraph> Args { get; } = new List<ActionGraph>();
+		public abstract ActionResult Run(List<ActionResult> args);
+
+		public override string ToString() {
+			return "[ACTION: " + this.GetType().Name + "]";
+		}
+	}
+
+	struct ActionResult {
+		private bool hasValue;
+		private bool hasBoolValue;
+		private bool hasIntValue;
+		private bool hasEntityValue;
+
+		private bool boolValue;
+		private int intValue;
+		private Entity entityValue;
+
+		public bool HasResult { get { return hasValue; } }
+
+		public static implicit operator ActionResult(int x) {
+			return new ActionResult { hasValue = true, hasIntValue = true, intValue = x };
+		}
+		public static implicit operator ActionResult(bool x) {
+			return new ActionResult { hasValue = true, hasBoolValue = true, boolValue = x };
+		}
+		public static implicit operator ActionResult(Entity x) {
+			return new ActionResult { hasValue = true, hasEntityValue = true, entityValue = x };
+		}
+		public static implicit operator int(ActionResult a) {
+			return a.intValue;
+		}
+		public static implicit operator bool(ActionResult a) {
+			return a.boolValue;
+		}
+		public static implicit operator Entity(ActionResult a) {
+			return a.entityValue;
+		}
+		public static bool operator ==(ActionResult x, ActionResult y) {
+			if (ReferenceEquals(x, y))
+				return true;
+			// Also deals with one-sided null comparisons since it will use struct value type defaults
+			return (x.boolValue == y.boolValue && x.intValue == y.intValue && x.entityValue == y.entityValue);
+		}
+		public static bool operator !=(ActionResult x, ActionResult y) {
+			return !(x == y);
+		}
+
+		public override bool Equals(object o) {
+			try {
+				return (bool)(this == (ActionResult)o);
+			}
+			catch {
+				return false;
+			}
+		}
+
+		public override int GetHashCode() {
+			return ToString().GetHashCode();
+		}
+
+		public static ActionResult None = new ActionResult();
+
+		public override string ToString() {
+			if (!hasValue)
+				return "<none>";
+			else if (hasIntValue)
+				return "<int: " + intValue + ">";
+			else if (hasBoolValue)
+				return "<bool: " + boolValue.ToString() + ">";
+			else if (hasEntityValue)
+				return "<Entity: " + entityValue + ">";
+			else
+				return "<unknown>";
+		}
+	}
+
+	class ActionGraph
+	{
+		private List<QueueAction> graph = new List<QueueAction>();
+
+		public ActionGraph(QueueAction q) {
+			graph.Add(q);
+		}
+
+		// Convert single QueueAction to ActionGraph
+		public static implicit operator ActionGraph(QueueAction q) {
+			return new ActionGraph(q);
+		}
+
+		public ActionGraph Then(ActionGraph act) {
+			graph.AddRange(act.graph);
+			return this;
+		}
+
+		// Convert ints to actions
+		public static implicit operator ActionGraph(int x) {
+			return new FixedNumber { Num = x };
+		}
+
+		// Add the graph to the game's action queue
+		public void Queue(Game game) {
+			foreach (var action in graph) {
+				foreach (var arg in action.Args)
+					arg.Queue(game);
+				game.ActionQueue.Enqueue(action);
+				action.Game = game;
+			}
+		}
+	}
+
+	class FixedNumber : QueueAction
+	{
+		public int Num { get; set; }
+
+		public override ActionResult Run(List<ActionResult> args) {
+			return Num;
+		}
+	}
+
+	class RandomOpponentMinion : QueueAction {
+		public override ActionResult Run(List<ActionResult> args) {
+			if (Game.Opponent.ZonePlay.Count == 0)
+				return ActionResult.None;
+			var m = new Random().Next(Game.Opponent.ZonePlay.Count);
+			return Game.Opponent.ZonePlay[m];
+		}
+	}
+
+	class RandomAmount : QueueAction
+	{
+		public override ActionResult Run(List<ActionResult> args) {
+			return RNG.Between(args[0], args[1]);
+		}
+	}
+
+	class Damage : QueueAction
+	{
+		private const int TARGET = 0;
+		private const int DAMAGE = 1;
+
+		public override ActionResult Run(List<ActionResult> args) {
+			if (args[TARGET] != null)
+				((Minion) args[TARGET]).Damage(args[DAMAGE]);
+			return ActionResult.None;
+		}
+	}
+
+	class Behaviour {
+		// Defaulting to null for unimplemented cards or actions
+		public ActionGraph Play;
+		public ActionGraph Death;
+	}
+
+	partial class CardBehaviour {
+		// Factory functions for DSL syntax
+		public static ActionGraph RandomOpponentMinion { get { return new RandomOpponentMinion(); } }
+		public static ActionGraph RandomAmount(ActionGraph min, ActionGraph max) { return new RandomAmount { Args = { min, max } }; }
+		public static ActionGraph Damage(ActionGraph target, ActionGraph amount) { return new Damage { Args = { target, amount } }; }
+	}
+
+	partial class CardBehaviour
+	{
+		// Flame Juggler
+		public static Behaviour AT_094 = new Behaviour {
+			Play = Damage(RandomOpponentMinion, 1)
+		};
+
+		// Boom Bot
+		public static Behaviour GVG_110t = new Behaviour {
+			Death = Damage(RandomOpponentMinion, RandomAmount(1, 4))
+		};
+	}
+
+	// Let's pretend this crap is XML or whatever
+	class GVG_096 : Card
+	{
+		public override string Id { get; set; } = "GVG_096";
+		public override string Name { get; set; } = "Piloted Shredder";
+		public override Dictionary<GameTag, int> Tags { get; set; } = new Dictionary<GameTag, int> {
+			{ GameTag.CARDTYPE, (int) CardType.MINION },
+			{ GameTag.HEALTH, 3 }
+		};
+	}
+
+	class AT_094 : Card
+	{
+		public override string Id { get; set; } = "AT_094";
+		public override string Name { get; set; } = "Flame Juggler";
+		public override Dictionary<GameTag, int> Tags { get; set; } = new Dictionary<GameTag, int> {
+			{ GameTag.CARDTYPE, (int) CardType.MINION },
+			{ GameTag.HEALTH, 3 }
+		};
+	}
+
+	class GVG_110t : Card
+	{
+		public override string Id { get; set; } = "GVG_110t";
+		public override string Name { get; set; } = "Boom Bot";
+		public override Dictionary<GameTag, int> Tags { get; set; } = new Dictionary<GameTag, int> {
+			{ GameTag.CARDTYPE, (int) CardType.MINION },
+			{ GameTag.HEALTH, 1 }
+		};
+	}
+
 	enum GameTag
 	{
 		ZONE,
 		ZONE_POSITION,
 		ENTITY_ID,
 		DAMAGE,
+		HEALTH,
+		CARDTYPE,
 		_COUNT
 	}
 
@@ -89,6 +253,15 @@ namespace Brimstone
 		HAND = 3,
 		GRAVEYARD = 4,
 		_COUNT = 3
+	}
+
+	enum CardType
+	{
+		GAME = 1,
+		PLAYER = 2,
+		HERO = 3,
+		MINION = 4,
+		SPELL = 5,
 	}
 
 	class PowerAction
@@ -106,9 +279,15 @@ namespace Brimstone
 		}
 	}
 
-	class Entity : ICloneable
+	interface IEntity
 	{
-		public IMinion Card { get; set; }
+		IEntity Play();
+	}
+
+	class Entity : IEntity, ICloneable
+	{
+		public Game Game { get; set; } = null;
+		public Card Card { get; set; }
 		public Dictionary<GameTag, int?> Tags { get; protected set; } = new Dictionary<GameTag, int?>((int)GameTag._COUNT);
 
 		public int? this[GameTag t] {
@@ -118,7 +297,7 @@ namespace Brimstone
 			}
 			set {
 				Tags[t] = value;
-				Card.Game.PowerHistory.Add(new TagChange { Entity = this, Key = t, Value = value });
+				Game.PowerHistory.Add(new TagChange { Entity = this, Key = t, Value = value });
 			}
 		}
 
@@ -130,6 +309,8 @@ namespace Brimstone
 			//foreach (var tagValue in tags)
 				//Tags.Add((GameTag)tagValue, null);
 		}
+
+		public virtual IEntity Play() { return this; }
 
 		public object Clone() {
 			// Cards will never change so we can just take pointers
@@ -143,26 +324,37 @@ namespace Brimstone
 		}
 	}
 
-	class ActiveMinion : Entity
+	class Minion : Entity
 	{
 		public int Health { get; set; }
 
-		public ActiveMinion Play() {
-			Health = Card.Health;
-			Console.WriteLine("Player {0} is playing {1}", Card.Game.CurrentPlayer, Card.Name);
-			Card.Game.CurrentPlayer.ZoneHand.Remove(this);
-			Card.Game.CurrentPlayer.ZonePlay.Add(this);
-			this[GameTag.ZONE] = (int) Zone.PLAY;
-			this[GameTag.ZONE_POSITION] = Card.Game.CurrentPlayer.ZonePlay.Count;
-			Card.OnPlay();
+		public override IEntity Play() {
+			Health = (int)Card[GameTag.HEALTH];
+			Console.WriteLine("Player {0} is playing {1}", Game.CurrentPlayer, Card.Name);
+			Game.CurrentPlayer.ZoneHand.Remove(this);
+			Game.CurrentPlayer.ZonePlay.Add(this);
+			this[GameTag.ZONE] = (int)Zone.PLAY;
+			this[GameTag.ZONE_POSITION] = Game.CurrentPlayer.ZonePlay.Count;
+			Game.Enqueue(Card.Behaviour.Play);
 			return this;
 		}
 
 		public void Damage(int amount) {
 			Console.WriteLine("{0} gets hit for {1} points of damage!", this, amount);
 			Health -= amount;
-			this[GameTag.DAMAGE] = Card.Health - Health;
-			Card.Game.CheckForDeath(this);
+			this[GameTag.DAMAGE] = Card[GameTag.HEALTH] - Health;
+			CheckForDeath();
+		}
+
+		public void CheckForDeath() {
+			if (Health <= 0) {
+				Console.WriteLine(this + " dies!");
+				Game.Opponent.ZonePlay.Remove(this);
+				Game.Enqueue(Card.Behaviour.Death);
+				this[GameTag.ZONE] = (int)Zone.GRAVEYARD;
+				this[GameTag.ZONE_POSITION] = 0;
+				this[GameTag.DAMAGE] = 0;
+			}
 		}
 
 		public override string ToString() {
@@ -175,7 +367,7 @@ namespace Brimstone
 
 		public new object Clone() {
 			// Cards will never change so we can just take pointers
-			var e = new ActiveMinion {
+			var e = new Minion {
 				Card = Card,
 				Health = Health
 			};
@@ -188,54 +380,54 @@ namespace Brimstone
 
 	class Player : Entity
 	{
-		public Game Game { get; set; }
-		public int Id { get; set; }
 		public int Health { get; private set; } = 30;
-		public List<ActiveMinion> ZoneHand { get; } = new List<ActiveMinion>();
-		public List<ActiveMinion> ZonePlay { get; } = new List<ActiveMinion>();
+		public List<Minion> ZoneHand { get; } = new List<Minion>();
+		public List<Minion> ZonePlay { get; } = new List<Minion>();
 		
-		public ActiveMinion Give(IMinion card) {
-			card.Game = Game;
-			var minion = new ActiveMinion { Card = card };
-			ZoneHand.Add(minion);
-			minion[GameTag.ZONE] = (int) Zone.HAND;
-			minion[GameTag.ZONE_POSITION] = ZoneHand.Count + 1;
-			return minion;
+		public Entity Give(Card card) {
+			if (card[GameTag.CARDTYPE] == (int) CardType.MINION) {
+				var minion = new Minion { Card = card, Game = Game };
+				ZoneHand.Add(minion);
+				minion[GameTag.ZONE] = (int)Zone.HAND;
+				minion[GameTag.ZONE_POSITION] = ZoneHand.Count + 1;
+				return minion;
+			}
+			return null;
 		}
 
 		public override string ToString() {
-			return Id.ToString();
+			return Card.Id;
 		}
 
 		public new object Clone() {
 			var p = new Player {
-				Game = Game,
-				Id = Id,
+				Card = Card,
 				Health = Health
 			};
 			foreach (var e in ZoneHand)
-				p.ZoneHand.Add((ActiveMinion) e.Clone());
+				p.ZoneHand.Add(e.Clone() as Minion);
 			foreach (var e in ZonePlay)
-				p.ZonePlay.Add((ActiveMinion) e.Clone());
+				p.ZonePlay.Add(e.Clone() as Minion);
 			return p;
 		}
 	}
 
-	class Game : Entity, ICloneable
+	class Game : Entity
 	{
-		private Random rng = new Random();
 		public Player Player1 { get; set; }
 		public Player Player2 { get; set; }
 		public Player CurrentPlayer { get; set; }
 		public Player Opponent { get; set; }
 
 		public List<PowerAction> PowerHistory = new List<PowerAction>();
+		public Queue<QueueAction> ActionQueue = new Queue<QueueAction>();
+		public Stack<ActionResult> ActionResultStack = new Stack<ActionResult>();
 
 		public override string ToString() {
 			string s = "Board state: ";
 			var players = new List<Player> { Player1, Player2 };
 			foreach (var player in players) {
-				s += "Player " + player.Id + " - ";
+				s += "Player " + player.Card.Id + " - ";
 				s += "HAND: ";
 				foreach (var entity in player.ZoneHand) {
 					s += entity.ToString() + ", ";
@@ -250,35 +442,38 @@ namespace Brimstone
 				s += item + "\n";
 			return s;
 		}
-
-		public IEnumerable<Entity> Entities() {
-			yield return this;
-			yield return Player1;
-			yield return Player2;
-			foreach (var e in Player1.ZoneHand)
-				yield return e;
-			foreach (var e in Player1.ZonePlay)
-				yield return e;
-			foreach (var e in Player2.ZoneHand)
-				yield return e;
-			foreach (var e in Player2.ZonePlay)
-				yield return e;
+		
+		public void Enqueue(ActionGraph g) {
+			// Don't queue unimplemented cards
+			if (g != null)
+				g.Queue(this);
 		}
 
-		public ActiveMinion RandomOpponentMinion() {
-			if (Opponent.ZonePlay.Count == 0)
-				return null;
-			var m = rng.Next(Opponent.ZonePlay.Count);
-			return Opponent.ZonePlay[m];
+		public void ResolveQueue() {
+			while (ActionQueue.Count > 0) {
+				var action = ActionQueue.Dequeue();
+				Console.WriteLine(action);
+				var args = new List<ActionResult>();
+				for (int i = 0; i < action.Args.Count; i++)
+					args.Add(ActionResultStack.Pop());
+				args.Reverse();
+				ActionResultStack.Push(action.Run(args));
+			}
 		}
-		public void CheckForDeath(ActiveMinion minion) {
-			if (minion.Health <= 0) {
-				Console.WriteLine(minion + " dies!");
-				Opponent.ZonePlay.Remove(minion);
-				minion.Card.OnDeath();
-				minion[GameTag.ZONE] = (int)Zone.GRAVEYARD;
-				minion[GameTag.ZONE_POSITION] = 0;
-				minion[GameTag.DAMAGE] = 0;
+
+		public IEnumerable<Entity> Entities {
+			get {
+				yield return this;
+				yield return Player1;
+				yield return Player2;
+				foreach (var e in Player1.ZoneHand)
+					yield return e;
+				foreach (var e in Player1.ZonePlay)
+					yield return e;
+				foreach (var e in Player2.ZoneHand)
+					yield return e;
+				foreach (var e in Player2.ZonePlay)
+					yield return e;
 			}
 		}
 
@@ -290,67 +485,94 @@ namespace Brimstone
 			// Yeah, fix this...
 			g.CurrentPlayer = g.Player1;
 			g.Opponent = g.Player2;
-			g.Player1.Game = g;
-			g.Player2.Game = g;
-			foreach (var e in g.Player1.ZoneHand)
-				e.Card.Game = g;
-			foreach (var e in g.Player2.ZoneHand)
-				e.Card.Game = g;
-			foreach (var e in g.Player1.ZonePlay)
-				e.Card.Game = g;
-			foreach (var e in g.Player2.ZonePlay)
-				e.Card.Game = g;
+			foreach (var entity in g.Entities) {
+				entity.Game = g;
+			}
 			return g;
+		}
+	}
+
+	class CardDefs
+	{
+		public Dictionary<string, Card> Cards = new Dictionary<string, Card>();
+
+		public Card this[string cardId] {
+			get {
+				return Cards[cardId];
+			}
+		}
+
+		public Card ByName(string cardName) {
+			return Cards.First(x => x.Value.Name == cardName).Value;
+		}
+
+		public CardDefs() {
+			// Build the card definitions from the 'XML' and the behaviour scripts
+			// These will never be modified once created
+			Cards = new Dictionary<string, Card> {
+				{ "GVG_096", new GVG_096() },
+				{ "AT_094", new AT_094 { Behaviour = CardBehaviour.AT_094 } },
+				{ "GVG_110t", new GVG_110t { Behaviour = CardBehaviour.GVG_110t } },
+				{ "Player", new Card { Id = "Player", Name = "Player" } }
+			};
 		}
 	}
 
 	class Brimstone
 	{
+		public static CardDefs Cards = new CardDefs();
+
 		public const int MaxMinions = 7;
 
 		static void Main(string[] args) {
 			Console.WriteLine("Hello Hearthstone!");
 
 			var game = new Game();
-			game.Player1 = new Player { Game = game, Id = 1 };
-			game.Player2 = new Player { Game = game, Id = 2 };
+			game.Player1 = new Player { Game = game, Card = Cards["Player"] };
+			game.Player2 = new Player { Game = game, Card = Cards["Player"] };
 			var p1 = game.Player1;
 			var p2 = game.Player2;
 			game.CurrentPlayer = p1;
 			game.Opponent = p2;
 
 			// Put a Piloted Shredder and Flame Juggler in each player's hand
-			p1.Give(new GVG_096());
-			p1.Give(new AT_094());
-			p2.Give(new GVG_096());
-			p2.Give(new AT_094());
+			p1.Give(Cards.ByName("Piloted Shredder"));
+			p1.Give(Cards.ByName("Flame Juggler"));
+			p2.Give(Cards.ByName("Piloted Shredder"));
+			p2.Give(Cards.ByName("Flame Juggler"));
 
 			Console.WriteLine(game);
 
 			// Fill the board with Flame Jugglers
 			for (int i = 0; i < MaxMinions - 2; i++) {
-				var fj = p1.Give(new AT_094());
+				var fj = p1.Give(Cards.ByName("Flame Juggler"));
 				fj.Play();
+				game.ResolveQueue();
 			}
 
 			game.CurrentPlayer = p2;
 			game.Opponent = p1;
 
 			for (int i = 0; i < MaxMinions - 2; i++) {
-				var fj = p2.Give(new AT_094());
+				var fj = p2.Give(Cards.ByName("Flame Juggler"));
 				fj.Play();
+				game.ResolveQueue();
 			}
 			// Throw in a couple of Boom Bots
-			p2.Give(new GVG_110t()).Play();
-			p2.Give(new GVG_110t()).Play();
+			p2.Give(Cards.ByName("Boom Bot")).Play();
+			game.ResolveQueue();
+			p2.Give(Cards.ByName("Boom Bot")).Play();
+			game.ResolveQueue();
 
 			game.CurrentPlayer = p1;
 			game.Opponent = p2;
 
-			p1.Give(new GVG_110t()).Play();
-			p1.Give(new GVG_110t()).Play();
+			p1.Give(Cards.ByName("Boom Bot")).Play();
+			game.ResolveQueue();
+			p1.Give(Cards.ByName("Boom Bot")).Play();
+			game.ResolveQueue();
 
-			// Set off the chain of events
+			// Set off the chain of eventsy
 			var boardStates = new Dictionary<string, int>();
 
 			var cOut = Console.Out;
@@ -360,6 +582,7 @@ namespace Brimstone
 				var clonedGame = game.Clone();
 				var firstboombot = clonedGame.Player1.ZonePlay.First(t => t.Card.Id == "GVG_110t");
 				firstboombot.Damage(1);
+				clonedGame.ResolveQueue();
 
 				var key = clonedGame.ToString();
 				if (!boardStates.ContainsKey(key))
