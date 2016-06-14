@@ -33,7 +33,6 @@ namespace BrimstoneVisualizer
 			for (int i = 0; i < MaxMinions; i++) {
 				var fj = p1.Give(Cards.FindByName("Flame Juggler"));
 				fj.Play();
-				game.ActionQueue.Process();
 			}
 
 			game.CurrentPlayer = p2;
@@ -42,7 +41,6 @@ namespace BrimstoneVisualizer
 			for (int i = 0; i < MaxMinions; i++) {
 				var fj = p2.Give(Cards.FindByName("Flame Juggler"));
 				fj.Play();
-				game.ActionQueue.Process();
 			}
 
 			string ph = string.Empty;
