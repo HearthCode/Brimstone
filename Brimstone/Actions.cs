@@ -98,7 +98,7 @@ namespace Brimstone
 			Player player = (Player)args[PLAYER];
 			IMinion entity = (IMinion) (BaseEntity) args[ENTITY];
 
-			entity.Health = (int)entity.Card[GameTag.HEALTH];
+			entity[GameTag.HEALTH] = entity.Card[GameTag.HEALTH];
 			player.ZoneHand.Remove(entity);
 			player.ZonePlay.Add(entity);
 			entity[GameTag.ZONE] = (int)Zone.PLAY;
@@ -122,8 +122,8 @@ namespace Brimstone
 				foreach (Minion e in args[TARGETS]) {
 					Console.WriteLine("{0} is getting hit for {1} points of damage", e, args[DAMAGE]);
 
-					e.Health -= args[DAMAGE];
-					e[GameTag.DAMAGE] = e.Card[GameTag.HEALTH] - e.Health;
+					e[GameTag.HEALTH]-= args[DAMAGE];
+					e[GameTag.DAMAGE] = e.Card[GameTag.HEALTH] - e[GameTag.HEALTH];
 					e.CheckForDeath();
 				}
 			return ActionResult.None;

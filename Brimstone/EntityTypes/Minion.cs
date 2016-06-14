@@ -5,12 +5,10 @@ namespace Brimstone
 {
 	public class Minion : BaseEntity, IMinion
 	{
-		public int Health { get; set; }
-
-		public Minion(Minion cloneFrom) : base(cloneFrom) {
-			Health = cloneFrom.Health;
+		public Minion(Minion cloneFrom) : base(cloneFrom) { }
+		public Minion(Game game, Card card, Dictionary<GameTag, int?> tags = null) : base(game, card, tags) {
+			this[GameTag.HEALTH] = card[GameTag.HEALTH];
 		}
-		public Minion(Game game, Card card, Dictionary<GameTag, int?> tags = null) : base(game, card, tags) { }
 
 		public IPlayable Play() {
 			// TODO: Might not be CurrentPlayer
@@ -24,7 +22,7 @@ namespace Brimstone
 		}
 
 		public void CheckForDeath() {
-			if (Health <= 0) {
+			if (this[GameTag.HEALTH] <= 0) {
 				Console.WriteLine(this + " dies!");
 				Game.Opponent.ZonePlay.Remove(this);
 				Game.ActionQueue.Enqueue(Card.Behaviour.Deathrattle);
@@ -36,7 +34,7 @@ namespace Brimstone
 		}
 
 		public override string ToString() {
-			string s = Card.Name + " (Health=" + Health + ", ";
+			string s = Card.Name + " (Health=" + Tags[GameTag.HEALTH] + ", ";
 			foreach (var tag in Tags) {
 				s += tag.Key + ": " + tag.Value + ", ";
 			}
