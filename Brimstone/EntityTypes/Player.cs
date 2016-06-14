@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Brimstone
 {
 	public class Player : Entity
 	{
+		public string FriendlyName { get; set; }
 		public int Health { get; private set; } = 30;
 		public List<IPlayable> ZoneHand { get; private set; } = new List<IPlayable>();
 		public List<IMinion> ZonePlay { get; private set; } = new List<IMinion>();
@@ -21,18 +23,14 @@ namespace Brimstone
 		public Player(Game game, Dictionary<GameTag, int?> tags = null) : base(game, Cards.Find["Player"], tags) { }
 
 		public IPlayable Give(Card card) {
-			if (card[GameTag.CARDTYPE] == (int)CardType.MINION) {
-				var minion = new Minion(Game, card);
-				ZoneHand.Add(minion);
-				minion[GameTag.ZONE] = (int)Zone.HAND;
-				minion[GameTag.ZONE_POSITION] = ZoneHand.Count + 1;
-				return minion;
-			}
-			return null;
+			Console.WriteLine("Giving {0} to {1}", card, this);
+
+			Game.ActionQueue.Enqueue(CardBehaviour.Give(this, card));
+			return (IPlayable)(Entity)Game.ActionQueue.Process()[0];
 		}
 
 		public override string ToString() {
-			return Card.Id;
+			return FriendlyName;
 		}
 
 		public override object Clone() {

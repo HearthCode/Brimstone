@@ -15,5 +15,9 @@ namespace Brimstone
 				return Tags[t];
 			}
 		}
+
+		public override string ToString() {
+			return "[CARD: " + Name + "]";
+		}
 	}
 }

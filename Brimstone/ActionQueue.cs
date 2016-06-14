@@ -22,7 +22,7 @@ namespace Brimstone
 				g.Queue(this);
 		}
 
-		public void Process() {
+		public List<ActionResult> Process() {
 			while (Queue.Count > 0) {
 				var action = Queue.Dequeue();
 				Console.WriteLine(action);
@@ -34,6 +34,10 @@ namespace Brimstone
 				if (result.HasResult)
 					ResultStack.Push(result);
 			}
+			// Return whatever is left on the stack
+			var stack = new List<ActionResult>(ResultStack);
+			ResultStack.Clear();
+			return stack;
 		}
 	}
 }

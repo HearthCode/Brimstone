@@ -15,8 +15,8 @@ namespace Test1
 			Console.WriteLine("Hello Hearthstone!");
 
 			var game = new Game(PowerHistory: true);
-			game.Player1 = new Player(game);
-			game.Player2 = new Player(game);
+			game.Player1 = new Player(game) { FriendlyName = "Player 1" };
+			game.Player2 = new Player(game) { FriendlyName = "Player 2" };
 			var p1 = game.Player1;
 			var p2 = game.Player2;
 			game.CurrentPlayer = p1;
@@ -34,7 +34,6 @@ namespace Test1
 			for (int i = 0; i < MaxMinions - 2; i++) {
 				var fj = p1.Give(Cards.FindByName("Flame Juggler"));
 				fj.Play();
-				game.ActionQueue.Process();
 			}
 
 			game.CurrentPlayer = p2;
@@ -43,21 +42,16 @@ namespace Test1
 			for (int i = 0; i < MaxMinions - 2; i++) {
 				var fj = p2.Give(Cards.FindByName("Flame Juggler"));
 				fj.Play();
-				game.ActionQueue.Process();
 			}
 			// Throw in a couple of Boom Bots
 			p2.Give(Cards.FindByName("Boom Bot")).Play();
-			game.ActionQueue.Process();
 			p2.Give(Cards.FindByName("Boom Bot")).Play();
-			game.ActionQueue.Process();
 
 			game.CurrentPlayer = p1;
 			game.Opponent = p2;
 
 			p1.Give(Cards.FindByName("Boom Bot")).Play();
-			game.ActionQueue.Process();
 			p1.Give(Cards.FindByName("Boom Bot")).Play();
-			game.ActionQueue.Process();
 
 			// Set off the chain of eventsy
 			var boardStates = new Dictionary<string, int>();
@@ -69,7 +63,6 @@ namespace Test1
 				var clonedGame = game.Clone() as Game;
 				var firstboombot = clonedGame.Player1.ZonePlay.First(t => t.Card.Id == "GVG_110t");
 				firstboombot.Damage(1);
-				clonedGame.ActionQueue.Process();
 
 				var key = clonedGame.ToString();
 				if (!boardStates.ContainsKey(key))

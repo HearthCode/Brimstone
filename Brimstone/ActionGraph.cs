@@ -20,9 +20,15 @@ namespace Brimstone
 			return this;
 		}
 
-		// Convert ints to actions
+		// Convert values to actions
 		public static implicit operator ActionGraph(int x) {
-			return new FixedNumber { Num = x };
+			return new LazyNumber { Num = x };
+		}
+		public static implicit operator ActionGraph(Card x) {
+			return new LazyCard { Card = x };
+		}
+		public static implicit operator ActionGraph(Entity x) {
+			return new LazyEntity { Entity = x };
 		}
 
 		// Add the graph to the game's action queue

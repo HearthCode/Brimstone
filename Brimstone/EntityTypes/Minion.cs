@@ -14,12 +14,13 @@ namespace Brimstone
 
 		public IPlayable Play() {
 			Health = (int)Card[GameTag.HEALTH];
-			Console.WriteLine("Player {0} is playing {1}", Game.CurrentPlayer, Card.Name);
+			Console.WriteLine("{0} is playing {1}", Game.CurrentPlayer, Card.Name);
 			Game.CurrentPlayer.ZoneHand.Remove(this);
 			Game.CurrentPlayer.ZonePlay.Add(this);
 			this[GameTag.ZONE] = (int)Zone.PLAY;
 			this[GameTag.ZONE_POSITION] = Game.CurrentPlayer.ZonePlay.Count;
 			Game.ActionQueue.Enqueue(Card.Behaviour.Battlecry);
+			Game.ActionQueue.Process();
 			return this;
 		}
 
@@ -35,6 +36,7 @@ namespace Brimstone
 				Console.WriteLine(this + " dies!");
 				Game.Opponent.ZonePlay.Remove(this);
 				Game.ActionQueue.Enqueue(Card.Behaviour.Deathrattle);
+				Game.ActionQueue.Process();
 				this[GameTag.ZONE] = (int)Zone.GRAVEYARD;
 				this[GameTag.ZONE_POSITION] = 0;
 				this[GameTag.DAMAGE] = 0;
