@@ -27,6 +27,8 @@ namespace Brimstone
 			foreach (var e in Entities)
 				e.Game = this;
 			// NOTE: Don't clone PowerHistory!
+			ActionQueue.Queue = new Queue<QueueAction>(cloneFrom.ActionQueue.Queue);
+			ActionQueue.ResultStack = new Stack<ActionResult>(cloneFrom.ActionQueue.ResultStack);
 			ActionQueue.Attach(this);
 		}
 

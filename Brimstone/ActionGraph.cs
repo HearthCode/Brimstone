@@ -36,7 +36,7 @@ namespace Brimstone
 			foreach (var action in graph) {
 				foreach (var arg in action.Args)
 					arg.Queue(queue);
-				queue.Queue.Enqueue(action);
+				queue.EnqueueSingleAction(action);
 			}
 		}
 	}

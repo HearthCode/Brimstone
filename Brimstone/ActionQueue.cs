@@ -24,6 +24,8 @@ namespace Brimstone
 		public Stack<ActionResult> ResultStack = new Stack<ActionResult>();
 		public bool Paused { get; set; }
 
+		public event EventHandler<QueueActionEventArgs> OnQueueing;
+		public event EventHandler<QueueActionEventArgs> OnQueued;
 		public event EventHandler<QueueActionEventArgs> OnActionStarting;
 		public event EventHandler<QueueActionEventArgs> OnAction;
 
@@ -34,7 +36,34 @@ namespace Brimstone
 		public void Enqueue(ActionGraph g) {
 			// Don't queue unimplemented cards
 			if (g != null)
+				// Unravel the graph into a list of actions
 				g.Queue(this);
+		}
+
+		public void EnqueueSingleAction(QueueAction a) {
+			if (OnQueueing != null)
+				OnQueueing(this, new QueueActionEventArgs(Game, a));
+
+			Queue.Enqueue(a);
+
+			if (OnQueued != null)
+				OnQueued(this, new QueueActionEventArgs(Game, a));
+		}
+
+		public void ReplaceArg(ActionResult newArg) {
+			ReplaceArgs(new List<ActionResult> { newArg });
+		}
+
+		public void ReplaceArgs(List<ActionResult> newArgs) {
+			for (int i = 0; i < newArgs.Count; i++)
+				ResultStack.Pop();
+			foreach (var a in newArgs)
+				ResultStack.Push(a); ;
+		}
+
+		public void ReplaceAction(QueueAction a) {
+			Queue.Dequeue();
+			Enqueue(a);
 		}
 
 		public List<ActionResult> Process() {

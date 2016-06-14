@@ -25,12 +25,18 @@ namespace Test1
 			game.ActionQueue.OnActionStarting += (o, e) => {
 				ActionQueue queue = o as ActionQueue;
 				if (e.Action is Damage) {
-					Console.Write("DAMAGE INTERCEPTED: " + e.Action);
-					Console.WriteLine();
-					/*int oldDamage = queue.ResultStack.Pop();
-					Console.Write("Enter new damage amount to push onto stack (old value: {0}): ", oldDamage);
-					int d = int.Parse(Console.ReadLine());
-					queue.ResultStack.Push(d);*/
+					Console.WriteLine("DAMAGE INTERCEPTED: " + e.Action);
+					queue.ReplaceArg(2);
+				}
+			};
+
+			game.ActionQueue.OnQueued += (o, e) => {
+				ActionQueue queue = o as ActionQueue;
+				if (e.Action is RandomOpponentMinion) {
+					if (game.Opponent.ZonePlay.Count > 0) {
+						Console.WriteLine("REPLACING RANDOM CHOICE ACTION: " + e.Action);
+						queue.ReplaceAction(new LazyEntity() { Entity = (Minion)game.Opponent.ZonePlay[0] });
+					}
 				}
 			};
 
