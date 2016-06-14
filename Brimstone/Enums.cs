@@ -8,6 +8,7 @@
 		DAMAGE,
 		HEALTH,
 		CARDTYPE,
+		STEP,
 		_COUNT
 	}
 
@@ -26,5 +27,10 @@
 		HERO = 3,
 		MINION = 4,
 		SPELL = 5,
+	}
+
+	public enum Step
+	{
+		MAIN_ACTION,
 	}
 }

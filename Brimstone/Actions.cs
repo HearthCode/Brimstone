@@ -55,6 +55,18 @@ namespace Brimstone
 		}
 	}
 
+	public class BeginTurn : QueueAction
+	{
+		public override ActionResult Run(Game game, List<ActionResult> args) {
+			var temp = game.CurrentPlayer;
+			game.CurrentPlayer = game.Opponent;
+			game.Opponent = temp;
+			game[GameTag.STEP] = (int) Step.MAIN_ACTION;
+
+			return ActionResult.None;
+		}
+	}
+
 	public class Give : QueueAction
 	{
 		public const int TARGET = 0;

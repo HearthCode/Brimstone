@@ -17,7 +17,9 @@ namespace Brimstone
 
 		// Required by IEntity
 		public Game(Game cloneFrom) : base(cloneFrom) {
-			NextEntityId = 1;
+			Id = cloneFrom.Id;
+			NextEntityId = cloneFrom.NextEntityId;
+			Game = this;
 			Player1 = (Player)cloneFrom.Player1.Clone();
 			Player2 = (Player)cloneFrom.Player2.Clone();
 			// Yeah, fix this...
@@ -40,6 +42,7 @@ namespace Brimstone
 			}
 			ActionQueue.Attach(this);
 			NextEntityId++;
+			Game = this;
 		}
 
 		public override string ToString() {
@@ -78,9 +81,13 @@ namespace Brimstone
 			}
 		}
 
+		public void BeginTurn() {
+			ActionQueue.Enqueue(CardBehaviour.BeginTurn);
+			ActionQueue.Process();
+		}
+
 		public override object Clone() {
 			return new Game(this);
 		}
 	}
-
 }

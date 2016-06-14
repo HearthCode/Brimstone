@@ -54,8 +54,7 @@ namespace Test1
 				fj.Play();
 			}
 
-			game.CurrentPlayer = p2;
-			game.Opponent = p1;
+			game.BeginTurn();
 
 			for (int i = 0; i < MaxMinions - 2; i++) {
 				var fj = p2.Give(Cards.FindByName("Flame Juggler"));
@@ -65,8 +64,7 @@ namespace Test1
 			p2.Give(Cards.FindByName("Boom Bot")).Play();
 			p2.Give(Cards.FindByName("Boom Bot")).Play();
 
-			game.CurrentPlayer = p1;
-			game.Opponent = p2;
+			game.BeginTurn();
 
 			p1.Give(Cards.FindByName("Boom Bot")).Play();
 			p1.Give(Cards.FindByName("Boom Bot")).Play();
