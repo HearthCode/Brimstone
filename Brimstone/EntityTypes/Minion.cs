@@ -14,17 +14,13 @@ namespace Brimstone
 
 		public IPlayable Play() {
 			// TODO: Might not be CurrentPlayer
-			Console.WriteLine("{0} is playing {1}", Game.CurrentPlayer, Card.Name);
-
 			Game.ActionQueue.Enqueue(CardBehaviour.Play(Game.CurrentPlayer, this));
 			return (IPlayable)(Entity)Game.ActionQueue.Process()[0];
 		}
 
 		public void Damage(int amount) {
-			Console.WriteLine("{0} gets hit for {1} points of damage!", this, amount);
-			Health -= amount;
-			this[GameTag.DAMAGE] = Card[GameTag.HEALTH] - Health;
-			CheckForDeath();
+			Game.ActionQueue.Enqueue(CardBehaviour.Damage(this, amount));
+			Game.ActionQueue.Process();
 		}
 
 		public void CheckForDeath() {

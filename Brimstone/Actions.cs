@@ -64,6 +64,8 @@ namespace Brimstone
 			Player player = (Player)args[TARGET];
 			Card card = args[CARD];
 
+			Console.WriteLine("Giving {0} to {1}", card, player);
+
 			if (card[GameTag.CARDTYPE] == (int)CardType.MINION) {
 				var minion = new Minion(game, card);
 				player.ZoneHand.Add(minion);
@@ -89,6 +91,9 @@ namespace Brimstone
 			player.ZonePlay.Add(entity);
 			entity[GameTag.ZONE] = (int)Zone.PLAY;
 			entity[GameTag.ZONE_POSITION] = player.ZonePlay.Count;
+
+			Console.WriteLine("{0} is playing {1}", player, entity);
+
 			game.ActionQueue.Enqueue(entity.Card.Behaviour.Battlecry);
 			game.ActionQueue.Process();
 			return (Entity) entity;
@@ -102,8 +107,13 @@ namespace Brimstone
 
 		public override ActionResult Run(Game game, List<ActionResult> args) {
 			if (args[TARGETS].HasResult)
-				foreach (Minion e in args[TARGETS])
-					e.Damage(args[DAMAGE]);
+				foreach (Minion e in args[TARGETS]) {
+					Console.WriteLine("{0} is getting hit for {1} points of damage", e, args[DAMAGE]);
+
+					e.Health -= args[DAMAGE];
+					e[GameTag.DAMAGE] = e.Card[GameTag.HEALTH] - e.Health;
+					e.CheckForDeath();
+				}
 			return ActionResult.None;
 		}
 	}
