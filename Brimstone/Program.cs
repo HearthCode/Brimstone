@@ -39,15 +39,15 @@ namespace Brimstone
 		}
 	}
 
-	struct ActionResult {
+	struct ActionResult : IEnumerable<IEntity> {
 		private bool hasValue;
 		private bool hasBoolValue;
 		private bool hasIntValue;
-		private bool hasEntityValue;
+		private bool hasEntityListValue;
 
 		private bool boolValue;
 		private int intValue;
-		private Entity entityValue;
+		private List<IEntity> entityListValue;
 
 		public bool HasResult { get { return hasValue; } }
 
@@ -58,7 +58,10 @@ namespace Brimstone
 			return new ActionResult { hasValue = true, hasBoolValue = true, boolValue = x };
 		}
 		public static implicit operator ActionResult(Entity x) {
-			return new ActionResult { hasValue = true, hasEntityValue = true, entityValue = x };
+			return new ActionResult { hasValue = true, hasEntityListValue = true, entityListValue = new List<IEntity> { x } };
+		}
+		public static implicit operator ActionResult(List<IEntity> x) {
+			return new ActionResult { hasValue = true, hasEntityListValue = true, entityListValue = x };
 		}
 		public static implicit operator int(ActionResult a) {
 			return a.intValue;
@@ -66,14 +69,15 @@ namespace Brimstone
 		public static implicit operator bool(ActionResult a) {
 			return a.boolValue;
 		}
-		public static implicit operator Entity(ActionResult a) {
-			return a.entityValue;
+		public static implicit operator List<IEntity>(ActionResult a) {
+			return a.entityListValue;
 		}
 		public static bool operator ==(ActionResult x, ActionResult y) {
 			if (ReferenceEquals(x, y))
 				return true;
 			// Also deals with one-sided null comparisons since it will use struct value type defaults
-			return (x.boolValue == y.boolValue && x.intValue == y.intValue && x.entityValue == y.entityValue);
+			// Do we need to compare the lists properly?
+			return (x.boolValue == y.boolValue && x.intValue == y.intValue && x.entityListValue == y.entityListValue);
 		}
 		public static bool operator !=(ActionResult x, ActionResult y) {
 			return !(x == y);
@@ -92,6 +96,13 @@ namespace Brimstone
 			return ToString().GetHashCode();
 		}
 
+		public IEnumerator<IEntity> GetEnumerator() {
+			return entityListValue.GetEnumerator();
+		}
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
+			return GetEnumerator();
+		}
+
 		public static ActionResult None = new ActionResult();
 
 		public override string ToString() {
@@ -101,8 +112,8 @@ namespace Brimstone
 				return "<int: " + intValue + ">";
 			else if (hasBoolValue)
 				return "<bool: " + boolValue.ToString() + ">";
-			else if (hasEntityValue)
-				return "<Entity: " + entityValue + ">";
+			else if (hasEntityListValue)
+				return "<Entities: " + entityListValue + ">";
 			else
 				return "<unknown>";
 		}
@@ -154,9 +165,16 @@ namespace Brimstone
 	class RandomOpponentMinion : QueueAction {
 		public override ActionResult Run(List<ActionResult> args) {
 			if (Game.Opponent.ZonePlay.Count == 0)
-				return ActionResult.None;
+				return new List<IEntity>();
 			var m = new Random().Next(Game.Opponent.ZonePlay.Count);
-			return Game.Opponent.ZonePlay[m];
+			return (Minion) Game.Opponent.ZonePlay[m];
+		}
+	}
+
+	class AllMinions : QueueAction
+	{
+		public override ActionResult Run(List<ActionResult> args) {
+			return Game.CurrentPlayer.ZonePlay.Concat(Game.Opponent.ZonePlay) as List<IEntity>;
 		}
 	}
 
@@ -169,12 +187,13 @@ namespace Brimstone
 
 	class Damage : QueueAction
 	{
-		private const int TARGET = 0;
+		private const int TARGETS = 0;
 		private const int DAMAGE = 1;
 
 		public override ActionResult Run(List<ActionResult> args) {
-			if (args[TARGET] != null)
-				((Minion) args[TARGET]).Damage(args[DAMAGE]);
+			if (args[TARGETS].HasResult)
+				foreach (Minion e in args[TARGETS])
+					e.Damage(args[DAMAGE]);
 			return ActionResult.None;
 		}
 	}
@@ -188,6 +207,7 @@ namespace Brimstone
 	partial class CardBehaviour {
 		// Factory functions for DSL syntax
 		public static ActionGraph RandomOpponentMinion { get { return new RandomOpponentMinion(); } }
+		public static ActionGraph AllMinions { get { return new AllMinions(); } }
 		public static ActionGraph RandomAmount(ActionGraph min, ActionGraph max) { return new RandomAmount { Args = { min, max } }; }
 		public static ActionGraph Damage(ActionGraph target, ActionGraph amount) { return new Damage { Args = { target, amount } }; }
 	}
@@ -203,6 +223,15 @@ namespace Brimstone
 		public static Behaviour GVG_110t = new Behaviour {
 			Death = Damage(RandomOpponentMinion, RandomAmount(1, 4))
 		};
+
+		// Whirlwind
+		public static Behaviour EX1_400 = new Behaviour {
+			Play = Damage(AllMinions, 1)
+		};
+
+		// Acolyte of Pain
+		// Armorsmith
+		// Imp Gang Boss
 	}
 
 	// Let's pretend this crap is XML or whatever
@@ -233,6 +262,15 @@ namespace Brimstone
 		public override Dictionary<GameTag, int> Tags { get; set; } = new Dictionary<GameTag, int> {
 			{ GameTag.CARDTYPE, (int) CardType.MINION },
 			{ GameTag.HEALTH, 1 }
+		};
+	}
+
+	class EX1_400 : Card
+	{
+		public override string Id { get; set; } = "EX1_400";
+		public override string Name { get; set; } = "Whirlwind";
+		public override Dictionary<GameTag, int> Tags { get; set; } = new Dictionary<GameTag, int> {
+			{ GameTag.CARDTYPE, (int) CardType.SPELL },
 		};
 	}
 
@@ -279,18 +317,45 @@ namespace Brimstone
 		}
 	}
 
-	interface IEntity
+	interface IEntity : ICloneable
 	{
-		IEntity Play();
+		Game Game { get; set; }
+		Card Card { get; set; }
+		Dictionary<GameTag, int?> Tags { get; set; }
+
+		int? this[GameTag t] { get; set; }
 	}
 
-	class Entity : IEntity, ICloneable
+	interface IPlayable : IEntity
+	{
+		IPlayable Play();
+	}
+
+	interface IMinion : IPlayable
+	{
+		void Damage(int amount);
+	}
+
+	abstract class BaseEntity : IEntity
 	{
 		public Game Game { get; set; } = null;
 		public Card Card { get; set; }
-		public Dictionary<GameTag, int?> Tags { get; protected set; } = new Dictionary<GameTag, int?>((int)GameTag._COUNT);
+		public Dictionary<GameTag, int?> Tags { get; set; } = new Dictionary<GameTag, int?>((int)GameTag._COUNT);
 
-		public int? this[GameTag t] {
+		public abstract int? this[GameTag t] { get;  set; }
+
+		public virtual object Clone() {
+			BaseEntity clone = OnClone();
+			clone.Card = Card;
+			clone.Tags = new Dictionary<GameTag, int?>(Tags);
+			return clone;
+		}
+
+		protected abstract BaseEntity OnClone();
+	}
+
+	class Entity : BaseEntity {
+		public override int? this[GameTag t] {
 			get {
 				// Use TryGetValue for safety
 				return Tags[t];
@@ -301,34 +366,16 @@ namespace Brimstone
 			}
 		}
 
-		public Entity() {
-			// set all tags to zero to avoid having to check if keys exist
-			// worsens memory footprint to improve performance
-			//var tags = Enum.GetValues(typeof(GameTag));
-
-			//foreach (var tagValue in tags)
-				//Tags.Add((GameTag)tagValue, null);
-		}
-
-		public virtual IEntity Play() { return this; }
-
-		public object Clone() {
-			// Cards will never change so we can just take pointers
-			var e = new Entity {
-				Card = Card
-			};
-			// Tags should be copied (for now)
-			// This works because the dictionary only uses value types!
-			e.Tags = new Dictionary<GameTag, int?>(Tags);
-			return e;
+		protected override BaseEntity OnClone() {
+			return new Entity();
 		}
 	}
 
-	class Minion : Entity
+	class Minion : Entity, IMinion
 	{
 		public int Health { get; set; }
 
-		public override IEntity Play() {
+		public IPlayable Play() {
 			Health = (int)Card[GameTag.HEALTH];
 			Console.WriteLine("Player {0} is playing {1}", Game.CurrentPlayer, Card.Name);
 			Game.CurrentPlayer.ZoneHand.Remove(this);
@@ -365,26 +412,23 @@ namespace Brimstone
 			return s.Substring(0, s.Length - 2) + ")";
 		}
 
-		public new object Clone() {
-			// Cards will never change so we can just take pointers
-			var e = new Minion {
-				Card = Card,
-				Health = Health
-			};
-			// Tags should be copied (for now)
-			// This works because the dictionary only uses value types!
-			e.Tags = new Dictionary<GameTag, int?>(Tags);
-			return e;
+		protected override BaseEntity OnClone() {
+			return new Minion();
+		}
+		public override object Clone() {
+			Minion clone = (Minion)base.Clone();
+			clone.Health = Health;
+			return clone;
 		}
 	}
 
 	class Player : Entity
 	{
 		public int Health { get; private set; } = 30;
-		public List<Minion> ZoneHand { get; } = new List<Minion>();
-		public List<Minion> ZonePlay { get; } = new List<Minion>();
+		public List<IPlayable> ZoneHand { get; private set; } = new List<IPlayable>();
+		public List<IMinion> ZonePlay { get; private set; } = new List<IMinion>();
 		
-		public Entity Give(Card card) {
+		public IPlayable Give(Card card) {
 			if (card[GameTag.CARDTYPE] == (int) CardType.MINION) {
 				var minion = new Minion { Card = card, Game = Game };
 				ZoneHand.Add(minion);
@@ -399,16 +443,19 @@ namespace Brimstone
 			return Card.Id;
 		}
 
-		public new object Clone() {
-			var p = new Player {
-				Card = Card,
-				Health = Health
-			};
+		protected override BaseEntity OnClone() {
+			return new Player();
+		}
+		public override object Clone() {
+			Player clone = (Player)base.Clone();
+			clone.Health = Health;
+			clone.ZoneHand = new List<IPlayable>();
+			clone.ZonePlay = new List<IMinion>();
 			foreach (var e in ZoneHand)
-				p.ZoneHand.Add(e.Clone() as Minion);
+				clone.ZoneHand.Add(e.Clone() as IPlayable);
 			foreach (var e in ZonePlay)
-				p.ZonePlay.Add(e.Clone() as Minion);
-			return p;
+				clone.ZonePlay.Add(e.Clone() as IMinion);
+			return clone;
 		}
 	}
 
@@ -457,11 +504,13 @@ namespace Brimstone
 				for (int i = 0; i < action.Args.Count; i++)
 					args.Add(ActionResultStack.Pop());
 				args.Reverse();
-				ActionResultStack.Push(action.Run(args));
+				var result = action.Run(args);
+				if (result.HasResult)
+					ActionResultStack.Push(result);
 			}
 		}
 
-		public IEnumerable<Entity> Entities {
+		public IEnumerable<IEntity> Entities {
 			get {
 				yield return this;
 				yield return Player1;
@@ -477,18 +526,21 @@ namespace Brimstone
 			}
 		}
 
-		public new Game Clone() {
-			var g = new Game {
-				Player1 = (Player)Player1.Clone(),
-				Player2 = (Player)Player2.Clone()
-			};
+		protected override BaseEntity OnClone() {
+			return new Game();
+		}
+		public override object Clone() {
+			Game clone = (Game)base.Clone();
+			clone.Player1 = (Player)Player1.Clone();
+			clone.Player2 = (Player)Player2.Clone();
 			// Yeah, fix this...
-			g.CurrentPlayer = g.Player1;
-			g.Opponent = g.Player2;
-			foreach (var entity in g.Entities) {
-				entity.Game = g;
+			clone.CurrentPlayer = clone.Player1;
+			clone.Opponent = clone.Player2;
+			foreach (var entity in clone.Entities) {
+				entity.Game = clone;
 			}
-			return g;
+			// NOTE: Don't clone PowerHistory!
+			return clone;
 		}
 	}
 
@@ -513,6 +565,7 @@ namespace Brimstone
 				{ "GVG_096", new GVG_096() },
 				{ "AT_094", new AT_094 { Behaviour = CardBehaviour.AT_094 } },
 				{ "GVG_110t", new GVG_110t { Behaviour = CardBehaviour.GVG_110t } },
+				{ "EX1_400", new EX1_400 { Behaviour = CardBehaviour.EX1_400 } },
 				{ "Player", new Card { Id = "Player", Name = "Player" } }
 			};
 		}
@@ -579,7 +632,7 @@ namespace Brimstone
 			Console.SetOut(TextWriter.Null);
 
 			for (int i = 0; i < 100000; i++) {
-				var clonedGame = game.Clone();
+				var clonedGame = game.Clone() as Game;
 				var firstboombot = clonedGame.Player1.ZonePlay.First(t => t.Card.Id == "GVG_110t");
 				firstboombot.Damage(1);
 				clonedGame.ResolveQueue();
