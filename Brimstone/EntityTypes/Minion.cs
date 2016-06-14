@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Brimstone
 {
 	public class Minion : Entity, IMinion
 	{
 		public int Health { get; set; }
+
+		public Minion(Game game, Card card, Dictionary<GameTag, int?> tags = null) : base(game, card, tags) { }
 
 		public IPlayable Play() {
 			Health = (int)Card[GameTag.HEALTH];
@@ -44,7 +47,7 @@ namespace Brimstone
 		}
 
 		protected override BaseEntity OnClone() {
-			return new Minion();
+			return new Minion(Game, Card, Tags);
 		}
 		public override object Clone() {
 			Minion clone = (Minion)base.Clone();

@@ -9,32 +9,30 @@ namespace Test1
 {
 	public class Brimstone
 	{
-		public static CardDefs Cards = new CardDefs();
-
 		public const int MaxMinions = 7;
 
 		static void Main(string[] args) {
 			Console.WriteLine("Hello Hearthstone!");
 
 			var game = new Game();
-			game.Player1 = new Player { Game = game, Card = Cards["Player"] };
-			game.Player2 = new Player { Game = game, Card = Cards["Player"] };
+			game.Player1 = new Player(game);
+			game.Player2 = new Player(game);
 			var p1 = game.Player1;
 			var p2 = game.Player2;
 			game.CurrentPlayer = p1;
 			game.Opponent = p2;
 
 			// Put a Piloted Shredder and Flame Juggler in each player's hand
-			p1.Give(Cards.ByName("Piloted Shredder"));
-			p1.Give(Cards.ByName("Flame Juggler"));
-			p2.Give(Cards.ByName("Piloted Shredder"));
-			p2.Give(Cards.ByName("Flame Juggler"));
+			p1.Give(Cards.FindByName("Piloted Shredder"));
+			p1.Give(Cards.FindByName("Flame Juggler"));
+			p2.Give(Cards.FindByName("Piloted Shredder"));
+			p2.Give(Cards.FindByName("Flame Juggler"));
 
 			Console.WriteLine(game);
 
 			// Fill the board with Flame Jugglers
 			for (int i = 0; i < MaxMinions - 2; i++) {
-				var fj = p1.Give(Cards.ByName("Flame Juggler"));
+				var fj = p1.Give(Cards.FindByName("Flame Juggler"));
 				fj.Play();
 				game.ResolveQueue();
 			}
@@ -43,22 +41,22 @@ namespace Test1
 			game.Opponent = p1;
 
 			for (int i = 0; i < MaxMinions - 2; i++) {
-				var fj = p2.Give(Cards.ByName("Flame Juggler"));
+				var fj = p2.Give(Cards.FindByName("Flame Juggler"));
 				fj.Play();
 				game.ResolveQueue();
 			}
 			// Throw in a couple of Boom Bots
-			p2.Give(Cards.ByName("Boom Bot")).Play();
+			p2.Give(Cards.FindByName("Boom Bot")).Play();
 			game.ResolveQueue();
-			p2.Give(Cards.ByName("Boom Bot")).Play();
+			p2.Give(Cards.FindByName("Boom Bot")).Play();
 			game.ResolveQueue();
 
 			game.CurrentPlayer = p1;
 			game.Opponent = p2;
 
-			p1.Give(Cards.ByName("Boom Bot")).Play();
+			p1.Give(Cards.FindByName("Boom Bot")).Play();
 			game.ResolveQueue();
-			p1.Give(Cards.ByName("Boom Bot")).Play();
+			p1.Give(Cards.FindByName("Boom Bot")).Play();
 			game.ResolveQueue();
 
 			// Set off the chain of eventsy

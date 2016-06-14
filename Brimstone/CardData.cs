@@ -3,6 +3,20 @@ using System.Linq;
 
 namespace Brimstone
 {
+	public static class Cards
+	{
+		private static CardDefs data = new CardDefs();
+		public static Dictionary<string, Card> Find {
+			get {
+				return data.Cards;
+			}
+		}
+
+		public static Card FindByName(string cardName) {
+			return data.ByName(cardName);
+		}
+	}
+
 	public class CardDefs
 	{
 		public Dictionary<string, Card> Cards = new Dictionary<string, Card>();

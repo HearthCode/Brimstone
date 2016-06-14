@@ -10,29 +10,28 @@ namespace BrimstoneVisualizer
 {
 	public partial class App : Application
 	{
-		public static CardDefs Cards = new CardDefs();
 		public const int MaxMinions = 7;
 
 		public static void PlayGame(MainWindow window) {
 			var game = new Game();
-			game.Player1 = new Player { Game = game, Card = Cards["Player"] };
-			game.Player2 = new Player { Game = game, Card = Cards["Player"] };
+			game.Player1 = new Player(game);
+			game.Player2 = new Player(game);
 			var p1 = game.Player1;
 			var p2 = game.Player2;
 			game.CurrentPlayer = p1;
 			game.Opponent = p2;
 
 			// Put a Piloted Shredder and Flame Juggler in each player's hand
-			p1.Give(Cards.ByName("Piloted Shredder"));
-			p1.Give(Cards.ByName("Flame Juggler"));
-			p2.Give(Cards.ByName("Piloted Shredder"));
-			p2.Give(Cards.ByName("Flame Juggler"));
+			p1.Give(Cards.FindByName("Piloted Shredder"));
+			p1.Give(Cards.FindByName("Flame Juggler"));
+			p2.Give(Cards.FindByName("Piloted Shredder"));
+			p2.Give(Cards.FindByName("Flame Juggler"));
 
 			Console.WriteLine(game);
 
 			// Fill the board with Flame Jugglers
-			for (int i = 0; i < MaxMinions - 2; i++) {
-				var fj = p1.Give(Cards.ByName("Flame Juggler"));
+			for (int i = 0; i < MaxMinions; i++) {
+				var fj = p1.Give(Cards.FindByName("Flame Juggler"));
 				fj.Play();
 				game.ResolveQueue();
 			}
@@ -40,8 +39,8 @@ namespace BrimstoneVisualizer
 			game.CurrentPlayer = p2;
 			game.Opponent = p1;
 
-			for (int i = 0; i < MaxMinions - 2; i++) {
-				var fj = p2.Give(Cards.ByName("Flame Juggler"));
+			for (int i = 0; i < MaxMinions; i++) {
+				var fj = p2.Give(Cards.FindByName("Flame Juggler"));
 				fj.Play();
 				game.ResolveQueue();
 			}

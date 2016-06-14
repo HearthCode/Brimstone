@@ -5,6 +5,8 @@ namespace Brimstone
 {
 	public class Game : Entity
 	{
+		public int NextEntityId = 1;
+
 		public Player Player1 { get; set; }
 		public Player Player2 { get; set; }
 		public Player CurrentPlayer { get; set; }
@@ -13,6 +15,12 @@ namespace Brimstone
 		public List<PowerAction> PowerHistory = new List<PowerAction>();
 		public Queue<QueueAction> ActionQueue = new Queue<QueueAction>();
 		public Stack<ActionResult> ActionResultStack = new Stack<ActionResult>();
+
+		// Required by IEntity
+		public Game(Game game = null, Card card = null, Dictionary<GameTag, int?> tags = null) : base(game, card, tags) {
+			NextEntityId++;
+			PowerHistory.Add(new CreateEntity(this));
+		}
 
 		public override string ToString() {
 			string s = "Board state: ";
@@ -71,10 +79,11 @@ namespace Brimstone
 		}
 
 		protected override BaseEntity OnClone() {
-			return new Game();
+			return new Game(this);
 		}
 		public override object Clone() {
 			Game clone = (Game)base.Clone();
+			clone.NextEntityId = NextEntityId;
 			clone.Player1 = (Player)Player1.Clone();
 			clone.Player2 = (Player)Player2.Clone();
 			// Yeah, fix this...
