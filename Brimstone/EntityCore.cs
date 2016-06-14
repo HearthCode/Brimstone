@@ -21,6 +21,7 @@ namespace Brimstone
 
 	public interface IMinion : IPlayable
 	{
+		int Health { get; set; }
 		void Damage(int amount);
 	}
 

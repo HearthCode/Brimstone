@@ -13,15 +13,11 @@ namespace Brimstone
 		public Minion(Game game, Card card, Dictionary<GameTag, int?> tags = null) : base(game, card, tags) { }
 
 		public IPlayable Play() {
-			Health = (int)Card[GameTag.HEALTH];
+			// TODO: Might not be CurrentPlayer
 			Console.WriteLine("{0} is playing {1}", Game.CurrentPlayer, Card.Name);
-			Game.CurrentPlayer.ZoneHand.Remove(this);
-			Game.CurrentPlayer.ZonePlay.Add(this);
-			this[GameTag.ZONE] = (int)Zone.PLAY;
-			this[GameTag.ZONE_POSITION] = Game.CurrentPlayer.ZonePlay.Count;
-			Game.ActionQueue.Enqueue(Card.Behaviour.Battlecry);
-			Game.ActionQueue.Process();
-			return this;
+
+			Game.ActionQueue.Enqueue(CardBehaviour.Play(Game.CurrentPlayer, this));
+			return (IPlayable)(Entity)Game.ActionQueue.Process()[0];
 		}
 
 		public void Damage(int amount) {

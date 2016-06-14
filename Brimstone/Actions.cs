@@ -75,6 +75,26 @@ namespace Brimstone
 		}
 	}
 
+	public class Play : QueueAction
+	{
+		public const int PLAYER = 0;
+		public const int ENTITY = 1;
+
+		public override ActionResult Run(Game game, List<ActionResult> args) {
+			Player player = (Player)args[PLAYER];
+			IMinion entity = (IMinion) (Entity) args[ENTITY];
+
+			entity.Health = (int)entity.Card[GameTag.HEALTH];
+			player.ZoneHand.Remove(entity);
+			player.ZonePlay.Add(entity);
+			entity[GameTag.ZONE] = (int)Zone.PLAY;
+			entity[GameTag.ZONE_POSITION] = player.ZonePlay.Count;
+			game.ActionQueue.Enqueue(entity.Card.Behaviour.Battlecry);
+			game.ActionQueue.Process();
+			return (Entity) entity;
+		}
+	}
+
 	public class Damage : QueueAction
 	{
 		private const int TARGETS = 0;
