@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.IO;
+using Brimstone;
 
-namespace Brimstone
+namespace Test1
 {
 	public class Brimstone
 	{
