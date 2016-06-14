@@ -7,6 +7,9 @@ namespace Brimstone
 	{
 		public int Health { get; set; }
 
+		public Minion(Minion cloneFrom) : base(cloneFrom) {
+			Health = cloneFrom.Health;
+		}
 		public Minion(Game game, Card card, Dictionary<GameTag, int?> tags = null) : base(game, card, tags) { }
 
 		public IPlayable Play() {
@@ -46,13 +49,8 @@ namespace Brimstone
 			return s.Substring(0, s.Length - 2) + ")";
 		}
 
-		protected override BaseEntity OnClone() {
-			return new Minion(Game, Card, Tags);
-		}
 		public override object Clone() {
-			Minion clone = (Minion)base.Clone();
-			clone.Health = Health;
-			return clone;
+			return new Minion(this);
 		}
 	}
 }

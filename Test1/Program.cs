@@ -14,7 +14,7 @@ namespace Test1
 		static void Main(string[] args) {
 			Console.WriteLine("Hello Hearthstone!");
 
-			var game = new Game();
+			var game = new Game(PowerHistory: true);
 			game.Player1 = new Player(game);
 			game.Player2 = new Player(game);
 			var p1 = game.Player1;
@@ -83,8 +83,13 @@ namespace Test1
 
 			// Check that cloning works
 
+			// Normal game has 68 entities: Game + 2 players + 2 heroes + 2 hero powers + 30 cards each + coin = 68
+			while (game.Entities.Count() < 68) {
+				p1.Give(Cards.FindByName("Flame Juggler"));
+			}
+
 			var game2 = game.Clone();
-			game.PowerHistory.Clear();
+			game.PowerHistory.Log.Clear();
 
 			Console.WriteLine(game);
 			Console.WriteLine(game2);

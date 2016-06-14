@@ -12,14 +12,35 @@ namespace Brimstone
 		public Player CurrentPlayer { get; set; }
 		public Player Opponent { get; set; }
 
-		public List<PowerAction> PowerHistory = new List<PowerAction>();
+		public PowerHistory PowerHistory = new PowerHistory();
 		public Queue<QueueAction> ActionQueue = new Queue<QueueAction>();
 		public Stack<ActionResult> ActionResultStack = new Stack<ActionResult>();
 
 		// Required by IEntity
-		public Game(Game game = null, Card card = null, Dictionary<GameTag, int?> tags = null) : base(game, card, tags) {
+		public Game(Game cloneFrom) : base(cloneFrom) {
+			NextEntityId = 1;
+			Player1 = (Player)cloneFrom.Player1.Clone();
+			Player2 = (Player)cloneFrom.Player2.Clone();
+			// Yeah, fix this...
+			CurrentPlayer = Player1;
+			Opponent = Player2;
+			// Change ownership
+			foreach (var e in Entities)
+				e.Game = this;
+			// NOTE: Don't clone PowerHistory!
+		}
+
+		public Game(Dictionary<GameTag, int?> tags = null,
+					bool PowerHistory = false) : base(null, Cards.Find["Game"], tags) {
+			if (PowerHistory) {
+				AttachPowerHistory();
+				this.PowerHistory.Add(new CreateEntity(this) { EntityId = NextEntityId, Tags = tags });
+			}
 			NextEntityId++;
-			PowerHistory.Add(new CreateEntity(this));
+		}
+
+		public void AttachPowerHistory() {
+			PowerHistory.Game = this;
 		}
 
 		public override string ToString() {
@@ -36,7 +57,7 @@ namespace Brimstone
 					s += entity.ToString() + ", ";
 				}
 			}
-			s += "\nPower log: ";
+			s = s.Substring(0, s.Length - 2) + "\nPower log: ";
 			foreach (var item in PowerHistory)
 				s += item + "\n";
 			return s;
@@ -78,21 +99,8 @@ namespace Brimstone
 			}
 		}
 
-		protected override BaseEntity OnClone() {
-			return new Game(this);
-		}
 		public override object Clone() {
-			Game clone = (Game)base.Clone();
-			clone.Player1 = (Player)Player1.Clone();
-			clone.Player2 = (Player)Player2.Clone();
-			// Yeah, fix this...
-			clone.CurrentPlayer = clone.Player1;
-			clone.Opponent = clone.Player2;
-			foreach (var entity in clone.Entities) {
-				entity.Game = clone;
-			}
-			// NOTE: Don't clone PowerHistory!
-			return clone;
+			return new Game(this);
 		}
 	}
 

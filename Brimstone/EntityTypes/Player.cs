@@ -8,6 +8,16 @@ namespace Brimstone
 		public List<IPlayable> ZoneHand { get; private set; } = new List<IPlayable>();
 		public List<IMinion> ZonePlay { get; private set; } = new List<IMinion>();
 
+		public Player(Player cloneFrom) : base(cloneFrom) {
+			Health = cloneFrom.Health;
+			ZoneHand = new List<IPlayable>();
+			ZonePlay = new List<IMinion>();
+			foreach (var e in cloneFrom.ZoneHand)
+				ZoneHand.Add(e.Clone() as IPlayable);
+			foreach (var e in cloneFrom.ZonePlay)
+				ZonePlay.Add(e.Clone() as IMinion);
+		}
+
 		public Player(Game game, Dictionary<GameTag, int?> tags = null) : base(game, Cards.Find["Player"], tags) { }
 
 		public IPlayable Give(Card card) {
@@ -25,19 +35,8 @@ namespace Brimstone
 			return Card.Id;
 		}
 
-		protected override BaseEntity OnClone() {
-			return new Player(Game, Tags);
-		}
 		public override object Clone() {
-			Player clone = (Player)base.Clone();
-			clone.Health = Health;
-			clone.ZoneHand = new List<IPlayable>();
-			clone.ZonePlay = new List<IMinion>();
-			foreach (var e in ZoneHand)
-				clone.ZoneHand.Add(e.Clone() as IPlayable);
-			foreach (var e in ZonePlay)
-				clone.ZonePlay.Add(e.Clone() as IMinion);
-			return clone;
+			return new Player(this);
 		}
 	}
 }

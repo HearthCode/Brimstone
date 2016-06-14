@@ -33,29 +33,31 @@ namespace Brimstone
 
 		public abstract int? this[GameTag t] { get; set; }
 		public BaseEntity(Game game, Card card, Dictionary<GameTag, int?> tags = null) {
-			// New game?
-			if (game == null) {
-				Id = 1;
-			}
-			else {
-				Id = game.NextEntityId++;
-				Game = game;
-				Card = card;
-			}
+			Card = card;
+			Game = game;
 			if (tags != null)
 				Tags = tags;
+
+			// Game is null if we are starting a new game
+			Id = (game == null ? 1 : game.NextEntityId++);
 		}
 
-		public virtual object Clone() {
-			return OnClone();
+		// Cloning copy constructor
+		public BaseEntity(BaseEntity cloneFrom) {
+			Card = cloneFrom.Card;
+			Game = cloneFrom.Game;
+			Id = cloneFrom.Id;
+			Tags = new Dictionary<GameTag, int?>(cloneFrom.Tags);
 		}
 
-		protected abstract BaseEntity OnClone();
+		public abstract object Clone();
 	}
 
 	public class Entity : BaseEntity
 	{
-		public Entity(Game game, Card card, Dictionary<GameTag, int?> tags) : base(game, card, tags) {
+		public Entity(Entity cloneFrom) : base(cloneFrom) { }
+		public Entity(Game game, Card card, Dictionary<GameTag, int?> tags = null) : base(game, card, tags) {
+			// game is null if we are cloning or starting a new game
 			if (game != null)
 				Game.PowerHistory.Add(new CreateEntity(this));
 		}
@@ -71,8 +73,8 @@ namespace Brimstone
 			}
 		}
 
-		protected override BaseEntity OnClone() {
-			return new Entity(Game, Card, new Dictionary<GameTag, int?>(Tags));
+		public override object Clone() {
+			return new Entity(this);
 		}
 	}
 }
