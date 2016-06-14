@@ -86,5 +86,12 @@ namespace Brimstone
 		IEnumerator IEnumerable.GetEnumerator() {
 			return GetEnumerator();
 		}
+
+		public override string ToString() {
+			string ph = string.Empty;
+			foreach (var p in Log)
+				ph += p.ToString() + "\n";
+			return ph;
+		}
 	}
 }

@@ -93,5 +93,19 @@ namespace Brimstone
 			ResultStack.Clear();
 			return stack;
 		}
+
+		public string StackToString() {
+			string s = string.Empty;
+			foreach (var r in ResultStack)
+				s += r + "\n";
+			return s;
+		}
+
+		public override string ToString() {
+			string s = string.Empty;
+			foreach (var a in Queue)
+				s += a + "\n";
+			return s;
+		}
 	}
 }

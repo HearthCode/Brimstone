@@ -25,7 +25,19 @@ namespace BrimstoneVisualizer
 		}
 
 		private void btnStepQueue_Click(object sender, RoutedEventArgs e) {
-			App.PlayGame(this);
+			tbActionQueue.Text = App.Game.ActionQueue.ToString();
+			tbActionResultStack.Text = App.Game.ActionQueue.StackToString();
+			tbPowerHistory.Text = App.Game.PowerHistory.ToString();
+			svPowerHistory.ScrollToEnd();
+			App.QueueRead.Set();
+		}
+
+		private void Window_Loaded(object sender, RoutedEventArgs e) {
+			App.StartGame();
+		}
+
+		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+			App.GameThread.Abort();
 		}
 	}
 }

@@ -90,8 +90,13 @@ namespace Brimstone
 				return "<bool: " + boolValue.ToString() + ">";
 			else if (hasCardValue)
 				return "<card: " + cardValue + ">";
-			else if (hasEntityListValue)
-				return "<Entities: " + entityListValue + ">";
+			else if (hasEntityListValue) {
+				string s = "<Entities:";
+				foreach (var e in entityListValue)
+					s += e;
+				s += ">";
+				return s;
+			}
 			else
 				return "<unknown>";
 		}

@@ -5,14 +5,27 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BrimstoneVisualizer"
         mc:Ignorable="d"
-        Title="Brimstone Visualizer" Height="350" Width="525">
+        Title="Brimstone Visualizer" Height="350" Width="750" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="250"/>
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
-        <ScrollViewer Grid.Row="0">
+        <ScrollViewer x:Name="svPowerHistory" Grid.Row="0" Grid.Column="0">
             <TextBlock x:Name="tbPowerHistory" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top"
+                    ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"/>
+        </ScrollViewer>
+        <ScrollViewer Grid.Row="0" Grid.Column="1">
+            <TextBlock x:Name="tbActionQueue" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top"
+                    ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"/>
+        </ScrollViewer>
+        <ScrollViewer Grid.Row="0" Grid.Column="2">
+            <TextBlock x:Name="tbActionResultStack" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top"
                     ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"/>
         </ScrollViewer>
         <Button Grid.Row="1" x:Name="btnStepQueue" Content="Step Queue" Margin="5,5,5,5" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="btnStepQueue_Click"/>

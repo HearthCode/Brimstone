@@ -82,7 +82,7 @@ namespace Brimstone
 				var minion = new Minion(game, card);
 				player.ZoneHand.Add(minion);
 				minion[GameTag.ZONE] = (int)Zone.HAND;
-				minion[GameTag.ZONE_POSITION] = player.ZoneHand.Count + 1;
+				minion[GameTag.ZONE_POSITION] = player.ZoneHand.Count;
 				return minion;
 			}
 			return ActionResult.None;
