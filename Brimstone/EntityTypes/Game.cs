@@ -83,7 +83,6 @@ namespace Brimstone
 		}
 		public override object Clone() {
 			Game clone = (Game)base.Clone();
-			clone.NextEntityId = NextEntityId;
 			clone.Player1 = (Player)Player1.Clone();
 			clone.Player2 = (Player)Player2.Clone();
 			// Yeah, fix this...
