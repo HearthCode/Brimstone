@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Brimstone
 {
-	public class Game : Entity
+	public class Game : BaseEntity
 	{
 		public int NextEntityId = 1;
 
@@ -17,7 +17,6 @@ namespace Brimstone
 
 		// Required by IEntity
 		public Game(Game cloneFrom) : base(cloneFrom) {
-			Id = cloneFrom.Id;
 			NextEntityId = cloneFrom.NextEntityId;
 			Game = this;
 			Player1 = (Player)cloneFrom.Player1.Clone();

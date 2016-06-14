@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Brimstone
 {
-	public class Player : Entity
+	public class Player : BaseEntity
 	{
 		public string FriendlyName { get; set; }
 		public int Health { get; private set; } = 30;
@@ -12,8 +12,6 @@ namespace Brimstone
 
 		public Player(Player cloneFrom) : base(cloneFrom) {
 			Health = cloneFrom.Health;
-			ZoneHand = new List<IPlayable>();
-			ZonePlay = new List<IMinion>();
 			foreach (var e in cloneFrom.ZoneHand)
 				ZoneHand.Add(e.Clone() as IPlayable);
 			foreach (var e in cloneFrom.ZonePlay)
@@ -24,7 +22,7 @@ namespace Brimstone
 
 		public IPlayable Give(Card card) {
 			Game.ActionQueue.Enqueue(CardBehaviour.Give(this, card));
-			return (IPlayable)(Entity)Game.ActionQueue.Process()[0];
+			return (IPlayable)(BaseEntity)Game.ActionQueue.Process()[0];
 		}
 
 		public override string ToString() {

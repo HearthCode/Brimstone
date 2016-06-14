@@ -24,7 +24,7 @@ namespace Brimstone
 
 	public class LazyEntity : QueueAction
 	{
-		public Entity Entity { get; set; }
+		public BaseEntity Entity { get; set; }
 
 		public override ActionResult Run(Game game, List<ActionResult> args) {
 			return Entity;
@@ -96,7 +96,7 @@ namespace Brimstone
 
 		public override ActionResult Run(Game game, List<ActionResult> args) {
 			Player player = (Player)args[PLAYER];
-			IMinion entity = (IMinion) (Entity) args[ENTITY];
+			IMinion entity = (IMinion) (BaseEntity) args[ENTITY];
 
 			entity.Health = (int)entity.Card[GameTag.HEALTH];
 			player.ZoneHand.Remove(entity);
@@ -108,7 +108,7 @@ namespace Brimstone
 
 			game.ActionQueue.Enqueue(entity.Card.Behaviour.Battlecry);
 			game.ActionQueue.Process();
-			return (Entity) entity;
+			return (BaseEntity) entity;
 		}
 	}
 

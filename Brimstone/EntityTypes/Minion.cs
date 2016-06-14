@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Brimstone
 {
-	public class Minion : Entity, IMinion
+	public class Minion : BaseEntity, IMinion
 	{
 		public int Health { get; set; }
 
@@ -15,7 +15,7 @@ namespace Brimstone
 		public IPlayable Play() {
 			// TODO: Might not be CurrentPlayer
 			Game.ActionQueue.Enqueue(CardBehaviour.Play(Game.CurrentPlayer, this));
-			return (IPlayable)(Entity)Game.ActionQueue.Process()[0];
+			return (IPlayable)(BaseEntity)Game.ActionQueue.Process()[0];
 		}
 
 		public void Damage(int amount) {

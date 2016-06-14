@@ -14,6 +14,11 @@ namespace Brimstone
 		int? this[GameTag t] { get; set; }
 	}
 
+	public interface ICopyOnWrite
+	{
+		void CopyOnWrite();
+	}
+
 	public interface IPlayable : IEntity
 	{
 		IPlayable Play();
@@ -25,57 +30,113 @@ namespace Brimstone
 		void Damage(int amount);
 	}
 
-	public abstract class BaseEntity : IEntity
+	public class BaseEntityData : ICloneable
 	{
 		public int Id { get; set; }
-		public Game Game { get; set; }
 		public Card Card { get; }
-		public Dictionary<GameTag, int?> Tags { get; } = new Dictionary<GameTag, int?>((int)GameTag._COUNT);
+		public Dictionary<GameTag, int?> Tags { get; }
 
-		public abstract int? this[GameTag t] { get; set; }
-		public BaseEntity(Game game, Card card, Dictionary<GameTag, int?> tags = null) {
-			Card = card;
-			Game = game;
-			if (tags != null)
-				Tags = tags;
-
-			// Game is null if we are starting a new game
-			Id = (game == null ? 1 : game.NextEntityId++);
-		}
-
-		// Cloning copy constructor
-		public BaseEntity(BaseEntity cloneFrom) {
-			Card = cloneFrom.Card;
-			Game = cloneFrom.Game;
-			Id = cloneFrom.Id;
-			Tags = new Dictionary<GameTag, int?>(cloneFrom.Tags);
-		}
-
-		public abstract object Clone();
-	}
-
-	public class Entity : BaseEntity
-	{
-		public Entity(Entity cloneFrom) : base(cloneFrom) { }
-		public Entity(Game game, Card card, Dictionary<GameTag, int?> tags = null) : base(game, card, tags) {
-			// game is null if we are cloning or starting a new game
-			if (game != null)
-				Game.PowerHistory.Add(new CreateEntity(this));
-		}
-
-		public override int? this[GameTag t] {
+		public int? this[GameTag t] {
 			get {
 				// Use TryGetValue for safety
 				return Tags[t];
 			}
 			set {
 				Tags[t] = value;
+			}
+		}
+
+		public BaseEntityData(Game game, Card card, Dictionary<GameTag, int?> tags = null) {
+			Card = card;
+			if (tags != null)
+				Tags = tags;
+			else
+				Tags = new Dictionary<GameTag, int?>((int)GameTag._COUNT);
+		}
+
+		// Cloning copy constructor
+		public BaseEntityData(BaseEntityData cloneFrom) {
+			Card = cloneFrom.Card;
+			Id = cloneFrom.Id;
+			Tags = new Dictionary<GameTag, int?>(cloneFrom.Tags);
+		}
+
+		public virtual object Clone() {
+			return new BaseEntityData(this);
+		}
+	}
+
+	public class BaseEntity : IEntity, ICopyOnWrite
+	{
+		private BaseEntityData _entity;
+		private List<BaseEntity> _references;
+
+		public Game Game { get; set; }
+
+		public BaseEntity(BaseEntity cloneFrom) {
+			_entity = cloneFrom._entity;
+			_references = cloneFrom._references;
+			_references.Add(this);
+			Game = cloneFrom.Game;
+		}
+
+		public BaseEntity(Game game, Card card, Dictionary<GameTag, int?> tags = null) {
+			_entity = new BaseEntityData(game, card, tags);
+			_references = new List<BaseEntity> { this };
+
+			Game = game;
+			// Game is null if we are starting a new game
+			Id = (game == null ? 1 : game.NextEntityId++);
+
+			if (Game != null)
+				Game.PowerHistory.Add(new CreateEntity(this));
+		}
+
+		public int? this[GameTag t] {
+			get {
+				return Tags[t];
+			}
+
+			set {
+				CopyOnWrite();
+				_entity[t] = value;
 				Game.PowerHistory.Add(new TagChange(this) { Key = t, Value = value });
 			}
 		}
 
-		public override object Clone() {
-			return new Entity(this);
+		public Card Card {
+			get {
+				return _entity.Card;
+			}
+		}
+
+		public int Id {
+			get {
+				return _entity.Id;
+			}
+
+			set {
+				CopyOnWrite();
+				_entity.Id = value;
+			}
+		}
+
+		public Dictionary<GameTag, int?> Tags {
+			get {
+				return _entity.Tags;
+			}
+		}
+
+		public virtual object Clone() {
+			return new BaseEntity(this);
+		}
+
+		public void CopyOnWrite() {
+			if (_references.Count > 1) {
+				_entity = (BaseEntityData)_entity.Clone();
+				_references.Remove(this);
+				_references = new List<BaseEntity> { this };
+			}
 		}
 	}
 }

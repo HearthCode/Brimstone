@@ -23,7 +23,7 @@ namespace Brimstone
 		public static implicit operator ActionResult(bool x) {
 			return new ActionResult { hasValue = true, hasBoolValue = true, boolValue = x };
 		}
-		public static implicit operator ActionResult(Entity x) {
+		public static implicit operator ActionResult(BaseEntity x) {
 			return new ActionResult { hasValue = true, hasEntityListValue = true, entityListValue = new List<IEntity> { x } };
 		}
 		public static implicit operator ActionResult(List<IEntity> x) {
@@ -38,8 +38,8 @@ namespace Brimstone
 		public static implicit operator bool(ActionResult a) {
 			return a.boolValue;
 		}
-		public static implicit operator Entity(ActionResult a) {
-			return a.entityListValue[0] as Entity;
+		public static implicit operator BaseEntity(ActionResult a) {
+			return a.entityListValue[0] as BaseEntity;
 		}
 		public static implicit operator List<IEntity>(ActionResult a) {
 			return a.entityListValue;
