@@ -10,12 +10,10 @@ namespace Brimstone
 	{
 		public Game Game;
 		public QueueAction Action;
-		public List<ActionResult> Args;
 
-		public QueueActionEventArgs(Game g, QueueAction a, List<ActionResult> args) {
+		public QueueActionEventArgs(Game g, QueueAction a) {
 			Game = g;
 			Action = a;
-			Args = args;
 		}
 	}
 
@@ -46,24 +44,20 @@ namespace Brimstone
 			while (Queue.Count > 0) {
 				var action = Queue.Dequeue();
 				Console.WriteLine(action);
+				if (OnActionStarting != null)
+					OnActionStarting(this, new QueueActionEventArgs(Game, action));
+				// TODO: Replace with async/await later
+				if (Paused)
+					return null;
 				var args = new List<ActionResult>();
 				for (int i = 0; i < action.Args.Count; i++)
 					args.Add(ResultStack.Pop());
-				if (OnActionStarting != null)
-					OnActionStarting(this, new QueueActionEventArgs(Game, action, args));
-				// TODO: Replace with async/await later
-				if (Paused) {
-					foreach (var a in args)
-						ResultStack.Push(a);
-					args.Reverse();
-					return args;
-				}
 				args.Reverse();
 				var result = action.Run(Game, args);
 				if (result.HasResult)
 					ResultStack.Push(result);
 				if (OnAction != null)
-					OnAction(this, new QueueActionEventArgs(Game, action, args));
+					OnAction(this, new QueueActionEventArgs(Game, action));
 			}
 			// Return whatever is left on the stack
 			var stack = new List<ActionResult>(ResultStack);

@@ -22,6 +22,18 @@ namespace Test1
 			game.CurrentPlayer = p1;
 			game.Opponent = p2;
 
+			game.ActionQueue.OnActionStarting += (o, e) => {
+				ActionQueue queue = o as ActionQueue;
+				if (e.Action is Damage) {
+					Console.Write("DAMAGE INTERCEPTED: " + e.Action);
+					Console.WriteLine();
+					/*int oldDamage = queue.ResultStack.Pop();
+					Console.Write("Enter new damage amount to push onto stack (old value: {0}): ", oldDamage);
+					int d = int.Parse(Console.ReadLine());
+					queue.ResultStack.Push(d);*/
+				}
+			};
+
 			// Put a Piloted Shredder and Flame Juggler in each player's hand
 			p1.Give(Cards.FindByName("Piloted Shredder"));
 			p1.Give(Cards.FindByName("Flame Juggler"));
