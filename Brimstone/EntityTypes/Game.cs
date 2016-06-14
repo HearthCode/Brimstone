@@ -13,8 +13,7 @@ namespace Brimstone
 		public Player Opponent { get; set; }
 
 		public PowerHistory PowerHistory = new PowerHistory();
-		public Queue<QueueAction> ActionQueue = new Queue<QueueAction>();
-		public Stack<ActionResult> ActionResultStack = new Stack<ActionResult>();
+		public ActionQueue ActionQueue = new ActionQueue();
 
 		// Required by IEntity
 		public Game(Game cloneFrom) : base(cloneFrom) {
@@ -28,19 +27,17 @@ namespace Brimstone
 			foreach (var e in Entities)
 				e.Game = this;
 			// NOTE: Don't clone PowerHistory!
+			ActionQueue.Attach(this);
 		}
 
 		public Game(Dictionary<GameTag, int?> tags = null,
 					bool PowerHistory = false) : base(null, Cards.Find["Game"], tags) {
 			if (PowerHistory) {
-				AttachPowerHistory();
+				this.PowerHistory.Attach(this);
 				this.PowerHistory.Add(new CreateEntity(this) { EntityId = NextEntityId, Tags = tags });
 			}
+			ActionQueue.Attach(this);
 			NextEntityId++;
-		}
-
-		public void AttachPowerHistory() {
-			PowerHistory.Game = this;
 		}
 
 		public override string ToString() {
@@ -61,26 +58,6 @@ namespace Brimstone
 			foreach (var item in PowerHistory)
 				s += item + "\n";
 			return s;
-		}
-
-		public void Enqueue(ActionGraph g) {
-			// Don't queue unimplemented cards
-			if (g != null)
-				g.Queue(this);
-		}
-
-		public void ResolveQueue() {
-			while (ActionQueue.Count > 0) {
-				var action = ActionQueue.Dequeue();
-				Console.WriteLine(action);
-				var args = new List<ActionResult>();
-				for (int i = 0; i < action.Args.Count; i++)
-					args.Add(ActionResultStack.Pop());
-				args.Reverse();
-				var result = action.Run(args);
-				if (result.HasResult)
-					ActionResultStack.Push(result);
-			}
 		}
 
 		public IEnumerable<IEntity> Entities {

@@ -34,7 +34,7 @@ namespace Test1
 			for (int i = 0; i < MaxMinions - 2; i++) {
 				var fj = p1.Give(Cards.FindByName("Flame Juggler"));
 				fj.Play();
-				game.ResolveQueue();
+				game.ActionQueue.Process();
 			}
 
 			game.CurrentPlayer = p2;
@@ -43,21 +43,21 @@ namespace Test1
 			for (int i = 0; i < MaxMinions - 2; i++) {
 				var fj = p2.Give(Cards.FindByName("Flame Juggler"));
 				fj.Play();
-				game.ResolveQueue();
+				game.ActionQueue.Process();
 			}
 			// Throw in a couple of Boom Bots
 			p2.Give(Cards.FindByName("Boom Bot")).Play();
-			game.ResolveQueue();
+			game.ActionQueue.Process();
 			p2.Give(Cards.FindByName("Boom Bot")).Play();
-			game.ResolveQueue();
+			game.ActionQueue.Process();
 
 			game.CurrentPlayer = p1;
 			game.Opponent = p2;
 
 			p1.Give(Cards.FindByName("Boom Bot")).Play();
-			game.ResolveQueue();
+			game.ActionQueue.Process();
 			p1.Give(Cards.FindByName("Boom Bot")).Play();
-			game.ResolveQueue();
+			game.ActionQueue.Process();
 
 			// Set off the chain of eventsy
 			var boardStates = new Dictionary<string, int>();
@@ -69,7 +69,7 @@ namespace Test1
 				var clonedGame = game.Clone() as Game;
 				var firstboombot = clonedGame.Player1.ZonePlay.First(t => t.Card.Id == "GVG_110t");
 				firstboombot.Damage(1);
-				clonedGame.ResolveQueue();
+				clonedGame.ActionQueue.Process();
 
 				var key = clonedGame.ToString();
 				if (!boardStates.ContainsKey(key))

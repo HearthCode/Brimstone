@@ -13,7 +13,7 @@ namespace BrimstoneVisualizer
 		public const int MaxMinions = 7;
 
 		public static void PlayGame(MainWindow window) {
-			var game = new Game();
+			var game = new Game(PowerHistory: true);
 			game.Player1 = new Player(game);
 			game.Player2 = new Player(game);
 			var p1 = game.Player1;
@@ -33,7 +33,7 @@ namespace BrimstoneVisualizer
 			for (int i = 0; i < MaxMinions; i++) {
 				var fj = p1.Give(Cards.FindByName("Flame Juggler"));
 				fj.Play();
-				game.ResolveQueue();
+				game.ActionQueue.Process();
 			}
 
 			game.CurrentPlayer = p2;
@@ -42,7 +42,7 @@ namespace BrimstoneVisualizer
 			for (int i = 0; i < MaxMinions; i++) {
 				var fj = p2.Give(Cards.FindByName("Flame Juggler"));
 				fj.Play();
-				game.ResolveQueue();
+				game.ActionQueue.Process();
 			}
 
 			string ph = string.Empty;

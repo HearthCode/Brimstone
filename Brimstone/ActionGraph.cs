@@ -26,12 +26,11 @@ namespace Brimstone
 		}
 
 		// Add the graph to the game's action queue
-		public void Queue(Game game) {
+		public void Queue(ActionQueue queue) {
 			foreach (var action in graph) {
 				foreach (var arg in action.Args)
-					arg.Queue(game);
-				game.ActionQueue.Enqueue(action);
-				action.Game = game;
+					arg.Queue(queue);
+				queue.Queue.Enqueue(action);
 			}
 		}
 	}

@@ -19,7 +19,7 @@ namespace Brimstone
 			Game.CurrentPlayer.ZonePlay.Add(this);
 			this[GameTag.ZONE] = (int)Zone.PLAY;
 			this[GameTag.ZONE_POSITION] = Game.CurrentPlayer.ZonePlay.Count;
-			Game.Enqueue(Card.Behaviour.Battlecry);
+			Game.ActionQueue.Enqueue(Card.Behaviour.Battlecry);
 			return this;
 		}
 
@@ -34,7 +34,7 @@ namespace Brimstone
 			if (Health <= 0) {
 				Console.WriteLine(this + " dies!");
 				Game.Opponent.ZonePlay.Remove(this);
-				Game.Enqueue(Card.Behaviour.Deathrattle);
+				Game.ActionQueue.Enqueue(Card.Behaviour.Deathrattle);
 				this[GameTag.ZONE] = (int)Zone.GRAVEYARD;
 				this[GameTag.ZONE_POSITION] = 0;
 				this[GameTag.DAMAGE] = 0;

@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionGraph.cs" />
+    <Compile Include="ActionQueue.cs" />
     <Compile Include="ActionResult.cs" />
     <Compile Include="Actions.cs" />
     <Compile Include="Behaviours.cs" />

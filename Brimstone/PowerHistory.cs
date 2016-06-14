@@ -56,10 +56,17 @@ namespace Brimstone
 
 	public class PowerHistory : IEnumerable<PowerAction>
 	{
-		public Game Game { get; set; }
+		public Game Game { get; private set; }
 		public List<PowerAction> Log { get; } = new List<PowerAction>();
 
 		public event EventHandler<PowerActionEventArgs> OnPowerAction;
+
+		public void Attach(Game game) {
+			Game = game;
+		}
+		public void Detach() {
+			Game = null;
+		}
 
 		public void Add(PowerAction a) {
 			// Ignore PowerHistory for untracked games
