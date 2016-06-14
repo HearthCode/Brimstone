@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test1", "Test1\Test1.csproj
 		{2ACA22D8-ED17-4BB0-BD5B-E0A435D180B8} = {2ACA22D8-ED17-4BB0-BD5B-E0A435D180B8}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrimstoneVisualizer", "BrimstoneVisualizer\BrimstoneVisualizer.csproj", "{328FFE6A-F79D-4D79-B6D0-7488D5665AC0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,11 +28,16 @@ Global
 		{5D1FBC0E-35B0-4D5F-9F7A-6D17930F71AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D1FBC0E-35B0-4D5F-9F7A-6D17930F71AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D1FBC0E-35B0-4D5F-9F7A-6D17930F71AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{328FFE6A-F79D-4D79-B6D0-7488D5665AC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{328FFE6A-F79D-4D79-B6D0-7488D5665AC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{328FFE6A-F79D-4D79-B6D0-7488D5665AC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{328FFE6A-F79D-4D79-B6D0-7488D5665AC0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5D1FBC0E-35B0-4D5F-9F7A-6D17930F71AD} = {54428178-5816-4B2E-B62F-07D40D57758A}
+		{328FFE6A-F79D-4D79-B6D0-7488D5665AC0} = {54428178-5816-4B2E-B62F-07D40D57758A}
 	EndGlobalSection
 EndGlobal
