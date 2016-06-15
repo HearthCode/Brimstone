@@ -3,27 +3,31 @@ using System.Collections.Generic;
 
 namespace Brimstone
 {
-	public class Player : BaseEntity
+	public class Player : Entity
 	{
 		public string FriendlyName { get; set; }
-		public List<IPlayable> ZoneHand { get; private set; } = new List<IPlayable>();
-		public List<IMinion> ZonePlay { get; private set; } = new List<IMinion>();
+		public List<Entity>[] Zones { get; } = new List<Entity>[(int)Zone._COUNT];
+
+		public List<Entity> Hand { get { return Zones[(int) Zone.HAND]; } }
+		public List<Entity> Board { get { return Zones[(int) Zone.PLAY]; } }
 
 		public Player(Player cloneFrom) : base(cloneFrom) {
 			FriendlyName = cloneFrom.FriendlyName;
-			foreach (var e in cloneFrom.ZoneHand)
-				ZoneHand.Add(e.Clone() as IPlayable);
-			foreach (var e in cloneFrom.ZonePlay)
-				ZonePlay.Add(e.Clone() as IMinion);
+			foreach (var e in cloneFrom.Hand)
+				Hand.Add(e.Clone() as Entity);
+			foreach (var e in cloneFrom.Board)
+				Board.Add(e.Clone() as Entity);
 		}
 
-		public Player(Game game, Dictionary<GameTag, int?> tags = null) : base(game, Cards.Find["Player"], tags) {
+		public Player(Game game = null, Dictionary<GameTag, int?> tags = null) : base(game, Cards.Find["Player"], tags) {
 			this[GameTag.HEALTH] = 30;
+			for (int i = 0; i < (int)Zone._COUNT; i++)
+				Zones[i] = new List<Entity>();
 		}
 
 		public IPlayable Give(Card card) {
 			Game.ActionQueue.Enqueue(CardBehaviour.Give(this, card));
-			return (IPlayable)(BaseEntity)Game.ActionQueue.Process()[0];
+			return (IPlayable)(Entity)Game.ActionQueue.Process()[0];
 		}
 
 		public override string ToString() {

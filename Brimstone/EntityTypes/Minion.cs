@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Brimstone
 {
-	public class Minion : BaseEntity, IMinion
+	public class Minion : Entity, IMinion
 	{
 		public Minion(Minion cloneFrom) : base(cloneFrom) { }
 		public Minion(Game game, Card card, Dictionary<GameTag, int?> tags = null) : base(game, card, tags) {
@@ -13,7 +13,7 @@ namespace Brimstone
 		public IPlayable Play() {
 			// TODO: Might not be CurrentPlayer
 			Game.ActionQueue.Enqueue(CardBehaviour.Play(Game.CurrentPlayer, this));
-			return (IPlayable)(BaseEntity)Game.ActionQueue.Process()[0];
+			return (IPlayable)(Entity)Game.ActionQueue.Process()[0];
 		}
 
 		public void Damage(int amount) {
@@ -24,7 +24,7 @@ namespace Brimstone
 		public void CheckForDeath() {
 			if (this[GameTag.HEALTH] <= 0) {
 				Console.WriteLine(this + " dies!");
-				Game.Opponent.ZonePlay.Remove(this);
+				Game.Opponent.Board.Remove(this);
 				Game.ActionQueue.Enqueue(Card.Behaviour.Deathrattle);
 				Game.ActionQueue.Process();
 				this[GameTag.ZONE] = (int)Zone.GRAVEYARD;

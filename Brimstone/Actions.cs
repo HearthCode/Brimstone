@@ -24,7 +24,7 @@ namespace Brimstone
 
 	public class LazyEntity : QueueAction
 	{
-		public BaseEntity Entity { get; set; }
+		public Entity Entity { get; set; }
 
 		public override ActionResult Run(Game game, List<ActionResult> args) {
 			return Entity;
@@ -34,17 +34,17 @@ namespace Brimstone
 	public class RandomOpponentMinion : QueueAction
 	{
 		public override ActionResult Run(Game game, List<ActionResult> args) {
-			if (game.Opponent.ZonePlay.Count == 0)
+			if (game.Opponent.Board.Count == 0)
 				return new List<IEntity>();
-			var m = new Random().Next(game.Opponent.ZonePlay.Count);
-			return (Minion)game.Opponent.ZonePlay[m];
+			var m = new Random().Next(game.Opponent.Board.Count);
+			return (Minion)game.Opponent.Board[m];
 		}
 	}
 
 	public class AllMinions : QueueAction
 	{
 		public override ActionResult Run(Game game, List<ActionResult> args) {
-			return game.CurrentPlayer.ZonePlay.Concat(game.Opponent.ZonePlay) as List<IEntity>;
+			return game.CurrentPlayer.Board.Concat(game.Opponent.Board) as List<IEntity>;
 		}
 	}
 
@@ -80,9 +80,9 @@ namespace Brimstone
 
 			if (card[GameTag.CARDTYPE] == (int)CardType.MINION) {
 				var minion = new Minion(game, card);
-				player.ZoneHand.Add(minion);
+				player.Hand.Add(minion);
 				minion[GameTag.ZONE] = (int)Zone.HAND;
-				minion[GameTag.ZONE_POSITION] = player.ZoneHand.Count;
+				minion[GameTag.ZONE_POSITION] = player.Hand.Count;
 				return minion;
 			}
 			return ActionResult.None;
@@ -96,19 +96,19 @@ namespace Brimstone
 
 		public override ActionResult Run(Game game, List<ActionResult> args) {
 			Player player = (Player)args[PLAYER];
-			IMinion entity = (IMinion) (BaseEntity) args[ENTITY];
+			Entity entity = (Entity) args[ENTITY];
 
 			entity[GameTag.HEALTH] = entity.Card[GameTag.HEALTH];
-			player.ZoneHand.Remove(entity);
-			player.ZonePlay.Add(entity);
+			player.Hand.Remove(entity);
+			player.Board.Add(entity);
 			entity[GameTag.ZONE] = (int)Zone.PLAY;
-			entity[GameTag.ZONE_POSITION] = player.ZonePlay.Count;
+			entity[GameTag.ZONE_POSITION] = player.Board.Count;
 
 			Console.WriteLine("{0} is playing {1}", player, entity);
 
 			game.ActionQueue.Enqueue(entity.Card.Behaviour.Battlecry);
 			game.ActionQueue.Process();
-			return (BaseEntity) entity;
+			return (Entity) entity;
 		}
 	}
 

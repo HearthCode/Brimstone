@@ -14,11 +14,9 @@ namespace Test1
 		static void Main(string[] args) {
 			Console.WriteLine("Hello Hearthstone!");
 
-			var game = new Game(PowerHistory: true);
-			game.Player1 = new Player(game) { FriendlyName = "Player 1" };
-			game.Player2 = new Player(game) { FriendlyName = "Player 2" };
-			var p1 = game.Player1;
-			var p2 = game.Player2;
+			var p1 = new Player { FriendlyName = "Player 1" };
+			var p2 = new Player { FriendlyName = "Player 2" };
+			var game = new Game(Player1: p1, Player2: p2, PowerHistory: true);
 			game.CurrentPlayer = p1;
 			game.Opponent = p2;
 
@@ -33,9 +31,9 @@ namespace Test1
 			game.ActionQueue.OnQueued += (o, e) => {
 				ActionQueue queue = o as ActionQueue;
 				if (e.Action is RandomOpponentMinion) {
-					if (game.Opponent.ZonePlay.Count > 0) {
+					if (game.Opponent.Board.Count > 0) {
 						Console.WriteLine("REPLACING RANDOM CHOICE ACTION: " + e.Action);
-						queue.ReplaceAction(new LazyEntity() { Entity = (Minion)game.Opponent.ZonePlay[0] });
+						queue.ReplaceAction(new LazyEntity() { Entity = (Minion)game.Opponent.Board[0] });
 					}
 				}
 			};
@@ -79,7 +77,7 @@ namespace Test1
 			sw.Start();
 			var clones = new EntityGroup<Game>(game, 100000).Entities;
 			for (int i = 0; i < 100000; i++) {
-				var firstboombot = clones[i].Player1.ZonePlay.First(t => t.Card.Id == "GVG_110t");
+				var firstboombot = (Minion) clones[i].Player1.Board.First(t => t.Card.Id == "GVG_110t");
 				firstboombot.Damage(1);
 				/*
 				var key = clonedGame.ToString();
@@ -111,14 +109,14 @@ namespace Test1
 
 			System.Diagnostics.Debug.Assert(gs1.Equals(gs2));
 
-			game.Player1.ZoneHand[0][GameTag.ZONE_POSITION] = 12345;
+			game.Player1.Hand[0][GameTag.ZONE_POSITION] = 12345;
 
 			gs1 = game.ToString();
 			gs2 = game2.ToString();
 
 			System.Diagnostics.Debug.Assert(!gs1.Equals(gs2));
 
-			Console.WriteLine("Entities to clone: " + (game.Player1.ZoneHand.Count + game.Player1.ZonePlay.Count + game.Player2.ZoneHand.Count + game.Player2.ZonePlay.Count + 3));
+			Console.WriteLine("Entities to clone: " + (game.Player1.Hand.Count + game.Player1.Board.Count + game.Player2.Hand.Count + game.Player2.Board.Count + 3));
 			// Measure clonimg time
 			Stopwatch s = new Stopwatch();
 			s.Start();

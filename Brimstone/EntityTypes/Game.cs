@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace Brimstone
 {
-	public class Game : BaseEntity
+	public class Game : Entity
 	{
-		public int NextEntityId = 1;
+		public EntitySequence Entities;
 
-		public Player Player1 { get; set; }
-		public Player Player2 { get; set; }
+		public Player Player1 { get; }
+		public Player Player2 { get; }
 		public Player CurrentPlayer { get; set; }
 		public Player Opponent { get; set; }
 
@@ -17,31 +17,37 @@ namespace Brimstone
 
 		// Required by IEntity
 		public Game(Game cloneFrom) : base(cloneFrom) {
-			NextEntityId = cloneFrom.NextEntityId;
-			Game = this;
-			Player1 = (Player)cloneFrom.Player1.Clone();
-			Player2 = (Player)cloneFrom.Player2.Clone();
-			// Yeah, fix this...
-			CurrentPlayer = Player1;
-			Opponent = Player2;
-			// Change ownership
-			foreach (var e in Entities)
-				e.Game = this;
-			// NOTE: Don't clone PowerHistory!
+			// This makes a copy-on-write proxy clone of all the entities
+			// and changes ownership to this game while preserving the entity IDs
+			Entities = (EntitySequence)cloneFrom.Entities.Clone();
+			// Set references to the new player proxies (no additional cloning)
+			Player1 = (Player)Entities[cloneFrom.Player1.Id];
+			Player2 = (Player)Entities[cloneFrom.Player2.Id];
+			CurrentPlayer = (Player)Entities[cloneFrom.CurrentPlayer.Id];
+			Opponent = (Player)Entities[cloneFrom.Opponent.Id];
+			// NOTE: Don't clone or enable PowerHistory!
 			ActionQueue.Queue = new Queue<QueueAction>(cloneFrom.ActionQueue.Queue);
 			ActionQueue.ResultStack = new Stack<ActionResult>(cloneFrom.ActionQueue.ResultStack);
 			ActionQueue.Attach(this);
 		}
 
-		public Game(Dictionary<GameTag, int?> tags = null,
-					bool PowerHistory = false) : base(null, Cards.Find["Game"], tags) {
+		public Game(Player Player1 = null, Player Player2 = null,
+					Dictionary<GameTag, int?> Tags = null,
+					bool PowerHistory = false) : base(null, Cards.Find["Game"], Tags) {
 			if (PowerHistory) {
 				this.PowerHistory.Attach(this);
-				this.PowerHistory.Add(new CreateEntity(this) { EntityId = NextEntityId, Tags = tags });
 			}
 			ActionQueue.Attach(this);
-			NextEntityId++;
-			Game = this;
+			Entities = new EntitySequence(this);
+			Entities.Add(this);
+			if (Player1 != null && Player2 != null) {
+				SetPlayers(Player1, Player2);
+			}
+		}
+
+		public void SetPlayers(Player Player1, Player Player2) {
+			Entities.Add(Player1);
+			Entities.Add(Player2);
 		}
 
 		public override string ToString() {
@@ -50,11 +56,11 @@ namespace Brimstone
 			foreach (var player in players) {
 				s += "Player " + player.Card.Id + " - ";
 				s += "HAND: ";
-				foreach (var entity in player.ZoneHand) {
+				foreach (var entity in player.Hand) {
 					s += entity.ToString() + ", ";
 				}
 				s += "PLAY: ";
-				foreach (var entity in player.ZonePlay) {
+				foreach (var entity in player.Board) {
 					s += entity.ToString() + ", ";
 				}
 			}
@@ -63,7 +69,7 @@ namespace Brimstone
 				s += item + "\n";
 			return s;
 		}
-
+		/*
 		public IEnumerable<IEntity> Entities {
 			get {
 				yield return this;
@@ -79,7 +85,7 @@ namespace Brimstone
 					yield return e;
 			}
 		}
-
+		*/
 		public void BeginTurn() {
 			ActionQueue.Enqueue(CardBehaviour.BeginTurn);
 			ActionQueue.Process();

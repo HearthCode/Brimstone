@@ -8,7 +8,7 @@ namespace Brimstone
 	{
 		public int EntityId { get; set; }
 
-		public PowerAction(BaseEntity e) {
+		public PowerAction(Entity e) {
 			EntityId = e.Id;
 		}
 
@@ -22,7 +22,7 @@ namespace Brimstone
 		public GameTag Key { get; set; }
 		public int? Value { get; set; }
 
-		public TagChange(BaseEntity e) : base(e) { }
+		public TagChange(Entity e) : base(e) { }
 
 		public override string ToString() {
 			return "[Tag] Entity " + EntityId + ": " + Key.ToString() + " = " + Value;
@@ -33,7 +33,7 @@ namespace Brimstone
 	{
 		public Dictionary<GameTag, int?> Tags { get; set; }
 
-		public CreateEntity(BaseEntity e) : base(e) {
+		public CreateEntity(Entity e) : base(e) {
 			// Make sure we copy the tags, not the references!
 			Tags = new Dictionary<GameTag, int?>(e.Tags);
 		}

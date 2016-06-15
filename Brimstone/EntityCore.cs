@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Brimstone
@@ -74,29 +75,23 @@ namespace Brimstone
 		public int Count { get; set; }
 	}
 
-	public class BaseEntity : IEntity, ICopyOnWrite
+	public class Entity : IEntity, ICopyOnWrite
 	{
 		private BaseEntityData _entity;
 		private ReferenceCount _referenceCount;
 
 		public Game Game { get; set; }
 
-		public BaseEntity(BaseEntity cloneFrom) {
+		public Entity(Entity cloneFrom) {
 			_entity = cloneFrom._entity;
 			_referenceCount = cloneFrom._referenceCount;
 			Game = cloneFrom.Game;
 		}
 
-		public BaseEntity(Game game, Card card, Dictionary<GameTag, int?> tags = null) {
+		public Entity(Game game, Card card, Dictionary<GameTag, int?> tags = null) {
 			_entity = new BaseEntityData(game, card, tags);
 			_referenceCount = new ReferenceCount();
-
 			Game = game;
-			// Game is null if we are starting a new game
-			Id = (game == null ? 1 : game.NextEntityId++);
-
-			if (Game != null)
-				Game.PowerHistory.Add(new CreateEntity(this));
 		}
 
 		public int? this[GameTag t] {
@@ -135,7 +130,7 @@ namespace Brimstone
 		}
 
 		public virtual object Clone() {
-			return new BaseEntity(this);
+			return new Entity(this);
 		}
 
 		public void CopyOnWrite() {
@@ -144,6 +139,52 @@ namespace Brimstone
 				_referenceCount.Count--;
 				_referenceCount = new ReferenceCount();
 			}
+		}
+	}
+
+	public class EntitySequence : IEnumerable<Entity>, ICloneable
+	{
+		public Game Game { get; }
+		public int NextEntityId = 1;
+
+		public SortedDictionary<int, Entity> Entities { get; } = new SortedDictionary<int, Entity>();
+
+		public Entity this[int id] {
+			get {
+				return Entities[id];
+			}
+		}
+
+		public EntitySequence(Game game) {
+			Game = game;
+		}
+
+		public EntitySequence(EntitySequence es) {
+			Game = es.Game;
+			NextEntityId = es.NextEntityId;
+			foreach (var entity in es) {
+				Entities.Add(entity.Id, (Entity) entity.Clone());
+			}
+		}
+
+		public int Add(Entity entity) {
+			entity.Game = Game;
+			entity.Id = NextEntityId++;
+			Entities[entity.Id] = entity;
+			Game.PowerHistory.Add(new CreateEntity(entity));
+			return entity.Id;
+		}
+
+		public IEnumerator<Entity> GetEnumerator() {
+			return Entities.Values.GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator() {
+			return GetEnumerator();
+		}
+
+		public object Clone() {
+			return new EntitySequence(this);
 		}
 	}
 }

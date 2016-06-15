@@ -30,10 +30,9 @@ namespace BrimstoneVisualizer
 				QueueRead.WaitOne();
 			};
 
-			Game.Player1 = new Player(Game) { FriendlyName = "Player 1" };
-			Game.Player2 = new Player(Game) { FriendlyName = "Player 2" };
-			var p1 = Game.Player1;
-			var p2 = Game.Player2;
+			var p1 = new Player { FriendlyName = "Player 1" };
+			var p2 = new Player { FriendlyName = "Player 2" };
+			Game.SetPlayers(p1, p2);
 			Game.CurrentPlayer = p1;
 			Game.Opponent = p2;
 
