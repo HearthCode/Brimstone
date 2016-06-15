@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Linq;
+using NUnit.Framework;
 using Brimstone;
 
 namespace BrimstoneTests
@@ -31,6 +32,8 @@ namespace BrimstoneTests
 				p2.Give(Cards.FindByName("Flame Juggler"));
 			for (int i = 0; i < 7; i++)
 				p2.Give(Cards.FindByName("Flame Juggler"));
+
+			Assert.IsTrue(game.Entities.Count == 27);
 
 			// Act
 
@@ -65,18 +68,19 @@ namespace BrimstoneTests
 
 			// All entity IDs must match
 			Assert.IsTrue(game.Entities.NextEntityId == clone.Entities.NextEntityId);
-			Assert.IsTrue(game.Entities.Entities.Count == clone.Entities.Entities.Count);
-			foreach (var id in game.Entities.Entities.Keys)
-				Assert.IsTrue(clone.Entities.Entities.ContainsKey(id));
+			Assert.IsTrue(game.Entities.Count == clone.Entities.Count);
+			foreach (var id in game.Entities.Keys)
+				Assert.IsTrue(clone.Entities.ContainsKey(id));
 
 			// All entities must be different proxies
-			foreach (var kv in game.Entities.Entities)
-				Assert.IsTrue(!ReferenceEquals(kv, clone.Entities.Entities[kv.Key]));
+			foreach (var e in game.Entities)
+				Assert.IsTrue(!ReferenceEquals(e, clone.Entities[e.Id]));
 
-			// All entities must have correct controllers
-			foreach (var kv in clone.Entities.Entities) {
-				Assert.IsTrue(kv.Value.Controller.Id == game.Entities.Entities[kv.Key].Controller.Id);
-				Assert.IsTrue(!ReferenceEquals(kv.Value.Controller, game.Entities.Entities[kv.Key].Controller));
+			// All entities must have correct game and controllers
+			foreach (var e in clone.Entities) {
+				Assert.IsTrue(e.Controller.Id == game.Entities[e.Id].Controller.Id);
+				Assert.IsTrue(ReferenceEquals(e.Game, clone));
+				Assert.IsTrue(ReferenceEquals(e.Controller, clone.Entities[e.Id].Controller));
 			}
 
 			// PowerHistory must be empty
@@ -90,22 +94,23 @@ namespace BrimstoneTests
 			Assert.IsTrue(game.ActionQueue.ResultStack.Count == clone.ActionQueue.ResultStack.Count);
 
 			// All proxies must point to original entities
-			foreach (var kv in game.Entities.Entities)
-				Assert.IsTrue(ReferenceEquals(kv.Value.BaseEntityData, clone.Entities.Entities[kv.Key].BaseEntityData));
+			foreach (var e in game.Entities)
+				Assert.IsTrue(ReferenceEquals(e.BaseEntityData, clone.Entities[e.Id].BaseEntityData));
 
 			// All reference counts must be 2
-			foreach (var kv in game.Entities.Entities)
-				Assert.IsTrue(kv.Value.ReferenceCount == 2);
-			foreach (var kv in clone.Entities.Entities)
-				Assert.IsTrue(kv.Value.ReferenceCount == 2);
+			foreach (var e in game.Entities)
+				Assert.IsTrue(e.ReferenceCount == 2);
+			foreach (var e in clone.Entities)
+				Assert.IsTrue(e.ReferenceCount == 2);
 
 			// All zones must match with new proxies
-			for (int p = 0; p < game.Players.Length; p++)
-				for (int z = 0; z < game.Players[p].Zones.Length; z++)
-					for (int e = 0; e < game.Players[p].Zones[z].Count; e++) {
-						Assert.IsTrue(game.Players[p].Zones[z][e].Id == clone.Players[p].Zones[z][e].Id);
-						Assert.IsTrue(!ReferenceEquals(game.Players[p].Zones[z][e], clone.Players[p].Zones[z][e]));
-					}
+			foreach (var p in game.Players)
+				foreach (var z in p.Zones)
+					if (z != null)
+						for (int e = 0; e < z.Count(); e++) {
+							Assert.IsTrue(z.ToList()[e].Id == ((Player)clone.Entities[p.Id]).Zones.First(x => x.Zone == z.Zone).Entities.ToList()[e].Id);
+							Assert.IsTrue(!ReferenceEquals(z.ToList()[e], ((Player)clone.Entities[p.Id]).Zones.First(x => x.Zone == z.Zone).Entities.ToList()[e]));
+						}
 		}
 	}
 }

@@ -25,11 +25,10 @@ namespace Brimstone
 			if (this[GameTag.HEALTH] <= 0) {
 				Console.WriteLine(this + " dies!");
 				Game.Opponent.Board.Remove(this);
+				Game.Opponent.Graveyard.Add(this);
+				this[GameTag.DAMAGE] = 0;
 				Game.ActionQueue.Enqueue(Card.Behaviour.Deathrattle);
 				Game.ActionQueue.Process();
-				this[GameTag.ZONE] = (int)Zone.GRAVEYARD;
-				this[GameTag.ZONE_POSITION] = 0;
-				this[GameTag.DAMAGE] = 0;
 			}
 		}
 

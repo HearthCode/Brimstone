@@ -1,26 +1,49 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Brimstone
 {
 	public class Player : Entity
 	{
 		public string FriendlyName { get; set; }
-		public List<Entity>[] Zones { get; } = new List<Entity>[(int)Zone._COUNT];
 
-		public List<Entity> Hand { get { return Zones[(int) Zone.HAND]; } }
-		public List<Entity> Board { get { return Zones[(int) Zone.PLAY]; } }
+		public ZoneEntities Deck { get; private set; }
+		public ZoneEntities Hand { get; private set; }
+		public ZoneEntities Board { get; private set; }
+		public ZoneEntities Graveyard { get; private set; }
+		public ZoneEntities Secrets { get; private set; }
+		public ZoneGroup Zones { get; } = new ZoneGroup();
 
 		public Player(Player cloneFrom) : base(cloneFrom) {
 			FriendlyName = cloneFrom.FriendlyName;
-			for (int i = 0; i < (int)Zone._COUNT; i++)
-				Zones[i] = new List<Entity>();
 		}
 
 		public Player(Game game = null, Dictionary<GameTag, int?> tags = null) : base(game, game, Cards.Find["Player"], tags) {
 			this[GameTag.HEALTH] = 30;
-			for (int i = 0; i < (int)Zone._COUNT; i++)
-				Zones[i] = new List<Entity>();
+			setZones();
+		}
+
+		public void Attach(Game game) {
+			Game = game;
+			Controller = game;
+			setZones();
+		}
+
+		private void setZones() {
+			if (Game == null)
+				return;
+			Deck = new ZoneEntities(Game, this, Zone.DECK);
+			Hand = new ZoneEntities(Game, this, Zone.HAND);
+			Board = new ZoneEntities(Game, this, Zone.PLAY);
+			Graveyard = new ZoneEntities(Game, this, Zone.GRAVEYARD);
+			Secrets = new ZoneEntities(Game, this, Zone.SECRET);
+			Zones[Zone.DECK] = Deck;
+			Zones[Zone.HAND] = Hand;
+			Zones[Zone.PLAY] = Board;
+			Zones[Zone.GRAVEYARD] = Graveyard;
+			Zones[Zone.SECRET] = Secrets;
 		}
 
 		public IPlayable Give(Card card) {

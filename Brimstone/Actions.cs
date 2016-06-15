@@ -36,7 +36,7 @@ namespace Brimstone
 		public override ActionResult Run(Game game, List<ActionResult> args) {
 			if (game.Opponent.Board.Count == 0)
 				return new List<IEntity>();
-			var m = new Random().Next(game.Opponent.Board.Count);
+			var m = new Random().Next(game.Opponent.Board.Count) + 1;
 			return (Minion)game.Opponent.Board[m];
 		}
 	}
@@ -79,11 +79,7 @@ namespace Brimstone
 			Console.WriteLine("Giving {0} to {1}", card, player);
 
 			if (card[GameTag.CARDTYPE] == (int)CardType.MINION) {
-				var minion = new Minion(game, player, card);
-				player.Hand.Add(minion);
-				minion[GameTag.ZONE] = (int)Zone.HAND;
-				minion[GameTag.ZONE_POSITION] = player.Hand.Count;
-				return minion;
+				return player.Hand.Add(new Minion(game, player, card));
 			}
 			return ActionResult.None;
 		}
@@ -101,8 +97,6 @@ namespace Brimstone
 			entity[GameTag.HEALTH] = entity.Card[GameTag.HEALTH];
 			player.Hand.Remove(entity);
 			player.Board.Add(entity);
-			entity[GameTag.ZONE] = (int)Zone.PLAY;
-			entity[GameTag.ZONE_POSITION] = player.Board.Count;
 
 			Console.WriteLine("{0} is playing {1}", player, entity);
 

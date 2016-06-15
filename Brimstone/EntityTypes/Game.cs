@@ -5,7 +5,7 @@ namespace Brimstone
 {
 	public class Game : Entity
 	{
-		public EntitySequence Entities;
+		public EntityController Entities;
 
 		public Player[] Players { get; private set; } = new Player[2];
 		public Player Player1 { get; private set; }
@@ -32,7 +32,7 @@ namespace Brimstone
 				this.PowerHistory.Attach(this);
 			}
 			ActionQueue.Attach(this);
-			Entities = new EntitySequence(this);
+			Entities = new EntityController(this);
 			Entities.Add(this);
 			if (Player1 != null && Player2 != null) {
 				SetPlayers(Player1, Player2);
@@ -40,14 +40,14 @@ namespace Brimstone
 		}
 
 		public void SetPlayers(Player Player1, Player Player2) {
-			Player1.Controller = this;
-			Player2.Controller = this;
-			Entities.Add(Player1);
-			Entities.Add(Player2);
 			this.Player1 = Player1;
 			this.Player2 = Player2;
 			Players[0] = Player1;
 			Players[1] = Player2;
+			foreach (var p in Players) {
+				Entities.Add(p);
+				p.Attach(this);
+			}
 		}
 
 		public override string ToString() {
@@ -76,7 +76,7 @@ namespace Brimstone
 		}
 
 		public override IEntity CloneState() {
-			var entities = ((EntitySequence)Entities.Clone());
+			var entities = ((EntityController)Entities.Clone());
 			Game game = entities.FindGame();
 			// Set references to the new player proxies (no additional cloning)
 			game.Player1 = entities.FindPlayer(1);
@@ -87,10 +87,8 @@ namespace Brimstone
 			game.Opponent = (Opponent.Id == game.Player1.Id ? game.Player1 : game.Player2);
 			game.Entities = entities;
 			// Re-assign zone references
-			for (int p = 0; p < Players.Length; p++)
-				for (int z = 0; z < Players[p].Zones.Length; z++)
-					foreach (var e in Players[p].Zones[z])
-						game.Players[p].Zones[z].Add(game.Entities[e.Id]);
+			foreach (var p in game.Players)
+				p.Attach(game);
 			return game;
 		}
 

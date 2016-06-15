@@ -158,12 +158,11 @@ namespace Brimstone
 		}
 	}
 
-	public class EntitySequence : IEnumerable<Entity>, ICloneable
-	{
+	public class EntityController : IEnumerable<Entity>, ICloneable {
 		public Game Game { get; }
 		public int NextEntityId = 1;
 
-		public SortedDictionary<int, Entity> Entities { get; } = new SortedDictionary<int, Entity>();
+		private SortedDictionary<int, Entity> Entities = new SortedDictionary<int, Entity>();
 
 		public Entity this[int id] {
 			get {
@@ -171,11 +170,27 @@ namespace Brimstone
 			}
 		}
 
-		public EntitySequence(Game game) {
+		public int Count {
+			get {
+				return Entities.Count;
+			}
+		}
+
+		public ICollection<int> Keys {
+			get {
+				return Entities.Keys;
+			}
+		}
+
+		public bool ContainsKey(int key) {
+			return Entities.ContainsKey(key);
+		}
+
+		public EntityController(Game game) {
 			Game = game;
 		}
 
-		public EntitySequence(EntitySequence es) {
+		public EntityController(EntityController es) {
 			NextEntityId = es.NextEntityId;
 			foreach (var entity in es) {
 				Entities.Add(entity.Id, (Entity) entity.Clone());
@@ -193,6 +208,11 @@ namespace Brimstone
 			entity.Id = NextEntityId++;
 			Entities[entity.Id] = entity;
 			Game.PowerHistory.Add(new CreateEntity(entity));
+			return entity.Id;
+		}
+
+		public int Remove(Entity entity) {
+			Entities.Remove(entity.Id);
 			return entity.Id;
 		}
 
@@ -215,7 +235,7 @@ namespace Brimstone
 		}
 
 		public object Clone() {
-			return new EntitySequence(this);
+			return new EntityController(this);
 		}
 	}
 }

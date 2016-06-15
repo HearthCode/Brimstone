@@ -33,7 +33,7 @@ namespace Test1
 				if (e.Action is RandomOpponentMinion) {
 					if (game.Opponent.Board.Count > 0) {
 						Console.WriteLine("REPLACING RANDOM CHOICE ACTION: " + e.Action);
-						queue.ReplaceAction(new LazyEntity() { Entity = (Minion)game.Opponent.Board[0] });
+						//queue.ReplaceAction(new LazyEntity() { Entity = (Minion)game.Opponent.Board[1] });
 					}
 				}
 			};
@@ -66,8 +66,10 @@ namespace Test1
 
 			p1.Give(Cards.FindByName("Boom Bot")).Play();
 			p1.Give(Cards.FindByName("Boom Bot")).Play();
+			/*
+			// Set off the chain of events
+			Console.WriteLine("Entities to clone: " + game.Entities.Count());
 
-			// Set off the chain of eventsy
 			var boardStates = new Dictionary<string, int>();
 
 			var cOut = Console.Out;
@@ -79,20 +81,20 @@ namespace Test1
 			for (int i = 0; i < 100000; i++) {
 				var firstboombot = (Minion) clones[i].Player1.Board.First(t => t.Card.Id == "GVG_110t");
 				firstboombot.Damage(1);
-				/*
+				
 				var key = clonedGame.ToString();
 				if (!boardStates.ContainsKey(key))
 					boardStates.Add(key, 1);
 				else
 					boardStates[key]++;
-					*/
+					
 			}
 			Console.SetOut(cOut);
 			Console.WriteLine("Fired off 100,000 Boom Bots in " + sw.ElapsedMilliseconds + " ms");
 			Console.WriteLine("{0} board states found", boardStates.Count);
 
 			// Check that cloning works
-
+			*/
 			// Normal game has 68 entities: Game + 2 players + 2 heroes + 2 hero powers + 30 cards each + coin = 68
 			while (game.Entities.Count() < 68) {
 				p1.Give(Cards.FindByName("Flame Juggler"));
@@ -109,7 +111,7 @@ namespace Test1
 
 			System.Diagnostics.Debug.Assert(gs1.Equals(gs2));
 
-			game.Player1.Hand[0][GameTag.ZONE_POSITION] = 12345;
+			game.Player1.Hand[1][GameTag.ZONE_POSITION] = 12345;
 
 			gs1 = game.ToString();
 			gs2 = game2.ToString();
@@ -120,9 +122,9 @@ namespace Test1
 			// Measure clonimg time
 			Stopwatch s = new Stopwatch();
 			s.Start();
-			for (int i = 0; i < 100000; i++)
-				game.CloneState();
+			var clones = new EntityGroup<Game>(game, 100000).Entities;
 			Console.WriteLine(s.ElapsedMilliseconds + "ms for 100,000 clones");
+			Console.ReadLine();
 		}
 	}
 }
