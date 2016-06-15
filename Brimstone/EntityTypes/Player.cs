@@ -10,6 +10,7 @@ namespace Brimstone
 		public List<IMinion> ZonePlay { get; private set; } = new List<IMinion>();
 
 		public Player(Player cloneFrom) : base(cloneFrom) {
+			FriendlyName = cloneFrom.FriendlyName;
 			foreach (var e in cloneFrom.ZoneHand)
 				ZoneHand.Add(e.Clone() as IPlayable);
 			foreach (var e in cloneFrom.ZonePlay)

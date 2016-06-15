@@ -75,7 +75,7 @@ namespace Test1
 			var cOut = Console.Out;
 			Console.SetOut(TextWriter.Null);
 
-			for (int i = 0; i < 100; i++) {
+			for (int i = 0; i < 100000; i++) {
 				var clonedGame = game.Clone() as Game;
 				var firstboombot = clonedGame.Player1.ZonePlay.First(t => t.Card.Id == "GVG_110t");
 				firstboombot.Damage(1);

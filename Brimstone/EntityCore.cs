@@ -65,23 +65,31 @@ namespace Brimstone
 		}
 	}
 
+	public class ReferenceCount
+	{
+		public ReferenceCount() {
+			Count = 1;
+		}
+
+		public int Count { get; set; }
+	}
+
 	public class BaseEntity : IEntity, ICopyOnWrite
 	{
 		private BaseEntityData _entity;
-		private List<BaseEntity> _references;
+		private ReferenceCount _referenceCount;
 
 		public Game Game { get; set; }
 
 		public BaseEntity(BaseEntity cloneFrom) {
 			_entity = cloneFrom._entity;
-			_references = cloneFrom._references;
-			_references.Add(this);
+			_referenceCount = cloneFrom._referenceCount;
 			Game = cloneFrom.Game;
 		}
 
 		public BaseEntity(Game game, Card card, Dictionary<GameTag, int?> tags = null) {
 			_entity = new BaseEntityData(game, card, tags);
-			_references = new List<BaseEntity> { this };
+			_referenceCount = new ReferenceCount();
 
 			Game = game;
 			// Game is null if we are starting a new game
@@ -131,10 +139,10 @@ namespace Brimstone
 		}
 
 		public void CopyOnWrite() {
-			if (_references.Count > 1) {
+			if (_referenceCount.Count > 1) {
 				_entity = (BaseEntityData)_entity.Clone();
-				_references.Remove(this);
-				_references = new List<BaseEntity> { this };
+				_referenceCount.Count--;
+				_referenceCount = new ReferenceCount();
 			}
 		}
 	}
