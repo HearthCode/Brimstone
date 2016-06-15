@@ -185,7 +185,7 @@ namespace Brimstone
 		public Game Game { get; }
 		public int NextEntityId = 1;
 
-		private SortedDictionary<int, Entity> Entities = new SortedDictionary<int, Entity>();
+		private Dictionary<int, Entity> Entities = new Dictionary<int, Entity>();
 
 		public Entity this[int id] {
 			get {

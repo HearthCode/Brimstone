@@ -120,7 +120,7 @@ namespace Test1
 			System.Diagnostics.Debug.Assert(!gs1.Equals(gs2));
 
 			Console.WriteLine("Entities to clone: " + game.Entities.Count);
-			// Measure clonimg time
+			// Measure clonimg timeI got
 			Stopwatch s = new Stopwatch();
 			s.Start();
 			for (int i = 0; i < 100000; i++)
