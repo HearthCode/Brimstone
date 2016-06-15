@@ -7,12 +7,15 @@ namespace Brimstone
 	public interface IEntity : ICloneable
 	{
 		int Id { get; set; }
-		// Allow owner game to be changed for state cloning
+		// Allow owner game and controller to be changed for state cloning
 		Game Game { get; set; }
+		Entity Controller { get; set; }
 		Card Card { get; }
 		Dictionary<GameTag, int?> Tags { get; }
 
 		int? this[GameTag t] { get; set; }
+
+		IEntity CloneState();
 	}
 
 	public interface ICopyOnWrite
@@ -81,17 +84,21 @@ namespace Brimstone
 		private ReferenceCount _referenceCount;
 
 		public Game Game { get; set; }
+		public Entity Controller { get; set; }
 
 		public Entity(Entity cloneFrom) {
 			_entity = cloneFrom._entity;
 			_referenceCount = cloneFrom._referenceCount;
 			Game = cloneFrom.Game;
+			Controller = Game.Entities[cloneFrom.Controller.Id];
 		}
 
-		public Entity(Game game, Card card, Dictionary<GameTag, int?> tags = null) {
+		public Entity(Game game, Entity controller, Card card, Dictionary<GameTag, int?> tags = null) {
 			_entity = new BaseEntityData(game, card, tags);
 			_referenceCount = new ReferenceCount();
-			Game = game;
+			Controller = controller;
+			if (game != null)
+				game.Entities.Add(this);
 		}
 
 		public int? this[GameTag t] {
@@ -102,7 +109,8 @@ namespace Brimstone
 			set {
 				CopyOnWrite();
 				_entity[t] = value;
-				Game.PowerHistory.Add(new TagChange(this) { Key = t, Value = value });
+				if (Game != null)
+					Game.PowerHistory.Add(new TagChange(this) { Key = t, Value = value });
 			}
 		}
 
@@ -133,6 +141,10 @@ namespace Brimstone
 			return new Entity(this);
 		}
 
+		public virtual IEntity CloneState() {
+			return Clone() as IEntity;
+		}
+
 		public void CopyOnWrite() {
 			if (_referenceCount.Count > 1) {
 				_entity = (BaseEntityData)_entity.Clone();
@@ -160,11 +172,16 @@ namespace Brimstone
 		}
 
 		public EntitySequence(EntitySequence es) {
-			Game = es.Game;
 			NextEntityId = es.NextEntityId;
 			foreach (var entity in es) {
 				Entities.Add(entity.Id, (Entity) entity.Clone());
 			}
+			// Change ownership
+			Game = FindGame();
+			foreach (var entity in Entities)
+				entity.Value.Game = Game;
+			foreach (var entity in Entities)
+				entity.Value.Controller = Entities[entity.Key];
 		}
 
 		public int Add(Entity entity) {
@@ -173,6 +190,16 @@ namespace Brimstone
 			Entities[entity.Id] = entity;
 			Game.PowerHistory.Add(new CreateEntity(entity));
 			return entity.Id;
+		}
+
+		public Game FindGame() {
+			// Game is always entity ID 1
+			return (Game)Entities[1];
+		}
+
+		public Player FindPlayer(int p) {
+			// Player is always p+1
+			return (Player)Entities[p + 1];
 		}
 
 		public IEnumerator<Entity> GetEnumerator() {

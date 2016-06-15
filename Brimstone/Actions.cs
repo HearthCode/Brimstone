@@ -79,7 +79,7 @@ namespace Brimstone
 			Console.WriteLine("Giving {0} to {1}", card, player);
 
 			if (card[GameTag.CARDTYPE] == (int)CardType.MINION) {
-				var minion = new Minion(game, card);
+				var minion = new Minion(game, player, card);
 				player.Hand.Add(minion);
 				minion[GameTag.ZONE] = (int)Zone.HAND;
 				minion[GameTag.ZONE_POSITION] = player.Hand.Count;

@@ -6,7 +6,7 @@ namespace Brimstone
 	public class Minion : Entity, IMinion
 	{
 		public Minion(Minion cloneFrom) : base(cloneFrom) { }
-		public Minion(Game game, Card card, Dictionary<GameTag, int?> tags = null) : base(game, card, tags) {
+		public Minion(Game game, Entity controller, Card card, Dictionary<GameTag, int?> tags = null) : base(game, controller, card, tags) {
 			this[GameTag.HEALTH] = card[GameTag.HEALTH];
 		}
 

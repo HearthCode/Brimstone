@@ -7,8 +7,8 @@ namespace Brimstone
 	{
 		public EntitySequence Entities;
 
-		public Player Player1 { get; }
-		public Player Player2 { get; }
+		public Player Player1 { get; private set; }
+		public Player Player2 { get; private set; }
 		public Player CurrentPlayer { get; set; }
 		public Player Opponent { get; set; }
 
@@ -17,14 +17,13 @@ namespace Brimstone
 
 		// Required by IEntity
 		public Game(Game cloneFrom) : base(cloneFrom) {
-			// This makes a copy-on-write proxy clone of all the entities
-			// and changes ownership to this game while preserving the entity IDs
-			Entities = (EntitySequence)cloneFrom.Entities.Clone();
+			Entities = cloneFrom.Entities;
 			// Set references to the new player proxies (no additional cloning)
-			Player1 = (Player)Entities[cloneFrom.Player1.Id];
-			Player2 = (Player)Entities[cloneFrom.Player2.Id];
-			CurrentPlayer = (Player)Entities[cloneFrom.CurrentPlayer.Id];
-			Opponent = (Player)Entities[cloneFrom.Opponent.Id];
+			Player1 = Entities.FindPlayer(1);
+			Player2 = Entities.FindPlayer(2);
+			// TODO: Fix this (we'll implement it using tags later)
+			CurrentPlayer = Player1;
+			Opponent = Player2;
 			// NOTE: Don't clone or enable PowerHistory!
 			ActionQueue.Queue = new Queue<QueueAction>(cloneFrom.ActionQueue.Queue);
 			ActionQueue.ResultStack = new Stack<ActionResult>(cloneFrom.ActionQueue.ResultStack);
@@ -33,7 +32,8 @@ namespace Brimstone
 
 		public Game(Player Player1 = null, Player Player2 = null,
 					Dictionary<GameTag, int?> Tags = null,
-					bool PowerHistory = false) : base(null, Cards.Find["Game"], Tags) {
+					bool PowerHistory = false) : base(null, null, Cards.Find["Game"], Tags) {
+			Controller = this;
 			if (PowerHistory) {
 				this.PowerHistory.Attach(this);
 			}
@@ -46,8 +46,12 @@ namespace Brimstone
 		}
 
 		public void SetPlayers(Player Player1, Player Player2) {
+			Player1.Controller = this;
+			Player2.Controller = this;
 			Entities.Add(Player1);
 			Entities.Add(Player2);
+			this.Player1 = Player1;
+			this.Player2 = Player2;
 		}
 
 		public override string ToString() {
@@ -69,26 +73,15 @@ namespace Brimstone
 				s += item + "\n";
 			return s;
 		}
-		/*
-		public IEnumerable<IEntity> Entities {
-			get {
-				yield return this;
-				yield return Player1;
-				yield return Player2;
-				foreach (var e in Player1.ZoneHand)
-					yield return e;
-				foreach (var e in Player1.ZonePlay)
-					yield return e;
-				foreach (var e in Player2.ZoneHand)
-					yield return e;
-				foreach (var e in Player2.ZonePlay)
-					yield return e;
-			}
-		}
-		*/
+
 		public void BeginTurn() {
 			ActionQueue.Enqueue(CardBehaviour.BeginTurn);
 			ActionQueue.Process();
+		}
+
+		public override IEntity CloneState() {
+			var entities = ((EntitySequence)Entities.Clone());
+			return entities.FindGame();
 		}
 
 		public override object Clone() {

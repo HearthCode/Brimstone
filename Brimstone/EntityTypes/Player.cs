@@ -13,13 +13,15 @@ namespace Brimstone
 
 		public Player(Player cloneFrom) : base(cloneFrom) {
 			FriendlyName = cloneFrom.FriendlyName;
+			for (int i = 0; i < (int)Zone._COUNT; i++)
+				Zones[i] = new List<Entity>();
 			foreach (var e in cloneFrom.Hand)
 				Hand.Add(e.Clone() as Entity);
 			foreach (var e in cloneFrom.Board)
 				Board.Add(e.Clone() as Entity);
 		}
 
-		public Player(Game game = null, Dictionary<GameTag, int?> tags = null) : base(game, Cards.Find["Player"], tags) {
+		public Player(Game game = null, Dictionary<GameTag, int?> tags = null) : base(game, game, Cards.Find["Player"], tags) {
 			this[GameTag.HEALTH] = 30;
 			for (int i = 0; i < (int)Zone._COUNT; i++)
 				Zones[i] = new List<Entity>();

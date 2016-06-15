@@ -17,7 +17,7 @@
 		PLAY = 1,
 		HAND = 3,
 		GRAVEYARD = 4,
-		_COUNT = 3
+		_COUNT
 	}
 
 	public enum CardType
