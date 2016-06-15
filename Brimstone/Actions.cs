@@ -36,7 +36,7 @@ namespace Brimstone
 		public override ActionResult Run(Game game, List<ActionResult> args) {
 			if (game.Opponent.InPlay.Count == 0)
 				return new List<IEntity>();
-			var m = new Random().Next(game.Opponent.InPlay.Count) + 1;
+			var m = RNG.Between(1, game.Opponent.InPlay.Count);
 			return (Minion)game.Opponent.InPlay[m];
 		}
 	}
