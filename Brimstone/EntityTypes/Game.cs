@@ -30,14 +30,13 @@ namespace Brimstone
 		public Game(Player Player1 = null, Player Player2 = null,
 					Dictionary<GameTag, int?> Tags = null,
 					bool PowerHistory = false) : base(null, null, Cards.Find["Game"], Tags) {
+			Controller = this;
 			if (PowerHistory) {
 				this.PowerHistory.Attach(this);
 			}
 			ActionQueue.Attach(this);
 			Entities = new EntityController(this);
 			Entities.Add(this);
-			// Must set Controller after adding to Entities
-			Controller = this;
 			if (Player1 != null && Player2 != null) {
 				SetPlayers(Player1, Player2);
 			}
@@ -60,8 +59,8 @@ namespace Brimstone
 			Players[0] = Player1;
 			Players[1] = Player2;
 			foreach (var p in Players) {
-				Entities.Add(p);
 				p.Attach(this);
+				Entities.Add(p);
 			}
 		}
 

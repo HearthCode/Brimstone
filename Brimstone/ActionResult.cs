@@ -93,7 +93,7 @@ namespace Brimstone
 			else if (hasEntityListValue) {
 				string s = "<Entities:";
 				foreach (var e in entityListValue)
-					s += e;
+					s += " (" + e + ")";
 				s += ">";
 				return s;
 			}

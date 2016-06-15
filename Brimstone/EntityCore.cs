@@ -86,16 +86,7 @@ namespace Brimstone
 		public BaseEntityData BaseEntityData { get { return _entity; } }
 
 		public Game Game { get; set; }
-		public Entity Controller {
-			get {
-				return Game.Entities[(int)this[GameTag.CONTROLLER]];
-			}
-			set {
-				if (value == null)
-					return;
-				this[GameTag.CONTROLLER] = value.Id;
-			}
-		}
+		public Entity Controller { get; set; }
 
 		public Entity(Entity cloneFrom) {
 			_entity = cloneFrom._entity;
@@ -108,14 +99,18 @@ namespace Brimstone
 		public Entity(Game game, Entity controller, Card card, Dictionary<GameTag, int?> tags = null) {
 			_entity = new BaseEntityData(game, card, tags);
 			_referenceCount = new ReferenceCount();
+			Controller = controller;
 			if (game != null)
 				game.Entities.Add(this);
-			// Must set this after adding to Entities
-			Controller = controller;
 		}
 
 		public int? this[GameTag t] {
 			get {
+				if (t == GameTag.ENTITY_ID)
+					return _entity.Id;
+				if (t == GameTag.CONTROLLER)
+					return Controller.Id;
+
 				if (!_entity.Tags.ContainsKey(t))
 					return 0;
 				return _entity[t];
@@ -124,8 +119,16 @@ namespace Brimstone
 				// Ignore unchanged data
 				if (_entity.Tags.ContainsKey(t) && _entity[t] == value)
 					return;
-				CopyOnWrite();
-				_entity[t] = value;
+				else if (t == GameTag.CONTROLLER && value != null) {
+					Controller = Game.Entities[(int)value];
+				}
+				else if (t == GameTag.ENTITY_ID && value != null) {
+					CopyOnWrite();
+					_entity.Id = (int)value;
+				} else {
+					CopyOnWrite();
+					_entity[t] = value;
+				}
 				if (Game != null)
 					Game.PowerHistory.Add(new TagChange(this) { Key = t, Value = value });
 			}
@@ -164,8 +167,19 @@ namespace Brimstone
 			}
 		}
 
+		public Dictionary<GameTag, int?> Tags {
+			get {
+				var allTags = new Dictionary<GameTag, int?>(_entity.Tags);
+				allTags[GameTag.CONTROLLER] = Controller.Id;
+				allTags[GameTag.ENTITY_ID] = _entity.Id;
+				return allTags;
+			}
+		}
+
 		public IEnumerator<KeyValuePair<GameTag, int?>> GetEnumerator() {
-			return _entity.Tags.GetEnumerator();
+			// Hopefully we're only iterating through tags in test code
+			// so it doesn't matter that we are making a deep clone of the dictionary
+			return Tags.GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() {
@@ -177,7 +191,7 @@ namespace Brimstone
 			foreach (var tag in this) {
 				s += tag.Key + ": " + tag.Value + ", ";
 			}
-			return s.Substring(0, s.Length - 2) + ")";
+			return s.Substring(0, s.Length - 2);
 		}
 	}
 
