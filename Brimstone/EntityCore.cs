@@ -83,12 +83,16 @@ namespace Brimstone
 		private BaseEntityData _entity;
 		private ReferenceCount _referenceCount;
 
+		public int ReferenceCount { get { return _referenceCount.Count; } }
+		public BaseEntityData BaseEntityData { get { return _entity; } }
+
 		public Game Game { get; set; }
 		public Entity Controller { get; set; }
 
 		public Entity(Entity cloneFrom) {
 			_entity = cloneFrom._entity;
 			_referenceCount = cloneFrom._referenceCount;
+			_referenceCount.Count++;
 			Game = cloneFrom.Game;
 			Controller = Game.Entities[cloneFrom.Controller.Id];
 		}
@@ -181,7 +185,7 @@ namespace Brimstone
 			foreach (var entity in Entities)
 				entity.Value.Game = Game;
 			foreach (var entity in Entities)
-				entity.Value.Controller = Entities[entity.Key];
+				entity.Value.Controller = Entities[es.Entities[entity.Key].Controller.Id];
 		}
 
 		public int Add(Entity entity) {

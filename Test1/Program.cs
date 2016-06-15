@@ -98,7 +98,7 @@ namespace Test1
 				p1.Give(Cards.FindByName("Flame Juggler"));
 			}
 
-			var game2 = game.Clone();
+			var game2 = game.CloneState();
 			game.PowerHistory.Log.Clear();
 
 			Console.WriteLine(game);
@@ -116,12 +116,12 @@ namespace Test1
 
 			System.Diagnostics.Debug.Assert(!gs1.Equals(gs2));
 
-			Console.WriteLine("Entities to clone: " + (game.Player1.Hand.Count + game.Player1.Board.Count + game.Player2.Hand.Count + game.Player2.Board.Count + 3));
+			Console.WriteLine("Entities to clone: " + game.Entities.Count());
 			// Measure clonimg time
 			Stopwatch s = new Stopwatch();
 			s.Start();
 			for (int i = 0; i < 100000; i++)
-				game.Clone();
+				game.CloneState();
 			Console.WriteLine(s.ElapsedMilliseconds + "ms for 100,000 clones");
 		}
 	}

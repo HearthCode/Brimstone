@@ -7,6 +7,7 @@ namespace Brimstone
 	{
 		public EntitySequence Entities;
 
+		public Player[] Players { get; private set; } = new Player[2];
 		public Player Player1 { get; private set; }
 		public Player Player2 { get; private set; }
 		public Player CurrentPlayer { get; set; }
@@ -17,14 +18,7 @@ namespace Brimstone
 
 		// Required by IEntity
 		public Game(Game cloneFrom) : base(cloneFrom) {
-			Entities = cloneFrom.Entities;
-			// Set references to the new player proxies (no additional cloning)
-			Player1 = Entities.FindPlayer(1);
-			Player2 = Entities.FindPlayer(2);
-			// TODO: Fix this (we'll implement it using tags later)
-			CurrentPlayer = Player1;
-			Opponent = Player2;
-			// NOTE: Don't clone or enable PowerHistory!
+			// Clone queue and stack but not PowerHistory; keep PowerHistory disabled
 			ActionQueue.Queue = new Queue<QueueAction>(cloneFrom.ActionQueue.Queue);
 			ActionQueue.ResultStack = new Stack<ActionResult>(cloneFrom.ActionQueue.ResultStack);
 			ActionQueue.Attach(this);
@@ -52,6 +46,8 @@ namespace Brimstone
 			Entities.Add(Player2);
 			this.Player1 = Player1;
 			this.Player2 = Player2;
+			Players[0] = Player1;
+			Players[1] = Player2;
 		}
 
 		public override string ToString() {
@@ -81,7 +77,21 @@ namespace Brimstone
 
 		public override IEntity CloneState() {
 			var entities = ((EntitySequence)Entities.Clone());
-			return entities.FindGame();
+			Game game = entities.FindGame();
+			// Set references to the new player proxies (no additional cloning)
+			game.Player1 = entities.FindPlayer(1);
+			game.Player2 = entities.FindPlayer(2);
+			game.Players[0] = game.Player1;
+			game.Players[1] = game.Player2;
+			game.CurrentPlayer = (CurrentPlayer.Id == game.Player1.Id ? game.Player1 : game.Player2);
+			game.Opponent = (Opponent.Id == game.Player1.Id ? game.Player1 : game.Player2);
+			game.Entities = entities;
+			// Re-assign zone references
+			for (int p = 0; p < Players.Length; p++)
+				for (int z = 0; z < Players[p].Zones.Length; z++)
+					foreach (var e in Players[p].Zones[z])
+						game.Players[p].Zones[z].Add(game.Entities[e.Id]);
+			return game;
 		}
 
 		public override object Clone() {

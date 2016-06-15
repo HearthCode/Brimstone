@@ -15,10 +15,6 @@ namespace Brimstone
 			FriendlyName = cloneFrom.FriendlyName;
 			for (int i = 0; i < (int)Zone._COUNT; i++)
 				Zones[i] = new List<Entity>();
-			foreach (var e in cloneFrom.Hand)
-				Hand.Add(e.Clone() as Entity);
-			foreach (var e in cloneFrom.Board)
-				Board.Add(e.Clone() as Entity);
 		}
 
 		public Player(Game game = null, Dictionary<GameTag, int?> tags = null) : base(game, game, Cards.Find["Player"], tags) {
