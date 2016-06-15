@@ -34,17 +34,17 @@ namespace Brimstone
 	public class RandomOpponentMinion : QueueAction
 	{
 		public override ActionResult Run(Game game, List<ActionResult> args) {
-			if (game.Opponent.Board.Count == 0)
+			if (game.Opponent.InPlay.Count == 0)
 				return new List<IEntity>();
-			var m = new Random().Next(game.Opponent.Board.Count) + 1;
-			return (Minion)game.Opponent.Board[m];
+			var m = new Random().Next(game.Opponent.InPlay.Count) + 1;
+			return (Minion)game.Opponent.InPlay[m];
 		}
 	}
 
 	public class AllMinions : QueueAction
 	{
 		public override ActionResult Run(Game game, List<ActionResult> args) {
-			return game.CurrentPlayer.Board.Concat(game.Opponent.Board) as List<IEntity>;
+			return game.CurrentPlayer.InPlay.Concat(game.Opponent.InPlay) as List<IEntity>;
 		}
 	}
 
@@ -96,7 +96,7 @@ namespace Brimstone
 
 			entity[GameTag.HEALTH] = entity.Card[GameTag.HEALTH];
 			player.Hand.Remove(entity);
-			player.Board.Add(entity);
+			player.InPlay.Add(entity);
 
 			Console.WriteLine("{0} is playing {1}", player, entity);
 

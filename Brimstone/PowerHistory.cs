@@ -35,7 +35,7 @@ namespace Brimstone
 
 		public CreateEntity(Entity e) : base(e) {
 			// Make sure we copy the tags, not the references!
-			Tags = new Dictionary<GameTag, int?>(e.Tags);
+			Tags = new Dictionary<GameTag, int?>(e.BaseEntityData.Tags);
 		}
 
 		public override string ToString() {

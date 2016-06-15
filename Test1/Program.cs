@@ -17,8 +17,6 @@ namespace Test1
 			var p1 = new Player { FriendlyName = "Player 1" };
 			var p2 = new Player { FriendlyName = "Player 2" };
 			var game = new Game(Player1: p1, Player2: p2, PowerHistory: true);
-			game.CurrentPlayer = p1;
-			game.Opponent = p2;
 
 			game.ActionQueue.OnActionStarting += (o, e) => {
 				ActionQueue queue = o as ActionQueue;
@@ -31,12 +29,14 @@ namespace Test1
 			game.ActionQueue.OnQueued += (o, e) => {
 				ActionQueue queue = o as ActionQueue;
 				if (e.Action is RandomOpponentMinion) {
-					if (game.Opponent.Board.Count > 0) {
+					if (game.Opponent.InPlay.Count > 0) {
 						Console.WriteLine("REPLACING RANDOM CHOICE ACTION: " + e.Action);
 						//queue.ReplaceAction(new LazyEntity() { Entity = (Minion)game.Opponent.Board[1] });
 					}
 				}
 			};
+
+			game.Start();
 
 			// Put a Piloted Shredder and Flame Juggler in each player's hand
 			p1.Give(Cards.FindByName("Piloted Shredder"));
@@ -68,7 +68,7 @@ namespace Test1
 			p1.Give(Cards.FindByName("Boom Bot")).Play();
 			/*
 			// Set off the chain of events
-			Console.WriteLine("Entities to clone: " + game.Entities.Count());
+			Console.WriteLine("Entities to clone: " + game.Entities.Count);
 
 			var boardStates = new Dictionary<string, int>();
 
@@ -96,7 +96,7 @@ namespace Test1
 			// Check that cloning works
 			*/
 			// Normal game has 68 entities: Game + 2 players + 2 heroes + 2 hero powers + 30 cards each + coin = 68
-			while (game.Entities.Count() < 68) {
+			while (game.Entities.Count < 68) {
 				p1.Give(Cards.FindByName("Flame Juggler"));
 			}
 
@@ -118,11 +118,12 @@ namespace Test1
 
 			System.Diagnostics.Debug.Assert(!gs1.Equals(gs2));
 
-			Console.WriteLine("Entities to clone: " + game.Entities.Count());
+			Console.WriteLine("Entities to clone: " + game.Entities.Count);
 			// Measure clonimg time
 			Stopwatch s = new Stopwatch();
 			s.Start();
-			var clones = new EntityGroup<Game>(game, 100000).Entities;
+			for (int i = 0; i < 100000; i++)
+				game.CloneState();
 			Console.WriteLine(s.ElapsedMilliseconds + "ms for 100,000 clones");
 			Console.ReadLine();
 		}

@@ -15,8 +15,7 @@ namespace BrimstoneTests
 			Player p1 = new Player() { FriendlyName = "Player 1" };
 			Player p2 = new Player() { FriendlyName = "Player 2" };
 			Game game = new Game(Player1: p1, Player2: p2, PowerHistory: true);
-			game.CurrentPlayer = p1;
-			game.Opponent = p2;
+			game.Start();
 
 			// Give the game and each player at least one tag
 			game[GameTag.STEP] = (int)Step.MAIN_ACTION;
@@ -107,9 +106,9 @@ namespace BrimstoneTests
 			foreach (var p in game.Players)
 				foreach (var z in p.Zones)
 					if (z != null)
-						for (int e = 0; e < z.Count(); e++) {
-							Assert.IsTrue(z.ToList()[e].Id == ((Player)clone.Entities[p.Id]).Zones.First(x => x.Zone == z.Zone).Entities.ToList()[e].Id);
-							Assert.IsTrue(!ReferenceEquals(z.ToList()[e], ((Player)clone.Entities[p.Id]).Zones.First(x => x.Zone == z.Zone).Entities.ToList()[e]));
+						for (int zp = 1; zp <= z.Count; zp++) {
+							Assert.IsTrue(z[zp].Id == ((Player)clone.Entities[p.Id]).Zones[z.Zone][zp].Id);
+							Assert.IsTrue(!ReferenceEquals(z[zp], ((Player)clone.Entities[p.Id]).Zones[z.Zone][zp]));
 						}
 		}
 	}

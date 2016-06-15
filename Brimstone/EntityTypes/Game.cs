@@ -13,6 +13,9 @@ namespace Brimstone
 		public Player CurrentPlayer { get; set; }
 		public Player Opponent { get; set; }
 
+		public ZoneEntities Setaside { get; private set; }
+		public ZoneGroup Zones = new ZoneGroup();
+
 		public PowerHistory PowerHistory = new PowerHistory();
 		public ActionQueue ActionQueue = new ActionQueue();
 
@@ -27,16 +30,28 @@ namespace Brimstone
 		public Game(Player Player1 = null, Player Player2 = null,
 					Dictionary<GameTag, int?> Tags = null,
 					bool PowerHistory = false) : base(null, null, Cards.Find["Game"], Tags) {
-			Controller = this;
 			if (PowerHistory) {
 				this.PowerHistory.Attach(this);
 			}
 			ActionQueue.Attach(this);
 			Entities = new EntityController(this);
 			Entities.Add(this);
+			// Must set Controller after adding to Entities
+			Controller = this;
 			if (Player1 != null && Player2 != null) {
 				SetPlayers(Player1, Player2);
 			}
+			Setaside = new ZoneEntities(this, this, Zone.SETASIDE);
+			Zones[Zone.SETASIDE] = Setaside;
+			Zones[Zone.PLAY] = new ZoneEntities(this, this, Zone.PLAY);
+		}
+
+		public void Start() {
+			Zones[Zone.PLAY].Add(this);
+			Player1.InPlay.Add(Player1);
+			Player2.InPlay.Add(Player2);
+			CurrentPlayer = Player1;
+			Opponent = Player2;
 		}
 
 		public void SetPlayers(Player Player1, Player Player2) {
@@ -60,7 +75,7 @@ namespace Brimstone
 					s += entity.ToString() + ", ";
 				}
 				s += "PLAY: ";
-				foreach (var entity in player.Board) {
+				foreach (var entity in player.InPlay) {
 					s += entity.ToString() + ", ";
 				}
 			}

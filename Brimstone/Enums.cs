@@ -9,6 +9,7 @@
 		HEALTH,
 		CARDTYPE,
 		STEP,
+		CONTROLLER,
 		_COUNT
 	}
 

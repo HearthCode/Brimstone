@@ -33,8 +33,7 @@ namespace BrimstoneVisualizer
 			var p1 = new Player { FriendlyName = "Player 1" };
 			var p2 = new Player { FriendlyName = "Player 2" };
 			Game.SetPlayers(p1, p2);
-			Game.CurrentPlayer = p1;
-			Game.Opponent = p2;
+			Game.Start();
 
 			PlayGame();
 		}

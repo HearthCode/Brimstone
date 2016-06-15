@@ -11,8 +11,7 @@ namespace Brimstone
 		}
 
 		public IPlayable Play() {
-			// TODO: Might not be CurrentPlayer
-			Game.ActionQueue.Enqueue(CardBehaviour.Play(Game.CurrentPlayer, this));
+			Game.ActionQueue.Enqueue(CardBehaviour.Play(Controller, this));
 			return (IPlayable)(Entity)Game.ActionQueue.Process()[0];
 		}
 
@@ -24,20 +23,12 @@ namespace Brimstone
 		public void CheckForDeath() {
 			if (this[GameTag.HEALTH] <= 0) {
 				Console.WriteLine(this + " dies!");
-				Game.Opponent.Board.Remove(this);
+				Game.Opponent.InPlay.Remove(this);
 				Game.Opponent.Graveyard.Add(this);
 				this[GameTag.DAMAGE] = 0;
 				Game.ActionQueue.Enqueue(Card.Behaviour.Deathrattle);
 				Game.ActionQueue.Process();
 			}
-		}
-
-		public override string ToString() {
-			string s = Card.Name + " (Health=" + Tags[GameTag.HEALTH] + ", ";
-			foreach (var tag in Tags) {
-				s += tag.Key + ": " + tag.Value + ", ";
-			}
-			return s.Substring(0, s.Length - 2) + ")";
 		}
 
 		public override object Clone() {

@@ -11,7 +11,7 @@ namespace Brimstone
 
 		public ZoneEntities Deck { get; private set; }
 		public ZoneEntities Hand { get; private set; }
-		public ZoneEntities Board { get; private set; }
+		public ZoneEntities InPlay { get; private set; }
 		public ZoneEntities Graveyard { get; private set; }
 		public ZoneEntities Secrets { get; private set; }
 		public ZoneGroup Zones { get; } = new ZoneGroup();
@@ -36,12 +36,12 @@ namespace Brimstone
 				return;
 			Deck = new ZoneEntities(Game, this, Zone.DECK);
 			Hand = new ZoneEntities(Game, this, Zone.HAND);
-			Board = new ZoneEntities(Game, this, Zone.PLAY);
+			InPlay = new ZoneEntities(Game, this, Zone.PLAY);
 			Graveyard = new ZoneEntities(Game, this, Zone.GRAVEYARD);
 			Secrets = new ZoneEntities(Game, this, Zone.SECRET);
 			Zones[Zone.DECK] = Deck;
 			Zones[Zone.HAND] = Hand;
-			Zones[Zone.PLAY] = Board;
+			Zones[Zone.PLAY] = InPlay;
 			Zones[Zone.GRAVEYARD] = Graveyard;
 			Zones[Zone.SECRET] = Secrets;
 		}

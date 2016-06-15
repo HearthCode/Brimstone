@@ -21,7 +21,7 @@ namespace Brimstone
 
 		public IEnumerable<Entity> Entities {
 			get {
-				return Game.Entities.Where(e => e.Controller == Controller && e.Tags[GameTag.ZONE] == (int)Zone);
+				return Game.Entities.Where(e => e.Controller == Controller && e[GameTag.ZONE] == (int)Zone);
 			}
 		}
 
@@ -33,7 +33,7 @@ namespace Brimstone
 
 		public Entity this[int zone_position] {
 			get {
-				return Game.Entities.FirstOrDefault(e => e.Controller == Controller && e.Tags[GameTag.ZONE] == (int)Zone && e.Tags[GameTag.ZONE_POSITION] == zone_position);
+				return Game.Entities.FirstOrDefault(e => e.Controller == Controller && e[GameTag.ZONE] == (int)Zone && e[GameTag.ZONE_POSITION] == zone_position);
 			}
 		}
 

@@ -11,7 +11,6 @@ namespace Brimstone
 		Game Game { get; set; }
 		Entity Controller { get; set; }
 		Card Card { get; }
-		Dictionary<GameTag, int?> Tags { get; }
 
 		int? this[GameTag t] { get; set; }
 
@@ -78,7 +77,7 @@ namespace Brimstone
 		public int Count { get; set; }
 	}
 
-	public class Entity : IEntity, ICopyOnWrite
+	public class Entity : IEntity, IEnumerable<KeyValuePair<GameTag, int?>>, ICopyOnWrite
 	{
 		private BaseEntityData _entity;
 		private ReferenceCount _referenceCount;
@@ -87,7 +86,16 @@ namespace Brimstone
 		public BaseEntityData BaseEntityData { get { return _entity; } }
 
 		public Game Game { get; set; }
-		public Entity Controller { get; set; }
+		public Entity Controller {
+			get {
+				return Game.Entities[(int)this[GameTag.CONTROLLER]];
+			}
+			set {
+				if (value == null)
+					return;
+				this[GameTag.CONTROLLER] = value.Id;
+			}
+		}
 
 		public Entity(Entity cloneFrom) {
 			_entity = cloneFrom._entity;
@@ -100,17 +108,22 @@ namespace Brimstone
 		public Entity(Game game, Entity controller, Card card, Dictionary<GameTag, int?> tags = null) {
 			_entity = new BaseEntityData(game, card, tags);
 			_referenceCount = new ReferenceCount();
-			Controller = controller;
 			if (game != null)
 				game.Entities.Add(this);
+			// Must set this after adding to Entities
+			Controller = controller;
 		}
 
 		public int? this[GameTag t] {
 			get {
-				return Tags[t];
+				if (!_entity.Tags.ContainsKey(t))
+					return 0;
+				return _entity[t];
 			}
-
 			set {
+				// Ignore unchanged data
+				if (_entity.Tags.ContainsKey(t) && _entity[t] == value)
+					return;
 				CopyOnWrite();
 				_entity[t] = value;
 				if (Game != null)
@@ -135,12 +148,6 @@ namespace Brimstone
 			}
 		}
 
-		public Dictionary<GameTag, int?> Tags {
-			get {
-				return _entity.Tags;
-			}
-		}
-
 		public virtual object Clone() {
 			return new Entity(this);
 		}
@@ -155,6 +162,22 @@ namespace Brimstone
 				_referenceCount.Count--;
 				_referenceCount = new ReferenceCount();
 			}
+		}
+
+		public IEnumerator<KeyValuePair<GameTag, int?>> GetEnumerator() {
+			return _entity.Tags.GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator() {
+			return GetEnumerator();
+		}
+
+		public override string ToString() {
+			string s = Card.Name + " - ";
+			foreach (var tag in this) {
+				s += tag.Key + ": " + tag.Value + ", ";
+			}
+			return s.Substring(0, s.Length - 2) + ")";
 		}
 	}
 
