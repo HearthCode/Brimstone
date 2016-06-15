@@ -79,7 +79,7 @@ namespace Brimstone
 			Console.WriteLine("Giving {0} to {1}", card, player);
 
 			if (card[GameTag.CARDTYPE] == (int)CardType.MINION) {
-				return player.Hand.Add(new Minion(game, player, card));
+				return player.Hand.MoveTo(new Minion(game, player, card));
 			}
 			return ActionResult.None;
 		}
@@ -95,8 +95,7 @@ namespace Brimstone
 			Entity entity = (Entity) args[ENTITY];
 
 			entity[GameTag.HEALTH] = entity.Card[GameTag.HEALTH];
-			player.Hand.Remove(entity);
-			player.InPlay.Add(entity);
+			player.InPlay.MoveTo(entity);
 
 			Console.WriteLine("{0} is playing {1}", player, entity);
 

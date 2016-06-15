@@ -106,9 +106,11 @@ namespace BrimstoneTests
 			foreach (var p in game.Players)
 				foreach (var z in p.Zones)
 					if (z != null)
-						for (int zp = 1; zp <= z.Count; zp++) {
-							Assert.IsTrue(z[zp].Id == ((Player)clone.Entities[p.Id]).Zones[z.Zone][zp].Id);
-							Assert.IsTrue(!ReferenceEquals(z[zp], ((Player)clone.Entities[p.Id]).Zones[z.Zone][zp]));
+						for (int zp = 0; zp <= z.Count; zp++) {
+							if (z[zp] != null) {
+								Assert.IsTrue(z[zp].Id == ((Player)clone.Entities[p.Id]).Zones[z.Zone][zp].Id);
+								Assert.IsTrue(!ReferenceEquals(z[zp], ((Player)clone.Entities[p.Id]).Zones[z.Zone][zp]));
+							}
 						}
 		}
 	}

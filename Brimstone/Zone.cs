@@ -7,13 +7,40 @@ using System.Threading.Tasks;
 
 namespace Brimstone
 {
+	public interface IZones
+	{
+		ZoneGroup Zones { get; }
+	}
+
+	public class ZoneGroup : IEnumerable<ZoneEntities>
+	{
+		private ZoneEntities[] _zones = new ZoneEntities[(int)Zone._COUNT];
+
+		public ZoneEntities this[Zone z] {
+			get {
+				return _zones[(int)z];
+			}
+			set {
+				_zones[(int)z] = value;
+			}
+		}
+
+		public IEnumerator<ZoneEntities> GetEnumerator() {
+			return ((IEnumerable<ZoneEntities>)_zones).GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator() {
+			return ((IEnumerable<ZoneEntities>)_zones).GetEnumerator();
+		}
+	}
+
 	public class ZoneEntities : IEnumerable<Entity>
 	{
 		public Game Game { get; }
 		public Zone Zone { get; }
-		public Entity Controller { get; }
+		public IZones Controller { get; }
 
-		public ZoneEntities(Game game, Entity controller, Zone zone) {
+		public ZoneEntities(Game game, IZones controller, Zone zone) {
 			Game = game;
 			Zone = zone;
 			Controller = controller;
@@ -37,19 +64,19 @@ namespace Brimstone
 			}
 		}
 
-		public Entity Add(Entity e) {
+		public virtual Entity MoveTo(Entity e) {
+			Zone previous = (Zone) e[GameTag.ZONE];
 			e[GameTag.ZONE] = (int)Zone;
 			e[GameTag.ZONE_POSITION] = Count;
+			if (previous != Zone.INVALID)
+				Controller.Zones[previous].Update();
 			return e;
 		}
 
-		public Entity Remove(Entity e) {
-			e[GameTag.ZONE_POSITION] = 0;
-			e[GameTag.ZONE] = (int)Zone.INVALID;
+		public virtual void Update() {
 			int p = 1;
 			foreach (var ze in Entities)
 				ze[GameTag.ZONE_POSITION] = p++;
-			return e;
 		}
 
 		public IEnumerator<Entity> GetEnumerator() {
@@ -61,25 +88,34 @@ namespace Brimstone
 		}
 	}
 
-	public class ZoneGroup : IEnumerable<ZoneEntities>
+	public class GameZoneEntities : ZoneEntities
 	{
-		private ZoneEntities[] _zones = new ZoneEntities[(int)Zone._COUNT];
+		public GameZoneEntities(Game game, IZones controller, Zone zone) : base(game, controller, zone) { }
 
-		public ZoneEntities this[Zone z] {
-			get {
-				return _zones[(int)z];
-			}
-			set {
-				_zones[(int)z] = value;
-			}
+		public override Entity MoveTo(Entity e) {
+			// Don't change zone position when adding global game entities to PLAY or SETASIDE
+			e[GameTag.ZONE] = (int)Zone;
+			return e;
 		}
 
-		public IEnumerator<ZoneEntities> GetEnumerator() {
-			return ((IEnumerable<ZoneEntities>)_zones).GetEnumerator();
+		public override void Update() {
+			// Don't re-order zone positions
+		}
+	}
+
+	public class PlayerGraveyardZoneEntities : ZoneEntities
+	{
+		public PlayerGraveyardZoneEntities(Game game, IZones controller, Zone zone) : base(game, controller, zone) { }
+
+		public override Entity MoveTo(Entity e) {
+			// Set zone position to zero when adding entities to GRAVEYARD zone
+			e[GameTag.ZONE] = (int)Zone;
+			e[GameTag.ZONE_POSITION] = 0;
+			return e;
 		}
 
-		IEnumerator IEnumerable.GetEnumerator() {
-			return ((IEnumerable<ZoneEntities>)_zones).GetEnumerator();
+		public override void Update() {
+			// Don't re-order zone positions
 		}
 	}
 }

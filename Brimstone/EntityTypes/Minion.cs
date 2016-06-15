@@ -23,8 +23,7 @@ namespace Brimstone
 		public void CheckForDeath() {
 			if (this[GameTag.HEALTH] <= 0) {
 				Console.WriteLine(this + " dies!");
-				Game.Opponent.InPlay.Remove(this);
-				Game.Opponent.Graveyard.Add(this);
+				Game.Opponent.Graveyard.MoveTo(this);
 				this[GameTag.DAMAGE] = 0;
 				Game.ActionQueue.Enqueue(Card.Behaviour.Deathrattle);
 				Game.ActionQueue.Process();

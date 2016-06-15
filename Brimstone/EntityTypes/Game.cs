@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Brimstone
 {
-	public class Game : Entity
+	public class Game : Entity, IZones
 	{
 		public EntityController Entities;
 
@@ -13,8 +13,8 @@ namespace Brimstone
 		public Player CurrentPlayer { get; set; }
 		public Player Opponent { get; set; }
 
-		public ZoneEntities Setaside { get; private set; }
-		public ZoneGroup Zones = new ZoneGroup();
+		public GameZoneEntities Setaside { get; private set; }
+		public ZoneGroup Zones { get; } = new ZoneGroup();
 
 		public PowerHistory PowerHistory = new PowerHistory();
 		public ActionQueue ActionQueue = new ActionQueue();
@@ -41,15 +41,15 @@ namespace Brimstone
 			if (Player1 != null && Player2 != null) {
 				SetPlayers(Player1, Player2);
 			}
-			Setaside = new ZoneEntities(this, this, Zone.SETASIDE);
+			Setaside = new GameZoneEntities(this, this, Zone.SETASIDE);
 			Zones[Zone.SETASIDE] = Setaside;
-			Zones[Zone.PLAY] = new ZoneEntities(this, this, Zone.PLAY);
+			Zones[Zone.PLAY] = new GameZoneEntities(this, this, Zone.PLAY);
 		}
 
 		public void Start() {
-			Zones[Zone.PLAY].Add(this);
-			Player1.InPlay.Add(Player1);
-			Player2.InPlay.Add(Player2);
+			Zones[Zone.PLAY].MoveTo(this);
+			Zones[Zone.PLAY].MoveTo(Player1);
+			Zones[Zone.PLAY].MoveTo(Player2);
 			CurrentPlayer = Player1;
 			Opponent = Player2;
 		}

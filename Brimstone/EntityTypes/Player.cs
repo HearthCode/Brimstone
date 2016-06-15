@@ -5,14 +5,14 @@ using System.Linq;
 
 namespace Brimstone
 {
-	public class Player : Entity
+	public class Player : Entity, IZones
 	{
 		public string FriendlyName { get; set; }
 
 		public ZoneEntities Deck { get; private set; }
 		public ZoneEntities Hand { get; private set; }
 		public ZoneEntities InPlay { get; private set; }
-		public ZoneEntities Graveyard { get; private set; }
+		public PlayerGraveyardZoneEntities Graveyard { get; private set; }
 		public ZoneEntities Secrets { get; private set; }
 		public ZoneGroup Zones { get; } = new ZoneGroup();
 
@@ -37,7 +37,7 @@ namespace Brimstone
 			Deck = new ZoneEntities(Game, this, Zone.DECK);
 			Hand = new ZoneEntities(Game, this, Zone.HAND);
 			InPlay = new ZoneEntities(Game, this, Zone.PLAY);
-			Graveyard = new ZoneEntities(Game, this, Zone.GRAVEYARD);
+			Graveyard = new PlayerGraveyardZoneEntities(Game, this, Zone.GRAVEYARD);
 			Secrets = new ZoneEntities(Game, this, Zone.SECRET);
 			Zones[Zone.DECK] = Deck;
 			Zones[Zone.HAND] = Hand;
