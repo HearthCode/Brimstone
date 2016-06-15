@@ -11,13 +11,11 @@ namespace Brimstone
 		}
 
 		public IPlayable Play() {
-			Game.ActionQueue.Enqueue(CardBehaviour.Play(Controller, this));
-			return (IPlayable)(Entity)Game.ActionQueue.Process()[0];
+			return (IPlayable) (Entity) Game.ActionQueue.EnqueueSingleResult(CardBehaviour.Play(Controller, this));
 		}
 
 		public void Damage(int amount) {
 			Game.ActionQueue.Enqueue(CardBehaviour.Damage(this, amount));
-			Game.ActionQueue.Process();
 		}
 
 		public void CheckForDeath() {
@@ -26,7 +24,6 @@ namespace Brimstone
 				Game.Opponent.Graveyard.MoveTo(this);
 				this[GameTag.DAMAGE] = 0;
 				Game.ActionQueue.Enqueue(Card.Behaviour.Deathrattle);
-				Game.ActionQueue.Process();
 			}
 		}
 

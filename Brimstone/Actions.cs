@@ -92,7 +92,7 @@ namespace Brimstone
 
 		public override ActionResult Run(Game game, List<ActionResult> args) {
 			Player player = (Player)args[PLAYER];
-			Entity entity = (Entity) args[ENTITY];
+			Entity entity = args[ENTITY];
 
 			entity[GameTag.HEALTH] = entity.Card[GameTag.HEALTH];
 			player.InPlay.MoveTo(entity);
@@ -100,8 +100,7 @@ namespace Brimstone
 			Console.WriteLine("{0} is playing {1}", player, entity);
 
 			game.ActionQueue.Enqueue(entity.Card.Behaviour.Battlecry);
-			game.ActionQueue.Process();
-			return (Entity) entity;
+			return entity;
 		}
 	}
 

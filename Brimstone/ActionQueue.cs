@@ -22,7 +22,6 @@ namespace Brimstone
 		public Game Game { get; private set; }
 		public Queue<QueueAction> Queue = new Queue<QueueAction>();
 		public Stack<ActionResult> ResultStack = new Stack<ActionResult>();
-		public bool Paused { get; set; }
 
 		public event EventHandler<QueueActionEventArgs> OnQueueing;
 		public event EventHandler<QueueActionEventArgs> OnQueued;
@@ -33,11 +32,21 @@ namespace Brimstone
 			Game = game;
 		}
 
-		public void Enqueue(ActionGraph g) {
+		public void EnqueuePaused(ActionGraph g) {
 			// Don't queue unimplemented cards
 			if (g != null)
 				// Unravel the graph into a list of actions
 				g.Queue(this);
+		}
+
+		public List<ActionResult> Enqueue(ActionGraph g) {
+			EnqueuePaused(g);
+			return Process();
+		}
+
+		public ActionResult EnqueueSingleResult(ActionGraph g) {
+			EnqueuePaused(g);
+			return Process()[0];
 		}
 
 		public void EnqueueSingleAction(QueueAction a) {
@@ -61,27 +70,28 @@ namespace Brimstone
 				ResultStack.Push(a); ;
 		}
 
-		public void ReplaceAction(QueueAction a) {
+		public void ReplaceNextAction(QueueAction a) {
 			Queue.Dequeue();
-			Enqueue(a);
+			// TODO: This really needs to be inserted at the start of the queue
+			EnqueuePaused(a);
 		}
 
 		public List<ActionResult> Process() {
-			if (Paused)
-				return null;
-
 			while (Queue.Count > 0) {
+				// Get next action
 				var action = Queue.Dequeue();
 				Console.WriteLine(action);
 				if (OnActionStarting != null)
 					OnActionStarting(this, new QueueActionEventArgs(Game, action));
-				// TODO: Replace with async/await later
-				if (Paused)
-					return null;
+
+				// Get arguments for action from stack
 				var args = new List<ActionResult>();
 				for (int i = 0; i < action.Args.Count; i++)
 					args.Add(ResultStack.Pop());
 				args.Reverse();
+
+				// TODO: Replace with async/await later
+				// Run action and push results onto stack
 				var result = action.Run(Game, args);
 				if (result.HasResult)
 					ResultStack.Push(result);

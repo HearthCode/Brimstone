@@ -18,6 +18,7 @@ namespace Test1
 			var p2 = new Player { FriendlyName = "Player 2" };
 			var game = new Game(Player1: p1, Player2: p2, PowerHistory: true);
 
+			// TODO: Add helper functions for these
 			game.ActionQueue.OnActionStarting += (o, e) => {
 				ActionQueue queue = o as ActionQueue;
 				if (e.Action is Damage) {

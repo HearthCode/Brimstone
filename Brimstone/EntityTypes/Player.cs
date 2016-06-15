@@ -47,8 +47,7 @@ namespace Brimstone
 		}
 
 		public IPlayable Give(Card card) {
-			Game.ActionQueue.Enqueue(CardBehaviour.Give(this, card));
-			return (IPlayable)(Entity)Game.ActionQueue.Process()[0];
+			return (IPlayable)(Entity)Game.ActionQueue.EnqueueSingleResult(CardBehaviour.Give(this, card));
 		}
 
 		public override string ToString() {

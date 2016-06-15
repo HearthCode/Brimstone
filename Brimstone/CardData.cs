@@ -45,7 +45,7 @@ namespace Brimstone
 		}
 	}
 
-	// Let's pretend this crap is XML or whatever
+	// TODO: Use XML instead
 	public class GVG_096 : Card
 	{
 		public override string Id { get; set; } = "GVG_096";

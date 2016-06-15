@@ -87,7 +87,6 @@ namespace Brimstone
 
 		public void BeginTurn() {
 			ActionQueue.Enqueue(CardBehaviour.BeginTurn);
-			ActionQueue.Process();
 		}
 
 		public override IEntity CloneState() {
