@@ -75,20 +75,23 @@ namespace Test1
 			var cOut = Console.Out;
 			Console.SetOut(TextWriter.Null);
 
+			Stopwatch sw = new Stopwatch();
+			sw.Start();
+			var clones = new EntityGroup<Game>(game, 100000).Entities;
 			for (int i = 0; i < 100000; i++) {
-				var clonedGame = game.Clone() as Game;
-				var firstboombot = clonedGame.Player1.ZonePlay.First(t => t.Card.Id == "GVG_110t");
+				var firstboombot = clones[i].Player1.ZonePlay.First(t => t.Card.Id == "GVG_110t");
 				firstboombot.Damage(1);
-
+				/*
 				var key = clonedGame.ToString();
 				if (!boardStates.ContainsKey(key))
 					boardStates.Add(key, 1);
 				else
 					boardStates[key]++;
+					*/
 			}
 			Console.SetOut(cOut);
+			Console.WriteLine("Fired off 100,000 Boom Bots in " + sw.ElapsedMilliseconds + " ms");
 			Console.WriteLine("{0} board states found", boardStates.Count);
-
 
 			// Check that cloning works
 
