@@ -86,6 +86,13 @@ namespace Brimstone
 		IEnumerator IEnumerable.GetEnumerator() {
 			return GetEnumerator();
 		}
+
+		public override string ToString() {
+			string s = string.Empty;
+			foreach (var e in this)
+				s += e + "\n";
+			return s;
+		}
 	}
 
 	public class GameZoneEntities : ZoneEntities

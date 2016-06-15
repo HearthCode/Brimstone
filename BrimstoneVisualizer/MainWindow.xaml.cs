@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Brimstone;
 
 namespace BrimstoneVisualizer
 {
@@ -24,12 +25,35 @@ namespace BrimstoneVisualizer
 			InitializeComponent();
 		}
 
-		private void btnStepQueue_Click(object sender, RoutedEventArgs e) {
+		private void UpdateDisplay() {
 			tbActionQueue.Text = App.Game.ActionQueue.ToString();
 			tbActionResultStack.Text = App.Game.ActionQueue.StackToString();
 			tbPowerHistory.Text = App.Game.PowerHistory.ToString();
+			tbPlayer1Hand.Text = App.Game.Player1.Hand.ToString();
+			tbPlayer2Hand.Text = App.Game.Player2.Hand.ToString();
+			tbPlayer1Board.Text = App.Game.Player1.InPlay.ToString();
+			tbPlayer2Board.Text = App.Game.Player2.InPlay.ToString();
 			svPowerHistory.ScrollToEnd();
+		}
+
+		private void btnStepQueue_Click(object sender, RoutedEventArgs e) {
+			UpdateDisplay();
 			App.QueueRead.Set();
+		}
+
+		private void btnStepQueue5_Click(object sender, RoutedEventArgs e) {
+			int i = 0;
+
+			EventHandler<QueueActionEventArgs> waiter = (o, ea) => {
+				i++;
+			};
+			App.Game.ActionQueue.OnActionStarting += waiter;
+			while (i < 5) {
+				App.QueueRead.Set();
+				System.Threading.Thread.Sleep(10);
+			}
+			App.Game.ActionQueue.OnActionStarting -= waiter;
+			UpdateDisplay();
 		}
 
 		private void Window_Loaded(object sender, RoutedEventArgs e) {
