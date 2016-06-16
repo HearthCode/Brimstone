@@ -13,7 +13,7 @@ namespace Brimstone
 		public Player CurrentPlayer { get; set; }
 		public Player Opponent { get; set; }
 
-		public GameZoneEntities Setaside { get; private set; }
+		public ZoneEntities Setaside { get; private set; }
 		public ZoneGroup Zones { get; } = new ZoneGroup();
 
 		public PowerHistory PowerHistory = new PowerHistory();
@@ -40,9 +40,9 @@ namespace Brimstone
 			if (Player1 != null && Player2 != null) {
 				SetPlayers(Player1, Player2);
 			}
-			Setaside = new GameZoneEntities(this, this, Zone.SETASIDE);
+			Setaside = new ZoneEntities(this, this, Zone.SETASIDE);
 			Zones[Zone.SETASIDE] = Setaside;
-			Zones[Zone.PLAY] = new GameZoneEntities(this, this, Zone.PLAY);
+			Zones[Zone.PLAY] = new ZoneEntities(this, this, Zone.PLAY);
 		}
 
 		public void Start() {

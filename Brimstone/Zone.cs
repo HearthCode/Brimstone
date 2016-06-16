@@ -40,79 +40,87 @@ namespace Brimstone
 		public Zone Zone { get; }
 		public IZones Controller { get; }
 
+		private List<IEntity> _cachedEntities;
+		private int _cachedCount;
+
 		public ZoneEntities(Game game, IZones controller, Zone zone) {
 			Game = game;
 			Zone = zone;
 			Controller = controller;
 		}
 
-		private bool _cacheDirty = true;
-		private int _cachedCount;
-		private List<IEntity> _cachedEntities;
-
-		public List<IEntity> Entities {
-			get {
-				if (_cacheDirty)
-					Refresh();
-				return _cachedEntities;
-			}
-		}
-
-		public int Count {
-			get {
-				if (_cacheDirty)
-					Refresh();
-				return _cachedCount;
-			}
-		}
-
-		// TODO: Optimize this into arrays
-		public IEntity this[int zone_position] {
-			get {
-				if (_cacheDirty)
-					Refresh();
-				return _cachedEntities[zone_position - 1];
-			}
-		}
-
-		protected IEntity MoveToImpl(IEntity Entity, bool SetZonePosition = true, bool Reorder = true) {
-			Zone previous = (Zone)Entity[GameTag.ZONE];
-			Entity[GameTag.ZONE] = (int)Zone;
-			if (SetZonePosition)
-				Entity[GameTag.ZONE_POSITION] = Count;
-			if (previous != Zone.INVALID)
-				Controller.Zones[previous].Update();
-			Update();
-			return Entity;
-		}
-
-		public virtual IEntity MoveTo(IEntity Entity) {
-			return MoveToImpl(Entity: Entity);
-		}
-
-		private void Refresh() {
+		private void Init() {
 			// Make sure that _cachedEntities[0] has ZONE_POSITION = 1 etc.
 			_cachedEntities = Game.Entities
 				.Where(e => e.Controller == Controller && e[GameTag.ZONE] == (int)Zone && e[GameTag.ZONE_POSITION] > 0)
 				.OrderBy(e => e[GameTag.ZONE_POSITION])
 				.ToList();
 			_cachedCount = _cachedEntities.Count();
-			_cacheDirty = false;
 		}
 
-		protected void UpdateImpl(bool Reorder = true) {
-			if (Reorder) {
-				Refresh();
-				int p = 1;
-				foreach (var ze in _cachedEntities)
-					ze[GameTag.ZONE_POSITION] = p++;
-			} else {
-				_cacheDirty = true;
+		protected virtual void UpdateZonePositions() {
+			int p = 1;
+			foreach (var ze in _cachedEntities)
+				ze[GameTag.ZONE_POSITION] = p++;
+		}
+
+		public List<IEntity> Entities {
+			get {
+				if (_cachedEntities == null)
+					Init();
+				return _cachedEntities;
 			}
 		}
 
-		public virtual void Update() {
-			UpdateImpl(Reorder: true);
+		public int Count {
+			get {
+				if (_cachedEntities == null)
+					Init();
+				return _cachedCount;
+			}
+		}
+
+		public IEntity this[int zone_position] {
+			get {
+				if (_cachedEntities == null)
+					Init();
+				return _cachedEntities[zone_position - 1];
+			}
+		}
+
+		public void Add(IEntity Entity, int ZonePosition = -1) {
+			Entity[GameTag.ZONE] = (int)Zone;
+			if (ZonePosition == -1)
+				if (Entity is Minion)
+					ZonePosition = Count + 1;
+				else if (Entity is Spell)
+					if (Zone == Zone.PLAY)
+						ZonePosition = 0;
+					else
+						ZonePosition = Count + 1;
+			if (Zone == Zone.SETASIDE || Zone == Zone.GRAVEYARD || (Zone == Zone.PLAY && Controller is Game))
+				ZonePosition = 0;
+			if (ZonePosition != 0) {
+				_cachedEntities.Insert(ZonePosition - 1, Entity);
+				_cachedCount++;
+				UpdateZonePositions();
+			}
+		}
+
+		public void Remove(IEntity Entity) {
+			bool removed = _cachedEntities.Remove(Entity);
+			if (removed) {
+				_cachedCount--;
+				UpdateZonePositions();
+			}
+		}
+
+		public IEntity MoveTo(IEntity Entity, int ZonePosition = -1) {
+			Zone previous = (Zone)Entity[GameTag.ZONE];
+			if (previous != Zone.INVALID)
+				Controller.Zones[previous].Remove(Entity);
+			Add(Entity, ZonePosition);
+			return Entity;
 		}
 
 		public IEnumerator<IEntity> GetEnumerator() {
@@ -128,36 +136,6 @@ namespace Brimstone
 			foreach (var e in this)
 				s += e + "\n";
 			return s;
-		}
-	}
-
-	public class GameZoneEntities : ZoneEntities
-	{
-		public GameZoneEntities(Game game, IZones controller, Zone zone) : base(game, controller, zone) { }
-
-		public override IEntity MoveTo(IEntity e) {
-			return MoveToImpl(Entity: e, SetZonePosition: false);
-		}
-
-		public override void Update() {
-			// Don't re-order zone positions
-			UpdateImpl(Reorder: false);
-		}
-	}
-
-	public class PlayerGraveyardZoneEntities : ZoneEntities
-	{
-		public PlayerGraveyardZoneEntities(Game game, IZones controller, Zone zone) : base(game, controller, zone) { }
-
-		public override IEntity MoveTo(IEntity e) {
-			// Set zone position to zero when adding entities to GRAVEYARD zone
-			e[GameTag.ZONE_POSITION] = 0;
-			return MoveToImpl(Entity: e, SetZonePosition: false);
-		}
-
-		public override void Update() {
-			// Don't re-order zone positions
-			UpdateImpl(Reorder: false);
 		}
 	}
 }
