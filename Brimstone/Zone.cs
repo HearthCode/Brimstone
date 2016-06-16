@@ -46,31 +46,39 @@ namespace Brimstone
 			Controller = controller;
 		}
 
+		private bool _cacheDirty = true;
+		private int _cachedCount;
+		private IEnumerable<Entity> _cachedEntities;
+
 		public IEnumerable<Entity> Entities {
 			get {
-				return Game.Entities.Where(e => e.Controller == Controller && e[GameTag.ZONE] == (int)Zone);
+				if (_cacheDirty)
+					Refresh();
+				return _cachedEntities;
 			}
 		}
 
 		public int Count {
 			get {
-				return Entities.Count();
+				return _cachedCount;
 			}
 		}
 
+		// TODO: Optimize this into arrays
 		public Entity this[int zone_position] {
 			get {
-				return Game.Entities.FirstOrDefault(e => e.Controller == Controller && e[GameTag.ZONE] == (int)Zone && e[GameTag.ZONE_POSITION] == zone_position);
+				return _cachedEntities.FirstOrDefault(e => e.Controller == Controller && e[GameTag.ZONE] == (int)Zone && e[GameTag.ZONE_POSITION] == zone_position);
 			}
 		}
 
-		protected Entity MoveToImpl(Entity Entity, bool SetZonePosition = true, bool UpdateDirtyZone = true) {
+		protected Entity MoveToImpl(Entity Entity, bool SetZonePosition = true, bool Reorder = true) {
 			Zone previous = (Zone)Entity[GameTag.ZONE];
 			Entity[GameTag.ZONE] = (int)Zone;
 			if (SetZonePosition)
 				Entity[GameTag.ZONE_POSITION] = Count;
-			if (UpdateDirtyZone && previous != Zone.INVALID)
+			if (previous != Zone.INVALID)
 				Controller.Zones[previous].Update();
+			Update();
 			return Entity;
 		}
 
@@ -78,10 +86,25 @@ namespace Brimstone
 			return MoveToImpl(Entity: Entity);
 		}
 
+		private void Refresh() {
+			_cachedEntities = Game.Entities.Where(e => e.Controller == Controller && e[GameTag.ZONE] == (int)Zone);
+			_cachedCount = _cachedEntities.Count();
+			_cacheDirty = false;
+		}
+
+		protected void UpdateImpl(bool Reorder = true) {
+			if (Reorder) {
+				Refresh();
+				int p = 1;
+				foreach (var ze in _cachedEntities)
+					ze[GameTag.ZONE_POSITION] = p++;
+			} else {
+				_cacheDirty = true;
+			}
+		}
+
 		public virtual void Update() {
-			int p = 1;
-			foreach (var ze in Entities)
-				ze[GameTag.ZONE_POSITION] = p++;
+			UpdateImpl(Reorder: true);
 		}
 
 		public IEnumerator<Entity> GetEnumerator() {
@@ -110,6 +133,7 @@ namespace Brimstone
 
 		public override void Update() {
 			// Don't re-order zone positions
+			UpdateImpl(Reorder: false);
 		}
 	}
 
@@ -125,6 +149,7 @@ namespace Brimstone
 
 		public override void Update() {
 			// Don't re-order zone positions
+			UpdateImpl(Reorder: false);
 		}
 	}
 }

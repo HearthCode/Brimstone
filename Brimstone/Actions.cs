@@ -76,7 +76,7 @@ namespace Brimstone
 			Player player = (Player)args[TARGET];
 			Card card = args[CARD];
 
-			Console.WriteLine("Giving {0} to {1}", card, player);
+			Console.WriteLine("Giving {0} to {1}", card.Name, player.FriendlyName);
 
 			if (card[GameTag.CARDTYPE] == (int)CardType.MINION) {
 				return player.Hand.MoveTo(new Minion(game, player, card));
@@ -97,7 +97,7 @@ namespace Brimstone
 			entity[GameTag.HEALTH] = entity.Card[GameTag.HEALTH];
 			player.InPlay.MoveTo(entity);
 
-			Console.WriteLine("{0} is playing {1}", player, entity);
+			Console.WriteLine("{0} is playing {1}", player.FriendlyName, entity.Card.Name);
 
 			game.ActionQueue.Enqueue(entity.Card.Behaviour.Battlecry);
 			return entity;
@@ -112,7 +112,7 @@ namespace Brimstone
 		public override ActionResult Run(Game game, List<ActionResult> args) {
 			if (args[TARGETS].HasResult)
 				foreach (Minion e in args[TARGETS]) {
-					Console.WriteLine("{0} is getting hit for {1} points of damage", e, args[DAMAGE]);
+					Console.WriteLine("{0} is getting hit for {1} points of damage", e.Card.Name, args[DAMAGE]);
 
 					e[GameTag.HEALTH]-= args[DAMAGE];
 					e[GameTag.DAMAGE] = e.Card[GameTag.HEALTH] - e[GameTag.HEALTH];

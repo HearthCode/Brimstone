@@ -80,7 +80,6 @@ namespace Brimstone
 			while (Queue.Count > 0) {
 				// Get next action
 				var action = Queue.Dequeue();
-				Console.WriteLine(action);
 				if (OnActionStarting != null)
 					OnActionStarting(this, new QueueActionEventArgs(Game, action));
 

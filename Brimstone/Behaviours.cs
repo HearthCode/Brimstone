@@ -1,4 +1,6 @@
-﻿namespace Brimstone
+﻿using System.Collections.Generic;
+
+namespace Brimstone
 {
 	public class Behaviour
 	{
