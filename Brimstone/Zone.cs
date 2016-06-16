@@ -64,13 +64,18 @@ namespace Brimstone
 			}
 		}
 
-		public virtual Entity MoveTo(Entity e) {
-			Zone previous = (Zone) e[GameTag.ZONE];
-			e[GameTag.ZONE] = (int)Zone;
-			e[GameTag.ZONE_POSITION] = Count;
-			if (previous != Zone.INVALID)
+		protected Entity MoveToImpl(Entity Entity, bool SetZonePosition = true, bool UpdateDirtyZone = true) {
+			Zone previous = (Zone)Entity[GameTag.ZONE];
+			Entity[GameTag.ZONE] = (int)Zone;
+			if (SetZonePosition)
+				Entity[GameTag.ZONE_POSITION] = Count;
+			if (UpdateDirtyZone && previous != Zone.INVALID)
 				Controller.Zones[previous].Update();
-			return e;
+			return Entity;
+		}
+
+		public virtual Entity MoveTo(Entity Entity) {
+			return MoveToImpl(Entity: Entity);
 		}
 
 		public virtual void Update() {
@@ -100,9 +105,7 @@ namespace Brimstone
 		public GameZoneEntities(Game game, IZones controller, Zone zone) : base(game, controller, zone) { }
 
 		public override Entity MoveTo(Entity e) {
-			// Don't change zone position when adding global game entities to PLAY or SETASIDE
-			e[GameTag.ZONE] = (int)Zone;
-			return e;
+			return MoveToImpl(Entity: e, SetZonePosition: false);
 		}
 
 		public override void Update() {
@@ -116,9 +119,8 @@ namespace Brimstone
 
 		public override Entity MoveTo(Entity e) {
 			// Set zone position to zero when adding entities to GRAVEYARD zone
-			e[GameTag.ZONE] = (int)Zone;
 			e[GameTag.ZONE_POSITION] = 0;
-			return e;
+			return MoveToImpl(Entity: e, SetZonePosition: false);
 		}
 
 		public override void Update() {
