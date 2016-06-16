@@ -48,9 +48,9 @@ namespace Brimstone
 
 		private bool _cacheDirty = true;
 		private int _cachedCount;
-		private IEnumerable<IEntity> _cachedEntities;
+		private List<IEntity> _cachedEntities;
 
-		public IEnumerable<IEntity> Entities {
+		public List<IEntity> Entities {
 			get {
 				if (_cacheDirty)
 					Refresh();
@@ -71,7 +71,7 @@ namespace Brimstone
 			get {
 				if (_cacheDirty)
 					Refresh();
-				return _cachedEntities.FirstOrDefault(e => e.Controller == Controller && e[GameTag.ZONE] == (int)Zone && e[GameTag.ZONE_POSITION] == zone_position);
+				return _cachedEntities[zone_position - 1];
 			}
 		}
 
@@ -91,7 +91,11 @@ namespace Brimstone
 		}
 
 		private void Refresh() {
-			_cachedEntities = Game.Entities.Where(e => e.Controller == Controller && e[GameTag.ZONE] == (int)Zone);
+			// Make sure that _cachedEntities[0] has ZONE_POSITION = 1 etc.
+			_cachedEntities = Game.Entities
+				.Where(e => e.Controller == Controller && e[GameTag.ZONE] == (int)Zone && e[GameTag.ZONE_POSITION] > 0)
+				.OrderBy(e => e[GameTag.ZONE_POSITION])
+				.ToList();
 			_cachedCount = _cachedEntities.Count();
 			_cacheDirty = false;
 		}

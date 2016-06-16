@@ -38,6 +38,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestZoneManager.cs" />
     <Compile Include="TestClone.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
