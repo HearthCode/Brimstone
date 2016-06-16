@@ -9,7 +9,7 @@ namespace Brimstone
 		public Spell(Game game, Entity controller, Card card, Dictionary<GameTag, int?> tags = null) : base(game, controller, card, tags) { }
 
 		public IPlayable Play() {
-			var played = (Entity)Game.ActionQueue.EnqueueSingleResult(CardBehaviour.Play(Controller, this));
+			var played = (Entity)Game.ActionQueue.EnqueueSingleResult(CardBehaviour.Play((Entity) Controller, this));
 
 			// Spells go to the graveyard after they are played
 			((Player)played.Controller).Graveyard.MoveTo(played);

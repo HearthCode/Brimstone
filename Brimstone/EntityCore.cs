@@ -4,13 +4,14 @@ using System.Collections.Generic;
 
 namespace Brimstone
 {
-	public interface IEntity : ICloneable
+	public interface IEntity : IEnumerable<KeyValuePair<GameTag, int?>>, ICloneable
 	{
 		int Id { get; set; }
 		// Allow owner game and controller to be changed for state cloning
 		Game Game { get; set; }
-		Entity Controller { get; set; }
+		IEntity Controller { get; set; }
 		Card Card { get; }
+		Dictionary<GameTag, int?> CopyTags();
 
 		int? this[GameTag t] { get; set; }
 
@@ -81,7 +82,7 @@ namespace Brimstone
 		public int Count { get; set; }
 	}
 
-	public class Entity : IEntity, IEnumerable<KeyValuePair<GameTag, int?>>, ICopyOnWrite
+	public class Entity : IEntity, ICopyOnWrite
 	{
 		private BaseEntityData _entity;
 		private ReferenceCount _referenceCount;
@@ -90,7 +91,7 @@ namespace Brimstone
 		public BaseEntityData BaseEntityData { get { return _entity; } }
 
 		public Game Game { get; set; }
-		public Entity Controller { get; set; }
+		public IEntity Controller { get; set; }
 
 		public Entity(Entity cloneFrom) {
 			_entity = cloneFrom._entity;
@@ -100,7 +101,7 @@ namespace Brimstone
 			Controller = Game.Entities[cloneFrom.Controller.Id];
 		}
 
-		public Entity(Game game, Entity controller, Card card, Dictionary<GameTag, int?> tags = null) {
+		public Entity(Game game, IEntity controller, Card card, Dictionary<GameTag, int?> tags = null) {
 			_entity = new BaseEntityData(game, card, tags);
 			_referenceCount = new ReferenceCount();
 			Controller = controller;
@@ -171,19 +172,18 @@ namespace Brimstone
 			}
 		}
 
-		public Dictionary<GameTag, int?> Tags {
-			get {
-				var allTags = new Dictionary<GameTag, int?>(_entity.Tags);
-				allTags[GameTag.CONTROLLER] = Controller.Id;
-				allTags[GameTag.ENTITY_ID] = _entity.Id;
-				return allTags;
-			}
+		// Returns a *copy* of all tags
+		public Dictionary<GameTag, int?> CopyTags() {
+			var allTags = new Dictionary<GameTag, int?>(_entity.Tags);
+			allTags[GameTag.CONTROLLER] = Controller.Id;
+			allTags[GameTag.ENTITY_ID] = _entity.Id;
+			return allTags;
 		}
 
 		public IEnumerator<KeyValuePair<GameTag, int?>> GetEnumerator() {
 			// Hopefully we're only iterating through tags in test code
 			// so it doesn't matter that we are making a deep clone of the dictionary
-			return Tags.GetEnumerator();
+			return CopyTags().GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() {
@@ -199,13 +199,13 @@ namespace Brimstone
 		}
 	}
 
-	public class EntityController : IEnumerable<Entity>, ICloneable {
+	public class EntityController : IEnumerable<IEntity>, ICloneable {
 		public Game Game { get; }
 		public int NextEntityId = 1;
 
-		private Dictionary<int, Entity> Entities = new Dictionary<int, Entity>();
+		private Dictionary<int, IEntity> Entities = new Dictionary<int, IEntity>();
 
-		public Entity this[int id] {
+		public IEntity this[int id] {
 			get {
 				return Entities[id];
 			}
@@ -234,7 +234,7 @@ namespace Brimstone
 		public EntityController(EntityController es) {
 			NextEntityId = es.NextEntityId;
 			foreach (var entity in es) {
-				Entities.Add(entity.Id, (Entity) entity.Clone());
+				Entities.Add(entity.Id, (IEntity) entity.Clone());
 			}
 			// Change ownership
 			Game = FindGame();
@@ -244,7 +244,7 @@ namespace Brimstone
 				entity.Value.Controller = Entities[es.Entities[entity.Key].Controller.Id];
 		}
 
-		public int Add(Entity entity) {
+		public int Add(IEntity entity) {
 			entity.Game = Game;
 			entity.Id = NextEntityId++;
 			Entities[entity.Id] = entity;
@@ -252,7 +252,7 @@ namespace Brimstone
 			return entity.Id;
 		}
 
-		public int Remove(Entity entity) {
+		public int Remove(IEntity entity) {
 			Entities.Remove(entity.Id);
 			return entity.Id;
 		}
@@ -267,7 +267,7 @@ namespace Brimstone
 			return (Player)Entities[p + 1];
 		}
 
-		public IEnumerator<Entity> GetEnumerator() {
+		public IEnumerator<IEntity> GetEnumerator() {
 			return Entities.Values.GetEnumerator();
 		}
 

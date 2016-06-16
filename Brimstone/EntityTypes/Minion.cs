@@ -6,13 +6,13 @@ namespace Brimstone
 	public class Minion : Entity, IMinion
 	{
 		public Minion(Minion cloneFrom) : base(cloneFrom) { }
-		public Minion(Game game, Entity controller, Card card, Dictionary<GameTag, int?> tags = null) : base(game, controller, card, tags) {
+		public Minion(Game game, IEntity controller, Card card, Dictionary<GameTag, int?> tags = null) : base(game, controller, card, tags) {
 			// TODO: Move to entity creation
 			this[GameTag.HEALTH] = card[GameTag.HEALTH];
 		}
 
 		public IPlayable Play() {
-			return (IPlayable) (Entity) Game.ActionQueue.EnqueueSingleResult(CardBehaviour.Play(Controller, this));
+			return (IPlayable) (Entity) Game.ActionQueue.EnqueueSingleResult(CardBehaviour.Play((Entity) Controller, this));
 		}
 
 		public void Damage(int amount) {

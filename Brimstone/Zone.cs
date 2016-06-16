@@ -34,7 +34,7 @@ namespace Brimstone
 		}
 	}
 
-	public class ZoneEntities : IEnumerable<Entity>
+	public class ZoneEntities : IEnumerable<IEntity>
 	{
 		public Game Game { get; }
 		public Zone Zone { get; }
@@ -48,9 +48,9 @@ namespace Brimstone
 
 		private bool _cacheDirty = true;
 		private int _cachedCount;
-		private IEnumerable<Entity> _cachedEntities;
+		private IEnumerable<IEntity> _cachedEntities;
 
-		public IEnumerable<Entity> Entities {
+		public IEnumerable<IEntity> Entities {
 			get {
 				if (_cacheDirty)
 					Refresh();
@@ -60,18 +60,22 @@ namespace Brimstone
 
 		public int Count {
 			get {
+				if (_cacheDirty)
+					Refresh();
 				return _cachedCount;
 			}
 		}
 
 		// TODO: Optimize this into arrays
-		public Entity this[int zone_position] {
+		public IEntity this[int zone_position] {
 			get {
+				if (_cacheDirty)
+					Refresh();
 				return _cachedEntities.FirstOrDefault(e => e.Controller == Controller && e[GameTag.ZONE] == (int)Zone && e[GameTag.ZONE_POSITION] == zone_position);
 			}
 		}
 
-		protected Entity MoveToImpl(Entity Entity, bool SetZonePosition = true, bool Reorder = true) {
+		protected IEntity MoveToImpl(IEntity Entity, bool SetZonePosition = true, bool Reorder = true) {
 			Zone previous = (Zone)Entity[GameTag.ZONE];
 			Entity[GameTag.ZONE] = (int)Zone;
 			if (SetZonePosition)
@@ -82,7 +86,7 @@ namespace Brimstone
 			return Entity;
 		}
 
-		public virtual Entity MoveTo(Entity Entity) {
+		public virtual IEntity MoveTo(IEntity Entity) {
 			return MoveToImpl(Entity: Entity);
 		}
 
@@ -107,7 +111,7 @@ namespace Brimstone
 			UpdateImpl(Reorder: true);
 		}
 
-		public IEnumerator<Entity> GetEnumerator() {
+		public IEnumerator<IEntity> GetEnumerator() {
 			return Entities.GetEnumerator();
 		}
 
@@ -127,7 +131,7 @@ namespace Brimstone
 	{
 		public GameZoneEntities(Game game, IZones controller, Zone zone) : base(game, controller, zone) { }
 
-		public override Entity MoveTo(Entity e) {
+		public override IEntity MoveTo(IEntity e) {
 			return MoveToImpl(Entity: e, SetZonePosition: false);
 		}
 
@@ -141,7 +145,7 @@ namespace Brimstone
 	{
 		public PlayerGraveyardZoneEntities(Game game, IZones controller, Zone zone) : base(game, controller, zone) { }
 
-		public override Entity MoveTo(Entity e) {
+		public override IEntity MoveTo(IEntity e) {
 			// Set zone position to zero when adding entities to GRAVEYARD zone
 			e[GameTag.ZONE_POSITION] = 0;
 			return MoveToImpl(Entity: e, SetZonePosition: false);

@@ -79,9 +79,9 @@ namespace Brimstone
 			Console.WriteLine("Giving {0} to {1}", card.Name, player.FriendlyName);
 
 			if (card[GameTag.CARDTYPE] == (int)CardType.MINION) {
-				return player.Hand.MoveTo(new Minion(game, player, card));
+				return (Minion)player.Hand.MoveTo(new Minion(game, player, card));
 			} else if (card[GameTag.CARDTYPE] == (int)CardType.SPELL) {
-				return player.Hand.MoveTo(new Spell(game, player, card));
+				return (Spell)player.Hand.MoveTo(new Spell(game, player, card));
 			}
 			return ActionResult.None;
 		}

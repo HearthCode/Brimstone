@@ -93,13 +93,13 @@ namespace BrimstoneTests
 			Assert.IsTrue(game.ActionQueue.ResultStack.Count == clone.ActionQueue.ResultStack.Count);
 
 			// All proxies must point to original entities
-			foreach (var e in game.Entities)
-				Assert.IsTrue(ReferenceEquals(e.BaseEntityData, clone.Entities[e.Id].BaseEntityData));
+			foreach (Entity e in game.Entities)
+				Assert.IsTrue(ReferenceEquals(e.BaseEntityData, ((Entity)clone.Entities[e.Id]).BaseEntityData));
 
 			// All reference counts must be 2
-			foreach (var e in game.Entities)
+			foreach (Entity e in game.Entities)
 				Assert.IsTrue(e.ReferenceCount == 2);
-			foreach (var e in clone.Entities)
+			foreach (Entity e in clone.Entities)
 				Assert.IsTrue(e.ReferenceCount == 2);
 
 			// All zones must match with new proxies
