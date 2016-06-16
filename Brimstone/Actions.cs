@@ -80,6 +80,8 @@ namespace Brimstone
 
 			if (card[GameTag.CARDTYPE] == (int)CardType.MINION) {
 				return player.Hand.MoveTo(new Minion(game, player, card));
+			} else if (card[GameTag.CARDTYPE] == (int)CardType.SPELL) {
+				return player.Hand.MoveTo(new Spell(game, player, card));
 			}
 			return ActionResult.None;
 		}
@@ -94,7 +96,6 @@ namespace Brimstone
 			Player player = (Player)args[PLAYER];
 			Entity entity = args[ENTITY];
 
-			entity[GameTag.HEALTH] = entity.Card[GameTag.HEALTH];
 			player.InPlay.MoveTo(entity);
 
 			Console.WriteLine("{0} is playing {1}", player.FriendlyName, entity.Card.Name);

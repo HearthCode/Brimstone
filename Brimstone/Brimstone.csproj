@@ -59,6 +59,7 @@
     <Compile Include="EntityTypes\Game.cs" />
     <Compile Include="EntityTypes\Minion.cs" />
     <Compile Include="EntityTypes\Player.cs" />
+    <Compile Include="EntityTypes\Spell.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="EntityGroup.cs" />
     <Compile Include="PowerHistory.cs" />

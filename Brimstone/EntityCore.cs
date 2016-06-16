@@ -32,6 +32,10 @@ namespace Brimstone
 		void Damage(int amount);
 	}
 
+	public interface ISpell : IPlayable
+	{
+	}
+
 	public class BaseEntityData : ICloneable
 	{
 		public int Id { get; set; }
