@@ -44,7 +44,7 @@ namespace Brimstone
 	public class AllMinions : QueueAction
 	{
 		public override ActionResult Run(Game game, List<ActionResult> args) {
-			return game.CurrentPlayer.InPlay.Concat(game.Opponent.InPlay) as List<IEntity>;
+			return game.CurrentPlayer.InPlay.Concat(game.Opponent.InPlay).ToList();
 		}
 	}
 
