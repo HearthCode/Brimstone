@@ -50,6 +50,7 @@
     <Compile Include="ActionQueue.cs" />
     <Compile Include="ActionResult.cs" />
     <Compile Include="Actions.cs" />
+    <Compile Include="BehaviourCompiler.cs" />
     <Compile Include="Behaviours.cs" />
     <Compile Include="Card.cs" />
     <Compile Include="CardData.cs" />

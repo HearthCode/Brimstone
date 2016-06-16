@@ -4,10 +4,10 @@ namespace Brimstone
 {
 	public class ActionGraph
 	{
-		private List<QueueAction> graph = new List<QueueAction>();
+		public List<QueueAction> Graph { get; } = new List<QueueAction>();
 
 		public ActionGraph(QueueAction q) {
-			graph.Add(q);
+			Graph.Add(q);
 		}
 
 		// Convert single QueueAction to ActionGraph
@@ -16,7 +16,7 @@ namespace Brimstone
 		}
 
 		public ActionGraph Then(ActionGraph act) {
-			graph.AddRange(act.graph);
+			Graph.AddRange(act.Graph);
 			return this;
 		}
 
@@ -33,10 +33,10 @@ namespace Brimstone
 
 		// Add the graph to the game's action queue
 		public void Queue(ActionQueue queue) {
-			foreach (var action in graph) {
+			foreach (var action in Graph) {
 				foreach (var arg in action.Args)
 					arg.Queue(queue);
-				queue.EnqueueSingleAction(action);
+				queue.EnqueuePaused(action);
 			}
 		}
 	}

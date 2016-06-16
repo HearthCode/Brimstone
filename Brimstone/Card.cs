@@ -7,7 +7,7 @@ namespace Brimstone
 		public virtual string Id { get; set; }
 		public virtual string Name { get; set; }
 		public virtual Dictionary<GameTag, int> Tags { get; set; }
-		public virtual Behaviour Behaviour { get; set; }
+		public virtual CompiledBehaviour Behaviour { get; set; }
 
 		public int? this[GameTag t] {
 			get {

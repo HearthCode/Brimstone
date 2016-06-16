@@ -36,9 +36,9 @@ namespace Brimstone
 			// These will never be modified once created
 			Cards = new Dictionary<string, Card> {
 				{ "GVG_096", new GVG_096() },
-				{ "AT_094", new AT_094 { Behaviour = CardBehaviour.AT_094 } },
-				{ "GVG_110t", new GVG_110t { Behaviour = CardBehaviour.GVG_110t } },
-				{ "EX1_400", new EX1_400 { Behaviour = CardBehaviour.EX1_400 } },
+				{ "AT_094", new AT_094 { Behaviour = CompiledBehaviour.Compile(CardBehaviour.AT_094) } },
+				{ "GVG_110t", new GVG_110t { Behaviour = CompiledBehaviour.Compile(CardBehaviour.GVG_110t) } },
+				{ "EX1_400", new EX1_400 { Behaviour = CompiledBehaviour.Compile(CardBehaviour.EX1_400) } },
 				{ "Player", new Card { Id = "Player", Name = "Player" } },
 				{ "Game", new Card { Id = "Game", Name = "Game" } }
 			};

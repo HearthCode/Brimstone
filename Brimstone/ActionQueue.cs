@@ -32,6 +32,11 @@ namespace Brimstone
 			Game = game;
 		}
 
+		public void EnqueuePaused(List<QueueAction> qa) {
+			foreach (var a in qa)
+				EnqueuePaused(a);
+		}
+
 		public void EnqueuePaused(ActionGraph g) {
 			// Don't queue unimplemented cards
 			if (g != null)
@@ -39,9 +44,19 @@ namespace Brimstone
 				g.Queue(this);
 		}
 
+		public List<ActionResult> Enqueue(List<QueueAction> qa) {
+			EnqueuePaused(qa);
+			return Process();
+		}
+
 		public List<ActionResult> Enqueue(ActionGraph g) {
 			EnqueuePaused(g);
 			return Process();
+		}
+
+		public ActionResult EnqueueSingleResult(List<QueueAction> qa) {
+			EnqueuePaused(qa);
+			return Process()[0];
 		}
 
 		public ActionResult EnqueueSingleResult(ActionGraph g) {
@@ -49,7 +64,17 @@ namespace Brimstone
 			return Process()[0];
 		}
 
-		public void EnqueueSingleAction(QueueAction a) {
+		public List<ActionResult> Enqueue(QueueAction a) {
+			EnqueuePaused(a);
+			return Process();
+		}
+
+		public ActionResult EnqueueSingleResult(QueueAction a) {
+			EnqueuePaused(a);
+			return Process()[0];
+		}
+
+		public void EnqueuePaused(QueueAction a) {
 			if (OnQueueing != null)
 				OnQueueing(this, new QueueActionEventArgs(Game, a));
 
@@ -73,7 +98,7 @@ namespace Brimstone
 		public void ReplaceNextAction(QueueAction a) {
 			Queue.Dequeue();
 			// TODO: This really needs to be inserted at the start of the queue
-			EnqueuePaused(a);
+			EnqueuePaused((ActionGraph)a);
 		}
 
 		public List<ActionResult> Process() {
