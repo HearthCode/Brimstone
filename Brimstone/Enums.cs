@@ -302,6 +302,14 @@
 		DREAM
 	}
 
+	public enum GameState
+	{
+		INVALID,
+		LOADING,
+		RUNNING,
+		COMPLETE
+	}
+
 	public enum MulliganState
 	{
 		INVALID,

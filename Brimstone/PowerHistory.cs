@@ -25,7 +25,7 @@ namespace Brimstone
 		public TagChange(IEntity e) : base(e) { }
 
 		public override string ToString() {
-			return "[Tag] Entity " + EntityId + ": " + Key.ToString() + " = " + Value;
+			return "[Tag] Entity " + EntityId + ": " + new KeyValuePair<GameTag, int?>(Key, Value).Format();
 		}
 	}
 
@@ -41,7 +41,7 @@ namespace Brimstone
 		public override string ToString() {
 			string s = "[Create] " + base.ToString();
 			foreach (var t in Tags) {
-				s += "\n    " + t.Key + " = " + t.Value;
+				s += "\n    " + t.Format();
 			}
 			return s;
 		}

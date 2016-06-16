@@ -193,7 +193,7 @@ namespace Brimstone
 		public override string ToString() {
 			string s = Card.Name + " - ";
 			foreach (var tag in this) {
-				s += tag.Key + ": " + tag.Value + ", ";
+				s += tag.Format() + ", ";
 			}
 			return s.Substring(0, s.Length - 2);
 		}
