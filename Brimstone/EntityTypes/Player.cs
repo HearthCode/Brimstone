@@ -20,7 +20,8 @@ namespace Brimstone
 			FriendlyName = cloneFrom.FriendlyName;
 		}
 
-		public Player(Game game = null, Dictionary<GameTag, int?> tags = null) : base(game, game, Cards.Find["Player"], tags) {
+		public Player(Game game = null) : base(game, game, Cards.Find["Player"],
+			new Dictionary<GameTag, int?> { { GameTag.ZONE, (int?) Zone.PLAY } }) {
 			this[GameTag.HEALTH] = 30;
 			setZones();
 		}

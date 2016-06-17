@@ -27,9 +27,8 @@ namespace Brimstone
 			ActionQueue.Attach(this);
 		}
 
-		public Game(Player Player1 = null, Player Player2 = null,
-					Dictionary<GameTag, int?> Tags = null,
-					bool PowerHistory = false) : base(null, null, Cards.Find["Game"], Tags) {
+		public Game(Player Player1 = null, Player Player2 = null, bool PowerHistory = false)
+					: base(null, null, Cards.Find["Game"], new Dictionary<GameTag, int?> { { GameTag.ZONE, (int?) Zone.PLAY } }) {
 			Controller = this;
 			if (PowerHistory) {
 				this.PowerHistory.Attach(this);
@@ -46,9 +45,6 @@ namespace Brimstone
 		}
 
 		public void Start() {
-			Zones[Zone.PLAY].MoveTo(this);
-			Zones[Zone.PLAY].MoveTo(Player1);
-			Zones[Zone.PLAY].MoveTo(Player2);
 			CurrentPlayer = Player1;
 			Opponent = Player2;
 		}

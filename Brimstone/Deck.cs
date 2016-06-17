@@ -16,16 +16,18 @@ namespace Brimstone
 			foreach (var card in cards) {
 				IEntity e = null;
 
+				var tags = new Dictionary<GameTag, int?> {
+					{ GameTag.ZONE, (int?)Zone.DECK },
+					{ GameTag.ZONE_POSITION, nextPos++ }
+				};
+
 				if (card[GameTag.CARDTYPE] == (int)CardType.MINION) {
-					e = new Minion(Game, (IEntity)Controller, card);
+					e = new Minion(Game, (IEntity)Controller, card, tags);
 				}
 				else if (card[GameTag.CARDTYPE] == (int)CardType.SPELL) {
-					e = new Spell(Game, (IEntity)Controller, card);
+					e = new Spell(Game, (IEntity)Controller, card, tags);
 				}
 				// TODO: Weapons
-
-				e[GameTag.ZONE] = (int)Zone.DECK;
-				e[GameTag.ZONE_POSITION] = nextPos++;
 			}
 			// Force deck zone contents to update
 			Init();
