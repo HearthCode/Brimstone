@@ -9,7 +9,7 @@ namespace Brimstone
 	{
 		public string FriendlyName { get; set; }
 
-		public ZoneEntities Deck { get; private set; }
+		public Deck Deck { get; private set; }
 		public ZoneEntities Hand { get; private set; }
 		public ZoneEntities InPlay { get; private set; }
 		public ZoneEntities Graveyard { get; private set; }
@@ -34,7 +34,7 @@ namespace Brimstone
 		private void setZones() {
 			if (Game == null)
 				return;
-			Deck = new ZoneEntities(Game, this, Zone.DECK);
+			Deck = new Deck(Game, this);
 			Hand = new ZoneEntities(Game, this, Zone.HAND);
 			InPlay = new ZoneEntities(Game, this, Zone.PLAY);
 			Graveyard = new ZoneEntities(Game, this, Zone.GRAVEYARD);

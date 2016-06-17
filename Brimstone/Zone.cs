@@ -49,7 +49,7 @@ namespace Brimstone
 			Controller = controller;
 		}
 
-		private void Init() {
+		protected void Init() {
 			// Make sure that _cachedEntities[0] has ZONE_POSITION = 1 etc.
 			_cachedEntities = Game.Entities
 				.Where(e => e.Controller == Controller && e[GameTag.ZONE] == (int)Zone && e[GameTag.ZONE_POSITION] > 0)
@@ -58,7 +58,7 @@ namespace Brimstone
 			_cachedCount = _cachedEntities.Count();
 		}
 
-		protected virtual void UpdateZonePositions() {
+		protected void UpdateZonePositions() {
 			int p = 1;
 			foreach (var ze in _cachedEntities)
 				ze[GameTag.ZONE_POSITION] = p++;

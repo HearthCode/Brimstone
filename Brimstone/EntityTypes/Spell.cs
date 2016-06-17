@@ -6,7 +6,7 @@ namespace Brimstone
 	public class Spell : Entity, ISpell
 	{
 		public Spell(Spell cloneFrom) : base(cloneFrom) { }
-		public Spell(Game game, Entity controller, Card card, Dictionary<GameTag, int?> tags = null) : base(game, controller, card, tags) { }
+		public Spell(Game game, IEntity controller, Card card, Dictionary<GameTag, int?> tags = null) : base(game, controller, card, tags) { }
 
 		public IPlayable Play() {
 			var played = (Entity)Game.ActionQueue.EnqueueSingleResult(CardBehaviour.Play((Entity) Controller, this));

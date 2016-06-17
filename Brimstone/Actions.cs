@@ -83,6 +83,8 @@ namespace Brimstone
 			} else if (card[GameTag.CARDTYPE] == (int)CardType.SPELL) {
 				return (Spell)player.Hand.MoveTo(new Spell(game, player, card));
 			}
+			// TODO: Weapons
+
 			return ActionResult.None;
 		}
 	}

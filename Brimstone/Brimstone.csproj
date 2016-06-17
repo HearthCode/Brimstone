@@ -55,6 +55,7 @@
     <Compile Include="Card.cs" />
     <Compile Include="CardData.cs" />
     <Compile Include="Cards\All.cs" />
+    <Compile Include="Deck.cs" />
     <Compile Include="EntityCore.cs" />
     <Compile Include="EntityTypes\Game.cs" />
     <Compile Include="EntityTypes\Minion.cs" />
