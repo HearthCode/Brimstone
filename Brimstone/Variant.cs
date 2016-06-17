@@ -11,8 +11,8 @@ public struct Variant
 	private int intValue;
 	private string stringValue;
 
-	public static implicit operator Variant(int? x) {
-		return new Variant { HasValue = x.HasValue, HasIntValue = x.HasValue, intValue = (x.HasValue? x.Value : 0) };
+	public static implicit operator Variant(int x) {
+		return new Variant { HasValue = true, HasIntValue = true, intValue = x };
 	}
 	public static implicit operator Variant(bool x) {
 		return new Variant { HasValue = true, HasBoolValue = true, boolValue = x };

@@ -19,8 +19,6 @@ namespace BrimstoneTests
 
 			// Give the game and each player at least one tag
 			game[GameTag.STEP] = (int)Step.MAIN_ACTION;
-			p1[GameTag.HEALTH] = 30;
-			p2[GameTag.HEALTH] = 30;
 
 			// Add items to zones
 			for (int i = 0; i < 5; i++)

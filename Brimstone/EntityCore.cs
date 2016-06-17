@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Brimstone
 {
-	public interface IEntity : IEnumerable<KeyValuePair<GameTag, int?>>, ICloneable
+	public interface IEntity : IEnumerable<KeyValuePair<GameTag, int>>, ICloneable
 	{
 		int Id { get; set; }
 		// Allow owner game and controller to be changed for state cloning
 		Game Game { get; set; }
 		IEntity Controller { get; set; }
 		Card Card { get; }
-		Dictionary<GameTag, int?> CopyTags();
+		Dictionary<GameTag, int> CopyTags();
 
-		int? this[GameTag t] { get; set; }
+		int this[GameTag t] { get; set; }
 
 		IEntity CloneState();
 	}
@@ -41,31 +42,35 @@ namespace Brimstone
 	{
 		public int Id { get; set; }
 		public Card Card { get; }
-		public Dictionary<GameTag, int?> Tags { get; }
+		public Dictionary<GameTag, int> Tags { get; }
 
-		public int? this[GameTag t] {
+		public int this[GameTag t] {
 			get {
-				// Use TryGetValue for safety
-				return Tags[t];
+				// Use the entity tag if available, otherwise the card tag
+				if (Tags.ContainsKey(t))
+					return Tags[t];
+				if (Card.Tags.ContainsKey(t))
+					return Card[t];
+				return 0;
 			}
 			set {
 				Tags[t] = value;
 			}
 		}
 
-		public BaseEntityData(Game game, Card card, Dictionary<GameTag, int?> tags = null) {
+		public BaseEntityData(Game game, Card card, Dictionary<GameTag, int> tags = null) {
 			Card = card;
 			if (tags != null)
 				Tags = tags;
 			else
-				Tags = new Dictionary<GameTag, int?>((int)GameTag._COUNT);
+				Tags = new Dictionary<GameTag, int>((int)GameTag._COUNT);
 		}
 
 		// Cloning copy constructor
 		public BaseEntityData(BaseEntityData cloneFrom) {
 			Card = cloneFrom.Card;
 			Id = cloneFrom.Id;
-			Tags = new Dictionary<GameTag, int?>(cloneFrom.Tags);
+			Tags = new Dictionary<GameTag, int>(cloneFrom.Tags);
 		}
 
 		public virtual object Clone() {
@@ -101,7 +106,7 @@ namespace Brimstone
 			Controller = Game.Entities[cloneFrom.Controller.Id];
 		}
 
-		public Entity(Game game, IEntity controller, Card card, Dictionary<GameTag, int?> tags = null) {
+		public Entity(Game game, IEntity controller, Card card, Dictionary<GameTag, int> tags = null) {
 			_entity = new BaseEntityData(game, card, tags);
 			_referenceCount = new ReferenceCount();
 			Controller = controller;
@@ -109,25 +114,22 @@ namespace Brimstone
 				game.Entities.Add(this);
 		}
 
-		public int? this[GameTag t] {
+		public int this[GameTag t] {
 			get {
 				if (t == GameTag.ENTITY_ID)
 					return _entity.Id;
 				if (t == GameTag.CONTROLLER)
 					return Controller.Id;
-
-				if (!_entity.Tags.ContainsKey(t))
-					return 0;
 				return _entity[t];
 			}
 			set {
 				// Ignore unchanged data
 				if (_entity.Tags.ContainsKey(t) && _entity[t] == value)
 					return;
-				else if (t == GameTag.CONTROLLER && value != null) {
+				else if (t == GameTag.CONTROLLER) {
 					Controller = Game.Entities[(int)value];
 				}
-				else if (t == GameTag.ENTITY_ID && value != null) {
+				else if (t == GameTag.ENTITY_ID) {
 					CopyOnWrite();
 					_entity.Id = (int)value;
 				} else {
@@ -172,15 +174,21 @@ namespace Brimstone
 			}
 		}
 
-		// Returns a *copy* of all tags
-		public Dictionary<GameTag, int?> CopyTags() {
-			var allTags = new Dictionary<GameTag, int?>(_entity.Tags);
+		// Returns a *copy* of all tags from both the entity and the underlying card
+		public Dictionary<GameTag, int> CopyTags() {
+			var allTags = new Dictionary<GameTag, int>(_entity.Card.Tags);
+			
+			// Entity tags override card tags
+			foreach (var tag in _entity.Tags)
+				allTags[tag.Key] = tag.Value;
+
+			// Specially handled tags
 			allTags[GameTag.CONTROLLER] = Controller.Id;
 			allTags[GameTag.ENTITY_ID] = _entity.Id;
 			return allTags;
 		}
 
-		public IEnumerator<KeyValuePair<GameTag, int?>> GetEnumerator() {
+		public IEnumerator<KeyValuePair<GameTag, int>> GetEnumerator() {
 			// Hopefully we're only iterating through tags in test code
 			// so it doesn't matter that we are making a deep clone of the dictionary
 			return CopyTags().GetEnumerator();

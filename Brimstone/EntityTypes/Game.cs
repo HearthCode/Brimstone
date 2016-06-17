@@ -28,7 +28,7 @@ namespace Brimstone
 		}
 
 		public Game(Player Player1 = null, Player Player2 = null, bool PowerHistory = false)
-					: base(null, null, Cards.Find["Game"], new Dictionary<GameTag, int?> { { GameTag.ZONE, (int?) Zone.PLAY } }) {
+					: base(null, null, Cards.Find["Game"], new Dictionary<GameTag, int> { { GameTag.ZONE, (int) Zone.PLAY } }) {
 			Controller = this;
 			if (PowerHistory) {
 				this.PowerHistory.Attach(this);

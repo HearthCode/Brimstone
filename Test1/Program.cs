@@ -83,8 +83,8 @@ namespace Test1
 			// Bombs away!
 			p1.Give(Cards.FindByName("Whirlwind")).Play();
 
+
 			/*
-			
 			// Set off the chain of events
 			Console.WriteLine("Entities to clone: " + game.Entities.Count);
 
@@ -100,12 +100,12 @@ namespace Test1
 			for (int i = 0; i < 100000; i++) {
 				((Minion) clones[i].Entities[firstboombotId]).Damage(1);
 				
-				var key = clonedGame.ToString();
+				var key = clones[i].ToString();
 				if (!boardStates.ContainsKey(key))
 					boardStates.Add(key, 1);
 				else
 					boardStates[key]++;
-					
+
 			}
 			Console.SetOut(cOut);
 			Console.WriteLine("Fired off 100,000 Boom Bots in " + sw.ElapsedMilliseconds + " ms");
@@ -138,7 +138,7 @@ namespace Test1
 			System.Diagnostics.Debug.Assert(!gs1.Equals(gs2));
 
 			Console.WriteLine("Entities to clone: " + game.Entities.Count);
-			// Measure clonimg timeI got
+			// Measure clonimg time
 			Stopwatch s = new Stopwatch();
 			s.Start();
 			for (int i = 0; i < 100000; i++)

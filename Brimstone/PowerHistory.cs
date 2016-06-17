@@ -32,7 +32,7 @@ namespace Brimstone
 
 	public class CreateEntity : PowerAction
 	{
-		public Dictionary<GameTag, int?> Tags { get; set; }
+		public Dictionary<GameTag, int> Tags { get; set; }
 
 		public CreateEntity(IEntity e) : base(e) {
 			// Make sure we copy the tags, not the references!

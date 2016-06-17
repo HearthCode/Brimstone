@@ -10,7 +10,7 @@ namespace Brimstone
 		public Dictionary<PlayRequirements, int> Requirements { get; set; }
 		public CompiledBehaviour Behaviour { get; set; }
 
-		public int? this[GameTag t] {
+		public int this[GameTag t] {
 			get {
 				// TODO: Use TryGetValue for safety
 				return Tags[t];

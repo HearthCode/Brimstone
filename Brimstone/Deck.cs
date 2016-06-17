@@ -16,8 +16,8 @@ namespace Brimstone
 			foreach (var card in cards) {
 				IEntity e = null;
 
-				var tags = new Dictionary<GameTag, int?> {
-					{ GameTag.ZONE, (int?)Zone.DECK },
+				var tags = new Dictionary<GameTag, int> {
+					{ GameTag.ZONE, (int)Zone.DECK },
 					{ GameTag.ZONE_POSITION, nextPos++ }
 				};
 
