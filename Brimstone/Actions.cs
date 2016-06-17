@@ -118,6 +118,8 @@ namespace Brimstone
 					e[GameTag.HEALTH]-= args[DAMAGE];
 					e[GameTag.DAMAGE] = e.Card[GameTag.HEALTH] - e[GameTag.HEALTH];
 					e.CheckForDeath();
+
+					// TODO: What if one of our targets gets killed?
 				}
 			return ActionResult.None;
 		}

@@ -135,7 +135,7 @@ namespace Brimstone
 					_entity[t] = value;
 				}
 				if (Game != null)
-					Game.PowerHistory.Add(new TagChange(this) { Key = t, Value = value });
+					Game.PowerHistory.Add(new TagChange(this, new Tag(t, value)));
 			}
 		}
 
@@ -193,7 +193,7 @@ namespace Brimstone
 		public override string ToString() {
 			string s = Card.Name + " - ";
 			foreach (var tag in this) {
-				s += tag.Format() + ", ";
+				s += new Tag(tag.Key, tag.Value) + ", ";
 			}
 			return s.Substring(0, s.Length - 2);
 		}

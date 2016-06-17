@@ -19,13 +19,14 @@ namespace Brimstone
 
 	public class TagChange : PowerAction
 	{
-		public GameTag Key { get; set; }
-		public int? Value { get; set; }
+		public Tag Tag { get; }
 
-		public TagChange(IEntity e) : base(e) { }
+		public TagChange(IEntity e, Tag t) : base(e) {
+			Tag = t;
+		}
 
 		public override string ToString() {
-			return "[Tag] Entity " + EntityId + ": " + new KeyValuePair<GameTag, int?>(Key, Value).Format();
+			return "[Tag] Entity " + EntityId + ": " + Tag;
 		}
 	}
 
@@ -41,7 +42,7 @@ namespace Brimstone
 		public override string ToString() {
 			string s = "[Create] " + base.ToString();
 			foreach (var t in Tags) {
-				s += "\n    " + t.Format();
+				s += "\n    " + new Tag(t.Key, t.Value);
 			}
 			return s;
 		}

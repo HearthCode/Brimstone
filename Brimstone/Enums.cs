@@ -241,7 +241,13 @@
 		CHOOSE_ONE = 443,
 		EXTRA_ATTACKS_THIS_TURN = 444,
 		SEEN_CTHUN = 445,
-		_COUNT
+		_COUNT,
+
+		// Log-specific
+		WEAPON = 334,
+
+		// Card definition-specific
+		Collectible = 321
 	}
 
 	public enum CardSet
@@ -308,6 +314,14 @@
 		LOADING,
 		RUNNING,
 		COMPLETE
+	}
+
+	public enum Faction
+	{
+		INVALID,
+		HORDE,
+		ALLIANCE,
+		NEUTRAL
 	}
 
 	public enum MulliganState
@@ -411,6 +425,25 @@
 		INVALID,
 		MULLIGAN,
 		GENERAL
+	}
+
+	public enum EnchantmentVisual
+	{
+		INVALID,
+		POSITIVE,
+		NEGATIVE,
+		NEUTRAL
+	}
+
+	public enum GoldRewardState
+	{
+		INVALID,
+		ELIGIBLE,
+		WRONG_GAME_TYPE,
+		ALREADY_CAPPED,
+		BAD_RATING,
+		SHORT_GAME,
+		OVER_CAIS
 	}
 
 	public enum PlayRequirements

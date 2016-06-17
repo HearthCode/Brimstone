@@ -65,15 +65,24 @@
     <Compile Include="PowerHistory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueueAction.cs" />
-    <Compile Include="TagFormatter.cs" />
+    <Compile Include="Tag.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="Variant.cs" />
     <Compile Include="Zone.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="configure.bat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Data\CardDefs.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>$(ProjectDir)configure "$(ProjectDir)"</PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

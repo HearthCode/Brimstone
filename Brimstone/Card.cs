@@ -4,14 +4,15 @@ namespace Brimstone
 {
 	public class Card
 	{
-		public virtual string Id { get; set; }
-		public virtual string Name { get; set; }
-		public virtual Dictionary<GameTag, int> Tags { get; set; }
-		public virtual CompiledBehaviour Behaviour { get; set; }
+		public string Id { get; set; }
+		public string Name { get; set; }
+		public Dictionary<GameTag, int> Tags { get; set; }
+		public Dictionary<PlayRequirements, int> Requirements { get; set; }
+		public CompiledBehaviour Behaviour { get; set; }
 
 		public int? this[GameTag t] {
 			get {
-				// Use TryGetValue for safety
+				// TODO: Use TryGetValue for safety
 				return Tags[t];
 			}
 		}
