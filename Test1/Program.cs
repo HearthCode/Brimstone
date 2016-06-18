@@ -42,7 +42,7 @@ namespace Test1
 			game.ActionQueue.OnQueued += (o, e) => {
 				ActionQueue queue = o as ActionQueue;
 				if (e.Action is RandomOpponentMinion) {
-					if (game.Opponent.InPlay.Count > 0) {
+					if (game.CurrentPlayer.Opponent.InPlay.Count > 0) {
 						Console.WriteLine("REPLACING RANDOM CHOICE ACTION: " + e.Action);
 						//queue.ReplaceAction(new LazyEntity() { Entity = (Minion)game.Opponent.Board[1] });
 					}
@@ -114,7 +114,7 @@ namespace Test1
 			// Check that cloning works
 			
 			// Normal game has 68 entities: Game + 2 players + 2 heroes + 2 hero powers + 30 cards each + coin = 68
-			/*
+			
 			while (game.Entities.Count < 68) {
 				p1.Give(Cards.FindByName("Flame Juggler"));
 			}
@@ -145,7 +145,7 @@ namespace Test1
 				game.CloneState();
 			Console.WriteLine(s.ElapsedMilliseconds + "ms for 100,000 clones");
 			Console.ReadLine();
-			*/
+			
 		}
 	}
 }

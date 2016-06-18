@@ -54,7 +54,7 @@ namespace BrimstoneTests
 			Assert.IsTrue(game.Player1.Id == clone.Player1.Id);
 			Assert.IsTrue(game.Player2.Id == clone.Player2.Id);
 			Assert.IsTrue(game.CurrentPlayer.Id == clone.CurrentPlayer.Id);
-			Assert.IsTrue(game.Opponent.Id == clone.Opponent.Id);
+			Assert.IsTrue(game.CurrentPlayer.Opponent.Id == clone.CurrentPlayer.Opponent.Id);
 			Assert.IsTrue(ReferenceEquals(clone.Players[0], clone.Player1));
 			Assert.IsTrue(ReferenceEquals(clone.Players[1], clone.Player2));
 

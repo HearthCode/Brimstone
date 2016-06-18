@@ -3,15 +3,13 @@ using System.Collections.Generic;
 
 namespace Brimstone
 {
-	public class Game : Entity, IZones
+	public partial class Game : Entity, IZones
 	{
 		public EntityController Entities;
 
 		public Player[] Players { get; private set; } = new Player[2];
 		public Player Player1 { get; private set; }
 		public Player Player2 { get; private set; }
-		public Player CurrentPlayer { get; set; }
-		public Player Opponent { get; set; }
 
 		public ZoneEntities Setaside { get; private set; }
 		public ZoneGroup Zones { get; } = new ZoneGroup();
@@ -45,8 +43,9 @@ namespace Brimstone
 		}
 
 		public void Start() {
-			CurrentPlayer = Player1;
-			Opponent = Player2;
+			// Pick a random starting player
+			FirstPlayer = Players[RNG.Between(0, 1)];
+			CurrentPlayer = FirstPlayer;
 		}
 
 		public void SetPlayers(Player Player1, Player Player2) {
@@ -93,7 +92,6 @@ namespace Brimstone
 			game.Players[0] = game.Player1;
 			game.Players[1] = game.Player2;
 			game.CurrentPlayer = (CurrentPlayer.Id == game.Player1.Id ? game.Player1 : game.Player2);
-			game.Opponent = (Opponent.Id == game.Player1.Id ? game.Player1 : game.Player2);
 			game.Entities = entities;
 			// Re-assign zone references
 			foreach (var p in game.Players)

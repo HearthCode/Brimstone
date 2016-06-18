@@ -34,17 +34,17 @@ namespace Brimstone
 	public class RandomOpponentMinion : QueueAction
 	{
 		public override ActionResult Run(Game game, List<ActionResult> args) {
-			if (game.Opponent.InPlay.Count == 0)
+			if (game.CurrentPlayer.Opponent.InPlay.Count == 0)
 				return new List<IEntity>();
-			var m = RNG.Between(1, game.Opponent.InPlay.Count);
-			return (Minion)game.Opponent.InPlay[m];
+			var m = RNG.Between(1, game.CurrentPlayer.Opponent.InPlay.Count);
+			return (Minion)game.CurrentPlayer.Opponent.InPlay[m];
 		}
 	}
 
 	public class AllMinions : QueueAction
 	{
 		public override ActionResult Run(Game game, List<ActionResult> args) {
-			return game.CurrentPlayer.InPlay.Concat(game.Opponent.InPlay).ToList();
+			return game.CurrentPlayer.InPlay.Concat(game.CurrentPlayer.Opponent.InPlay).ToList();
 		}
 	}
 
@@ -58,9 +58,7 @@ namespace Brimstone
 	public class BeginTurn : QueueAction
 	{
 		public override ActionResult Run(Game game, List<ActionResult> args) {
-			var temp = game.CurrentPlayer;
-			game.CurrentPlayer = game.Opponent;
-			game.Opponent = temp;
+			game.CurrentPlayer = game.CurrentPlayer.Opponent;
 			game[GameTag.STEP] = (int) Step.MAIN_ACTION;
 
 			return ActionResult.None;
@@ -117,8 +115,7 @@ namespace Brimstone
 				foreach (Minion e in args[TARGETS]) {
 					Console.WriteLine("{0} is getting hit for {1} points of damage", e.Card.Name, args[DAMAGE]);
 
-					e[GameTag.HEALTH]-= args[DAMAGE];
-					e[GameTag.DAMAGE] = e.Card[GameTag.HEALTH] - e[GameTag.HEALTH];
+					e.Damage += args[DAMAGE];
 					e.CheckForDeath();
 
 					// TODO: What if one of our targets gets killed?

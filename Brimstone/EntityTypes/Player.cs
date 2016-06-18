@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Brimstone
 {
-	public class Player : Entity, IZones
+	public partial class Player : CanBeDamaged, IZones
 	{
 		public string FriendlyName { get; set; }
 
@@ -22,7 +22,7 @@ namespace Brimstone
 
 		public Player(Game game = null) : base(game, game, Cards.Find["Player"],
 			new Dictionary<GameTag, int> { { GameTag.ZONE, (int) Zone.PLAY } }) {
-			this[GameTag.HEALTH] = 30;
+			Health = 30;
 			setZones();
 		}
 

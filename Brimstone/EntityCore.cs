@@ -31,7 +31,7 @@ namespace Brimstone
 
 	public interface IMinion : IPlayable
 	{
-		void Damage(int amount);
+		void Hit(int amount);
 	}
 
 	public interface ISpell : IPlayable
@@ -87,7 +87,7 @@ namespace Brimstone
 		public int Count { get; set; }
 	}
 
-	public class Entity : IEntity, ICopyOnWrite
+	public partial class Entity : IEntity, ICopyOnWrite
 	{
 		private BaseEntityData _entity;
 		private ReferenceCount _referenceCount;
@@ -157,6 +157,8 @@ namespace Brimstone
 				_entity.Id = value;
 			}
 		}
+
+		// TODO: Add Zone property helper semantics
 
 		public virtual object Clone() {
 			return new Entity(this);
