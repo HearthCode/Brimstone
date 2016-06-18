@@ -21,12 +21,14 @@ namespace Brimstone
 			StartingHeroCard = cloneFrom.StartingHeroCard;
 		}
 
-		public Player(Game game, Card hero, string name) : base(game, game, Cards.Find["Player"],
+		public Player(Game game, Card hero, string name, int playerId, int teamId = 0) : base(game, game, Cards.Find["Player"],
 			new Dictionary<GameTag, int> {
 				{ GameTag.PLAYSTATE, (int) PlayState.PLAYING },
 				{ GameTag.MAXHANDSIZE, 10 },
 				{ GameTag.ZONE, (int) Zone.PLAY },
-				{ GameTag.MAXRESOURCES, 10 }
+				{ GameTag.MAXRESOURCES, 10 },
+				{ GameTag.PLAYER_ID, playerId },
+				{ GameTag.TEAM_ID, (teamId != 0? teamId : playerId) }
 			}) {
 			StartingHeroCard = hero;
 			FriendlyName = name;

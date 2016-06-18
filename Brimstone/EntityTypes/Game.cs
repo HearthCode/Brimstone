@@ -46,8 +46,8 @@ namespace Brimstone
 
 			// Generate players and empty decks
 			SetPlayers(
-				new Player(this, Hero1, (Player1Name.Length > 0) ? Player1Name : "Player 1"),
-				new Player(this, Hero2, (Player2Name.Length > 0) ? Player2Name : "Player 2")
+				new Player(this, Hero1, (Player1Name.Length > 0) ? Player1Name : "Player 1", 1),
+				new Player(this, Hero2, (Player2Name.Length > 0) ? Player2Name : "Player 2", 2)
 			);
 
 			// Generate zones owned by game
