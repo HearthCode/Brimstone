@@ -11,7 +11,8 @@
 	{
 		// Factory functions for DSL syntax
 		public static QueueAction BeginTurn { get { return new BeginTurn(); } }
-		public static ActionGraph Give(ActionGraph target, ActionGraph card) { return new Give { Args = { target, card } }; }
+		public static ActionGraph Draw(ActionGraph player) { return new Draw { Args = { player } }; }
+		public static ActionGraph Give(ActionGraph player, ActionGraph card) { return new Give { Args = { player, card } }; }
 		public static ActionGraph Play(ActionGraph player, ActionGraph entity) { return new Play { Args = { player, entity } }; }
 
 		public static QueueAction RandomOpponentMinion { get { return new RandomOpponentMinion(); } }

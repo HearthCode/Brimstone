@@ -62,17 +62,19 @@ namespace Brimstone
 			game.Step = Step.MAIN_ACTION;
 			game.NextStep = Step.MAIN_END;
 
+			game.ActionQueue.Enqueue(CardBehaviour.Draw(game.CurrentPlayer));
+
 			return ActionResult.None;
 		}
 	}
 
 	public class Give : QueueAction
 	{
-		public const int TARGET = 0;
+		public const int PLAYER = 0;
 		public const int CARD = 1;
 
 		public override ActionResult Run(Game game, List<ActionResult> args) {
-			Player player = (Player)args[TARGET];
+			Player player = (Player)args[PLAYER];
 			Card card = args[CARD];
 
 			Console.WriteLine("Giving {0} to {1}", card.Name, player.FriendlyName);
@@ -85,6 +87,21 @@ namespace Brimstone
 			// TODO: Weapons
 
 			return ActionResult.None;
+		}
+	}
+
+	public class Draw : QueueAction
+	{
+		public const int PLAYER = 0;
+
+		public override ActionResult Run(Game game, List<ActionResult> args) {
+			Player player = (Player)args[PLAYER];
+			Entity entity = (Entity)player.Deck[1];
+
+			Console.WriteLine("{0} draws {1}", player.FriendlyName, entity.Card.Name);
+
+			player.Hand.MoveTo(entity);
+			return entity;
 		}
 	}
 

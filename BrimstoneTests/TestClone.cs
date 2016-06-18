@@ -28,7 +28,7 @@ namespace BrimstoneTests
 			for (int i = 0; i < 7; i++)
 				p2.Give(Cards.FindByName("Flame Juggler"));
 
-			Assert.IsTrue(game.Entities.Count == 27);
+			Assert.IsTrue(game.Entities.Count == 29);
 
 			// Act
 

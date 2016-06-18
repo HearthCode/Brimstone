@@ -71,6 +71,10 @@ namespace Brimstone
 			return (IPlayable)(Entity)Game.ActionQueue.EnqueueSingleResult(CardBehaviour.Give(this, card));
 		}
 
+		public IPlayable Draw() {
+			return (IPlayable)(Entity)Game.ActionQueue.EnqueueSingleResult(CardBehaviour.Draw(this));
+		}
+
 		// TODO: Add Zone move semantic helpers here
 
 		public override object Clone() {
