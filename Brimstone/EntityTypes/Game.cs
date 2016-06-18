@@ -60,9 +60,18 @@ namespace Brimstone
 			// Pick a random starting player
 			FirstPlayer = Players[RNG.Between(0, 1)];
 			CurrentPlayer = FirstPlayer;
-			Step = Step.BEGIN_MULLIGAN;
 			foreach (var p in Players)
 				p.Start();
+
+			// TODO: Insert event call here so KettleSharp can iterate all created entities
+
+			StartMulligan();
+		}
+
+		public void StartMulligan() {
+			Step = Step.BEGIN_MULLIGAN;
+			foreach (var p in Players)
+				p.StartMulligan();
 		}
 
 		public void SetPlayers(Player Player1, Player Player2) {

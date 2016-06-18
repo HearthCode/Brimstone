@@ -53,10 +53,14 @@ namespace Brimstone
 		}
 
 		public void Start() {
-			// Generate hero
-			new Hero(Game, this, StartingHeroCard);
+			// Shuffle deck
 
 			Deck.Shuffle();
+			// Generate hero
+			new Hero(Game, this, StartingHeroCard);
+		}
+
+		public void StartMulligan() {
 			MulliganState = MulliganState.INPUT;
 		}
 
