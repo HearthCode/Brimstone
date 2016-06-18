@@ -48,7 +48,26 @@ namespace Brimstone
 		}
 	}
 
-	public abstract class CanBeDamaged : Entity
+	public partial class Player : Entity, IZones
+	{
+		public Player Opponent {
+			get {
+				return Game.Player1 == this ? Game.Player2 : Game.Player1;
+			}
+		}
+
+		public PlayState PlayState {
+			get { return (PlayState)this[GameTag.PLAYSTATE]; }
+			set { this[GameTag.PLAYSTATE] = (int)value; }
+		}
+
+		public MulliganState MulliganState {
+			get { return (MulliganState)this[GameTag.MULLIGAN_STATE]; }
+			set { this[GameTag.MULLIGAN_STATE] = (int)value; }
+		}
+	}
+
+	public abstract partial class CanBeDamaged : Entity
 	{
 		public CanBeDamaged(Game game, IEntity controller, Card card, Dictionary<GameTag, int> tags = null) : base(game, controller, card, tags) { }
 		public CanBeDamaged(CanBeDamaged cloneFrom) : base(cloneFrom) { }
@@ -74,28 +93,5 @@ namespace Brimstone
 			get { return this[GameTag.DAMAGE]; }
 			set { this[GameTag.DAMAGE] = value; }
 		}
-	}
-
-	public partial class Player : CanBeDamaged, IZones
-	{
-		public Player Opponent {
-			get {
-				return Game.Player1 == this ? Game.Player2 : Game.Player1;
-			}
-		}
-
-		public PlayState PlayState {
-			get { return (PlayState)this[GameTag.PLAYSTATE]; }
-			set { this[GameTag.PLAYSTATE] = (int)value; }
-		}
-
-		public MulliganState MulliganState {
-			get { return (MulliganState)this[GameTag.MULLIGAN_STATE]; }
-			set { this[GameTag.MULLIGAN_STATE] = (int)value; }
-		}
-	}
-
-	public partial class Minion : CanBeDamaged, IMinion
-	{
 	}
 }

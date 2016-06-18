@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Brimstone
 {
-	public partial class Player : CanBeDamaged, IZones
+	public partial class Player : Entity, IZones
 	{
 		public string FriendlyName { get; set; }
 
