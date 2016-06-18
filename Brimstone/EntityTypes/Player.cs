@@ -28,7 +28,8 @@ namespace Brimstone
 				{ GameTag.ZONE, (int) Zone.PLAY },
 				{ GameTag.MAXRESOURCES, 10 },
 				{ GameTag.PLAYER_ID, playerId },
-				{ GameTag.TEAM_ID, (teamId != 0? teamId : playerId) }
+				{ GameTag.TEAM_ID, (teamId != 0? teamId : playerId) },
+				{ GameTag.STARTHANDSIZE, 4 }
 			}) {
 			StartingHeroCard = hero;
 			FriendlyName = name;
