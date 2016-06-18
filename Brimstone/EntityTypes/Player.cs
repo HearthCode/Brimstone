@@ -5,9 +5,8 @@ using System.Linq;
 
 namespace Brimstone
 {
-	public partial class Player : Entity, IZones
-	{
-		public string FriendlyName { get; set; }
+	public partial class Player : Entity, IZones {
+		public string FriendlyName { get; }
 
 		public Deck Deck { get; private set; }
 		public ZoneEntities Hand { get; private set; }
@@ -15,18 +14,22 @@ namespace Brimstone
 		public ZoneEntities Graveyard { get; private set; }
 		public ZoneEntities Secrets { get; private set; }
 		public ZoneGroup Zones { get; } = new ZoneGroup();
+		public Card StartingHeroCard { get; }
 
 		public Player(Player cloneFrom) : base(cloneFrom) {
 			FriendlyName = cloneFrom.FriendlyName;
+			StartingHeroCard = cloneFrom.StartingHeroCard;
 		}
 
-		public Player(Game game = null) : base(game, game, Cards.Find["Player"],
+		public Player(Game game, Card hero, string name) : base(game, game, Cards.Find["Player"],
 			new Dictionary<GameTag, int> {
 				{ GameTag.PLAYSTATE, (int) PlayState.PLAYING },
 				{ GameTag.MAXHANDSIZE, 10 },
 				{ GameTag.ZONE, (int) Zone.PLAY },
 				{ GameTag.MAXRESOURCES, 10 }
 			}) {
+			StartingHeroCard = hero;
+			FriendlyName = name;
 			setZones();
 		}
 
@@ -37,8 +40,6 @@ namespace Brimstone
 		}
 
 		private void setZones() {
-			if (Game == null)
-				return;
 			Deck = new Deck(Game, this);
 			Hand = new ZoneEntities(Game, this, Zone.HAND);
 			InPlay = new ZoneEntities(Game, this, Zone.PLAY);
@@ -49,6 +50,14 @@ namespace Brimstone
 			Zones[Zone.PLAY] = InPlay;
 			Zones[Zone.GRAVEYARD] = Graveyard;
 			Zones[Zone.SECRET] = Secrets;
+		}
+
+		public void Start() {
+			// Generate hero
+			new Hero(Game, this, StartingHeroCard);
+
+			Deck.Shuffle();
+			MulliganState = MulliganState.INPUT;
 		}
 
 		public IPlayable Give(Card card) {

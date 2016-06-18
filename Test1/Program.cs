@@ -14,11 +14,9 @@ namespace Test1
 		static void Main(string[] args) {
 			Console.WriteLine("Hello Hearthstone!");
 
-			// TODO: Clean up constructor order
-
-			var p1 = new Player { FriendlyName = "Player 1" };
-			var p2 = new Player { FriendlyName = "Player 2" };
-			var game = new Game(Player1: p1, Player2: p2, PowerHistory: true);
+			var game = new Game(HeroClass.Druid, HeroClass.Druid, PowerHistory: true);
+			var p1 = game.Player1;
+			var p2 = game.Player2;
 
 			p1.Deck.Add(new List<Card> {
 				Cards.FindByName("Bloodfen Raptor"),

@@ -12,7 +12,7 @@ namespace BrimstoneVisualizer
 	public partial class App : Application
 	{
 		public static AutoResetEvent QueueRead = new AutoResetEvent(false);
-		public static Game Game = new Game(PowerHistory: true);
+		public static Game Game;
 		public static Thread GameThread;
 		public const int MaxMinions = 7;
 
@@ -22,6 +22,8 @@ namespace BrimstoneVisualizer
 		}
 
 		public static void GameWorkerThread() {
+			Game = new Game(HeroClass.Hunter, HeroClass.Warlock, PowerHistory: true);
+
 			// Block every time we queue or perform action
 			Game.ActionQueue.OnQueued += (s, e) => {
 				QueueRead.WaitOne();
@@ -30,9 +32,8 @@ namespace BrimstoneVisualizer
 				QueueRead.WaitOne();
 			};
 
-			var p1 = new Player { FriendlyName = "Player 1" };
-			var p2 = new Player { FriendlyName = "Player 2" };
-			Game.SetPlayers(p1, p2);
+			var p1 = Game.Player1;
+			var p2 = Game.Player2;
 
 			p1.Deck.Add(new List<Card> {
 				Cards.FindByName("Bloodfen Raptor"),

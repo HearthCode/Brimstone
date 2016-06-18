@@ -25,26 +25,35 @@ namespace Brimstone
 			ActionQueue.Attach(this);
 		}
 
-		public Game(Player Player1 = null, Player Player2 = null, bool PowerHistory = false)
+		public Game(Card Hero1, Card Hero2, string Player1Name = "", string Player2Name = "", bool PowerHistory = false)
 					: base(null, null, Cards.Find["Game"], new Dictionary<GameTag, int> {
 						{ GameTag.TURN, 1 },
 						{ GameTag.ZONE, (int) Zone.PLAY },
 						{ GameTag.NEXT_STEP, (int) Step.BEGIN_MULLIGAN },
 						{ GameTag.STATE, (int) GameState.RUNNING }
 					}) {
-			Controller = this;
+			// Start Power log
 			if (PowerHistory) {
 				this.PowerHistory.Attach(this);
 			}
 			ActionQueue.Attach(this);
+
 			Entities = new EntityController(this);
+
+			// Generate game
+			Controller = this;
 			Entities.Add(this);
-			if (Player1 != null && Player2 != null) {
-				SetPlayers(Player1, Player2);
-			}
-			Setaside = new ZoneEntities(this, this, Zone.SETASIDE);
-			Zones[Zone.SETASIDE] = Setaside;
+
+			// Generate players and empty decks
+			SetPlayers(
+				new Player(this, Hero1, (Player1Name.Length > 0) ? Player1Name : "Player 1"),
+				new Player(this, Hero2, (Player2Name.Length > 0) ? Player2Name : "Player 2")
+			);
+
+			// Generate zones owned by game
+			Zones[Zone.SETASIDE] = new ZoneEntities(this, this, Zone.SETASIDE);
 			Zones[Zone.PLAY] = new ZoneEntities(this, this, Zone.PLAY);
+			Setaside = Zones[Zone.SETASIDE];
 		}
 
 		public void Start() {
@@ -52,10 +61,8 @@ namespace Brimstone
 			FirstPlayer = Players[RNG.Between(0, 1)];
 			CurrentPlayer = FirstPlayer;
 			Step = Step.BEGIN_MULLIGAN;
-			foreach (var p in Players) {
-				p.Deck.Shuffle();
-				p.MulliganState = MulliganState.INPUT;
-			}
+			foreach (var p in Players)
+				p.Start();
 		}
 
 		public void SetPlayers(Player Player1, Player Player2) {
@@ -65,7 +72,6 @@ namespace Brimstone
 			Players[1] = Player2;
 			foreach (var p in Players) {
 				p.Attach(this);
-				Entities.Add(p);
 			}
 		}
 

@@ -12,13 +12,11 @@ namespace BrimstoneTests
 			// Arrange
 
 			// Create game with players
-			Player p1 = new Player() { FriendlyName = "Player 1" };
-			Player p2 = new Player() { FriendlyName = "Player 2" };
-			Game game = new Game(Player1: p1, Player2: p2, PowerHistory: true);
+			Game game = new Game(HeroClass.Druid, HeroClass.Druid, PowerHistory: true);
 			game.Start();
 
-			// Give the game and each player at least one tag
-			game[GameTag.STEP] = (int)Step.MAIN_ACTION;
+			var p1 = game.CurrentPlayer;
+			var p2 = game.CurrentPlayer.Opponent;
 
 			// Add items to zones
 			for (int i = 0; i < 5; i++)
