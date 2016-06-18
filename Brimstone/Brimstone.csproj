@@ -63,6 +63,7 @@
     <Compile Include="EntityTypes\Spell.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="EntityGroup.cs" />
+    <Compile Include="Heroes.cs" />
     <Compile Include="PowerHistory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueueAction.cs" />
