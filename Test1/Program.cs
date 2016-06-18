@@ -14,6 +14,8 @@ namespace Test1
 		static void Main(string[] args) {
 			Console.WriteLine("Hello Hearthstone!");
 
+			// TODO: Clean up constructor order
+
 			var p1 = new Player { FriendlyName = "Player 1" };
 			var p2 = new Player { FriendlyName = "Player 2" };
 			var game = new Game(Player1: p1, Player2: p2, PowerHistory: true);
@@ -27,6 +29,7 @@ namespace Test1
 				Cards.FindByName("Murloc Tinyfin"),
 				Cards.FindByName("Wisp"),
 			});
+
 			var chromaggus = new Minion(game, p1, Cards.FindByName("Chromaggus"));
 			p1.Deck.Add(chromaggus);
 

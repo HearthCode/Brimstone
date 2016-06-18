@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Brimstone
 {
@@ -30,6 +31,16 @@ namespace Brimstone
 				// TODO: Weapons
 			}
 			// Force deck zone contents to update
+			Init();
+		}
+
+		public void Shuffle() {
+			var possiblePositions = Enumerable.Range(1, Count).ToList();
+			foreach (var c in this) {
+				int selIndex = RNG.Between(0, possiblePositions.Count - 1);
+				c[GameTag.ZONE_POSITION] = possiblePositions[selIndex];
+				possiblePositions.RemoveAt(selIndex);
+			}
 			Init();
 		}
 	}

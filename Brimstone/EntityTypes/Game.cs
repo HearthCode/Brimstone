@@ -52,8 +52,10 @@ namespace Brimstone
 			FirstPlayer = Players[RNG.Between(0, 1)];
 			CurrentPlayer = FirstPlayer;
 			Step = Step.BEGIN_MULLIGAN;
-			foreach (var p in Players)
+			foreach (var p in Players) {
+				p.Deck.Shuffle();
 				p.MulliganState = MulliganState.INPUT;
+			}
 		}
 
 		public void SetPlayers(Player Player1, Player Player2) {
