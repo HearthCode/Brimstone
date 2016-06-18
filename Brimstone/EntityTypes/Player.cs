@@ -21,8 +21,12 @@ namespace Brimstone
 		}
 
 		public Player(Game game = null) : base(game, game, Cards.Find["Player"],
-			new Dictionary<GameTag, int> { { GameTag.ZONE, (int) Zone.PLAY } }) {
-			Health = 30;
+			new Dictionary<GameTag, int> {
+				{ GameTag.PLAYSTATE, (int) PlayState.PLAYING },
+				{ GameTag.MAXHANDSIZE, 10 },
+				{ GameTag.ZONE, (int) Zone.PLAY },
+				{ GameTag.MAXRESOURCES, 10 }
+			}) {
 			setZones();
 		}
 

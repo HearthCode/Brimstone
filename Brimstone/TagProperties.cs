@@ -36,6 +36,16 @@ namespace Brimstone
 				value[GameTag.CURRENT_PLAYER] = 1;
 			}
 		}
+
+		public Step Step {
+			get { return (Step)this[GameTag.STEP]; }
+			set { this[GameTag.STEP] = (int)value; }
+		}
+
+		public Step NextStep {
+			get { return (Step)this[GameTag.NEXT_STEP]; }
+			set { this[GameTag.NEXT_STEP] = (int)value; }
+		}
 	}
 
 	public abstract class CanBeDamaged : Entity
@@ -72,6 +82,16 @@ namespace Brimstone
 			get {
 				return Game.Player1 == this ? Game.Player2 : Game.Player1;
 			}
+		}
+
+		public PlayState PlayState {
+			get { return (PlayState)this[GameTag.PLAYSTATE]; }
+			set { this[GameTag.PLAYSTATE] = (int)value; }
+		}
+
+		public MulliganState MulliganState {
+			get { return (MulliganState)this[GameTag.MULLIGAN_STATE]; }
+			set { this[GameTag.MULLIGAN_STATE] = (int)value; }
 		}
 	}
 

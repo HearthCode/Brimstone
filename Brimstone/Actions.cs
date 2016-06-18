@@ -59,7 +59,8 @@ namespace Brimstone
 	{
 		public override ActionResult Run(Game game, List<ActionResult> args) {
 			game.CurrentPlayer = game.CurrentPlayer.Opponent;
-			game[GameTag.STEP] = (int) Step.MAIN_ACTION;
+			game.Step = Step.MAIN_ACTION;
+			game.NextStep = Step.MAIN_END;
 
 			return ActionResult.None;
 		}

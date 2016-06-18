@@ -26,7 +26,12 @@ namespace Brimstone
 		}
 
 		public Game(Player Player1 = null, Player Player2 = null, bool PowerHistory = false)
-					: base(null, null, Cards.Find["Game"], new Dictionary<GameTag, int> { { GameTag.ZONE, (int) Zone.PLAY } }) {
+					: base(null, null, Cards.Find["Game"], new Dictionary<GameTag, int> {
+						{ GameTag.TURN, 1 },
+						{ GameTag.ZONE, (int) Zone.PLAY },
+						{ GameTag.NEXT_STEP, (int) Step.BEGIN_MULLIGAN },
+						{ GameTag.STATE, (int) GameState.RUNNING }
+					}) {
 			Controller = this;
 			if (PowerHistory) {
 				this.PowerHistory.Attach(this);
@@ -46,6 +51,9 @@ namespace Brimstone
 			// Pick a random starting player
 			FirstPlayer = Players[RNG.Between(0, 1)];
 			CurrentPlayer = FirstPlayer;
+			Step = Step.BEGIN_MULLIGAN;
+			foreach (var p in Players)
+				p.MulliganState = MulliganState.INPUT;
 		}
 
 		public void SetPlayers(Player Player1, Player Player2) {
