@@ -25,7 +25,7 @@ namespace Brimstone
 			ActionQueue.Attach(this);
 		}
 
-		public Game(Card Hero1, Card Hero2, string Player1Name = "", string Player2Name = "", bool PowerHistory = false)
+		public Game(HeroClass Hero1, HeroClass Hero2, string Player1Name = "", string Player2Name = "", bool PowerHistory = false)
 					: base(null, null, Cards.Find["Game"], new Dictionary<GameTag, int> {
 						{ GameTag.TURN, 1 },
 						{ GameTag.ZONE, (int) Zone.PLAY },

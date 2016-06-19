@@ -1,6 +1,36 @@
-﻿namespace Brimstone
+﻿using System.Collections.Generic;
+
+namespace Brimstone
 {
-	public static class HeroClass {
+	public enum HeroClass {
+		Druid,
+		Hunter,
+		Mage,
+		Paladin,
+		Priest,
+		Rogue,
+		Shaman,
+		Warlock,
+		Warrior
+	}
+
+	public static class DefaultHero {
+		private static Dictionary<HeroClass, Card> cards = new Dictionary<HeroClass, Card>() {
+			{ HeroClass.Druid, Cards.Find["HERO_06"] },
+			{ HeroClass.Hunter, Cards.Find["HERO_05"] },
+			{ HeroClass.Mage, Cards.Find["HERO_08"] },
+			{ HeroClass.Paladin, Cards.Find["HERO_04"] },
+			{ HeroClass.Priest, Cards.Find["HERO_09"] },
+			{ HeroClass.Rogue, Cards.Find["HERO_03"] },
+			{ HeroClass.Shaman, Cards.Find["HERO_02"] },
+			{ HeroClass.Warlock, Cards.Find["HERO_07"] },
+			{ HeroClass.Warrior, Cards.Find["HERO_01"] }
+		};
+
+		public static Card For(HeroClass heroClass) {
+			return cards[heroClass];
+		}
+
 		public static Card Warrior = Cards.Find["HERO_01"];
 		public static Card Shaman = Cards.Find["HERO_02"];
 		public static Card Rogue = Cards.Find["HERO_03"];
@@ -12,7 +42,7 @@
 		public static Card Priest = Cards.Find["HERO_09"];
 	}
 
-	public static class SpecificHero {
+	public static class HeroCard {
 		public static Card Grommash = Cards.Find["HERO_01"];
 		public static Card Magni = Cards.Find["HERO_01a"];
 		public static Card Thrall = Cards.Find["HERO_02"];

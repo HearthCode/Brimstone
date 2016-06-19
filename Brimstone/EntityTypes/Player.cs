@@ -14,14 +14,14 @@ namespace Brimstone
 		public ZoneEntities Graveyard { get; private set; }
 		public ZoneEntities Secrets { get; private set; }
 		public ZoneGroup Zones { get; } = new ZoneGroup();
-		public Card StartingHeroCard { get; }
+		public HeroClass HeroClass { get; }
 
 		public Player(Player cloneFrom) : base(cloneFrom) {
 			FriendlyName = cloneFrom.FriendlyName;
-			StartingHeroCard = cloneFrom.StartingHeroCard;
+			HeroClass = cloneFrom.HeroClass;
 		}
 
-		public Player(Game game, Card hero, string name, int playerId, int teamId = 0) : base(game, game, Cards.Find["Player"],
+		public Player(Game game, HeroClass hero, string name, int playerId, int teamId = 0) : base(game, game, Cards.Find["Player"],
 			new Dictionary<GameTag, int> {
 				{ GameTag.PLAYSTATE, (int) PlayState.PLAYING },
 				{ GameTag.MAXHANDSIZE, 10 },
@@ -31,7 +31,7 @@ namespace Brimstone
 				{ GameTag.TEAM_ID, (teamId != 0? teamId : playerId) },
 				{ GameTag.STARTHANDSIZE, 4 }
 			}) {
-			StartingHeroCard = hero;
+			HeroClass = hero;
 			FriendlyName = name;
 			setZones();
 		}
@@ -43,7 +43,7 @@ namespace Brimstone
 		}
 
 		private void setZones() {
-			Deck = new Deck(Game, this);
+			Deck = new Deck(Game, HeroClass, this);
 			Hand = new ZoneEntities(Game, this, Zone.HAND);
 			InPlay = new ZoneEntities(Game, this, Zone.PLAY);
 			Graveyard = new ZoneEntities(Game, this, Zone.GRAVEYARD);
@@ -57,10 +57,10 @@ namespace Brimstone
 
 		public void Start() {
 			// Shuffle deck
-
 			Deck.Shuffle();
+
 			// Generate hero
-			new Hero(Game, this, StartingHeroCard);
+			new Hero(Game, this, DefaultHero.For(HeroClass));
 		}
 
 		public void StartMulligan() {

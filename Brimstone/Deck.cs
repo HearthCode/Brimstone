@@ -5,7 +5,9 @@ namespace Brimstone
 {
 	public class Deck : ZoneEntities
 	{
-		public Deck(Game game, IZones controller) : base(game, controller, Zone.DECK) { }
+		public HeroClass HeroClass { get; }
+
+		public Deck(Game game, HeroClass hero, IZones controller) : base(game, controller, Zone.DECK) { }
 
 		public void Add(Card card) {
 			Add(new List<Card> { card });
@@ -42,6 +44,16 @@ namespace Brimstone
 				possiblePositions.RemoveAt(selIndex);
 			}
 			Init();
+		}
+
+		public void Fill() {
+			// TODO: Add filters later
+
+
+		}
+
+		public int Qty(Card card) {
+			return this.Select(x => x.Card == card).Count();
 		}
 	}
 }

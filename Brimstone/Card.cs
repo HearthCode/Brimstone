@@ -17,6 +17,10 @@ namespace Brimstone
 			}
 		}
 
+		public int MaxAllowedInDeck {
+			get { return Tags[GameTag.RARITY] == (int)Rarity.LEGENDARY ? 1 : 2; }
+		}
+
 		public override string ToString() {
 			return "[CARD: " + Name + "]";
 		}

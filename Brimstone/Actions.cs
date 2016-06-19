@@ -96,12 +96,18 @@ namespace Brimstone
 
 		public override ActionResult Run(Game game, List<ActionResult> args) {
 			Player player = (Player)args[PLAYER];
-			Entity entity = (Entity)player.Deck[1];
 
-			Console.WriteLine("{0} draws {1}", player.FriendlyName, entity.Card.Name);
+			if (!player.Deck.IsEmpty) {
+				Entity entity = (Entity)player.Deck[1];
 
-			player.Hand.MoveTo(entity);
-			return entity;
+				Console.WriteLine("{0} draws {1}", player.FriendlyName, entity.Card.Name);
+
+				player.Hand.MoveTo(entity);
+				return entity;
+			}
+
+			Console.WriteLine("{0} tries to draw but their hand is empty", player.FriendlyName);
+			return ActionResult.None;
 		}
 	}
 

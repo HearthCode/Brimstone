@@ -43,10 +43,12 @@ namespace Brimstone
 		private List<IEntity> _cachedEntities;
 		private int _cachedCount;
 
-		public ZoneEntities(Game game, IZones controller, Zone zone) {
-			Game = game;
-			Zone = zone;
-			Controller = controller;
+		private List<IEntity> Entities {
+			get {
+				if (_cachedEntities == null)
+					Init();
+				return _cachedEntities;
+			}
 		}
 
 		protected void Init() {
@@ -64,12 +66,10 @@ namespace Brimstone
 				ze[GameTag.ZONE_POSITION] = p++;
 		}
 
-		public List<IEntity> Entities {
-			get {
-				if (_cachedEntities == null)
-					Init();
-				return _cachedEntities;
-			}
+		public ZoneEntities(Game game, IZones controller, Zone zone) {
+			Game = game;
+			Zone = zone;
+			Controller = controller;
 		}
 
 		public int Count {
@@ -77,6 +77,12 @@ namespace Brimstone
 				if (_cachedEntities == null)
 					Init();
 				return _cachedCount;
+			}
+		}
+
+		public bool IsEmpty {
+			get {
+				return (Count == 0);
 			}
 		}
 
@@ -88,8 +94,7 @@ namespace Brimstone
 			}
 		}
 
-		public void Add(IEntity Entity, int ZonePosition = -1) {
-			Entity[GameTag.ZONE] = (int)Zone;
+		public IEntity Add(IEntity Entity, int ZonePosition = -1) {
 			if (ZonePosition == -1)
 				if (Entity is Minion)
 					ZonePosition = Count + 1;
@@ -103,22 +108,34 @@ namespace Brimstone
 			if (ZonePosition != 0) {
 				_cachedEntities.Insert(ZonePosition - 1, Entity);
 				_cachedCount++;
-				UpdateZonePositions();
 			}
+			else
+				Entity[GameTag.ZONE_POSITION] = 0;
+			Entity[GameTag.ZONE] = (int)Zone;
+
+			if (ZonePosition != 0)
+				UpdateZonePositions();
+			return Entity;
 		}
 
-		public void Remove(IEntity Entity) {
+		public IEntity Remove(IEntity Entity, bool ClearZone = true) {
 			bool removed = _cachedEntities.Remove(Entity);
 			if (removed) {
 				_cachedCount--;
 				UpdateZonePositions();
+				if (ClearZone) {
+					Entity[GameTag.ZONE_POSITION] = 0;
+					Entity[GameTag.ZONE] = (int)Zone.INVALID;
+				}
+				return Entity;
 			}
+			return null;
 		}
 
 		public IEntity MoveTo(IEntity Entity, int ZonePosition = -1) {
 			Zone previous = (Zone)Entity[GameTag.ZONE];
 			if (previous != Zone.INVALID)
-				Controller.Zones[previous].Remove(Entity);
+				Controller.Zones[previous].Remove(Entity, ClearZone: false);
 			Add(Entity, ZonePosition);
 			return Entity;
 		}
