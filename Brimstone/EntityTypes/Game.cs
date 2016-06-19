@@ -23,6 +23,11 @@ namespace Brimstone
 			ActionQueue.Queue = new Queue<QueueAction>(cloneFrom.ActionQueue.Queue);
 			ActionQueue.ResultStack = new Stack<ActionResult>(cloneFrom.ActionQueue.ResultStack);
 			ActionQueue.Attach(this);
+
+			// Generate zones owned by game
+			Zones[Zone.SETASIDE] = new ZoneEntities(this, this, Zone.SETASIDE);
+			Zones[Zone.PLAY] = new ZoneEntities(this, this, Zone.PLAY);
+			Setaside = Zones[Zone.SETASIDE];
 		}
 
 		public Game(HeroClass Hero1, HeroClass Hero2, string Player1Name = "", string Player2Name = "", bool PowerHistory = false)
