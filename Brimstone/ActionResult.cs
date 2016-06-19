@@ -85,11 +85,11 @@ namespace Brimstone
 			if (!hasValue)
 				return "<none>";
 			else if (hasIntValue)
-				return "<int: " + intValue + ">";
+				return intValue.ToString();
 			else if (hasBoolValue)
-				return "<bool: " + boolValue.ToString() + ">";
+				return boolValue.ToString();
 			else if (hasCardValue)
-				return "<card: " + cardValue + ">";
+				return "<" + cardValue + ">";
 			else if (hasEntityListValue) {
 				string s = "<Entities:";
 				foreach (var e in entityListValue)
