@@ -106,7 +106,7 @@ namespace Brimstone
 				return entity;
 			}
 
-			Console.WriteLine("{0} tries to draw but their hand is empty", player.FriendlyName);
+			Console.WriteLine("{0} tries to draw but their deck is empty", player.FriendlyName);
 			return ActionResult.None;
 		}
 	}

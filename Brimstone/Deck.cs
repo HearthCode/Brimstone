@@ -5,6 +5,8 @@ namespace Brimstone
 {
 	public class Deck : ZoneEntities
 	{
+		public const int MaxCards = 30;
+
 		public HeroClass HeroClass { get; }
 
 		public Deck(Game game, HeroClass hero, IZones controller) : base(game, controller, Zone.DECK) { }
@@ -49,7 +51,9 @@ namespace Brimstone
 		public void Fill() {
 			// TODO: Add filters later
 
-
+			while (Count < MaxCards) {
+				
+			}
 		}
 
 		public int Qty(Card card) {

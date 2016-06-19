@@ -17,6 +17,10 @@ namespace Brimstone
 			}
 		}
 
+		public bool Collectible {
+			get { return Tags[GameTag.COLLECTIBLE] == 1; }
+		}
+
 		public int MaxAllowedInDeck {
 			get { return Tags[GameTag.RARITY] == (int)Rarity.LEGENDARY ? 1 : 2; }
 		}

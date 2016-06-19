@@ -36,15 +36,15 @@ namespace BrimstoneVisualizer
 			var p2 = Game.Player2;
 
 			p1.Deck.Add(new List<Card> {
-				Cards.FindByName("Bloodfen Raptor"),
-				Cards.FindByName("Wisp"),
+				Cards.FromName("Bloodfen Raptor"),
+				Cards.FromName("Wisp"),
 			});
-			p1.Deck.Add(Cards.FindByName("Knife Juggler"));
+			p1.Deck.Add(Cards.FromName("Knife Juggler"));
 			p1.Deck.Add(new List<Card> {
-				Cards.FindByName("Murloc Tinyfin"),
-				Cards.FindByName("Wisp"),
+				Cards.FromName("Murloc Tinyfin"),
+				Cards.FromName("Wisp"),
 			});
-			var chromaggus = new Minion(Game, p1, Cards.FindByName("Chromaggus"));
+			var chromaggus = new Minion(Game, p1, Cards.FromName("Chromaggus"));
 			p1.Deck.Add(chromaggus);
 
 			Game.Start();

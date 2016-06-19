@@ -247,7 +247,7 @@
 		WEAPON = 334,
 
 		// Card definition-specific
-		Collectible = 321
+		COLLECTIBLE = 321
 	}
 
 	public enum CardSet

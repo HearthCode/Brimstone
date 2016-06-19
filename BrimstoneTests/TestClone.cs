@@ -20,13 +20,13 @@ namespace BrimstoneTests
 
 			// Add items to zones
 			for (int i = 0; i < 5; i++)
-				p1.Give(Cards.FindByName("Wisp")).Play();
+				p1.Give(Cards.FromName("Wisp")).Play();
 			for (int i = 0; i < 5; i++)
-				p2.Give(Cards.FindByName("Wisp")).Play();
+				p2.Give(Cards.FromName("Wisp")).Play();
 			for (int i = 0; i < 7; i++)
-				p2.Give(Cards.FindByName("Wisp"));
+				p2.Give(Cards.FromName("Wisp"));
 			for (int i = 0; i < 7; i++)
-				p2.Give(Cards.FindByName("Wisp"));
+				p2.Give(Cards.FromName("Wisp"));
 
 			Assert.AreEqual(29, game.Entities.Count);
 

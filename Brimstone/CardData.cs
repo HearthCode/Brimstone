@@ -11,14 +11,20 @@ namespace Brimstone
 	{
 		private static CardDefs data = new CardDefs();
 		
-		public static Dictionary<string, Card> Find {
-			get {
-				return data.Cards;
-			}
+		public static Card FromId(string cardId) {
+			return data.Cards[cardId];
 		}
 
-		public static Card FindByName(string cardName) {
+		public static Card FromName(string cardName) {
 			return data.ByName(cardName);
+		}
+
+		public static Dictionary<string, Card> All {
+			get { return data.Cards; }
+		}
+
+		public static int Count {
+			get { return data.Cards.Count; }
 		}
 	}
 

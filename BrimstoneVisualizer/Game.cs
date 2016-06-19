@@ -15,28 +15,28 @@ namespace BrimstoneVisualizer
 
 			// Fill the board with Flame Jugglers
 			for (int i = 0; i < MaxMinions - 2; i++) {
-				var fj = p1.Give(Cards.FindByName("Flame Juggler"));
+				var fj = p1.Give(Cards.FromName("Flame Juggler"));
 				fj.Play();
 			}
 
 			Game.BeginTurn();
 
 			for (int i = 0; i < MaxMinions - 2; i++) {
-				var fj = p2.Give(Cards.FindByName("Flame Juggler"));
+				var fj = p2.Give(Cards.FromName("Flame Juggler"));
 				fj.Play();
 			}
 
 			// Throw in a couple of Boom Bots
-			p2.Give(Cards.FindByName("Boom Bot")).Play();
-			p2.Give(Cards.FindByName("Boom Bot")).Play();
+			p2.Give(Cards.FromName("Boom Bot")).Play();
+			p2.Give(Cards.FromName("Boom Bot")).Play();
 
 			Game.BeginTurn();
 
-			p1.Give(Cards.FindByName("Boom Bot")).Play();
-			p1.Give(Cards.FindByName("Boom Bot")).Play();
+			p1.Give(Cards.FromName("Boom Bot")).Play();
+			p1.Give(Cards.FromName("Boom Bot")).Play();
 
 			// Bombs away!
-			p1.Give(Cards.FindByName("Whirlwind")).Play();
+			p1.Give(Cards.FromName("Whirlwind")).Play();
 		}
 	}
 }

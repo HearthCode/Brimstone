@@ -21,7 +21,7 @@ namespace BrimstoneTests
 
 			// Add items to zones
 			for (int i = 0; i < 5; i++)
-				items.Add(p1.InPlay.Add(new Minion(game, p1, Cards.FindByName("River Crocolisk"))));
+				items.Add(p1.InPlay.Add(new Minion(game, p1, Cards.FromName("River Crocolisk"))));
 
 			// Assert
 			Assert.IsFalse(p1.InPlay.IsEmpty);
@@ -65,13 +65,13 @@ namespace BrimstoneTests
 
 			// Add items to zones
 			for (int i = 0; i < 5; i++)
-				items.Add(p1.InPlay.Add(new Minion(game, p1, Cards.FindByName("River Crocolisk"))));
+				items.Add(p1.InPlay.Add(new Minion(game, p1, Cards.FromName("River Crocolisk"))));
 
 			// Add a new item at the middle, beginning and end and test
 			var posList = new List<int> { 2, 1, 8 };
 			foreach (var pos in posList) {
 				var oldCount = p1.InPlay.Count;
-				var inserted = p1.InPlay.Add(new Minion(game, p1, Cards.FindByName("Wisp")), pos);
+				var inserted = p1.InPlay.Add(new Minion(game, p1, Cards.FromName("Wisp")), pos);
 				items.Insert(pos - 1, inserted);
 				// Assert
 				Assert.AreEqual(oldCount + 1, p1.InPlay.Count);
@@ -92,7 +92,7 @@ namespace BrimstoneTests
 
 			// Add items to zones
 			for (int i = 0; i < 5; i++)
-				items.Add(p1.InPlay.Add(new Minion(game, p1, Cards.FindByName("River Crocolisk"))));
+				items.Add(p1.InPlay.Add(new Minion(game, p1, Cards.FromName("River Crocolisk"))));
 
 			// Move an item from the middle, beginning and end and test
 			var posList = new List<int> { 3, 1, 3 };
@@ -123,7 +123,7 @@ namespace BrimstoneTests
 			// Act
 			// Add items to zones
 			for (int i = 0; i < 5; i++)
-				p1.InPlay.Add(new Minion(game, p1, Cards.FindByName("River Crocolisk")));
+				p1.InPlay.Add(new Minion(game, p1, Cards.FromName("River Crocolisk")));
 
 			var item = p1.InPlay[1];
 
@@ -146,15 +146,15 @@ namespace BrimstoneTests
 
 			// Act
 			p1.Deck.Add(new List<Card> {
-				Cards.FindByName("Bloodfen Raptor"),
-				Cards.FindByName("Wisp"),
+				Cards.FromName("Bloodfen Raptor"),
+				Cards.FromName("Wisp"),
 			});
-			p1.Deck.Add(Cards.FindByName("River Crocolisk"));
+			p1.Deck.Add(Cards.FromName("River Crocolisk"));
 			p1.Deck.Add(new List<Card> {
-				Cards.FindByName("Murloc Tinyfin"),
-				Cards.FindByName("Wisp"),
+				Cards.FromName("Murloc Tinyfin"),
+				Cards.FromName("Wisp"),
 			});
-			var chromaggus = new Minion(game, p1, Cards.FindByName("Chromaggus"));
+			var chromaggus = new Minion(game, p1, Cards.FromName("Chromaggus"));
 			p1.Deck.Add(chromaggus);
 
 			// Assert

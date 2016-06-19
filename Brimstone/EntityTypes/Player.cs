@@ -21,7 +21,7 @@ namespace Brimstone
 			HeroClass = cloneFrom.HeroClass;
 		}
 
-		public Player(Game game, HeroClass hero, string name, int playerId, int teamId = 0) : base(game, game, Cards.Find["Player"],
+		public Player(Game game, HeroClass hero, string name, int playerId, int teamId = 0) : base(game, game, Cards.FromId("Player"),
 			new Dictionary<GameTag, int> {
 				{ GameTag.PLAYSTATE, (int) PlayState.PLAYING },
 				{ GameTag.MAXHANDSIZE, 10 },

@@ -19,16 +19,16 @@ namespace Test1
 			var p2 = game.Player2;
 
 			p1.Deck.Add(new List<Card> {
-				Cards.FindByName("Bloodfen Raptor"),
-				Cards.FindByName("Wisp"),
+				Cards.FromName("Bloodfen Raptor"),
+				Cards.FromName("Wisp"),
 			});
-			p1.Deck.Add(Cards.FindByName("Knife Juggler"));
+			p1.Deck.Add(Cards.FromName("Knife Juggler"));
 			p1.Deck.Add(new List<Card> {
-				Cards.FindByName("Murloc Tinyfin"),
-				Cards.FindByName("Wisp"),
+				Cards.FromName("Murloc Tinyfin"),
+				Cards.FromName("Wisp"),
 			});
 
-			var chromaggus = new Minion(game, p1, Cards.FindByName("Chromaggus"));
+			var chromaggus = new Minion(game, p1, Cards.FromName("Chromaggus"));
 			p1.Deck.Add(chromaggus);
 
 			// TODO: Add helper functions for these
@@ -53,33 +53,33 @@ namespace Test1
 			game.Start();
 
 			// Put a Piloted Shredder and Flame Juggler in each player's hand
-			p1.Give(Cards.FindByName("Piloted Shredder"));
-			p1.Give(Cards.FindByName("Flame Juggler"));
-			p2.Give(Cards.FindByName("Piloted Shredder"));
-			p2.Give(Cards.FindByName("Flame Juggler"));
+			p1.Give(Cards.FromName("Piloted Shredder"));
+			p1.Give(Cards.FromName("Flame Juggler"));
+			p2.Give(Cards.FromName("Piloted Shredder"));
+			p2.Give(Cards.FromName("Flame Juggler"));
 
 			Console.WriteLine(game);
 
 			// Fill the board with Flame Jugglers
 			for (int i = 0; i < MaxMinions - 2; i++) {
-				var fj = p1.Give(Cards.FindByName("Flame Juggler"));
+				var fj = p1.Give(Cards.FromName("Flame Juggler"));
 				fj.Play();
 			}
 
 			game.BeginTurn();
 
 			for (int i = 0; i < MaxMinions - 2; i++) {
-				var fj = p2.Give(Cards.FindByName("Flame Juggler"));
+				var fj = p2.Give(Cards.FromName("Flame Juggler"));
 				fj.Play();
 			}
 			// Throw in a couple of Boom Bots
-			p2.Give(Cards.FindByName("Boom Bot")).Play();
-			p2.Give(Cards.FindByName("Boom Bot")).Play();
+			p2.Give(Cards.FromName("Boom Bot")).Play();
+			p2.Give(Cards.FromName("Boom Bot")).Play();
 
 			game.BeginTurn();
 
-			p1.Give(Cards.FindByName("Boom Bot")).Play();
-			p1.Give(Cards.FindByName("Boom Bot")).Play();
+			p1.Give(Cards.FromName("Boom Bot")).Play();
+			p1.Give(Cards.FromName("Boom Bot")).Play();
 
 			// Bombs away!
 			//p1.Give(Cards.FindByName("Whirlwind")).Play();
@@ -116,7 +116,7 @@ namespace Test1
 			// Normal game has 68 entities: Game + 2 players + 2 heroes + 2 hero powers + 30 cards each + coin = 68
 			
 			while (game.Entities.Count < 68) {
-				p1.Give(Cards.FindByName("Flame Juggler"));
+				p1.Give(Cards.FromName("Flame Juggler"));
 			}
 
 			var game2 = game.CloneState();
