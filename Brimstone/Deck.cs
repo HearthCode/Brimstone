@@ -50,10 +50,15 @@ namespace Brimstone
 
 		public void Fill() {
 			// TODO: Add filters later
+			var cardsToAdd = MaxCards - Count;
+			var fillCards = new List<Card>(cardsToAdd);
 
-			while (Count < MaxCards) {
-				
+			while (fillCards.Count < cardsToAdd) {
+				var chosenCard = RNG<Card>.Choose(Cards.All);
+				if (chosenCard.Collectible && chosenCard.Class == (CardClass)HeroClass && chosenCard.Type != CardType.HERO)
+					fillCards.Add(chosenCard);
 			}
+			Add(fillCards);
 		}
 
 		public int Qty(Card card) {

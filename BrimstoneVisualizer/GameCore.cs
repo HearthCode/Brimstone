@@ -47,6 +47,9 @@ namespace BrimstoneVisualizer
 			var chromaggus = new Minion(Game, p1, Cards.FromName("Chromaggus"));
 			p1.Deck.Add(chromaggus);
 
+			p1.Deck.Fill();
+			p2.Deck.Fill();
+
 			Game.Start();
 
 			PlayGame();
