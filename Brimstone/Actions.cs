@@ -55,6 +55,20 @@ namespace Brimstone
 		}
 	}
 
+	public class Repeat : QueueAction
+	{
+		public ActionGraph Actions { get; set; }
+
+		public const int AMOUNT = 0;
+
+		public override ActionResult Run(Game game, List<ActionResult> args) {
+			for (int i = 0; i < args[AMOUNT]; i++)
+				game.ActionQueue.EnqueuePaused(Actions);
+			game.ActionQueue.Process();
+			return ActionResult.None;
+		}
+	}
+
 	public class BeginTurn : QueueAction
 	{
 		public override ActionResult Run(Game game, List<ActionResult> args) {
@@ -145,6 +159,15 @@ namespace Brimstone
 					// TODO: What if one of our targets gets killed?
 				}
 			return ActionResult.None;
+		}
+	}
+
+	public class MulliganChoice : QueueAction
+	{
+		private const int PLAYER = 0;
+
+		public override ActionResult Run(Game game, List<ActionResult> args) {
+			throw new NotImplementedException();
 		}
 	}
 }
