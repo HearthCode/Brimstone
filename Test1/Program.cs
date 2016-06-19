@@ -82,11 +82,10 @@ namespace Test1
 			p1.Give(Cards.FindByName("Boom Bot")).Play();
 
 			// Bombs away!
-			p1.Give(Cards.FindByName("Whirlwind")).Play();
+			//p1.Give(Cards.FindByName("Whirlwind")).Play();
 
 
-			/*
-			// Set off the chain of events
+			// Boom Bot cloning test
 			Console.WriteLine("Entities to clone: " + game.Entities.Count);
 
 			var boardStates = new Dictionary<string, int>();
@@ -96,22 +95,22 @@ namespace Test1
 
 			Stopwatch sw = new Stopwatch();
 			sw.Start();
-			var clones = new EntityGroup<Game>(game, 100000).Entities;
 			var firstboombotId = game.Player1.InPlay.First(t => t.Card.Id == "GVG_110t").Id;
 			for (int i = 0; i < 100000; i++) {
-				((Minion) clones[i].Entities[firstboombotId]).Damage(1);
-				
-				var key = clones[i].ToString();
+				Game cloned = (Game) game.CloneState();
+				((Minion) cloned.Entities[firstboombotId]).Hit(1);
+				/*
+				var key = cloned.ToString();
 				if (!boardStates.ContainsKey(key))
 					boardStates.Add(key, 1);
 				else
 					boardStates[key]++;
-
+					*/
 			}
 			Console.SetOut(cOut);
 			Console.WriteLine("Fired off 100,000 Boom Bots in " + sw.ElapsedMilliseconds + " ms");
 			Console.WriteLine("{0} board states found", boardStates.Count);
-			*/
+			
 			// Check that cloning works
 			
 			// Normal game has 68 entities: Game + 2 players + 2 heroes + 2 hero powers + 30 cards each + coin = 68
@@ -122,9 +121,6 @@ namespace Test1
 
 			var game2 = game.CloneState();
 			game.PowerHistory.Log.Clear();
-
-			Console.WriteLine(game);
-			Console.WriteLine(game2);
 
 			string gs1 = game.ToString();
 			string gs2 = game2.ToString();

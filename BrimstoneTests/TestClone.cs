@@ -20,15 +20,15 @@ namespace BrimstoneTests
 
 			// Add items to zones
 			for (int i = 0; i < 5; i++)
-				p1.Give(Cards.FindByName("Flame Juggler")).Play();
+				p1.Give(Cards.FindByName("Wisp")).Play();
 			for (int i = 0; i < 5; i++)
-				p2.Give(Cards.FindByName("Flame Juggler")).Play();
+				p2.Give(Cards.FindByName("Wisp")).Play();
 			for (int i = 0; i < 7; i++)
-				p2.Give(Cards.FindByName("Flame Juggler"));
+				p2.Give(Cards.FindByName("Wisp"));
 			for (int i = 0; i < 7; i++)
-				p2.Give(Cards.FindByName("Flame Juggler"));
+				p2.Give(Cards.FindByName("Wisp"));
 
-			Assert.IsTrue(game.Entities.Count == 29);
+			Assert.AreEqual(29, game.Entities.Count);
 
 			// Act
 
@@ -38,65 +38,92 @@ namespace BrimstoneTests
 			// Assert
 
 			// Games must be different
-			Assert.IsTrue(!ReferenceEquals(game, clone));
+			Assert.AreNotSame(game, clone);
 
 			// Players must be different
-			Assert.IsTrue(!ReferenceEquals(game.Player1, clone.Player1));
-			Assert.IsTrue(!ReferenceEquals(game.Player2, clone.Player2));
+			Assert.AreNotSame(game.Player1, clone.Player1);
+			Assert.AreNotSame(game.Player2, clone.Player2);
 
-			// Player names must match
-			Assert.IsTrue(game.Player1.FriendlyName == clone.Player1.FriendlyName);
-			Assert.IsTrue(game.Player2.FriendlyName == clone.Player2.FriendlyName);
+			// Player names and hero classes must match
+			Assert.AreEqual(game.Player1.FriendlyName, clone.Player1.FriendlyName);
+			Assert.AreEqual(game.Player2.FriendlyName, clone.Player2.FriendlyName);
+			Assert.AreEqual(game.Player1.HeroClass, clone.Player1.HeroClass);
+			Assert.AreEqual(game.Player2.HeroClass, clone.Player2.HeroClass);
 
 			// Player assignments must match
-			Assert.IsTrue(game.Player1.Id == clone.Player1.Id);
-			Assert.IsTrue(game.Player2.Id == clone.Player2.Id);
-			Assert.IsTrue(game.CurrentPlayer.Id == clone.CurrentPlayer.Id);
-			Assert.IsTrue(game.CurrentPlayer.Opponent.Id == clone.CurrentPlayer.Opponent.Id);
-			Assert.IsTrue(ReferenceEquals(clone.Players[0], clone.Player1));
-			Assert.IsTrue(ReferenceEquals(clone.Players[1], clone.Player2));
+			Assert.AreEqual(game.Player1.Id, clone.Player1.Id);
+			Assert.AreEqual(game.Player2.Id, clone.Player2.Id);
+			Assert.AreEqual(game.CurrentPlayer.Id, clone.CurrentPlayer.Id);
+			Assert.AreEqual(game.CurrentPlayer.Opponent.Id, clone.CurrentPlayer.Opponent.Id);
+			Assert.AreSame(clone.Players[0], clone.Player1);
+			Assert.AreSame(clone.Players[1], clone.Player2);
 
 			// EntitySequences must have correct owners
-			Assert.IsTrue(!ReferenceEquals(game.Entities, clone.Entities));
-			Assert.IsTrue(game.Entities.Game == game);
-			Assert.IsTrue(clone.Entities.Game == clone);
+			Assert.AreNotSame(game.Entities, clone.Entities);
+			Assert.AreEqual(game.Entities.Game, game);
+			Assert.AreEqual(clone.Entities.Game, clone);
 
 			// All entity IDs must match
-			Assert.IsTrue(game.Entities.NextEntityId == clone.Entities.NextEntityId);
-			Assert.IsTrue(game.Entities.Count == clone.Entities.Count);
+			Assert.AreEqual(game.Entities.NextEntityId, clone.Entities.NextEntityId);
+			Assert.AreEqual(game.Entities.Count, clone.Entities.Count);
 			foreach (var id in game.Entities.Keys)
 				Assert.IsTrue(clone.Entities.ContainsKey(id));
 
 			// All entities must be different proxies
 			foreach (var e in game.Entities)
-				Assert.IsTrue(!ReferenceEquals(e, clone.Entities[e.Id]));
+				Assert.AreNotSame(e, clone.Entities[e.Id]);
 
 			// All entities must have correct game and controllers
 			foreach (var e in clone.Entities) {
-				Assert.IsTrue(e.Controller.Id == game.Entities[e.Id].Controller.Id);
-				Assert.IsTrue(ReferenceEquals(e.Game, clone));
-				Assert.IsTrue(ReferenceEquals(e.Controller, clone.Entities[e.Id].Controller));
+				Assert.AreEqual(game.Entities[e.Id].Controller.Id, e.Controller.Id);
+				Assert.AreSame(clone, e.Game);
+				Assert.AreSame(clone.Entities[e.Id].Controller, e.Controller);
 			}
 
 			// PowerHistory must be empty
-			Assert.IsTrue(clone.PowerHistory.Log.Count == 0);
+			Assert.AreEqual(0, clone.PowerHistory.Log.Count);
 
 			// Queue and stack must be copied
-			Assert.IsTrue(!ReferenceEquals(game.ActionQueue, clone.ActionQueue));
-			Assert.IsTrue(!ReferenceEquals(game.ActionQueue.Queue, clone.ActionQueue.Queue));
-			Assert.IsTrue(!ReferenceEquals(game.ActionQueue.ResultStack, clone.ActionQueue.ResultStack));
-			Assert.IsTrue(game.ActionQueue.Queue.Count == clone.ActionQueue.Queue.Count);
-			Assert.IsTrue(game.ActionQueue.ResultStack.Count == clone.ActionQueue.ResultStack.Count);
+			Assert.AreNotSame(game.ActionQueue, clone.ActionQueue);
+			Assert.AreNotSame(game.ActionQueue.Queue, clone.ActionQueue.Queue);
+			Assert.AreNotSame(game.ActionQueue.ResultStack, clone.ActionQueue.ResultStack);
+			Assert.AreEqual(game.ActionQueue.Queue.Count, clone.ActionQueue.Queue.Count);
+			Assert.AreEqual(game.ActionQueue.ResultStack.Count, clone.ActionQueue.ResultStack.Count);
 
 			// All proxies must point to original entities
 			foreach (Entity e in game.Entities)
-				Assert.IsTrue(ReferenceEquals(e.BaseEntityData, ((Entity)clone.Entities[e.Id]).BaseEntityData));
+				Assert.AreSame(e.BaseEntityData, ((Entity)clone.Entities[e.Id]).BaseEntityData);
 
 			// All reference counts must be 2
 			foreach (Entity e in game.Entities)
-				Assert.IsTrue(e.ReferenceCount == 2);
+				Assert.AreEqual(2, e.ReferenceCount);
 			foreach (Entity e in clone.Entities)
-				Assert.IsTrue(e.ReferenceCount == 2);
+				Assert.AreEqual(2, e.ReferenceCount);
+
+			// All zone managers must be re-created
+			foreach (var z in game.Zones)
+				if (z != null)
+					Assert.AreNotSame(z, clone.Zones[z.Zone]);
+
+			foreach (var p in game.Players)
+				foreach (var z in p.Zones)
+					if (z != null)
+						Assert.AreNotSame(z, ((Player)clone.Entities[p.Id]).Zones[z.Zone]);
+
+			// All new zones must have re-assigned game and controllers
+			foreach (var z in clone.Zones) {
+				if (z == null)
+					continue;
+				Assert.AreSame(clone, z.Game);
+				Assert.AreSame(clone, z.Controller);
+			}
+			foreach (var p in clone.Players)
+				foreach (var z in p.Zones) {
+					if (z == null)
+						continue;
+					Assert.AreSame(clone, z.Game);
+					Assert.AreSame(p, z.Controller);
+				}
 
 			// All zones must match with new proxies
 			foreach (var p in game.Players)
@@ -104,8 +131,8 @@ namespace BrimstoneTests
 					if (z != null)
 						for (int zp = 1; zp <= z.Count; zp++) {
 							if (z[zp] != null) {
-								Assert.IsTrue(z[zp].Id == ((Player)clone.Entities[p.Id]).Zones[z.Zone][zp].Id);
-								Assert.IsTrue(!ReferenceEquals(z[zp], ((Player)clone.Entities[p.Id]).Zones[z.Zone][zp]));
+								Assert.AreEqual(z[zp].Id, ((Player)clone.Entities[p.Id]).Zones[z.Zone][zp].Id);
+								Assert.AreNotSame(z[zp], ((Player)clone.Entities[p.Id]).Zones[z.Zone][zp]);
 							}
 						}
 		}
