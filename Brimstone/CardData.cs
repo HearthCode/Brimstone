@@ -27,6 +27,10 @@ namespace Brimstone
 		public static int Count {
 			get { return data.Cards.Count; }
 		}
+
+		public static Card TheCoin {
+			get { return data.Cards["GAME_005"]; }
+		}
 	}
 
 	public class CardDefs : IEnumerable<Card>
