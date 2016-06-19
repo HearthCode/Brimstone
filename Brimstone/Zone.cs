@@ -106,7 +106,7 @@ namespace Brimstone
 			if (Zone == Zone.SETASIDE || Zone == Zone.GRAVEYARD || (Zone == Zone.PLAY && Controller is Game))
 				ZonePosition = 0;
 			if (ZonePosition != 0) {
-				_cachedEntities.Insert(ZonePosition - 1, Entity);
+				Entities.Insert(ZonePosition - 1, Entity);
 				_cachedCount++;
 			}
 			else
@@ -119,7 +119,7 @@ namespace Brimstone
 		}
 
 		public IEntity Remove(IEntity Entity, bool ClearZone = true) {
-			bool removed = _cachedEntities.Remove(Entity);
+			bool removed = Entities.Remove(Entity);
 			if (removed) {
 				_cachedCount--;
 				UpdateZonePositions();
