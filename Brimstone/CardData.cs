@@ -101,6 +101,8 @@ namespace Brimstone
 					var script = b.GetValue(null) as Behaviour;
 					c.Behaviour = CompiledBehaviour.Compile(script);
 				}
+				else
+					c.Behaviour = new CompiledBehaviour();
 				Cards.Add(c.Id, c);
 			}
 

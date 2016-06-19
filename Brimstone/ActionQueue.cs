@@ -33,8 +33,9 @@ namespace Brimstone
 		}
 
 		public void EnqueuePaused(List<QueueAction> qa) {
-			foreach (var a in qa)
-				EnqueuePaused(a);
+			if (qa != null)
+				foreach (var a in qa)
+					EnqueuePaused(a);
 		}
 
 		public void EnqueuePaused(ActionGraph g) {
@@ -75,6 +76,9 @@ namespace Brimstone
 		}
 
 		public void EnqueuePaused(QueueAction a) {
+			if (a == null)
+				return;
+
 			if (OnQueueing != null)
 				OnQueueing(this, new QueueActionEventArgs(Game, a));
 
