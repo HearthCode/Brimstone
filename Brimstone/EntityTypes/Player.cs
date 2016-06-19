@@ -61,6 +61,9 @@ namespace Brimstone
 
 			// Generate hero
 			new Hero(Game, this, DefaultHero.For(HeroClass));
+
+			// Draw 3 cards
+			Draw(3);
 		}
 
 		public void StartMulligan() {
@@ -73,6 +76,10 @@ namespace Brimstone
 
 		public IPlayable Draw() {
 			return (IPlayable)(Entity)Game.ActionQueue.EnqueueSingleResult(CardBehaviour.Draw(this));
+		}
+
+		public void Draw(ActionGraph qty) {
+			Game.ActionQueue.Enqueue(CardBehaviour.Draw(this) * qty);
 		}
 
 		// TODO: Add Zone move semantic helpers here
