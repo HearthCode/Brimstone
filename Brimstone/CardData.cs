@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,8 +20,8 @@ namespace Brimstone
 			return data.ByName(cardName);
 		}
 
-		public static Dictionary<string, Card> All {
-			get { return data.Cards; }
+		public static List<Card> All {
+			get { return data.Cards.Values.ToList(); }
 		}
 
 		public static int Count {
@@ -28,7 +29,7 @@ namespace Brimstone
 		}
 	}
 
-	public class CardDefs
+	public class CardDefs : IEnumerable<Card>
 	{
 		public Dictionary<string, Card> Cards = new Dictionary<string, Card>();
 
@@ -127,6 +128,14 @@ namespace Brimstone
 				Requirements = new Dictionary<PlayRequirements, int>(),
 				Behaviour = null
 			});
+		}
+
+		public IEnumerator<Card> GetEnumerator() {
+			return Cards.Values.GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator() {
+			return GetEnumerator();
 		}
 	}
 }

@@ -12,17 +12,27 @@ namespace Brimstone
 
 		public int this[GameTag t] {
 			get {
-				// TODO: Use TryGetValue for safety
-				return Tags[t];
+				if (Tags.ContainsKey(t))
+					return Tags[t];
+				else
+					return 0;
 			}
 		}
 
 		public bool Collectible {
-			get { return Tags[GameTag.COLLECTIBLE] == 1; }
+			get { return this[GameTag.COLLECTIBLE] == 1; }
+		}
+
+		public CardClass Class {
+			get { return (CardClass) this[GameTag.CLASS]; }
+		}
+
+		public CardType Type {
+			get { return (CardType)this[GameTag.CARDTYPE]; }
 		}
 
 		public int MaxAllowedInDeck {
-			get { return Tags[GameTag.RARITY] == (int)Rarity.LEGENDARY ? 1 : 2; }
+			get { return this[GameTag.RARITY] == (int)Rarity.LEGENDARY ? 1 : 2; }
 		}
 
 		public override string ToString() {

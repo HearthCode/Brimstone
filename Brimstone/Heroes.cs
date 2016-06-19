@@ -3,15 +3,15 @@
 namespace Brimstone
 {
 	public enum HeroClass {
-		Druid,
-		Hunter,
-		Mage,
-		Paladin,
-		Priest,
-		Rogue,
-		Shaman,
-		Warlock,
-		Warrior
+		Druid = CardClass.DRUID,
+		Hunter = CardClass.HUNTER,
+		Mage = CardClass.MAGE,
+		Paladin = CardClass.PALADIN,
+		Priest = CardClass.PRIEST,
+		Rogue = CardClass.ROGUE,
+		Shaman = CardClass.SHAMAN,
+		Warlock = CardClass.WARLOCK,
+		Warrior = CardClass.WARRIOR
 	}
 
 	public static class DefaultHero {
