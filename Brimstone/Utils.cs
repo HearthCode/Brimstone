@@ -13,7 +13,7 @@ namespace Brimstone
 
 	public static class RNG<T> {
 		public static T Choose(List<T> choices) {
-			return choices[RNG.Between(0, choices.Count)];
+			return choices[RNG.Between(0, choices.Count - 1)];
 		}
 	}
 }
