@@ -65,6 +65,11 @@ namespace Brimstone
 			get { return (MulliganState)this[GameTag.MULLIGAN_STATE]; }
 			set { this[GameTag.MULLIGAN_STATE] = (int)value; }
 		}
+
+		public int NumCardsDrawnThisTurn {
+			get { return this[GameTag.NUM_CARDS_DRAWN_THIS_TURN]; }
+			set { this[GameTag.NUM_CARDS_DRAWN_THIS_TURN] = value; }
+		}
 	}
 
 	public abstract partial class CanBeDamaged : Entity
