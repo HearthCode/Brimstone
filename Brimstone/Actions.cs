@@ -31,6 +31,17 @@ namespace Brimstone
 		}
 	}
 
+	public class Selector : QueueAction
+	{
+		public const int SOURCE = 0;
+
+		public Func<IEntity, List<IEntity>> Lambda { get; set; }
+
+		public override ActionResult Run(Game game, List<ActionResult> args) {
+			return Lambda((Entity)args[SOURCE]);
+		}
+	}
+
 	public class RandomOpponentMinion : QueueAction
 	{
 		public override ActionResult Run(Game game, List<ActionResult> args) {
@@ -116,6 +127,7 @@ namespace Brimstone
 
 				Console.WriteLine("{0} draws {1}", player.FriendlyName, entity.Card.Name);
 
+				player.NumCardsDrawnThisTurn++;
 				player.Hand.MoveTo(entity);
 				return entity;
 			}
@@ -159,15 +171,6 @@ namespace Brimstone
 					// TODO: What if one of our targets gets killed?
 				}
 			return ActionResult.None;
-		}
-	}
-
-	public class MulliganChoice : QueueAction
-	{
-		private const int PLAYER = 0;
-
-		public override ActionResult Run(Game game, List<ActionResult> args) {
-			throw new NotImplementedException();
 		}
 	}
 }
