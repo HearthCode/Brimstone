@@ -50,6 +50,9 @@ namespace Test1
 				}
 			};
 
+			p1.Deck.Fill();
+			p2.Deck.Fill();
+
 			game.Start();
 
 			// Put a Piloted Shredder and Flame Juggler in each player's hand
