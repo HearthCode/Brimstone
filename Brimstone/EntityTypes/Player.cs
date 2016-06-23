@@ -62,12 +62,17 @@ namespace Brimstone
 			// Generate hero
 			new Hero(Game, this, DefaultHero.For(HeroClass));
 
-			// Draw 3 cards
-			Draw(3);
+			// Draw cards
+			Draw((Game.FirstPlayer == this ? 3 : 4));
+
+			// Give 2nd player the coin
+			if (Game.FirstPlayer != this)
+				Give(Cards.TheCoin);
 		}
 
-		public void StartMulligan() {
+		public List<IEntity> StartMulligan() {
 			MulliganState = MulliganState.INPUT;
+			return Game.ActionQueue.EnqueueSingleResult(CardBehaviour.CreateMulligan(this));
 		}
 
 		public IPlayable Give(Card card) {
