@@ -94,6 +94,10 @@ namespace Brimstone
 			}
 		}
 
+		public List<IEntity> Slice(int zpStart, int zpEnd) {
+			return Entities.Skip(zpStart - 1).Take((zpEnd - zpStart) + 1).ToList();
+		}
+
 		public IEntity Add(IEntity Entity, int ZonePosition = -1) {
 			if (ZonePosition == -1)
 				if (Entity is Minion)
