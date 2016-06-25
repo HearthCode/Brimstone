@@ -42,7 +42,7 @@ namespace Test1
 
 			game.ActionQueue.OnQueued += (o, e) => {
 				ActionQueue queue = o as ActionQueue;
-				if (e.Action is RandomOpponentMinion) {
+				if (e.Action is RandomChoice) {
 					if (game.CurrentPlayer.Opponent.InPlay.Count > 0) {
 						Console.WriteLine("REPLACING RANDOM CHOICE ACTION: " + e.Action);
 						//queue.ReplaceAction(new LazyEntity() { Entity = (Minion)game.Opponent.Board[1] });

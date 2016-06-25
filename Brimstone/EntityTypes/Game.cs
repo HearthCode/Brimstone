@@ -74,6 +74,7 @@ namespace Brimstone
 		}
 
 		public void StartMulligan() {
+			// TODO: Put the output into choices
 			Step = Step.BEGIN_MULLIGAN;
 			foreach (var p in Players)
 				p.StartMulligan();
@@ -110,7 +111,7 @@ namespace Brimstone
 		}
 
 		public void BeginTurn() {
-			ActionQueue.Enqueue(CardBehaviour.BeginTurn);
+			ActionQueue.Enqueue(this, CardBehaviour.BeginTurn);
 		}
 
 		public override IEntity CloneState() {
@@ -126,6 +127,7 @@ namespace Brimstone
 			// Re-assign zone references
 			foreach (var p in game.Players)
 				p.Attach(game);
+			// TODO: Entity lists in the result stack will be pointing to the old game's entities
 			return game;
 		}
 

@@ -33,7 +33,9 @@ namespace BrimstoneVisualizer
 			Game.BeginTurn();
 
 			p1.Give(Cards.FromName("Boom Bot")).Play();
-			p1.Give(Cards.FromName("Boom Bot")).Play();
+			Minion boombot = p1.Give(Cards.FromName("Boom Bot")).Play() as Minion;
+
+			boombot.Hit(1);
 
 			// Bombs away!
 			p1.Give(Cards.FromName("Whirlwind")).Play();

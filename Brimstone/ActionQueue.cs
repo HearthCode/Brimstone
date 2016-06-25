@@ -9,10 +9,12 @@ namespace Brimstone
 	public class QueueActionEventArgs : EventArgs
 	{
 		public Game Game;
+		public IEntity Source;
 		public QueueAction Action;
 
-		public QueueActionEventArgs(Game g, QueueAction a) {
+		public QueueActionEventArgs(Game g, IEntity s, QueueAction a) {
 			Game = g;
+			Source = s;
 			Action = a;
 		}
 	}
@@ -32,60 +34,62 @@ namespace Brimstone
 			Game = game;
 		}
 
-		public void EnqueuePaused(List<QueueAction> qa) {
+		public void EnqueuePaused(IEntity source, List<QueueAction> qa) {
 			if (qa != null)
 				foreach (var a in qa)
-					EnqueuePaused(a);
+					EnqueuePaused(source, a);
 		}
 
-		public void EnqueuePaused(ActionGraph g) {
+		public void EnqueuePaused(IEntity source, ActionGraph g) {
 			// Don't queue unimplemented cards
 			if (g != null)
 				// Unravel the graph into a list of actions
-				g.Queue(this);
+				g.Queue(source, this);
 		}
 
-		public List<ActionResult> Enqueue(List<QueueAction> qa) {
-			EnqueuePaused(qa);
+		public List<ActionResult> Enqueue(IEntity source, List<QueueAction> qa) {
+			EnqueuePaused(source, qa);
 			return Process();
 		}
 
-		public List<ActionResult> Enqueue(ActionGraph g) {
-			EnqueuePaused(g);
+		public List<ActionResult> Enqueue(IEntity source, ActionGraph g) {
+			EnqueuePaused(source, g);
 			return Process();
 		}
 
-		public ActionResult EnqueueSingleResult(List<QueueAction> qa) {
-			EnqueuePaused(qa);
+		public ActionResult EnqueueSingleResult(IEntity source, List<QueueAction> qa) {
+			EnqueuePaused(source, qa);
 			return Process()[0];
 		}
 
-		public ActionResult EnqueueSingleResult(ActionGraph g) {
-			EnqueuePaused(g);
+		public ActionResult EnqueueSingleResult(IEntity source, ActionGraph g) {
+			EnqueuePaused(source, g);
 			return Process()[0];
 		}
 
-		public List<ActionResult> Enqueue(QueueAction a) {
-			EnqueuePaused(a);
+		public List<ActionResult> Enqueue(IEntity source, QueueAction a) {
+			EnqueuePaused(source, a);
 			return Process();
 		}
 
-		public ActionResult EnqueueSingleResult(QueueAction a) {
-			EnqueuePaused(a);
+		public ActionResult EnqueueSingleResult(IEntity source, QueueAction a) {
+			EnqueuePaused(source, a);
 			return Process()[0];
 		}
 
-		public void EnqueuePaused(QueueAction a) {
+		public void EnqueuePaused(IEntity source, QueueAction a) {
 			if (a == null)
 				return;
 
+			a.SourceEntityId = source.Id;
+
 			if (OnQueueing != null)
-				OnQueueing(this, new QueueActionEventArgs(Game, a));
+				OnQueueing(this, new QueueActionEventArgs(Game, source, a));
 
 			Queue.Enqueue(a);
 
 			if (OnQueued != null)
-				OnQueued(this, new QueueActionEventArgs(Game, a));
+				OnQueued(this, new QueueActionEventArgs(Game, source, a));
 		}
 
 		public void ReplaceArg(ActionResult newArg) {
@@ -100,17 +104,19 @@ namespace Brimstone
 		}
 
 		public void ReplaceNextAction(QueueAction a) {
-			Queue.Dequeue();
+			var previousAction = Queue.Dequeue();
 			// TODO: This really needs to be inserted at the start of the queue
-			EnqueuePaused((ActionGraph)a);
+			EnqueuePaused(Game.Entities[previousAction.SourceEntityId], (ActionGraph)a);
 		}
 
 		public List<ActionResult> Process() {
 			while (Queue.Count > 0) {
 				// Get next action
 				var action = Queue.Dequeue();
+				var source = Game.Entities[action.SourceEntityId];
+
 				if (OnActionStarting != null)
-					OnActionStarting(this, new QueueActionEventArgs(Game, action));
+					OnActionStarting(this, new QueueActionEventArgs(Game, source, action));
 
 				// Get arguments for action from stack
 				var args = new List<ActionResult>();
@@ -120,11 +126,11 @@ namespace Brimstone
 
 				// TODO: Replace with async/await later
 				// Run action and push results onto stack
-				var result = action.Run(Game, args);
+				var result = action.Run(Game, source, args);
 				if (result.HasResult)
 					ResultStack.Push(result);
 				if (OnAction != null)
-					OnAction(this, new QueueActionEventArgs(Game, action));
+					OnAction(this, new QueueActionEventArgs(Game, source, action));
 			}
 			// Return whatever is left on the stack
 			var stack = new List<ActionResult>(ResultStack);

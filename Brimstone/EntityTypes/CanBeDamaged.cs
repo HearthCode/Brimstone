@@ -5,7 +5,7 @@ namespace Brimstone
 	public abstract partial class CanBeDamaged : Entity
 	{
 		public void Hit(int amount) {
-			Game.ActionQueue.Enqueue(CardBehaviour.Damage(this, amount));
+			Game.ActionQueue.Enqueue(this, CardBehaviour.Damage(this, amount));
 		}
 
 		public void CheckForDeath() {
@@ -13,7 +13,7 @@ namespace Brimstone
 				Console.WriteLine(Card.Name + " dies!");
 				((Player)Controller).Graveyard.MoveTo(this);
 				Damage = 0;
-				Game.ActionQueue.Enqueue(Card.Behaviour.Deathrattle);
+				Game.ActionQueue.Enqueue(this, Card.Behaviour.Deathrattle);
 			}
 		}
 	}

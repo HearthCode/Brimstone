@@ -4,45 +4,61 @@ using System.Linq;
 
 namespace Brimstone
 {
-	public class LazyNumber : QueueAction
+	public class FixedNumber : QueueAction
 	{
 		public int Num { get; set; }
 
-		public override ActionResult Run(Game game, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			return Num;
 		}
 	}
 
-	public class LazyCard : QueueAction
+	public class FixedCard : QueueAction
 	{
 		public Card Card { get; set; }
 
-		public override ActionResult Run(Game game, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			return Card;
 		}
 	}
 
 	public class LazyEntity : QueueAction
 	{
-		public Entity Entity { get; set; }
+		public int EntityId { get; set; }
 
-		public override ActionResult Run(Game game, List<ActionResult> args) {
-			return Entity;
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			return (Entity)game.Entities[EntityId];
 		}
 	}
 
-	public class Selector : QueueAction
+	public enum SelectionSource
 	{
-		public const int SOURCE = 0;
+		Game,
+		Player,
+		ActionSource
+	}
+
+	public class Selector : QueueAction {
+		public SelectionSource SelectionSource { get; set; }
 
 		public Func<IEntity, IEnumerable<IEntity>> Lambda { get; set; }
 
-		public override ActionResult Run(Game game, List<ActionResult> args) {
-			// Use game if no source supplied
-			if (args.Count == 0)
-				return Lambda(game).ToList();
-
-			return Lambda((Entity)args[SOURCE]).ToList();
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			switch (SelectionSource) {
+				case SelectionSource.Game:
+					return Lambda(game).ToList();
+				case SelectionSource.Player:
+					if (source is Game)
+						return Lambda(game.CurrentPlayer).ToList();
+					else if (source is Player)
+						return Lambda(source).ToList();
+					else
+						return Lambda(source.Controller).ToList();
+				case SelectionSource.ActionSource:
+					return Lambda(source).ToList();
+				default:
+					throw new NotImplementedException();
+			}
 		}
 	}
 
@@ -50,7 +66,7 @@ namespace Brimstone
 	{
 		public const int ENTITIES = 0;
 
-		public override ActionResult Run(Game game, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			var entities = (List<IEntity>)args[ENTITIES];
 			if (entities.Count == 0)
 				return new List<IEntity>();
@@ -61,7 +77,7 @@ namespace Brimstone
 
 	public class RandomAmount : QueueAction
 	{
-		public override ActionResult Run(Game game, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			return RNG.Between(args[0], args[1]);
 		}
 	}
@@ -72,9 +88,9 @@ namespace Brimstone
 
 		public const int AMOUNT = 0;
 
-		public override ActionResult Run(Game game, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			for (int i = 0; i < args[AMOUNT]; i++)
-				game.ActionQueue.EnqueuePaused(Actions);
+				game.ActionQueue.EnqueuePaused(source, Actions);
 			game.ActionQueue.Process();
 			return ActionResult.None;
 		}
@@ -82,12 +98,12 @@ namespace Brimstone
 
 	public class BeginTurn : QueueAction
 	{
-		public override ActionResult Run(Game game, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			game.CurrentPlayer = game.CurrentPlayer.Opponent;
 			game.Step = Step.MAIN_ACTION;
 			game.NextStep = Step.MAIN_END;
 
-			game.ActionQueue.Enqueue(CardBehaviour.Draw(game.CurrentPlayer));
+			game.ActionQueue.Enqueue(game.CurrentPlayer, CardBehaviour.Draw(game.CurrentPlayer));
 
 			return ActionResult.None;
 		}
@@ -98,7 +114,7 @@ namespace Brimstone
 		public const int PLAYER = 0;
 		public const int CARD = 1;
 
-		public override ActionResult Run(Game game, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			Player player = (Player)args[PLAYER];
 			Card card = args[CARD];
 
@@ -119,7 +135,7 @@ namespace Brimstone
 	{
 		public const int PLAYER = 0;
 
-		public override ActionResult Run(Game game, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			Player player = (Player)args[PLAYER];
 
 			if (!player.Deck.IsEmpty) {
@@ -139,18 +155,17 @@ namespace Brimstone
 
 	public class Play : QueueAction
 	{
-		public const int PLAYER = 0;
-		public const int ENTITY = 1;
+		public const int ENTITY = 0;
 
-		public override ActionResult Run(Game game, List<ActionResult> args) {
-			Player player = (Player)args[PLAYER];
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			Player player = (Player)source.Controller;
 			Entity entity = args[ENTITY];
 
 			player.InPlay.MoveTo(entity);
 
 			Console.WriteLine("{0} is playing {1}", player.FriendlyName, entity.Card.Name);
 
-			game.ActionQueue.Enqueue(entity.Card.Behaviour.Battlecry);
+			game.ActionQueue.Enqueue(entity, entity.Card.Behaviour.Battlecry);
 			return entity;
 		}
 	}
@@ -160,7 +175,7 @@ namespace Brimstone
 		private const int TARGETS = 0;
 		private const int DAMAGE = 1;
 
-		public override ActionResult Run(Game game, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			if (args[TARGETS].HasResult)
 				foreach (Minion e in args[TARGETS]) {
 					Console.WriteLine("{0} is getting hit for {1} points of damage", e.Card.Name, args[DAMAGE]);

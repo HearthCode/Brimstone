@@ -72,19 +72,19 @@ namespace Brimstone
 
 		public List<IEntity> StartMulligan() {
 			MulliganState = MulliganState.INPUT;
-			return Game.ActionQueue.EnqueueSingleResult(CardBehaviour.CreateMulligan(this));
+			return Game.ActionQueue.EnqueueSingleResult(Game, CardBehaviour.CreateMulligan(this));
 		}
 
 		public IPlayable Give(Card card) {
-			return (IPlayable)(Entity)Game.ActionQueue.EnqueueSingleResult(CardBehaviour.Give(this, card));
+			return (IPlayable)(Entity)Game.ActionQueue.EnqueueSingleResult(Game, CardBehaviour.Give(this, card));
 		}
 
 		public IPlayable Draw() {
-			return (IPlayable)(Entity)Game.ActionQueue.EnqueueSingleResult(CardBehaviour.Draw(this));
+			return (IPlayable)(Entity)Game.ActionQueue.EnqueueSingleResult(Game, CardBehaviour.Draw(this));
 		}
 
 		public void Draw(ActionGraph qty) {
-			Game.ActionQueue.Enqueue(CardBehaviour.Draw(this) * qty);
+			Game.ActionQueue.Enqueue(this, CardBehaviour.Draw(this) * qty);
 		}
 
 		// TODO: Add Zone move semantic helpers here

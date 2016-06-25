@@ -32,13 +32,13 @@ namespace Brimstone
 
 		// Convert values to actions
 		public static implicit operator ActionGraph(int x) {
-			return new LazyNumber { Num = x };
+			return new FixedNumber { Num = x };
 		}
 		public static implicit operator ActionGraph(Card x) {
-			return new LazyCard { Card = x };
+			return new FixedCard { Card = x };
 		}
 		public static implicit operator ActionGraph(Entity x) {
-			return new LazyEntity { Entity = x };
+			return new LazyEntity { EntityId = x.Id };
 		}
 
 		// Repeated action
@@ -47,11 +47,11 @@ namespace Brimstone
 		}
 
 		// Add the graph to the game's action queue
-		public void Queue(ActionQueue queue) {
+		public void Queue(IEntity source, ActionQueue queue) {
 			foreach (var action in Graph) {
 				foreach (var arg in action.Args)
-					arg.Queue(queue);
-				queue.EnqueuePaused(action);
+					arg.Queue(source, queue);
+				queue.EnqueuePaused(source, action);
 			}
 		}
 	}

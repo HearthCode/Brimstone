@@ -4,8 +4,7 @@ using System.Linq;
 
 namespace Brimstone
 {
-	public class Behaviour
-	{
+	public class Behaviour {
 		// Defaulting to null for unimplemented cards or actions
 		public ActionGraph Battlecry;
 		public ActionGraph Deathrattle;
@@ -18,31 +17,33 @@ namespace Brimstone
 
 		public static ActionGraph Draw(ActionGraph player) { return new Draw { Args = { player } }; }
 		public static ActionGraph Give(ActionGraph player, ActionGraph card) { return new Give { Args = { player, card } }; }
-		public static ActionGraph Play(ActionGraph player, ActionGraph entity) { return new Play { Args = { player, entity } }; }
+		public static ActionGraph Play(ActionGraph entity) { return new Play { Args = { entity } }; }
 
-		public static ActionGraph CreateMulligan(ActionGraph player) { return Select(player, p => p.Hand.Slice(1, p.NumCardsDrawnThisTurn)); }
+		public static ActionGraph CreateMulligan(ActionGraph player) { return Select(p => p.Hand.Slice(1, p.NumCardsDrawnThisTurn)); }
 
 		public static QueueAction RandomOpponentMinion { get { return new RandomChoice { Args = { OpponentMinions } }; } }
 
 		public static QueueAction AllMinions { get { return Select(g => g.CurrentPlayer.InPlay.Concat(g.CurrentPlayer.Opponent.InPlay)); } }
 		// TODO: Fix fundamental problem of action source not being sent to Run()
-		public static QueueAction OpponentMinions { get { return Select(g => g.CurrentPlayer.Opponent.InPlay); } }
+		public static QueueAction OpponentMinions { get { return Select(p => p.Opponent.InPlay); } }
 		public static ActionGraph RandomAmount(ActionGraph min, ActionGraph max) { return new RandomAmount { Args = { min, max } }; }
 
-		public static QueueAction Select(Func<Game, IEnumerable<IEntity>> selector) {
+		public static QueueAction Select(Func<IEntity, IEnumerable<IEntity>> selector) {
 			return new Selector {
-				Lambda = (g => selector((Game)g))
+				SelectionSource = SelectionSource.ActionSource,
+				Lambda = selector
 			};
 		}
-		public static QueueAction Select(ActionGraph source, Func<IEntity, IEnumerable<IEntity>> selector) {
+		public static QueueAction Select(Func<Player, IEnumerable<IEntity>> selector) {
 			return new Selector {
-				Args = { source },
-				Lambda = selector };
+				SelectionSource = SelectionSource.Player,
+				Lambda = e => selector((Player)e)
+			};
 		}
-		public static QueueAction Select(ActionGraph source, Func<Player, IEnumerable<IEntity>> selector) {
+		public static QueueAction Select(Func<Game, IEnumerable<IEntity>> selector) {
 			return new Selector {
-				Args = { source },
-				Lambda = (p => selector((Player)p))
+				SelectionSource = SelectionSource.Game,
+				Lambda = e => selector((Game)e)
 			};
 		}
 
