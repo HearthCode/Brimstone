@@ -19,6 +19,7 @@ namespace Brimstone
 		public Player(Player cloneFrom) : base(cloneFrom) {
 			FriendlyName = cloneFrom.FriendlyName;
 			HeroClass = cloneFrom.HeroClass;
+			// TODO: Shallow clone choices
 		}
 
 		public Player(Game game, HeroClass hero, string name, int playerId, int teamId = 0) : base(game, game, Cards.FromId("Player"),
@@ -40,6 +41,7 @@ namespace Brimstone
 			Game = game;
 			Controller = game;
 			setZones();
+			// TODO: Update choices to point to new game entities
 		}
 
 		private void setZones() {

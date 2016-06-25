@@ -16,4 +16,12 @@ namespace Brimstone
 			return choices[RNG.Between(0, choices.Count - 1)];
 		}
 	}
+
+	public class Choice
+	{
+		public ChoiceType ChoiceType { get; set; }
+		public List<IEntity> Choices { get; set; }
+
+		// TODO: Implement
+	}
 }

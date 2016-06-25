@@ -94,6 +94,7 @@ namespace Brimstone
 			}
 		}
 
+		// TODO: Make this easier to use. Single argument for first X items. Negative single argument for last X items
 		public IEnumerable<IEntity> Slice(int zpStart, int zpEnd) {
 			return Entities.Skip(zpStart - 1).Take((zpEnd - zpStart) + 1);
 		}

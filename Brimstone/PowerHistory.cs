@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace Brimstone
 {
+	// TODO: Implement rewind stack
+	// TODO: Register only filtered entities
+
 	public abstract class PowerAction
 	{
 		public int EntityId { get; set; }

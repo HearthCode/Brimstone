@@ -5,6 +5,8 @@ namespace Brimstone
 {
 	public partial class Hero : CanBeDamaged
 	{
+		// TODO: Add hero powers
+
 		public Hero(Hero cloneFrom) : base(cloneFrom) { }
 		public Hero(Game game, IEntity controller, Card card, Dictionary<GameTag, int> tags = null) : base(game, controller, card, tags) {
 			// Set player's hero entity tag

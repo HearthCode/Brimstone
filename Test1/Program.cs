@@ -101,6 +101,7 @@ namespace Test1
 			var firstboombotId = game.Player1.Board.First(t => t.Card.Id == "GVG_110t").Id;
 			for (int i = 0; i < 100000; i++) {
 				Game cloned = (Game) game.CloneState();
+				// TODO: Show example where queue is paused at start of deathrattle for increased performance
 				((Minion) cloned.Entities[firstboombotId]).Hit(1);
 				/*
 				var key = cloned.ToString();

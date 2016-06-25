@@ -32,6 +32,7 @@ namespace Brimstone
 
 		public void Attach(Game game) {
 			Game = game;
+			// TODO: Make action stack entities point to new game here
 		}
 
 		public void EnqueuePaused(IEntity source, List<QueueAction> qa) {

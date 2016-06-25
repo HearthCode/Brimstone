@@ -21,11 +21,14 @@ namespace Brimstone
 
 		public static ActionGraph CreateMulligan(ActionGraph player) { return Select(p => p.Hand.Slice(1, p.NumCardsDrawnThisTurn)); }
 
-		public static QueueAction RandomOpponentMinion { get { return new RandomChoice { Args = { OpponentMinions } }; } }
-
+		// TODO: Write all common selectors
 		public static QueueAction AllMinions { get { return Select(g => g.CurrentPlayer.Board.Concat(g.CurrentPlayer.Opponent.Board)); } }
 		public static QueueAction OpponentMinions { get { return Select(p => p.Opponent.Board); } }
+
+		public static QueueAction RandomOpponentMinion { get { return new RandomChoice { Args = { OpponentMinions } }; } }
 		public static ActionGraph RandomAmount(ActionGraph min, ActionGraph max) { return new RandomAmount { Args = { min, max } }; }
+
+		// TODO: Add selector set ops
 
 		public static QueueAction Select(Func<IEntity, IEnumerable<IEntity>> selector) {
 			return new Selector {

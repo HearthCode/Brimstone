@@ -9,6 +9,7 @@ namespace Brimstone
 		private bool hasIntValue;
 		private bool hasCardValue;
 		private bool hasEntityListValue;
+		// TODO: Implement Choice values
 
 		private bool boolValue;
 		private int intValue;

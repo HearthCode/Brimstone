@@ -135,6 +135,8 @@ namespace BrimstoneTests
 								Assert.AreNotSame(z[zp], ((Player)clone.Entities[p.Id]).Zones[z.Zone][zp]);
 							}
 						}
+
+			// TODO: Add test for cloned stack entity pointers
 		}
 	}
 }
