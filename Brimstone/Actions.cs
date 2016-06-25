@@ -35,27 +35,27 @@ namespace Brimstone
 	{
 		public const int SOURCE = 0;
 
-		public Func<IEntity, List<IEntity>> Lambda { get; set; }
+		public Func<IEntity, IEnumerable<IEntity>> Lambda { get; set; }
 
 		public override ActionResult Run(Game game, List<ActionResult> args) {
-			return Lambda((Entity)args[SOURCE]);
+			// Use game if no source supplied
+			if (args.Count == 0)
+				return Lambda(game).ToList();
+
+			return Lambda((Entity)args[SOURCE]).ToList();
 		}
 	}
 
-	public class RandomOpponentMinion : QueueAction
+	public class RandomChoice : QueueAction
 	{
+		public const int ENTITIES = 0;
+
 		public override ActionResult Run(Game game, List<ActionResult> args) {
-			if (game.CurrentPlayer.Opponent.InPlay.Count == 0)
+			var entities = (List<IEntity>)args[ENTITIES];
+			if (entities.Count == 0)
 				return new List<IEntity>();
-			var m = RNG.Between(1, game.CurrentPlayer.Opponent.InPlay.Count);
-			return (Minion)game.CurrentPlayer.Opponent.InPlay[m];
-		}
-	}
-
-	public class AllMinions : QueueAction
-	{
-		public override ActionResult Run(Game game, List<ActionResult> args) {
-			return game.CurrentPlayer.InPlay.Concat(game.CurrentPlayer.Opponent.InPlay).ToList();
+			var m = RNG.Between(0, entities.Count - 1);
+			return (Entity)entities[m];
 		}
 	}
 
