@@ -10,7 +10,7 @@ namespace Brimstone
 
 		public Deck Deck { get; private set; }
 		public ZoneEntities Hand { get; private set; }
-		public ZoneEntities InPlay { get; private set; }
+		public ZoneEntities Board { get; private set; }
 		public ZoneEntities Graveyard { get; private set; }
 		public ZoneEntities Secrets { get; private set; }
 		public ZoneGroup Zones { get; } = new ZoneGroup();
@@ -45,12 +45,12 @@ namespace Brimstone
 		private void setZones() {
 			Deck = new Deck(Game, HeroClass, this);
 			Hand = new ZoneEntities(Game, this, Zone.HAND);
-			InPlay = new ZoneEntities(Game, this, Zone.PLAY);
+			Board = new ZoneEntities(Game, this, Zone.PLAY);
 			Graveyard = new ZoneEntities(Game, this, Zone.GRAVEYARD);
 			Secrets = new ZoneEntities(Game, this, Zone.SECRET);
 			Zones[Zone.DECK] = Deck;
 			Zones[Zone.HAND] = Hand;
-			Zones[Zone.PLAY] = InPlay;
+			Zones[Zone.PLAY] = Board;
 			Zones[Zone.GRAVEYARD] = Graveyard;
 			Zones[Zone.SECRET] = Secrets;
 		}
@@ -72,15 +72,15 @@ namespace Brimstone
 
 		public List<IEntity> StartMulligan() {
 			MulliganState = MulliganState.INPUT;
-			return Game.ActionQueue.EnqueueSingleResult(Game, CardBehaviour.CreateMulligan(this));
+			return Game.ActionQueue.Enqueue(Game, CardBehaviour.CreateMulligan(this));
 		}
 
 		public IPlayable Give(Card card) {
-			return (IPlayable)(Entity)Game.ActionQueue.EnqueueSingleResult(Game, CardBehaviour.Give(this, card));
+			return (IPlayable)(Entity)Game.ActionQueue.Enqueue(Game, CardBehaviour.Give(this, card));
 		}
 
 		public IPlayable Draw() {
-			return (IPlayable)(Entity)Game.ActionQueue.EnqueueSingleResult(Game, CardBehaviour.Draw(this));
+			return (IPlayable)(Entity)Game.ActionQueue.Enqueue(Game, CardBehaviour.Draw(this));
 		}
 
 		public void Draw(ActionGraph qty) {

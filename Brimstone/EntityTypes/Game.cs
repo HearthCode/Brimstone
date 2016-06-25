@@ -100,7 +100,7 @@ namespace Brimstone
 					s += entity.ToString() + ", ";
 				}
 				s += "PLAY: ";
-				foreach (var entity in player.InPlay) {
+				foreach (var entity in player.Board) {
 					s += entity.ToString() + ", ";
 				}
 			}

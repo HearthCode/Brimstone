@@ -43,7 +43,7 @@ namespace Test1
 			game.ActionQueue.OnQueued += (o, e) => {
 				ActionQueue queue = o as ActionQueue;
 				if (e.Action is RandomChoice) {
-					if (game.CurrentPlayer.Opponent.InPlay.Count > 0) {
+					if (game.CurrentPlayer.Opponent.Board.Count > 0) {
 						Console.WriteLine("REPLACING RANDOM CHOICE ACTION: " + e.Action);
 						//queue.ReplaceAction(new LazyEntity() { Entity = (Minion)game.Opponent.Board[1] });
 					}
@@ -98,7 +98,7 @@ namespace Test1
 
 			Stopwatch sw = new Stopwatch();
 			sw.Start();
-			var firstboombotId = game.Player1.InPlay.First(t => t.Card.Id == "GVG_110t").Id;
+			var firstboombotId = game.Player1.Board.First(t => t.Card.Id == "GVG_110t").Id;
 			for (int i = 0; i < 100000; i++) {
 				Game cloned = (Game) game.CloneState();
 				((Minion) cloned.Entities[firstboombotId]).Hit(1);

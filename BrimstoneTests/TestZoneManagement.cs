@@ -17,35 +17,35 @@ namespace BrimstoneTests
 			// Act
 			List<IEntity> items = new List<IEntity>(5);
 
-			Assert.IsTrue(p1.InPlay.IsEmpty);
+			Assert.IsTrue(p1.Board.IsEmpty);
 
 			// Add items to zones
 			for (int i = 0; i < 5; i++)
-				items.Add(p1.InPlay.Add(new Minion(game, p1, Cards.FromName("River Crocolisk"))));
+				items.Add(p1.Board.Add(new Minion(game, p1, Cards.FromName("River Crocolisk"))));
 
 			// Assert
-			Assert.IsFalse(p1.InPlay.IsEmpty);
-			Assert.AreEqual(5, p1.InPlay.Count);
+			Assert.IsFalse(p1.Board.IsEmpty);
+			Assert.AreEqual(5, p1.Board.Count);
 
 			// Check zones, zone positions and references are correct
 			for (int i = 1; i <= 5; i++) {
-				Assert.AreEqual((int)Zone.PLAY, p1.InPlay[i][GameTag.ZONE]);
-				Assert.AreEqual(i, p1.InPlay[i][GameTag.ZONE_POSITION]);
-				Assert.AreSame(items[i - 1], p1.InPlay[i]);
+				Assert.AreEqual((int)Zone.PLAY, p1.Board[i][GameTag.ZONE]);
+				Assert.AreEqual(i, p1.Board[i][GameTag.ZONE_POSITION]);
+				Assert.AreSame(items[i - 1], p1.Board[i]);
 			}
 
 			// Act
 
 			// Remove first item
-			p1.InPlay.Remove(items[0]);
+			p1.Board.Remove(items[0]);
 
 			// Assert
-			Assert.AreEqual(4, p1.InPlay.Count);
+			Assert.AreEqual(4, p1.Board.Count);
 
 			// Check zone positions and references are correct
 			for (int i = 1; i <= 4; i++) {
-				Assert.AreEqual(i, p1.InPlay[i][GameTag.ZONE_POSITION]);
-				Assert.AreSame(items[i], p1.InPlay[i]);
+				Assert.AreEqual(i, p1.Board[i][GameTag.ZONE_POSITION]);
+				Assert.AreSame(items[i], p1.Board[i]);
 			}
 
 			// Check removed entity has correct zone data
@@ -65,16 +65,16 @@ namespace BrimstoneTests
 
 			// Add items to zones
 			for (int i = 0; i < 5; i++)
-				items.Add(p1.InPlay.Add(new Minion(game, p1, Cards.FromName("River Crocolisk"))));
+				items.Add(p1.Board.Add(new Minion(game, p1, Cards.FromName("River Crocolisk"))));
 
 			// Add a new item at the middle, beginning and end and test
 			var posList = new List<int> { 2, 1, 8 };
 			foreach (var pos in posList) {
-				var oldCount = p1.InPlay.Count;
-				var inserted = p1.InPlay.Add(new Minion(game, p1, Cards.FromName("Wisp")), pos);
+				var oldCount = p1.Board.Count;
+				var inserted = p1.Board.Add(new Minion(game, p1, Cards.FromName("Wisp")), pos);
 				items.Insert(pos - 1, inserted);
 				// Assert
-				Assert.AreEqual(oldCount + 1, p1.InPlay.Count);
+				Assert.AreEqual(oldCount + 1, p1.Board.Count);
 				for (int i = 0; i < oldCount + 1; i++)
 					Assert.AreEqual(i + 1, items[i][GameTag.ZONE_POSITION]);
 			}
@@ -92,20 +92,20 @@ namespace BrimstoneTests
 
 			// Add items to zones
 			for (int i = 0; i < 5; i++)
-				items.Add(p1.InPlay.Add(new Minion(game, p1, Cards.FromName("River Crocolisk"))));
+				items.Add(p1.Board.Add(new Minion(game, p1, Cards.FromName("River Crocolisk"))));
 
 			// Move an item from the middle, beginning and end and test
 			var posList = new List<int> { 3, 1, 3 };
 			foreach (var pos in posList) {
-				var oldPlay = p1.InPlay.Count;
+				var oldPlay = p1.Board.Count;
 				var oldHand = p1.Hand.Count;
-				p1.Hand.MoveTo(p1.InPlay[pos]);
+				p1.Hand.MoveTo(p1.Board[pos]);
 
 				// Assert
-				Assert.AreEqual(oldPlay - 1, p1.InPlay.Count);
+				Assert.AreEqual(oldPlay - 1, p1.Board.Count);
 				Assert.AreEqual(oldHand + 1, p1.Hand.Count);
 				for (int i = 1; i <= oldPlay - 1; i++)
-					Assert.AreEqual(i, p1.InPlay[i][GameTag.ZONE_POSITION]);
+					Assert.AreEqual(i, p1.Board[i][GameTag.ZONE_POSITION]);
 				for (int i = 1; i <= oldHand + 1; i++) {
 					Assert.AreEqual((int)Zone.HAND, p1.Hand[i][GameTag.ZONE]);
 					Assert.AreEqual(i, p1.Hand[i][GameTag.ZONE_POSITION]);
@@ -123,9 +123,9 @@ namespace BrimstoneTests
 			// Act
 			// Add items to zones
 			for (int i = 0; i < 5; i++)
-				p1.InPlay.Add(new Minion(game, p1, Cards.FromName("River Crocolisk")));
+				p1.Board.Add(new Minion(game, p1, Cards.FromName("River Crocolisk")));
 
-			var item = p1.InPlay[1];
+			var item = p1.Board[1];
 
 			// Send one to the graveyard
 			p1.Graveyard.MoveTo(item);

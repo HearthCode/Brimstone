@@ -161,7 +161,7 @@ namespace Brimstone
 			Player player = (Player)source.Controller;
 			Entity entity = args[ENTITY];
 
-			player.InPlay.MoveTo(entity);
+			player.Board.MoveTo(entity);
 
 			Console.WriteLine("{0} is playing {1}", player.FriendlyName, entity.Card.Name);
 

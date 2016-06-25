@@ -47,34 +47,43 @@ namespace Brimstone
 				g.Queue(source, this);
 		}
 
-		public List<ActionResult> Enqueue(IEntity source, List<QueueAction> qa) {
+		public List<ActionResult> EnqueueMultiResult(IEntity source, List<QueueAction> qa) {
 			EnqueuePaused(source, qa);
 			return Process();
 		}
 
-		public List<ActionResult> Enqueue(IEntity source, ActionGraph g) {
+		public List<ActionResult> EnqueueMultiResult(IEntity source, ActionGraph g) {
 			EnqueuePaused(source, g);
 			return Process();
 		}
 
-		public ActionResult EnqueueSingleResult(IEntity source, List<QueueAction> qa) {
+		public ActionResult Enqueue(IEntity source, List<QueueAction> qa) {
 			EnqueuePaused(source, qa);
-			return Process()[0];
+			var result = Process();
+			if (result.Count > 0)
+				return result[0];
+			return ActionResult.None;
 		}
 
-		public ActionResult EnqueueSingleResult(IEntity source, ActionGraph g) {
+		public ActionResult Enqueue(IEntity source, ActionGraph g) {
 			EnqueuePaused(source, g);
-			return Process()[0];
+			var result = Process();
+			if (result.Count > 0)
+				return result[0];
+			return ActionResult.None;
 		}
 
-		public List<ActionResult> Enqueue(IEntity source, QueueAction a) {
+		public List<ActionResult> EnqueueMultiResult(IEntity source, QueueAction a) {
 			EnqueuePaused(source, a);
 			return Process();
 		}
 
-		public ActionResult EnqueueSingleResult(IEntity source, QueueAction a) {
+		public ActionResult Enqueue(IEntity source, QueueAction a) {
 			EnqueuePaused(source, a);
-			return Process()[0];
+			var result = Process();
+			if (result.Count > 0)
+				return result[0];
+			return ActionResult.None;
 		}
 
 		public void EnqueuePaused(IEntity source, QueueAction a) {

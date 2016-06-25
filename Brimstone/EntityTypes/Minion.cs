@@ -9,7 +9,7 @@ namespace Brimstone
 		public Minion(Game game, IEntity controller, Card card, Dictionary<GameTag, int> tags = null) : base(game, controller, card, tags) { }
 
 		public IPlayable Play() {
-			return (IPlayable) (Entity) Game.ActionQueue.EnqueueSingleResult(this, CardBehaviour.Play(this));
+			return (IPlayable) (Entity) Game.ActionQueue.Enqueue(this, CardBehaviour.Play(this));
 		}
 
 		public override object Clone() {

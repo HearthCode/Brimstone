@@ -23,9 +23,8 @@ namespace Brimstone
 
 		public static QueueAction RandomOpponentMinion { get { return new RandomChoice { Args = { OpponentMinions } }; } }
 
-		public static QueueAction AllMinions { get { return Select(g => g.CurrentPlayer.InPlay.Concat(g.CurrentPlayer.Opponent.InPlay)); } }
-		// TODO: Fix fundamental problem of action source not being sent to Run()
-		public static QueueAction OpponentMinions { get { return Select(p => p.Opponent.InPlay); } }
+		public static QueueAction AllMinions { get { return Select(g => g.CurrentPlayer.Board.Concat(g.CurrentPlayer.Opponent.Board)); } }
+		public static QueueAction OpponentMinions { get { return Select(p => p.Opponent.Board); } }
 		public static ActionGraph RandomAmount(ActionGraph min, ActionGraph max) { return new RandomAmount { Args = { min, max } }; }
 
 		public static QueueAction Select(Func<IEntity, IEnumerable<IEntity>> selector) {
