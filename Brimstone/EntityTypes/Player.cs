@@ -74,7 +74,7 @@ namespace Brimstone
 
 		public List<IEntity> StartMulligan() {
 			MulliganState = MulliganState.INPUT;
-			return Game.ActionQueue.Enqueue(Game, CardBehaviour.CreateMulligan(this));
+			return Game.ActionQueue.Enqueue(this, CardBehaviour.CreateMulligan);
 		}
 
 		public IPlayable Give(Card card) {

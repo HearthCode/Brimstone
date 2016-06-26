@@ -20,7 +20,7 @@ namespace Brimstone
 		public static ActionGraph Give(ActionGraph player, ActionGraph card) { return new Give { Args = { player, card } }; }
 		public static ActionGraph Play(ActionGraph entity) { return new Play { Args = { entity } }; }
 
-		public static ActionGraph CreateMulligan(ActionGraph player) { return Select(p => p.Hand.Slice(1, p.NumCardsDrawnThisTurn)); }
+		public static ActionGraph CreateMulligan { get { return Select(p => p.Hand.Slice(1, p.NumCardsDrawnThisTurn)); } }
 
 		// TODO: Write all common selectors
 		public static ActionGraph Self { get { return Select(e => e); } }
