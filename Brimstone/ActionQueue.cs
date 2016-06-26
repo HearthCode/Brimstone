@@ -11,11 +11,13 @@ namespace Brimstone
 		public Game Game;
 		public IEntity Source;
 		public QueueAction Action;
+		public bool Cancel { get; set; }
 
 		public QueueActionEventArgs(Game g, IEntity s, QueueAction a) {
 			Game = g;
 			Source = s;
 			Action = a;
+			Cancel = false;
 		}
 	}
 
@@ -93,10 +95,15 @@ namespace Brimstone
 
 			a.SourceEntityId = source.Id;
 
-			if (OnQueueing != null)
-				OnQueueing(this, new QueueActionEventArgs(Game, source, a));
-
-			Queue.Enqueue(a);
+			if (OnQueueing != null) {
+				var e = new QueueActionEventArgs(Game, source, a);
+				OnQueueing(this, e);
+				// TODO: Count the number of arguments the cancelled action would take and remove those too
+				if (!e.Cancel)
+					Queue.Enqueue(a);
+			}
+			else
+				Queue.Enqueue(a);
 
 			if (OnQueued != null)
 				OnQueued(this, new QueueActionEventArgs(Game, source, a));
@@ -111,12 +118,6 @@ namespace Brimstone
 				ResultStack.Pop();
 			foreach (var a in newArgs)
 				ResultStack.Push(a); ;
-		}
-
-		public void ReplaceNextAction(QueueAction a) {
-			var previousAction = Queue.Dequeue();
-			// TODO: This really needs to be inserted at the start of the queue
-			EnqueuePaused(Game.Entities[previousAction.SourceEntityId], (ActionGraph)a);
 		}
 
 		public List<ActionResult> Process() {
