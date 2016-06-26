@@ -21,6 +21,7 @@ namespace Brimstone
 		public abstract ActionResult Run(Game game, IEntity source, List<ActionResult> args);
 
 		public ActionResult Execute(Game game, IEntity source, List<ActionResult> args) {
+
 			Type me = GetType();
 			// TODO: Track active triggers instead of iterating because this is dog slow
 			// (make Game use a dictionary of lists indexed by TriggerActionType)
@@ -30,7 +31,10 @@ namespace Brimstone
 						foreach (var trigger in e.Card.Behaviour.Triggers)
 							if (trigger.TriggerActionType == me && trigger.Epoch == TriggerEpoch.When) {
 								// Get arguments that must match for the trigger to fire
-								var matchArgs = game.ActionQueue.EnqueueMultiResult(e, trigger.Args);
+								var matchArgs = new List<ActionResult>();
+								foreach (var a in trigger.Args)
+									matchArgs.Add(a.Run(game, e, null));
+								//var matchArgs = game.ActionQueue.EnqueueMultiResult(e, trigger.Args);
 
 								bool match = true;
 								for (int i = 0; i < matchArgs.Count; i++) {
