@@ -136,7 +136,7 @@ namespace Brimstone
 
 				// TODO: Replace with async/await later
 				// Run action and push results onto stack
-				var result = action.Run(Game, source, args);
+				var result = action.Execute(Game, source, args);
 				if (result.HasResult)
 					ResultStack.Push(result);
 				if (OnAction != null)
@@ -145,6 +145,7 @@ namespace Brimstone
 			// Return whatever is left on the stack
 			var stack = new List<ActionResult>(ResultStack);
 			ResultStack.Clear();
+			stack.Reverse();
 			return stack;
 		}
 

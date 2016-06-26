@@ -84,8 +84,10 @@ namespace Test1
 			p1.Give(Cards.FromName("Boom Bot")).Play();
 			p1.Give(Cards.FromName("Boom Bot")).Play();
 
+			//p1.Give(Cards.FromName("Acolyte of Pain")).Play();
+
 			// Bombs away!
-			//p1.Give(Cards.FindByName("Whirlwind")).Play();
+			//p1.Give(Cards.FromName("Whirlwind")).Play();
 
 
 			// Boom Bot cloning test

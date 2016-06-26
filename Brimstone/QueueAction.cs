@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Brimstone
 {
@@ -17,6 +19,49 @@ namespace Brimstone
 		public int SourceEntityId { get; set; }
 		public List<ActionGraph> Args { get; } = new List<ActionGraph>();
 		public abstract ActionResult Run(Game game, IEntity source, List<ActionResult> args);
+
+		public ActionResult Execute(Game game, IEntity source, List<ActionResult> args) {
+			Type me = GetType();
+			// TODO: Track active triggers instead of iterating because this is dog slow
+			// (make Game use a dictionary of lists indexed by TriggerActionType)
+			foreach (var e in game.Entities)
+				if (e.Card.Behaviour != null)
+					if (e.Card.Behaviour.Triggers != null)
+						foreach (var trigger in e.Card.Behaviour.Triggers)
+							if (trigger.TriggerActionType == me && trigger.Epoch == TriggerEpoch.When) {
+								// Get arguments that must match for the trigger to fire
+								var matchArgs = game.ActionQueue.EnqueueMultiResult(e, trigger.Args);
+
+								bool match = true;
+								for (int i = 0; i < matchArgs.Count; i++) {
+									// Always match unspecified arguments
+									if (matchArgs[i].IsBlank)
+										continue;
+									// Match if value type equality is met
+									else if (matchArgs[i] == args[i])
+										continue;
+									// Check if it's a list of entities
+									List<IEntity> matchEntities = matchArgs[i];
+									if (matchEntities == null) {
+										// If it's not then equality failed and there is no match
+										match = false;
+										break;
+									}
+									// One if the items in the trigger list must be in the actual entity list to match
+									match = matchArgs[i].Intersect((List<IEntity>)args[i]).Any();
+									if (!match)
+										break;
+								}
+								if (match)
+									game.ActionQueue.Enqueue(e, trigger.Action);
+							}
+
+			var result = Run(game, source, args);
+
+			// TODO: After triggers
+
+			return result;
+		}
 
 		public override string ToString() {
 			return "[ACTION: " + GetType().Name + ", SOURCE: " + SourceEntityId + "]";

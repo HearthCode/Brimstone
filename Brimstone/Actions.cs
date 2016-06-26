@@ -4,6 +4,12 @@ using System.Linq;
 
 namespace Brimstone
 {
+	public class Empty : QueueAction
+	{
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			return ActionResult.Empty;
+		}
+	}
 	public class FixedNumber : QueueAction
 	{
 		public int Num { get; set; }

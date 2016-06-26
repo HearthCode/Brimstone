@@ -71,6 +71,7 @@
     <Compile Include="QueueAction.cs" />
     <Compile Include="Tag.cs" />
     <Compile Include="TagProperties.cs" />
+    <Compile Include="Trigger.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Variant.cs" />
     <Compile Include="Zone.cs" />

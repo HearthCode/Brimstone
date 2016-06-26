@@ -9,6 +9,7 @@ namespace Brimstone
 		private bool hasIntValue;
 		private bool hasCardValue;
 		private bool hasEntityListValue;
+
 		// TODO: Implement Choice values
 
 		private bool boolValue;
@@ -16,7 +17,9 @@ namespace Brimstone
 		private Card cardValue;
 		private List<IEntity> entityListValue;
 
-		public bool HasResult { get { return hasValue; } }
+		public bool HasResult { get { return hasValue || IsBlank; } }
+
+		public bool IsBlank { get; set; }
 
 		public static implicit operator ActionResult(int x) {
 			return new ActionResult { hasValue = true, hasIntValue = true, intValue = x };
@@ -62,7 +65,7 @@ namespace Brimstone
 
 		public override bool Equals(object o) {
 			try {
-				return (bool)(this == (ActionResult)o);
+				return (this == (ActionResult)o);
 			}
 			catch {
 				return false;
@@ -81,6 +84,7 @@ namespace Brimstone
 		}
 
 		public static ActionResult None = new ActionResult();
+		public static ActionResult Empty = new ActionResult { IsBlank = true };
 
 		public override string ToString() {
 			if (!hasValue)

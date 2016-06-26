@@ -54,5 +54,20 @@ namespace Brimstone
 				queue.EnqueuePaused(source, action);
 			}
 		}
+
+		public List<QueueAction> Unravel(ActionGraph g = null) {
+			if (g == null)
+				g = this;
+			var ql = new List<QueueAction>();
+			foreach (var action in g.Graph) {
+				foreach (var arg in action.Args)
+					if (arg != null)
+						ql.AddRange(Unravel(arg));
+					else
+						ql.Add(new Empty());
+				ql.Add(action);
+			}
+			return ql;
+		}
 	}
 }
