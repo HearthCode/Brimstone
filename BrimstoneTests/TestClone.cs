@@ -28,7 +28,7 @@ namespace BrimstoneTests
 			for (int i = 0; i < 7; i++)
 				p2.Give(Cards.FromName("Wisp"));
 
-			Assert.AreEqual(29, game.Entities.Count);
+			Assert.AreEqual(30, game.Entities.Count);
 
 			// Act
 
