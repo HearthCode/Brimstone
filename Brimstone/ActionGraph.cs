@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Brimstone
 {
@@ -39,6 +40,9 @@ namespace Brimstone
 		}
 		public static implicit operator ActionGraph(Entity x) {
 			return new LazyEntity { EntityId = x.Id };
+		}
+		public static implicit operator ActionGraph(Action<IEntity> x) {
+			return new Func { F = x };
 		}
 
 		// Repeated action

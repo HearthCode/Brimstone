@@ -10,6 +10,7 @@ namespace Brimstone
 			return ActionResult.Empty;
 		}
 	}
+
 	public class FixedNumber : QueueAction
 	{
 		public int Num { get; set; }
@@ -65,6 +66,16 @@ namespace Brimstone
 				default:
 					throw new NotImplementedException();
 			}
+		}
+	}
+
+	public class Func : QueueAction
+	{
+		public Action<IEntity> F { get; set; }
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			F(source);
+			return ActionResult.None;
 		}
 	}
 
