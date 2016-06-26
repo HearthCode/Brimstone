@@ -120,7 +120,7 @@ namespace Brimstone
 			game.Step = Step.MAIN_ACTION;
 			game.NextStep = Step.MAIN_END;
 
-			game.ActionQueue.Enqueue(game.CurrentPlayer, CardBehaviour.Draw(game.CurrentPlayer));
+			game.ActionQueue.EnqueuePaused(game.CurrentPlayer, CardBehaviour.Draw(game.CurrentPlayer));
 
 			return ActionResult.None;
 		}
@@ -182,7 +182,7 @@ namespace Brimstone
 
 			Console.WriteLine("{0} is playing {1}", player.FriendlyName, entity.Card.Name);
 
-			game.ActionQueue.Enqueue(entity, entity.Card.Behaviour.Battlecry);
+			game.ActionQueue.EnqueuePaused(entity, entity.Card.Behaviour.Battlecry);
 			return entity;
 		}
 	}

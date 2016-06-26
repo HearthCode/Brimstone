@@ -21,6 +21,7 @@ namespace Brimstone
 		// Required by IEntity
 		public Game(Game cloneFrom) : base(cloneFrom) {
 			// Clone queue and stack but not PowerHistory; keep PowerHistory disabled
+			// TODO: Events are not cloned
 			ActionQueue.Queue = new Queue<QueueAction>(cloneFrom.ActionQueue.Queue);
 			ActionQueue.ResultStack = new Stack<ActionResult>(cloneFrom.ActionQueue.ResultStack);
 			ActionQueue.Attach(this);

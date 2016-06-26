@@ -13,7 +13,7 @@ namespace Brimstone
 				Console.WriteLine(Card.Name + " dies!");
 				((Player)Controller).Graveyard.MoveTo(this);
 				Damage = 0;
-				Game.ActionQueue.Enqueue(this, Card.Behaviour.Deathrattle);
+				Game.ActionQueue.EnqueuePaused(this, Card.Behaviour.Deathrattle);
 			}
 		}
 	}
