@@ -16,9 +16,9 @@ namespace Brimstone
 		// Factory functions for DSL syntax
 		public static ActionGraph BeginTurn { get { return new BeginTurn(); } }
 
-		public static ActionGraph Draw(ActionGraph player) { return new Draw { Args = { player } }; }
-		public static ActionGraph Give(ActionGraph player, ActionGraph card) { return new Give { Args = { player, card } }; }
-		public static ActionGraph Play(ActionGraph entity) { return new Play { Args = { entity } }; }
+		public static ActionGraph Draw(ActionGraph Player = null) { return new Draw { Args = { Player } }; }
+		public static ActionGraph Give(ActionGraph Player = null, ActionGraph Card = null) { return new Give { Args = { Player, Card } }; }
+		public static ActionGraph Play(ActionGraph Entity = null) { return new Play { Args = { Entity } }; }
 
 		public static ActionGraph CreateMulligan { get { return Select(p => p.Hand.Slice(1, p.NumCardsDrawnThisTurn)); } }
 
@@ -29,7 +29,7 @@ namespace Brimstone
 		public static ActionGraph OpponentMinions { get { return Select(p => p.Opponent.Board); } }
 
 		public static ActionGraph RandomOpponentMinion { get { return new RandomChoice { Args = { OpponentMinions } }; } }
-		public static ActionGraph RandomAmount(ActionGraph min, ActionGraph max) { return new RandomAmount { Args = { min, max } }; }
+		public static ActionGraph RandomAmount(ActionGraph Min, ActionGraph Max) { return new RandomAmount { Args = { Min, Max } }; }
 
 		// TODO: Add selector set ops
 
@@ -58,7 +58,7 @@ namespace Brimstone
 			};
 		}
 
-		public static ActionGraph Damage(ActionGraph target = null, ActionGraph amount = null) { return new Damage { Args = { target, amount } }; }
+		public static ActionGraph Damage(ActionGraph Target = null, ActionGraph Amount = null) { return new Damage { Args = { Target, Amount } }; }
 
 		// Event helpers
 		public static Trigger When(ActionGraph trigger, ActionGraph action) { return Trigger.When(trigger, action); }
