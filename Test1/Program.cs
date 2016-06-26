@@ -50,6 +50,12 @@ namespace Test1
 				}
 			};
 
+			// TODO: Trigger manager
+			/*
+			game.ActiveTriggers.When(CardBehaviour.Damage(CardBehaviour.AllMinions), (Action<IEntity>)(g => {
+				Console.WriteLine("A MINION IS ABOUT TO BE DAMAGED!");
+			}));*/
+
 			p1.Deck.Fill();
 			p2.Deck.Fill();
 
@@ -84,7 +90,7 @@ namespace Test1
 			p1.Give(Cards.FromName("Boom Bot")).Play();
 			p1.Give(Cards.FromName("Boom Bot")).Play();
 
-			//p1.Give(Cards.FromName("Acolyte of Pain")).Play();
+			p1.Give(Cards.FromName("Acolyte of Pain")).Play();
 
 			// Bombs away!
 			//p1.Give(Cards.FromName("Whirlwind")).Play();

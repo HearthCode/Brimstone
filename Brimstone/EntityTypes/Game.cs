@@ -6,7 +6,7 @@ namespace Brimstone
 	public partial class Game : Entity, IZones
 	{
 		public EntityController Entities;
-		public Dictionary<Type, List<Trigger>> ActiveTriggers;
+		public TriggerManager ActiveTriggers;
 
 		public Player[] Players { get; private set; } = new Player[2];
 		public Player Player1 { get; private set; }
@@ -24,8 +24,6 @@ namespace Brimstone
 			ActionQueue.Queue = new Queue<QueueAction>(cloneFrom.ActionQueue.Queue);
 			ActionQueue.ResultStack = new Stack<ActionResult>(cloneFrom.ActionQueue.ResultStack);
 			ActionQueue.Attach(this);
-
-			ActiveTriggers = new Dictionary<Type, List<Trigger>>(cloneFrom.ActiveTriggers);
 
 			// Generate zones owned by game
 			Zones[Zone.SETASIDE] = new ZoneEntities(this, this, Zone.SETASIDE);
@@ -47,7 +45,7 @@ namespace Brimstone
 			ActionQueue.Attach(this);
 
 			Entities = new EntityController(this);
-			ActiveTriggers = new Dictionary<Type, List<Trigger>>();
+			ActiveTriggers = new TriggerManager(this);
 
 			// Generate game
 			Controller = this;
@@ -131,6 +129,9 @@ namespace Brimstone
 			// Re-assign zone references
 			foreach (var p in game.Players)
 				p.Attach(game);
+			// Clone triggers
+			game.ActiveTriggers = ((TriggerManager)ActiveTriggers.Clone());
+			game.ActiveTriggers.Game = game;
 			// TODO: Entity lists in the result stack will be pointing to the old game's entities
 			return game;
 		}
