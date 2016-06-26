@@ -10,10 +10,7 @@ namespace Brimstone
 
 		public void CheckForDeath() {
 			if (Health <= 0) {
-				Console.WriteLine(Card.Name + " dies!");
-				((Player)Controller).Graveyard.MoveTo(this);
-				Damage = 0;
-				Game.ActionQueue.EnqueuePaused(this, Card.Behaviour.Deathrattle);
+				Game.ActionQueue.EnqueuePaused(this, CardBehaviour.Death(this));
 			}
 		}
 	}

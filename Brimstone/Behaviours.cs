@@ -11,8 +11,7 @@ namespace Brimstone
 		public List<Trigger> Triggers = new List<Trigger>();
 	}
 
-	public partial class CardBehaviour
-	{
+	public partial class CardBehaviour {
 		// Factory functions for DSL syntax
 		public static ActionGraph BeginTurn { get { return new BeginTurn(); } }
 
@@ -58,7 +57,8 @@ namespace Brimstone
 			};
 		}
 
-		public static ActionGraph Damage(ActionGraph Target = null, ActionGraph Amount = null) { return new Damage { Args = { Target, Amount } }; }
+		public static ActionGraph Damage(ActionGraph Targets = null, ActionGraph Amount = null) { return new Damage { Args = { Targets, Amount } }; }
+		public static ActionGraph Death(ActionGraph Targets = null) { return new Death { Args = { Targets } }; }
 
 		// Event helpers
 		public static Trigger When(ActionGraph trigger, ActionGraph action) { return Trigger.When(trigger, action); }

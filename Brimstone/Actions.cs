@@ -205,4 +205,23 @@ namespace Brimstone
 			return ActionResult.None;
 		}
 	}
+
+	public class Death : QueueAction
+	{
+		private const int TARGETS = 0;
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			if (args[TARGETS].HasResult)
+				foreach (var e in args[TARGETS]) {
+					Console.WriteLine("{0} dies", e.Card.Name);
+
+					if (e is Minion) {
+						((Player)e.Controller).Graveyard.MoveTo(e);
+						((Minion)e).Damage = 0;
+						game.ActionQueue.EnqueuePaused(e, e.Card.Behaviour.Deathrattle);
+					}
+				}
+			return ActionResult.None;
+		}
+	}
 }
