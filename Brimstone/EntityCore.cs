@@ -259,11 +259,23 @@ namespace Brimstone
 			entity.Id = NextEntityId++;
 			Entities[entity.Id] = entity;
 			Game.PowerHistory.Add(new CreateEntity(entity));
+
+			if (entity.Card.Behaviour != null)
+				if (entity.Card.Behaviour.Triggers != null)
+					foreach (var t in entity.Card.Behaviour.Triggers) {
+						var linkedTrigger = t.CreateAttachedTrigger(entity.Id);
+						if (Game.ActiveTriggers.ContainsKey(t.TriggerActionType))
+							Game.ActiveTriggers[t.TriggerActionType].Add(linkedTrigger);
+						else
+							Game.ActiveTriggers.Add(t.TriggerActionType, new List<Trigger> { linkedTrigger });
+					}
 			return entity.Id;
 		}
 
 		public int Remove(IEntity entity) {
 			Entities.Remove(entity.Id);
+
+			// TODO: Remove active triggers for entity
 			return entity.Id;
 		}
 

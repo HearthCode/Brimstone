@@ -137,6 +137,7 @@ namespace BrimstoneTests
 						}
 
 			// TODO: Add test for cloned stack entity pointers
+			// TODO: Check that ActiveTriggers is cloned correctly and only once
 		}
 	}
 }
