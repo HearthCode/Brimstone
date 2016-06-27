@@ -194,6 +194,8 @@ namespace Brimstone
 				source = e.Source;
 				action = e.Action;
 				args = e.Args;
+				if (e.Cancel)
+					return false;
 			}
 
 			// TODO: Replace with async/await later
