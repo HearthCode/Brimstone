@@ -18,13 +18,24 @@ namespace Brimstone
 		public PowerHistory PowerHistory = new PowerHistory();
 		public ActionQueue ActionQueue;
 
+		// Game clones n-tree traversal
+		private static int SequenceNumber { get; set; }
+		public int GameId { get; }
+		public Game Parent { get; }
+		public HashSet<int> Children { get; } = new HashSet<int>();
+
 		// Required by IEntity
 		public Game(Game cloneFrom) : base(cloneFrom) {
 			// TODO: Clone PowerHistory if desired
 			// Generate zones owned by game
+			GameId = ++SequenceNumber;
 			Zones[Zone.SETASIDE] = new ZoneEntities(this, this, Zone.SETASIDE);
 			Zones[Zone.PLAY] = new ZoneEntities(this, this, Zone.PLAY);
 			Setaside = Zones[Zone.SETASIDE];
+
+			// Update tree
+			Parent = cloneFrom;
+			cloneFrom.Children.Add(GameId);
 		}
 
 		public Game(HeroClass Hero1, HeroClass Hero2, string Player1Name = "", string Player2Name = "", bool PowerHistory = false)
@@ -56,6 +67,10 @@ namespace Brimstone
 			Zones[Zone.SETASIDE] = new ZoneEntities(this, this, Zone.SETASIDE);
 			Zones[Zone.PLAY] = new ZoneEntities(this, this, Zone.PLAY);
 			Setaside = Zones[Zone.SETASIDE];
+
+			// No parent or children
+			GameId = ++SequenceNumber;
+			Parent = null;
 		}
 
 		public void Start() {
