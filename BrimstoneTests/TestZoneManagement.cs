@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using Brimstone;
 
@@ -135,6 +136,46 @@ namespace BrimstoneTests
 			Assert.AreEqual(0, p1.Graveyard.Count);
 			Assert.AreEqual((int)Zone.GRAVEYARD, item[GameTag.ZONE]);
 			Assert.AreEqual(0, item[GameTag.ZONE_POSITION]);
+		}
+
+		[Test]
+		public void TestZoneSlice() {
+			// Arrange
+			var game = new Game(HeroClass.Druid, HeroClass.Druid);
+			var p1 = game.Player1;
+			var p2 = game.Player2;
+
+			// Act
+			for (int i = 0; i < 5; i++)
+				p1.Deck.Add(Cards.FromName("Wisp"));
+
+			// Assert
+			List<IEntity> e;
+
+			e = p1.Deck.Slice(2).ToList();
+			Assert.AreEqual(2, e.Count);
+			for (int i = 0; i < e.Count; i++)
+				Assert.AreEqual(i + 1, e[i][GameTag.ZONE_POSITION]);
+
+			e = p1.Deck.Slice(-2).ToList();
+			Assert.AreEqual(2, e.Count);
+			for (int i = 0; i < e.Count; i++)
+				Assert.AreEqual(i + 4, e[i][GameTag.ZONE_POSITION]);
+
+			e = p1.Deck.Slice(-3, -1).ToList();
+			Assert.AreEqual(3, e.Count);
+			for (int i = 0; i < e.Count; i++)
+				Assert.AreEqual(i + 3, e[i][GameTag.ZONE_POSITION]);
+
+			e = p1.Deck.Slice(2, 4).ToList();
+			Assert.AreEqual(3, e.Count);
+			for (int i = 0; i < e.Count; i++)
+				Assert.AreEqual(i + 2, e[i][GameTag.ZONE_POSITION]);
+
+			e = p1.Deck.Slice(3, -2).ToList();
+			Assert.AreEqual(2, e.Count);
+			for (int i = 0; i < e.Count; i++)
+				Assert.AreEqual(i + 3, e[i][GameTag.ZONE_POSITION]);
 		}
 
 		[Test]

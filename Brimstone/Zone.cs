@@ -94,9 +94,31 @@ namespace Brimstone
 			}
 		}
 
-		// TODO: Make this easier to use. Single argument for first X items. Negative single argument for last X items
-		public IEnumerable<IEntity> Slice(int zpStart, int zpEnd) {
-			return Entities.Skip(zpStart - 1).Take((zpEnd - zpStart) + 1);
+		public IEnumerable<IEntity> Slice(int? zpStart = null, int? zpEnd = null) {
+			int start = 0, count = 0;
+
+			// First or last X elements
+			if (zpStart != null && zpEnd == null) {
+				start = (zpStart > 0? 0 : Entities.Count + (int)zpStart);
+				count = Math.Abs((int)zpStart);
+			}
+
+			// Range
+			if (zpStart != null && zpEnd != null) {
+				start = (zpStart > 0 ? (int)zpStart - 1 : Entities.Count + (int)zpStart);
+				count = ((int)zpEnd - (int)zpStart) + 1; // works when both numbers are same sign
+
+				if (zpStart > 0 && zpEnd < 0)
+					count = (Entities.Count + (int)zpEnd - (int)zpStart) + 2;
+			}
+
+			// All
+			if (zpStart == null && zpEnd == null) {
+				start = 0;
+				count = Entities.Count;
+			}
+
+			return Entities.Skip(start).Take(count);
 		}
 
 		public IEntity Add(IEntity Entity, int ZonePosition = -1) {
