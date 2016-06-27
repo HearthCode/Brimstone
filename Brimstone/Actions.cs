@@ -94,8 +94,11 @@ namespace Brimstone
 
 	public class RandomAmount : QueueAction
 	{
+		public const int MIN = 0;
+		public const int MAX = 1;
+
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
-			return RNG.Between(args[0], args[1]);
+			return RNG.Between(args[MIN], args[MAX]);
 		}
 	}
 
