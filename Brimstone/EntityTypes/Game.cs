@@ -16,16 +16,11 @@ namespace Brimstone
 		public ZoneGroup Zones { get; } = new ZoneGroup();
 
 		public PowerHistory PowerHistory = new PowerHistory();
-		public ActionQueue ActionQueue = new ActionQueue();
+		public ActionQueue ActionQueue;
 
 		// Required by IEntity
 		public Game(Game cloneFrom) : base(cloneFrom) {
-			// Clone queue and stack but not PowerHistory; keep PowerHistory disabled
-			// TODO: Events are not cloned
-			ActionQueue.Queue = new Queue<QueueAction>(cloneFrom.ActionQueue.Queue);
-			ActionQueue.ResultStack = new Stack<ActionResult>(cloneFrom.ActionQueue.ResultStack);
-			ActionQueue.Attach(this);
-
+			// TODO: Clone PowerHistory if desired
 			// Generate zones owned by game
 			Zones[Zone.SETASIDE] = new ZoneEntities(this, this, Zone.SETASIDE);
 			Zones[Zone.PLAY] = new ZoneEntities(this, this, Zone.PLAY);
@@ -43,8 +38,7 @@ namespace Brimstone
 			if (PowerHistory) {
 				this.PowerHistory.Attach(this);
 			}
-			ActionQueue.Attach(this);
-
+			ActionQueue = new ActionQueue(this);
 			Entities = new EntityController(this);
 			ActiveTriggers = new TriggerManager(this);
 
@@ -130,10 +124,12 @@ namespace Brimstone
 			// Re-assign zone references
 			foreach (var p in game.Players)
 				p.Attach(game);
+			// Clone queue, stack and events
+			game.ActionQueue = ((ActionQueue)ActionQueue.Clone());
+			game.ActionQueue.Attach(game);
 			// Clone triggers
 			game.ActiveTriggers = ((TriggerManager)ActiveTriggers.Clone());
 			game.ActiveTriggers.Game = game;
-			// TODO: Entity lists in the result stack will be pointing to the old game's entities
 			return game;
 		}
 
