@@ -70,6 +70,15 @@ namespace Brimstone
 			}
 		}
 
+		// TODO: Other Insert functions
+		public void InsertPaused(IEntity source, QueueAction a) {
+			if (a == null)
+				return;
+			// No event triggers when inserting at front of queue
+			a.SourceEntityId = source.Id;
+			Queue.AddFront(a);
+		}
+
 		public void EnqueuePaused(IEntity source, List<QueueAction> qa) {
 			if (qa != null)
 				foreach (var a in qa)
