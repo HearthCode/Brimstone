@@ -5,7 +5,6 @@ using System.Collections.Generic;
 namespace Brimstone
 {
 	// TODO: Implement rewind stack
-	// TODO: Register only filtered entities
 
 	public abstract class PowerAction
 	{
@@ -76,6 +75,7 @@ namespace Brimstone
 	{
 		public Game Game { get; private set; }
 		public List<PowerAction> Log { get; } = new List<PowerAction>();
+		public int SequenceNumber { get; private set; } = 0;
 
 		public event EventHandler<PowerActionEventArgs> OnPowerAction;
 
@@ -92,8 +92,10 @@ namespace Brimstone
 				return;
 
 			// Tag changes indicate they are filtered out by setting entity ID to zero
-			if (a.EntityId != 0)
+			if (a.EntityId != 0) {
 				Log.Add(a);
+				SequenceNumber++;
+			}
 
 			if (OnPowerAction != null)
 				OnPowerAction(this, new PowerActionEventArgs(Game, a));
