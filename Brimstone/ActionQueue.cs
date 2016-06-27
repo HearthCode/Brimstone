@@ -8,15 +8,17 @@ namespace Brimstone
 {
 	public class QueueActionEventArgs : EventArgs
 	{
-		public Game Game;
-		public IEntity Source;
-		public QueueAction Action;
+		public Game Game { get; }
+		public IEntity Source { get; set; }
+		public QueueAction Action { get; set; }
+		public List<ActionResult> Args { get; set; }
 		public bool Cancel { get; set; }
 
-		public QueueActionEventArgs(Game g, IEntity s, QueueAction a) {
+		public QueueActionEventArgs(Game g, IEntity s, QueueAction a, List<ActionResult> p = null) {
 			Game = g;
 			Source = s;
 			Action = a;
+			Args = p;
 			Cancel = false;
 		}
 	}
@@ -171,8 +173,7 @@ namespace Brimstone
 			var action = Queue.Dequeue();
 			var source = Game.Entities[action.SourceEntityId];
 
-			if (OnActionStarting != null)
-				OnActionStarting(this, new QueueActionEventArgs(Game, source, action));
+			// TODO: Fix stack modifying on OnActionStarting
 
 			// Get arguments for action from stack
 			var args = new List<ActionResult>();
@@ -180,13 +181,21 @@ namespace Brimstone
 				args.Add(ResultStack.Pop());
 			args.Reverse();
 
+			if (OnActionStarting != null) {
+				var e = new QueueActionEventArgs(Game, source, action, args);
+				OnActionStarting(this, e);
+				source = e.Source;
+				action = e.Action;
+				args = e.Args;
+			}
+
 			// TODO: Replace with async/await later
 			// Run action and push results onto stack
 			var result = action.Execute(Game, source, args);
 			if (result.HasResult)
 				ResultStack.Push(result);
 			if (OnAction != null)
-				OnAction(this, new QueueActionEventArgs(Game, source, action));
+				OnAction(this, new QueueActionEventArgs(Game, source, action, args));
 
 			return true;
 		}
