@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 using Brimstone;
 
@@ -30,6 +30,10 @@ namespace BrimstoneTests
 
 			Assert.AreEqual(30, game.Entities.Count);
 
+			// Put a referenced entity on the stack
+			game.ActionQueue.EnqueuePaused(game, CardBehaviour.Draw(p1));
+			game.ActionQueue.ProcessOne(); // places reference to player 1 on the stack
+
 			// Act
 
 			// Clone with copy-on-write
@@ -43,6 +47,8 @@ namespace BrimstoneTests
 			// Players must be different
 			Assert.AreNotSame(game.Player1, clone.Player1);
 			Assert.AreNotSame(game.Player2, clone.Player2);
+			Assert.AreNotSame(game.Players[0], clone.Players[0]);
+			Assert.AreNotSame(game.Players[1], clone.Players[1]);
 
 			// Player names and hero classes must match
 			Assert.AreEqual(game.Player1.FriendlyName, clone.Player1.FriendlyName);
@@ -51,12 +57,12 @@ namespace BrimstoneTests
 			Assert.AreEqual(game.Player2.HeroClass, clone.Player2.HeroClass);
 
 			// Player assignments must match
+			Assert.AreSame(clone.Players[0], clone.Player1);
+			Assert.AreSame(clone.Players[1], clone.Player2);
 			Assert.AreEqual(game.Player1.Id, clone.Player1.Id);
 			Assert.AreEqual(game.Player2.Id, clone.Player2.Id);
 			Assert.AreEqual(game.CurrentPlayer.Id, clone.CurrentPlayer.Id);
 			Assert.AreEqual(game.CurrentPlayer.Opponent.Id, clone.CurrentPlayer.Opponent.Id);
-			Assert.AreSame(clone.Players[0], clone.Player1);
-			Assert.AreSame(clone.Players[1], clone.Player2);
 
 			// EntitySequences must have correct owners
 			Assert.AreNotSame(game.Entities, clone.Entities);
@@ -84,11 +90,20 @@ namespace BrimstoneTests
 			Assert.AreEqual(0, clone.PowerHistory.Log.Count);
 
 			// Queue and stack must be copied
+			Assert.AreEqual(1, game.ActionQueue.Queue.Count);
+			Assert.AreEqual(1, game.ActionQueue.ResultStack.Count);
+
 			Assert.AreNotSame(game.ActionQueue, clone.ActionQueue);
 			Assert.AreNotSame(game.ActionQueue.Queue, clone.ActionQueue.Queue);
 			Assert.AreNotSame(game.ActionQueue.ResultStack, clone.ActionQueue.ResultStack);
 			Assert.AreEqual(game.ActionQueue.Queue.Count, clone.ActionQueue.Queue.Count);
 			Assert.AreEqual(game.ActionQueue.ResultStack.Count, clone.ActionQueue.ResultStack.Count);
+
+			while (game.ActionQueue.Queue.Count > 0) {
+				var i1 = game.ActionQueue.Queue.Dequeue();
+				var i2 = clone.ActionQueue.Queue.Dequeue();
+				Assert.AreNotSame(i1, i2);
+			}
 
 			// All proxies must point to original entities
 			foreach (Entity e in game.Entities)
@@ -136,8 +151,28 @@ namespace BrimstoneTests
 							}
 						}
 
-			// TODO: Add test for cloned stack entity pointers
+			// All stack entity references must be updated
+			while (game.ActionQueue.ResultStack.Count > 0) {
+				var i1 = game.ActionQueue.ResultStack.Pop();
+				var i2 = clone.ActionQueue.ResultStack.Pop();
+				Assert.AreNotSame(i1, i2);
+
+				List<IEntity> il1 = i1;
+				List<IEntity> il2 = i2;
+
+				if (il1 == null)
+					Assert.IsNull(il2);
+				else {
+					Assert.AreEqual(il1.Count, il2.Count);
+					for (int i = 0; i < il1.Count; i++) {
+						Assert.AreNotSame(il1[i], il2[i]);
+						Assert.AreEqual(il1[i].Id, il2[i].Id);
+					}
+				}
+			}
+
 			// TODO: Check that ActiveTriggers is cloned correctly and only once
+			// TODO: Check Queue events are copied
 		}
 	}
 }

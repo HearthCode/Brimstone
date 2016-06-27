@@ -24,8 +24,8 @@ namespace Brimstone
 	public class ActionQueue : ICloneable
 	{
 		public Game Game { get; private set; }
-		public Queue<QueueAction> Queue;
-		public Stack<ActionResult> ResultStack;
+		public Queue<QueueAction> Queue = new Queue<QueueAction>();
+		public Stack<ActionResult> ResultStack = new Stack<ActionResult>();
 
 		public event EventHandler<QueueActionEventArgs> OnQueueing;
 		public event EventHandler<QueueActionEventArgs> OnQueued;
@@ -33,14 +33,16 @@ namespace Brimstone
 		public event EventHandler<QueueActionEventArgs> OnAction;
 
 		public ActionQueue(Game game) {
-			Queue = new Queue<QueueAction>();
-			ResultStack = new Stack<ActionResult>();
 			Game = game;
 		}
 
 		public ActionQueue(ActionQueue cloneFrom) {
-			Queue = new Queue<QueueAction>(cloneFrom.Queue);
-			ResultStack = new Stack<ActionResult>(cloneFrom.ResultStack);
+			foreach (var item in cloneFrom.Queue)
+				Queue.Enqueue((QueueAction)item.Clone());
+			var stack = new List<ActionResult>(cloneFrom.ResultStack);
+			stack.Reverse();
+			foreach (var item in stack)
+				ResultStack.Push((ActionResult)item.Clone());
 			// Events are immutable so this creates copies
 			OnQueueing = cloneFrom.OnQueueing;
 			OnQueued = cloneFrom.OnQueued;
@@ -52,12 +54,19 @@ namespace Brimstone
 			Game = game;
 
 			// Make action stack entities point to new game
-			foreach (var ar in ResultStack) {
+			var stack = new List<ActionResult>(ResultStack);
+			stack.Reverse();
+			ResultStack.Clear();
+			foreach (var ar in stack) {
 				List<IEntity> el = ar;
-				if (el == null)
+				if (el == null) {
+					ResultStack.Push(ar);
 					continue;
-				foreach (var e in el)
-					e.Game = game;
+				}
+				List<IEntity> nel = new List<IEntity>();
+				foreach (var item in el)
+					nel.Add(game.Entities[item.Id]);
+				ResultStack.Push(nel);
 			}
 		}
 

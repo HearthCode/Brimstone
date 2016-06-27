@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Brimstone
 {
-	public struct ActionResult : IEnumerable<IEntity>
+	public struct ActionResult : IEnumerable<IEntity>, ICloneable
 	{
 		private bool hasValue;
 		private bool hasBoolValue;
@@ -104,6 +105,10 @@ namespace Brimstone
 			}
 			else
 				return "<unknown>";
+		}
+
+		public object Clone() {
+			return MemberwiseClone();
 		}
 	}
 }
