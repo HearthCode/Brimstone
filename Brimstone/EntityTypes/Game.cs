@@ -26,14 +26,13 @@ namespace Brimstone
 
 		// Required by IEntity
 		public Game(Game cloneFrom) : base(cloneFrom) {
-			// TODO: Clone PowerHistory if desired
 			// Generate zones owned by game
-			GameId = ++SequenceNumber;
 			Zones[Zone.SETASIDE] = new ZoneEntities(this, this, Zone.SETASIDE);
 			Zones[Zone.PLAY] = new ZoneEntities(this, this, Zone.PLAY);
 			Setaside = Zones[Zone.SETASIDE];
 
 			// Update tree
+			GameId = ++SequenceNumber;
 			Parent = cloneFrom;
 			cloneFrom.Children.Add(GameId);
 		}
@@ -145,6 +144,8 @@ namespace Brimstone
 			// Clone triggers
 			game.ActiveTriggers = ((TriggerManager)ActiveTriggers.Clone());
 			game.ActiveTriggers.Game = game;
+			// TODO: Link PowerHistory
+			game.PowerHistory.Attach(game, this);
 			return game;
 		}
 

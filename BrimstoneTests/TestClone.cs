@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using Brimstone;
 
@@ -86,8 +87,13 @@ namespace BrimstoneTests
 				Assert.AreSame(clone.Entities[e.Id].Controller, e.Controller);
 			}
 
-			// PowerHistory must be empty
-			Assert.AreEqual(0, clone.PowerHistory.Log.Count);
+			// PowerHistory must be linked properly
+			Assert.AreEqual(game.PowerHistory.SequenceNumber, clone.PowerHistory.SequenceNumber);
+			Assert.AreEqual(game.PowerHistory.SequenceNumber, clone.PowerHistory.ParentBranchEntry);
+			Assert.AreEqual(game.PowerHistory.Count(), clone.PowerHistory.Count());
+			Assert.AreEqual(game.PowerHistory.SequenceNumber, game.PowerHistory.Count());
+			Assert.AreSame(clone, clone.PowerHistory.Game);
+			Assert.AreEqual(0, clone.PowerHistory.Delta.Count);
 
 			// Queue and stack must be copied
 			Assert.AreEqual(1, game.ActionQueue.Queue.Count);

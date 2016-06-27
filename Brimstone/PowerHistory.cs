@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Brimstone
 {
@@ -74,13 +75,21 @@ namespace Brimstone
 	public class PowerHistory : IEnumerable<PowerAction>
 	{
 		public Game Game { get; private set; }
-		public List<PowerAction> Log { get; } = new List<PowerAction>();
-		public int SequenceNumber { get; private set; } = 0;
+		public List<PowerAction> Delta { get; } = new List<PowerAction>();
+		public int SequenceNumber { get; private set; }
+		public int ParentBranchEntry { get; private set; }
 
 		public event EventHandler<PowerActionEventArgs> OnPowerAction;
 
-		public void Attach(Game game) {
+		public void Attach(Game game, Game parent = null) {
 			Game = game;
+			if (parent != null) {
+				SequenceNumber = parent.PowerHistory.SequenceNumber;
+				ParentBranchEntry = SequenceNumber;
+			} else {
+				SequenceNumber = 0;
+				ParentBranchEntry = -1;
+			}
 		}
 		public void Detach() {
 			Game = null;
@@ -93,7 +102,7 @@ namespace Brimstone
 
 			// Tag changes indicate they are filtered out by setting entity ID to zero
 			if (a.EntityId != 0) {
-				Log.Add(a);
+				Delta.Add(a);
 				SequenceNumber++;
 			}
 
@@ -102,7 +111,10 @@ namespace Brimstone
 		}
 
 		public IEnumerator<PowerAction> GetEnumerator() {
-			return Log.GetEnumerator();
+			if (ParentBranchEntry == -1)
+				return Delta.GetEnumerator();
+
+			return Game.Parent.PowerHistory.Concat(Delta).GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() {
@@ -111,7 +123,7 @@ namespace Brimstone
 
 		public override string ToString() {
 			string ph = string.Empty;
-			foreach (var p in Log)
+			foreach (var p in Delta)
 				ph += p.ToString() + "\n";
 			return ph;
 		}
