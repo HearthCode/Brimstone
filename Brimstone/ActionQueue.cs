@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Brimstone
 {
@@ -26,7 +24,7 @@ namespace Brimstone
 	public class ActionQueue : ICloneable
 	{
 		public Game Game { get; private set; }
-		public Queue<QueueAction> Queue = new Queue<QueueAction>();
+		public Deque<QueueAction> Queue = new Deque<QueueAction>();
 		public Stack<ActionResult> ResultStack = new Stack<ActionResult>();
 
 		public event EventHandler<QueueActionEventArgs> OnQueueing;
@@ -40,7 +38,7 @@ namespace Brimstone
 
 		public ActionQueue(ActionQueue cloneFrom) {
 			foreach (var item in cloneFrom.Queue)
-				Queue.Enqueue((QueueAction)item.Clone());
+				Queue.AddBack((QueueAction)item.Clone());
 			var stack = new List<ActionResult>(cloneFrom.ResultStack);
 			stack.Reverse();
 			foreach (var item in stack)
@@ -135,10 +133,10 @@ namespace Brimstone
 				OnQueueing(this, e);
 				// TODO: Count the number of arguments the cancelled action would take and remove those too
 				if (!e.Cancel)
-					Queue.Enqueue(a);
+					Queue.AddBack(a);
 			}
 			else
-				Queue.Enqueue(a);
+				Queue.AddBack(a);
 
 			if (OnQueued != null)
 				OnQueued(this, new QueueActionEventArgs(Game, source, a));
@@ -170,7 +168,7 @@ namespace Brimstone
 				return false;
 
 			// Get next action
-			var action = Queue.Dequeue();
+			var action = Queue.RemoveFront();
 			var source = Game.Entities[action.SourceEntityId];
 
 			// TODO: Fix stack modifying on OnActionStarting

@@ -100,8 +100,8 @@ namespace BrimstoneTests
 			Assert.AreEqual(game.ActionQueue.ResultStack.Count, clone.ActionQueue.ResultStack.Count);
 
 			while (game.ActionQueue.Queue.Count > 0) {
-				var i1 = game.ActionQueue.Queue.Dequeue();
-				var i2 = clone.ActionQueue.Queue.Dequeue();
+				var i1 = game.ActionQueue.Queue.RemoveFront();
+				var i2 = clone.ActionQueue.Queue.RemoveFront();
 				Assert.AreNotSame(i1, i2);
 			}
 
