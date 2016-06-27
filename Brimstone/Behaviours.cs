@@ -24,6 +24,7 @@ namespace Brimstone
 		// TODO: Write all common selectors
 		public static ActionGraph Self { get { return Select(e => e); } }
 		public static ActionGraph Controller { get { return Select(e => e.Controller); } }
+		public static ActionGraph CurrentPlayer { get { return Select(e => e.Game.CurrentPlayer); } }
 		public static ActionGraph AllMinions { get { return Select(g => g.CurrentPlayer.Board.Concat(g.CurrentPlayer.Opponent.Board)); } }
 		public static ActionGraph OpponentMinions { get { return Select(p => p.Opponent.Board); } }
 
