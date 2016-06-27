@@ -21,20 +21,44 @@ namespace Brimstone
 		}
 	}
 
-	public class ActionQueue
+	public class ActionQueue : ICloneable
 	{
 		public Game Game { get; private set; }
-		public Queue<QueueAction> Queue = new Queue<QueueAction>();
-		public Stack<ActionResult> ResultStack = new Stack<ActionResult>();
+		public Queue<QueueAction> Queue;
+		public Stack<ActionResult> ResultStack;
 
 		public event EventHandler<QueueActionEventArgs> OnQueueing;
 		public event EventHandler<QueueActionEventArgs> OnQueued;
 		public event EventHandler<QueueActionEventArgs> OnActionStarting;
 		public event EventHandler<QueueActionEventArgs> OnAction;
 
+		public ActionQueue(Game game) {
+			Queue = new Queue<QueueAction>();
+			ResultStack = new Stack<ActionResult>();
+			Game = game;
+		}
+
+		public ActionQueue(ActionQueue cloneFrom) {
+			Queue = new Queue<QueueAction>(cloneFrom.Queue);
+			ResultStack = new Stack<ActionResult>(cloneFrom.ResultStack);
+			// Events are immutable so this creates copies
+			OnQueueing = cloneFrom.OnQueueing;
+			OnQueued = cloneFrom.OnQueued;
+			OnActionStarting = cloneFrom.OnActionStarting;
+			OnAction = cloneFrom.OnAction;
+		}
+
 		public void Attach(Game game) {
 			Game = game;
-			// TODO: Make action stack entities point to new game here
+
+			// Make action stack entities point to new game
+			foreach (var ar in ResultStack) {
+				List<IEntity> el = ar;
+				if (el == null)
+					continue;
+				foreach (var e in el)
+					e.Game = game;
+			}
 		}
 
 		public void EnqueuePaused(IEntity source, List<QueueAction> qa) {
@@ -52,17 +76,17 @@ namespace Brimstone
 
 		public List<ActionResult> EnqueueMultiResult(IEntity source, List<QueueAction> qa) {
 			EnqueuePaused(source, qa);
-			return Process();
+			return ProcessAll();
 		}
 
 		public List<ActionResult> EnqueueMultiResult(IEntity source, ActionGraph g) {
 			EnqueuePaused(source, g);
-			return Process();
+			return ProcessAll();
 		}
 
 		public ActionResult Enqueue(IEntity source, List<QueueAction> qa) {
 			EnqueuePaused(source, qa);
-			var result = Process();
+			var result = ProcessAll();
 			if (result.Count > 0)
 				return result[0];
 			return ActionResult.None;
@@ -70,7 +94,7 @@ namespace Brimstone
 
 		public ActionResult Enqueue(IEntity source, ActionGraph g) {
 			EnqueuePaused(source, g);
-			var result = Process();
+			var result = ProcessAll();
 			if (result.Count > 0)
 				return result[0];
 			return ActionResult.None;
@@ -78,12 +102,12 @@ namespace Brimstone
 
 		public List<ActionResult> EnqueueMultiResult(IEntity source, QueueAction a) {
 			EnqueuePaused(source, a);
-			return Process();
+			return ProcessAll();
 		}
 
 		public ActionResult Enqueue(IEntity source, QueueAction a) {
 			EnqueuePaused(source, a);
-			var result = Process();
+			var result = ProcessAll();
 			if (result.Count > 0)
 				return result[0];
 			return ActionResult.None;
@@ -120,34 +144,42 @@ namespace Brimstone
 				ResultStack.Push(a); ;
 		}
 
-		public List<ActionResult> Process() {
-			while (Queue.Count > 0) {
-				// Get next action
-				var action = Queue.Dequeue();
-				var source = Game.Entities[action.SourceEntityId];
-
-				if (OnActionStarting != null)
-					OnActionStarting(this, new QueueActionEventArgs(Game, source, action));
-
-				// Get arguments for action from stack
-				var args = new List<ActionResult>();
-				for (int i = 0; i < action.Args.Count; i++)
-					args.Add(ResultStack.Pop());
-				args.Reverse();
-
-				// TODO: Replace with async/await later
-				// Run action and push results onto stack
-				var result = action.Execute(Game, source, args);
-				if (result.HasResult)
-					ResultStack.Push(result);
-				if (OnAction != null)
-					OnAction(this, new QueueActionEventArgs(Game, source, action));
-			}
+		public List<ActionResult> ProcessAll() {
+			while (ProcessOne())
+				;
 			// Return whatever is left on the stack
 			var stack = new List<ActionResult>(ResultStack);
 			ResultStack.Clear();
 			stack.Reverse();
 			return stack;
+		}
+
+		public bool ProcessOne() {
+			if (Queue.Count == 0)
+				return false;
+
+			// Get next action
+			var action = Queue.Dequeue();
+			var source = Game.Entities[action.SourceEntityId];
+
+			if (OnActionStarting != null)
+				OnActionStarting(this, new QueueActionEventArgs(Game, source, action));
+
+			// Get arguments for action from stack
+			var args = new List<ActionResult>();
+			for (int i = 0; i < action.Args.Count; i++)
+				args.Add(ResultStack.Pop());
+			args.Reverse();
+
+			// TODO: Replace with async/await later
+			// Run action and push results onto stack
+			var result = action.Execute(Game, source, args);
+			if (result.HasResult)
+				ResultStack.Push(result);
+			if (OnAction != null)
+				OnAction(this, new QueueActionEventArgs(Game, source, action));
+
+			return true;
 		}
 
 		public string StackToString() {
@@ -162,6 +194,10 @@ namespace Brimstone
 			foreach (var a in Queue)
 				s += a + "\n";
 			return s;
+		}
+
+		public object Clone() {
+			return new ActionQueue(this);
 		}
 	}
 }
