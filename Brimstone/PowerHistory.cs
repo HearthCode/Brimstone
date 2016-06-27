@@ -25,7 +25,12 @@ namespace Brimstone
 		public Tag Tag { get; }
 
 		public TagChange(IEntity e, Tag t) : base(e) {
-			Tag = t;
+			if (t.Filtered(e) != null) {
+				EntityId = e.Id;
+				Tag = t;
+			}
+			else
+				EntityId = 0;
 		}
 
 		public override string ToString() {
@@ -38,8 +43,13 @@ namespace Brimstone
 		public Dictionary<GameTag, int> Tags { get; set; }
 
 		public CreateEntity(IEntity e) : base(e) {
+			Tags = new Dictionary<GameTag, int>();
 			// Make sure we copy the tags, not the references!
-			Tags = e.CopyTags();
+			foreach (var tag in e) {
+				// Filtered tags only
+				if (new Tag(tag.Key, tag.Value).Filtered(e) != null)
+					Tags.Add(tag.Key, tag.Value);
+			}
 		}
 
 		public override string ToString() {
@@ -81,7 +91,9 @@ namespace Brimstone
 			if (Game == null)
 				return;
 
-			Log.Add(a);
+			// Tag changes indicate they are filtered out by setting entity ID to zero
+			if (a.EntityId != 0)
+				Log.Add(a);
 
 			if (OnPowerAction != null)
 				OnPowerAction(this, new PowerActionEventArgs(Game, a));

@@ -247,6 +247,8 @@
 		WEAPON = 334,
 
 		// Card definition-specific
+		ATTACK_VISUAL_TYPE = 251,
+		DEV_STATE = 268,
 		COLLECTIBLE = 321
 	}
 
