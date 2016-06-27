@@ -13,8 +13,8 @@ namespace Brimstone
 		IEntity Controller { get; set; }
 		Card Card { get; }
 		Dictionary<GameTag, int> CopyTags();
-
 		int this[GameTag t] { get; set; }
+		string ShortDescription { get; }
 
 		IEntity CloneState();
 	}
@@ -198,6 +198,12 @@ namespace Brimstone
 
 		IEnumerator IEnumerable.GetEnumerator() {
 			return GetEnumerator();
+		}
+
+		public string ShortDescription {
+			get {
+				return Card.Name + " [" + Id + "]";
+			}
 		}
 
 		public override string ToString() {

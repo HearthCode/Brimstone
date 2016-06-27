@@ -158,7 +158,7 @@ namespace Brimstone
 			if (!player.Deck.IsEmpty) {
 				Entity entity = (Entity)player.Deck[1];
 
-				Console.WriteLine("{0} draws {1}", player.FriendlyName, entity.Card.Name);
+				Console.WriteLine("{0} draws {1}", player.FriendlyName, entity.ShortDescription);
 
 				player.NumCardsDrawnThisTurn++;
 				player.Hand.MoveTo(entity);
@@ -180,7 +180,7 @@ namespace Brimstone
 
 			player.Board.MoveTo(entity);
 
-			Console.WriteLine("{0} is playing {1}", player.FriendlyName, entity.Card.Name);
+			Console.WriteLine("{0} is playing {1}", player.FriendlyName, entity.ShortDescription);
 
 			game.ActionQueue.EnqueuePaused(entity, entity.Card.Behaviour.Battlecry);
 			return entity;
@@ -195,7 +195,7 @@ namespace Brimstone
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			if (args[TARGETS].HasResult)
 				foreach (Minion e in args[TARGETS]) {
-					Console.WriteLine("{0} is getting hit for {1} points of damage", e.Card.Name, args[DAMAGE]);
+					Console.WriteLine("{0} is getting hit for {1} points of damage", e.ShortDescription, args[DAMAGE]);
 
 					e.Damage += args[DAMAGE];
 					e.CheckForDeath();
@@ -213,7 +213,7 @@ namespace Brimstone
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			if (args[TARGETS].HasResult)
 				foreach (var e in args[TARGETS]) {
-					Console.WriteLine("{0} dies", e.Card.Name);
+					Console.WriteLine("{0} dies", e.ShortDescription);
 
 					if (e is Minion) {
 						((Player)e.Controller).Graveyard.MoveTo(e);
