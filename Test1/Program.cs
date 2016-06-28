@@ -13,6 +13,46 @@ namespace Test1
 
 		static void Main(string[] args) {
 			Console.WriteLine("Hello Hearthstone!");
+
+			// Build tree
+			var game1 = new Game(HeroClass.Druid, HeroClass.Warrior, PowerHistory: true);
+			game1.Player1.Give(Cards.FromName("Wisp"));
+			var game2 = game1.CloneState() as Game;
+			var game3 = game1.CloneState() as Game;
+			game2.Player2.Give(Cards.FromName("Wisp"));
+			var game4 = game2.CloneState() as Game;
+			var game5 = game2.CloneState() as Game;
+			var game6 = game2.CloneState() as Game;
+			game4.Player1.Give(Cards.FromName("Deathwing"));
+			var game7 = game4.CloneState() as Game;
+			var game8 = game4.CloneState() as Game;
+			var game9 = game4.CloneState() as Game;
+			game7.Player1.Give(Cards.FromName("Boom Bot"));
+			game8.Player1.Give(Cards.FromName("Murloc Tinyfin"));
+			game9.Player1.Give(Cards.FromName("Knife Juggler"));
+			var game10 = game9.CloneState() as Game;
+			var game11 = game9.CloneState() as Game;
+			var game12 = game9.CloneState() as Game;
+
+			// same as game 8
+			var game13 = game4.CloneState() as Game;
+			game13.Player1.Give(Cards.FromName("Murloc Tinyfin"));
+
+			var d1 = game4.PowerHistory.DeltaSince(game2);
+			var d2 = game6.PowerHistory.DeltaSince(game1);
+			var d3 = game2.PowerHistory.DeltaSince(game2);
+			var d4 = game1.PowerHistory.DeltaSince(game2);
+			var d5 = game12.PowerHistory.DeltaSince(game1);
+
+			Console.WriteLine(game8.PowerHistory.EquivalentTo(game13.PowerHistory));
+			Console.WriteLine(game8.PowerHistory.EquivalentTo(game12.PowerHistory));
+
+
+
+
+
+
+
 			/*
 						var game = new Game(HeroClass.Druid, HeroClass.Druid, PowerHistory: true);
 						var p1 = game.Player1;
@@ -164,14 +204,15 @@ namespace Test1
 			game.Player1.Deck.Fill();
 			game.Player2.Deck.Fill();
 			game.Start();
-			for (int i = 0; i < MaxMinions - 4; i++)
+
+			for (int i = 0; i < MaxMinions - 3; i++)
 				game.CurrentPlayer.Give(Cards.FromName("Bloodfen Raptor")).Play();
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < 3; i++)
 				game.CurrentPlayer.Give(Cards.FromName("Boom Bot")).Play();
 			game.BeginTurn();
-			for (int i = 0; i < MaxMinions - 4; i++)
+			for (int i = 0; i < MaxMinions - 3; i++)
 				game.CurrentPlayer.Give(Cards.FromName("Bloodfen Raptor")).Play();
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < 3; i++)
 				game.CurrentPlayer.Give(Cards.FromName("Boom Bot")).Play();
 
 			int clones = 0;

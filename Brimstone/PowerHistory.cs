@@ -183,6 +183,75 @@ namespace Brimstone
 				OnPowerAction(this, new PowerActionEventArgs(Game, a));
 		}
 
+		public List<PowerAction> DeltaSince(Game game) {
+			if (ReferenceEquals(game, null))
+				return null;
+
+			var delta = new List<PowerAction>();
+
+			if (ReferenceEquals(game, Game))
+				return delta;
+
+			bool found = false;
+			for (Game g = Game; g != null; g = g.Parent) {
+				if (g == game) {
+					found = true;
+					break;
+				}
+				delta = g.PowerHistory.Delta.Concat(delta).ToList();
+			}
+			return found ? delta : null;
+		}
+
+		// Compare two PowerHistory logs to see if they are functionally equivalent
+		public bool EquivalentTo(PowerHistory p) {
+			if (ReferenceEquals(p, null))
+				return false;
+
+			// Same log?
+			if (ReferenceEquals(this, p))
+				return true;
+
+			// Same game?
+			if (ReferenceEquals(Game, p.Game))
+				return true;
+
+			// Get all ancestors of each PowerHistory log
+			var ancestorsA = new Stack<Game>();
+			var ancestorsB = new Stack<Game>();
+
+			for (Game g = Game; g != null; g = g.Parent)
+				ancestorsA.Push(g);
+			for (Game g = p.Game; g != null; g = g.Parent)
+				ancestorsB.Push(g);
+
+			// Search from root game to find lowest common ancestor of each game
+			Game lca = null;
+			foreach (var pair in ancestorsA.Zip(ancestorsB, (x, y) => new { A = x, B = y }))
+				if (pair.A != pair.B)
+					break;
+				else {
+					lca = pair.A;
+				}
+
+			// Calculate deltas from LCA to leaf
+			var deltaA = DeltaSince(lca);
+			var deltaB = p.DeltaSince(lca);
+
+			// Naive equivalence comparison
+			// TODO: Ignore zone positions for hand
+			// TODO: Ignore entity IDs if all other tags same
+			// TODO: Ignore board ordering if all other tags same
+
+			// Pure equality
+			foreach (var pair in deltaA.Zip(deltaB, (x, y) => new { A = x, B = y }))
+				// Cannot use == operator because it is not overridden in base PowerAction
+				// and will do reference equality only. Use IEquatable<T> instead.
+				if (!pair.A.Equals(pair.B))
+					return false;
+			return true;
+		}
+
 		public IEnumerator<PowerAction> GetEnumerator() {
 			if (ParentBranchEntry == -1)
 				return Delta.GetEnumerator();
