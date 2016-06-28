@@ -67,8 +67,8 @@ namespace BrimstoneTests
 
 			// EntitySequences must have correct owners
 			Assert.AreNotSame(game.Entities, clone.Entities);
-			Assert.AreEqual(game.Entities.Game, game);
-			Assert.AreEqual(clone.Entities.Game, clone);
+			Assert.AreSame(game.Entities.Game, game);
+			Assert.AreSame(clone.Entities.Game, clone);
 
 			// All entity IDs must match
 			Assert.AreEqual(game.Entities.NextEntityId, clone.Entities.NextEntityId);
