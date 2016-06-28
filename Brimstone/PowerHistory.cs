@@ -20,7 +20,7 @@ namespace Brimstone
 		}
 	}
 
-	public class TagChange : PowerAction
+	public class TagChange : PowerAction, IEquatable<TagChange>
 	{
 		public Tag Tag { get; }
 
@@ -35,6 +35,34 @@ namespace Brimstone
 
 		public override string ToString() {
 			return "[Tag] Entity " + EntityId + ": " + Tag;
+		}
+
+		public static bool operator ==(TagChange x, TagChange y) {
+			if (ReferenceEquals(x, null))
+				return false;
+			return x.Equals(y);
+		}
+
+		public static bool operator !=(TagChange x, TagChange y) {
+			return !(x == y);
+		}
+
+		public override bool Equals(object o) {
+			if (!(o is TagChange))
+				return false;
+			return Equals((TagChange)o);
+		}
+
+		public bool Equals(TagChange o) {
+			if (ReferenceEquals(o, null))
+				return false;
+			if (ReferenceEquals(this, o))
+				return true;
+			return EntityId == o.EntityId && Tag == o.Tag;
+		}
+
+		public override int GetHashCode() {
+			return (17 * 31 + EntityId) * 31 + Tag.GetHashCode();
 		}
 	}
 
