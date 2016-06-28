@@ -64,13 +64,13 @@ namespace Brimstone
 							 // Unfortunately the file contains some duplicate tags
 							 // so we have to make a list first and weed out the unique ones
 							 Tags = (from tag in r.Descendants("Tag")
-									 select new Tag {
-											Name = (GameTag) Enum.Parse(typeof(GameTag), tag.Attribute("enumID").Value),
-											Value = (tag.Attribute("value") != null? (Variant) int.Parse(tag.Attribute("value").Value)
+									 select new Tag(
+											Name: (GameTag) Enum.Parse(typeof(GameTag), tag.Attribute("enumID").Value),
+											Value: (tag.Attribute("value") != null? (Variant) int.Parse(tag.Attribute("value").Value)
 													: (tag.Attribute("type").Value == "String"? (Variant) tag.Value
 														: (tag.Attribute("type").Value == "LocString"?
 															(Variant) tag.Element("enUS").Value : (Variant) 0)))
-										}).ToList(),
+										)).ToList(),
 										
 							Requirements = (from req in r.Descendants("PlayRequirement")
 												select new {

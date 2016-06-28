@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace Brimstone
 {
-	public struct Tag
+	public struct Tag : IEquatable<Tag>
 	{
-		public GameTag Name { get; set; }
-		public Variant Value { get; set; }
+		public GameTag Name { get;}
+		public Variant Value { get; }
 
 		public Tag(GameTag Name, Variant Value) {
 			this.Name = Name;
@@ -35,6 +35,34 @@ namespace Brimstone
 			if (e is Player)
 				return (PlayerIncludeFilters.Contains(Name) ? (Tag?)this : null);
 			return this;
+		}
+
+		public static bool operator ==(Tag x, Tag y) {
+			if (ReferenceEquals(x, null))
+				return false;
+			return x.Equals(y);
+		}
+
+		public static bool operator !=(Tag x, Tag y) {
+			return !(x == y);
+		}
+
+		public override bool Equals(object o) {
+			if (!(o is Tag))
+				return false;
+			return Equals((Tag)o);
+		}
+
+		public bool Equals(Tag o) {
+			if (ReferenceEquals(o, null))
+				return false;
+			if (ReferenceEquals(this, o))
+				return true;
+			return Name == o.Name && Value == o.Value;
+		}
+
+		public override int GetHashCode() {
+			return (17 * 31 + (int)Name) * 31 + Value.ToString().GetHashCode();
 		}
 
 		private static Dictionary<GameTag, Type> TypedTags = new Dictionary<GameTag, Type> {
