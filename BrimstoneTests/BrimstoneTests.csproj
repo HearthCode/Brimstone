@@ -42,6 +42,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestPowerHistory.cs" />
     <Compile Include="TestZoneManagement.cs" />
     <Compile Include="TestClone.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
