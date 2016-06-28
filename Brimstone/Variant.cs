@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
-public struct Variant
+public struct Variant : IEquatable<Variant>
 {
 	public bool HasValue { get; private set; }
 	public bool HasBoolValue { get; private set; }
@@ -31,11 +32,9 @@ public struct Variant
 	}
 
 	public static bool operator ==(Variant x, Variant y) {
-		if (ReferenceEquals(x, y))
-			return true;
-		// Also deals with one-sided null comparisons since it will use struct value type defaults
-		// Do we need to compare the lists properly?
-		return (x.boolValue == y.boolValue && x.intValue == y.intValue && x.stringValue == y.stringValue);
+		if (ReferenceEquals(x, null))
+			return false;
+		return x.Equals(y);
 	}
 
 	public static bool operator !=(Variant x, Variant y) {
@@ -43,12 +42,30 @@ public struct Variant
 	}
 
 	public override bool Equals(object o) {
-		try {
-			return (bool)(this == (Variant)o);
-		}
-		catch {
+		if (!(o is Variant))
 			return false;
-		}
+		return Equals((Variant)o);
+	}
+
+	public bool Equals(Variant o) {
+		if (ReferenceEquals(o, null))
+			return false;
+		if (ReferenceEquals(this, o))
+			return true;
+		// Both must have a value or no value
+		if (HasValue != o.HasValue)
+			return false;
+		// If neither have a value, they are equal
+		if (!(HasValue || o.HasValue))
+			return true;
+		// Precedence order: int -> bool -> string
+		if (HasIntValue && o.HasIntValue)
+			return intValue == o.intValue;
+		if (HasBoolValue && o.HasBoolValue)
+			return boolValue == o.boolValue;
+		if (HasStringValue && o.HasStringValue)
+			return stringValue == o.stringValue;
+		return false;
 	}
 
 	public override string ToString() {
