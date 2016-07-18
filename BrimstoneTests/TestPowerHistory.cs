@@ -80,6 +80,13 @@ namespace BrimstoneTests
 			Assert.NotNull(game4.PowerHistory.DeltaSince(game2));
 			Assert.NotNull(game6.PowerHistory.DeltaSince(game1));
 
+			// Make sure that crunched deltas accumulate in the right order
+			var pa = new List<PowerAction> {
+				new TagChange(1, GameTag.STEP, (int)Step.MAIN_BEGIN),
+				new TagChange(1, GameTag.STEP, (int)Step.MAIN_ACTION)
+			};
+			Assert.AreEqual(new HashSet<TagChange> { new TagChange(1, GameTag.STEP, (int)Step.MAIN_ACTION) }, game1.PowerHistory.CrunchedDelta(pa));
+
 			// Same game, change list is equal to the exact local delta
 			Assert.AreEqual(game2.PowerHistory.Delta.Count, game2.PowerHistory.DeltaSince(game2).Count);
 
@@ -121,10 +128,10 @@ namespace BrimstoneTests
 			game11.Step = Step.FINAL_GAMEOVER;
 
 			// Tag order should be ignored, Game10 and Game11 are equivalent
-			Assert.True(game10.PowerHistory.EquivalentTo(game11.PowerHistory, PreciseTagOrder: false));
+			Assert.True(game10.PowerHistory.EquivalentTo(game11.PowerHistory, Pure: false));
 
 			// But with precise tag order, they are different
-			Assert.False(game10.PowerHistory.EquivalentTo(game11.PowerHistory, PreciseTagOrder: true));
+			Assert.False(game10.PowerHistory.EquivalentTo(game11.PowerHistory, Pure: true));
 
 			// Test the case where the LCA has been modified after branching
 			// (every entry after the branch should be ignored)
@@ -145,10 +152,10 @@ namespace BrimstoneTests
 			game12.Player1.Give(Cards.FromName("Bloodfen Raptor"));
 
 			// Tag order should be ignored, Game9 and Game12 are equivalent
-			Assert.True(game9.PowerHistory.EquivalentTo(game12.PowerHistory, PreciseTagOrder: false));
+			Assert.True(game9.PowerHistory.EquivalentTo(game12.PowerHistory, Pure: false));
 
 			// But with precise tag order, they are different
-			Assert.False(game9.PowerHistory.EquivalentTo(game12.PowerHistory, PreciseTagOrder: true));
+			Assert.False(game9.PowerHistory.EquivalentTo(game12.PowerHistory, Pure: true));
 
 			// Branch from a game at two different points and test for equivalence
 			game8.Player1.Give(Cards.FromName("River Crocolisk"));
@@ -163,7 +170,22 @@ namespace BrimstoneTests
 			game16.Player1.Give(Cards.FromName("Dr. Boom"));
 			game17.Player1.Give(Cards.FromName("Dr. Boom"));
 
-			Assert.True(game17.PowerHistory.EquivalentTo(game16.PowerHistory, PreciseTagOrder: true));
+			Assert.True(game17.PowerHistory.EquivalentTo(game16.PowerHistory, Pure: true));
+
+			// Hand order should be ignored
+			var game18 = game1.CloneState() as Game;
+			var game19 = game1.CloneState() as Game;
+
+			game18.Player1.Give(Cards.FromName("Wisp"));
+			game18.Player1.Give(Cards.FromName("Murloc Tinyfin"));
+
+			game19.Player1.Give(Cards.FromName("Murloc Tinyfin"));
+			game19.Player1.Give(Cards.FromName("Wisp"));
+
+			Assert.True(game18.PowerHistory.EquivalentTo(game19.PowerHistory));
+
+			// But the games are different if hand order is not ignored
+			Assert.False(game18.PowerHistory.EquivalentTo(game19.PowerHistory, IgnoreHandOrder: false));
 		}
 	}
 }

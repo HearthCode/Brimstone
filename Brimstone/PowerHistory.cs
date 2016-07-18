@@ -165,6 +165,18 @@ namespace Brimstone
 		}
 	}
 
+	public class CompareEntityAndTagName : IEqualityComparer<TagChange>
+	{
+		public bool Equals(TagChange x, TagChange y) {
+			return x.EntityId == y.EntityId && x.Tag.Name == y.Tag.Name;
+		}
+
+		public int GetHashCode(TagChange obj) {
+			int hash = 17 * 31 + obj.EntityId;
+			return hash * 31 + (int)obj.Tag.Name;
+		}
+	}
+
 	public class PowerHistory : IEnumerable<PowerAction>
 	{
 		public Game Game { get; private set; }
@@ -229,8 +241,8 @@ namespace Brimstone
 
 		// Crunch changes to get only latest changed tags for each changed entity
 		public HashSet<TagChange> CrunchedDelta(List<PowerAction> delta) {
-			var collapsedDelta = new HashSet<TagChange>();
-			foreach (var entry in delta) {
+			var collapsedDelta = new HashSet<TagChange>(new CompareEntityAndTagName());
+			foreach (var entry in delta.Reverse<PowerAction>()) {
 				// TODO: All the other PowerAction types
 				if (entry is CreateEntity) {
 					foreach (var tag in ((CreateEntity)entry).Tags)
@@ -244,7 +256,7 @@ namespace Brimstone
 		}
 
 		// Compare two PowerHistory logs to see if they are functionally equivalent
-		public bool EquivalentTo(PowerHistory History, bool PreciseTagOrder = false) {
+		public bool EquivalentTo(PowerHistory History, bool Pure = false, bool IgnoreHandOrder = true, bool IgnoreEntityIds = true) {
 			if (ReferenceEquals(History, null))
 				return false;
 
@@ -285,7 +297,7 @@ namespace Brimstone
 			// TODO: Tag exclusion filters
 
 			// Pure equality
-			if (PreciseTagOrder) {
+			if (Pure) {
 				foreach (var pair in deltaA.Zip(deltaB, (x, y) => new { A = x, B = y }))
 					// Cannot use == operator because it is not overridden in base PowerAction
 					// and will do reference equality only. Use IEquatable<T> instead.
