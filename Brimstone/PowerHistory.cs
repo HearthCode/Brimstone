@@ -11,6 +11,10 @@ namespace Brimstone
 	{
 		public int EntityId { get; set; }
 
+		public PowerAction(int eId) {
+			EntityId = eId;
+		}
+
 		public PowerAction(IEntity e) {
 			EntityId = e.Id;
 		}
@@ -24,13 +28,29 @@ namespace Brimstone
 	{
 		public Tag Tag { get; }
 
+		public TagChange(int entityId, Tag t) : base(entityId) {
+			Tag = t;
+		}
+
 		public TagChange(IEntity e, Tag t) : base(e) {
 			if (t.Filtered(e) != null) {
-				EntityId = e.Id;
 				Tag = t;
 			}
 			else
 				EntityId = 0;
+		}
+
+		public TagChange(IEntity e, GameTag name, int value) : base(e) {
+			var t = new Tag(name, value);
+			if (t.Filtered(e) != null) {
+				Tag = t;
+			}
+			else
+				EntityId = 0;
+		}
+
+		public TagChange(int entityId, GameTag name, int value) : base(entityId) {
+			Tag = new Tag(name, value);
 		}
 
 		public override string ToString() {
@@ -161,7 +181,7 @@ namespace Brimstone
 				ParentBranchEntry = SequenceNumber;
 			} else {
 				SequenceNumber = 0;
-				ParentBranchEntry = -1;
+				ParentBranchEntry = 0;
 			}
 		}
 		public void Detach() {
@@ -183,37 +203,57 @@ namespace Brimstone
 				OnPowerAction(this, new PowerActionEventArgs(Game, a));
 		}
 
+		public List<PowerAction> DeltaTo(int childBranchPoint) {
+			return Delta.Take(childBranchPoint - ParentBranchEntry).ToList();
+		}
+
+		// Return the PowerHistory delta from the point where the specified game was created
 		public List<PowerAction> DeltaSince(Game game) {
 			if (ReferenceEquals(game, null))
 				return null;
 
+			if (ReferenceEquals(game, Game))
+				return Delta;
+
 			var delta = new List<PowerAction>();
 
-			if (ReferenceEquals(game, Game))
-				return delta;
-
 			bool found = false;
-			for (Game g = Game; g != null; g = g.Parent) {
-				if (g == game) {
-					found = true;
-					break;
-				}
-				delta = g.PowerHistory.Delta.Concat(delta).ToList();
+			int branchPoint = SequenceNumber;
+			for (Game g = Game; g != null && !found; g = g.Parent) {
+				delta = g.PowerHistory.DeltaTo(branchPoint).Concat(delta).ToList();
+				branchPoint = g.PowerHistory.ParentBranchEntry;
+				found = g == game;
 			}
 			return found ? delta : null;
 		}
 
+		// Crunch changes to get only latest changed tags for each changed entity
+		public HashSet<TagChange> CrunchedDelta(List<PowerAction> delta) {
+			var collapsedDelta = new HashSet<TagChange>();
+			foreach (var entry in delta) {
+				// TODO: All the other PowerAction types
+				if (entry is CreateEntity) {
+					foreach (var tag in ((CreateEntity)entry).Tags)
+						collapsedDelta.Add(new TagChange(entry.EntityId, tag.Key, tag.Value));
+				}
+				else if (entry is TagChange) {
+					collapsedDelta.Add((TagChange)entry);
+				}
+			}
+			return collapsedDelta;
+		}
+
 		// Compare two PowerHistory logs to see if they are functionally equivalent
-		public bool EquivalentTo(PowerHistory p) {
-			if (ReferenceEquals(p, null))
+		public bool EquivalentTo(PowerHistory History, bool PreciseTagOrder = false) {
+			if (ReferenceEquals(History, null))
 				return false;
 
 			// Same log?
-			if (ReferenceEquals(this, p))
+			if (ReferenceEquals(this, History))
 				return true;
 
 			// Same game?
-			if (ReferenceEquals(Game, p.Game))
+			if (ReferenceEquals(Game, History.Game))
 				return true;
 
 			// Get all ancestors of each PowerHistory log
@@ -222,7 +262,7 @@ namespace Brimstone
 
 			for (Game g = Game; g != null; g = g.Parent)
 				ancestorsA.Push(g);
-			for (Game g = p.Game; g != null; g = g.Parent)
+			for (Game g = History.Game; g != null; g = g.Parent)
 				ancestorsB.Push(g);
 
 			// Search from root game to find lowest common ancestor of each game
@@ -236,24 +276,39 @@ namespace Brimstone
 
 			// Calculate deltas from LCA to leaf
 			var deltaA = DeltaSince(lca);
-			var deltaB = p.DeltaSince(lca);
+			var deltaB = History.DeltaSince(lca);
 
 			// Naive equivalence comparison
 			// TODO: Ignore zone positions for hand
 			// TODO: Ignore entity IDs if all other tags same
 			// TODO: Ignore board ordering if all other tags same
+			// TODO: Tag exclusion filters
 
 			// Pure equality
-			foreach (var pair in deltaA.Zip(deltaB, (x, y) => new { A = x, B = y }))
-				// Cannot use == operator because it is not overridden in base PowerAction
-				// and will do reference equality only. Use IEquatable<T> instead.
-				if (!pair.A.Equals(pair.B))
+			if (PreciseTagOrder) {
+				foreach (var pair in deltaA.Zip(deltaB, (x, y) => new { A = x, B = y }))
+					// Cannot use == operator because it is not overridden in base PowerAction
+					// and will do reference equality only. Use IEquatable<T> instead.
+					if (!pair.A.Equals(pair.B))
+						return false;
+				return true;
+			}
+
+			// Equality ignoring tag order
+			else {
+				// Crunch
+				var cDeltaA = CrunchedDelta(deltaA);
+				var cDeltaB = CrunchedDelta(deltaB);
+
+				// Number of changed entities must be same
+				if (cDeltaA.Count != cDeltaB.Count)
 					return false;
-			return true;
+				return cDeltaA.SetEquals(cDeltaB);
+			}
 		}
 
 		public IEnumerator<PowerAction> GetEnumerator() {
-			if (ParentBranchEntry == -1)
+			if (ParentBranchEntry == 0)
 				return Delta.GetEnumerator();
 
 			return Game.Parent.PowerHistory.Concat(Delta).GetEnumerator();
