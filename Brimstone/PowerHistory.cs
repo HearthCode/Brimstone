@@ -167,6 +167,7 @@ namespace Brimstone
 
 	public class CompareEntityAndTagName : IEqualityComparer<TagChange>
 	{
+		// Used when adding to and fetching from HashSet, and testing for equality
 		public bool Equals(TagChange x, TagChange y) {
 			return x.EntityId == y.EntityId && x.Tag.Name == y.Tag.Name;
 		}
@@ -252,7 +253,8 @@ namespace Brimstone
 					collapsedDelta.Add((TagChange)entry);
 				}
 			}
-			return collapsedDelta;
+			// Use the default equality comparer for the retuend HashSet
+			return new HashSet<TagChange>(collapsedDelta);
 		}
 
 		// Compare two PowerHistory logs to see if they are functionally equivalent
@@ -311,6 +313,15 @@ namespace Brimstone
 				// Crunch
 				var cDeltaA = CrunchedDelta(deltaA);
 				var cDeltaB = CrunchedDelta(deltaB);
+
+				// Remove ZONE_POSITION from entities in hand if we don't care about them
+				if (IgnoreHandOrder) {
+					IEnumerable<int> entitiesInHand;
+					entitiesInHand = cDeltaA.Where(x => x.Tag.Name == GameTag.ZONE && x.Tag.Value == (int)Zone.HAND).Select(x => x.EntityId);
+					cDeltaA.RemoveWhere(x => x.Tag.Name == GameTag.ZONE_POSITION && entitiesInHand.Contains(x.EntityId));
+					entitiesInHand = cDeltaB.Where(x => x.Tag.Name == GameTag.ZONE && x.Tag.Value == (int)Zone.HAND).Select(x => x.EntityId);
+					cDeltaB.RemoveWhere(x => x.Tag.Name == GameTag.ZONE_POSITION && entitiesInHand.Contains(x.EntityId));
+				}
 
 				// Number of changed entities must be same
 				if (cDeltaA.Count != cDeltaB.Count)

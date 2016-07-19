@@ -176,11 +176,24 @@ namespace BrimstoneTests
 			var game18 = game1.CloneState() as Game;
 			var game19 = game1.CloneState() as Game;
 
-			game18.Player1.Give(Cards.FromName("Wisp"));
-			game18.Player1.Give(Cards.FromName("Murloc Tinyfin"));
+			// NOTE: This doesn't ignore the entity IDs, so if we care about that, we must disable it separately
+			// Here we ensure that the entities have the same IDs even though they are placed in hand in a different order
+			var wisp18 = new Minion(game18, game18.Player1, Cards.FromName("Wisp"));
+			var fin18 = new Minion(game18, game18.Player1, Cards.FromName("Murloc Tinyfin"));
+			var wisp19 = new Minion(game19, game19.Player1, Cards.FromName("Wisp"));
+			var fin19 = new Minion(game19, game19.Player1, Cards.FromName("Murloc Tinyfin"));
 
-			game19.Player1.Give(Cards.FromName("Murloc Tinyfin"));
-			game19.Player1.Give(Cards.FromName("Wisp"));
+			game18.Player1.Hand.MoveTo(wisp18);
+			game18.Player1.Hand.MoveTo(fin18);
+
+			game19.Player1.Hand.MoveTo(fin19);
+			game19.Player1.Hand.MoveTo(wisp19);
+
+			Assert.AreEqual(2, wisp18[GameTag.ZONE_POSITION]);
+			Assert.AreEqual(3, fin18[GameTag.ZONE_POSITION]);
+
+			Assert.AreEqual(3, wisp19[GameTag.ZONE_POSITION]);
+			Assert.AreEqual(2, fin19[GameTag.ZONE_POSITION]);
 
 			Assert.True(game18.PowerHistory.EquivalentTo(game19.PowerHistory));
 
