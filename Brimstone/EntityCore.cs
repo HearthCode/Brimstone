@@ -15,6 +15,7 @@ namespace Brimstone
 		Dictionary<GameTag, int> CopyTags();
 		int this[GameTag t] { get; set; }
 		string ShortDescription { get; }
+		int FuzzyHash { get; }
 
 		IEntity CloneState();
 	}
@@ -203,6 +204,30 @@ namespace Brimstone
 		public string ShortDescription {
 			get {
 				return Card.Name + " [" + Id + "]";
+			}
+		}
+
+		// Get a NON-UNIQUE hash code for the entity (without copying the tags for speed)
+		// This is used for testing fuzzy entity equality across games
+		// The ENTITY_ID is left out, and the ZONE_POSITION is left out if the entity is in the player's hand
+		// All underlying card tags are included to differentiate cards from each other. CONTROLLER is included
+		public int FuzzyHash {
+			// TODO: Caching
+			get {
+				bool inHand = _entity.Tags.ContainsKey(GameTag.ZONE) && _entity.Tags[GameTag.ZONE] == (int)Zone.HAND;
+				int hash = 17;
+				foreach (var kv in _entity.Card.Tags) {
+					hash = hash * 31 + (int)kv.Key;
+					hash = hash * 31 + kv.Value;
+				}
+				foreach (var kv in _entity.Tags)
+					if (kv.Key != GameTag.ZONE_POSITION || !inHand) {
+						hash = hash * 31 + (int)kv.Key;
+						hash = hash * 31 + kv.Value;
+					}
+				hash = hash * 31 + (int)GameTag.CONTROLLER;
+				hash = hash * 31 + Controller.Id;
+				return hash;
 			}
 		}
 
