@@ -288,12 +288,14 @@ namespace Brimstone
 					lca = pair.A;
 				}
 
+			// TODO: Delta caching
+
 			// Calculate deltas from LCA to leaf
 			var deltaA = DeltaSince(lca);
 			var deltaB = History.DeltaSince(lca);
 
-			// Naive equivalence comparison
-			// TODO: Ignore zone positions for hand
+			// TODO: Naive equivalence comparison
+			// TODO: Local equivalence if we know in advance both games have the same ancestor
 			// TODO: Ignore entity IDs if all other tags same
 			// TODO: Ignore board ordering if all other tags same
 			// TODO: Tag exclusion filters

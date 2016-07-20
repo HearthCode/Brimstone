@@ -240,6 +240,18 @@ namespace Brimstone
 		}
 	}
 
+	public class FuzzyEntityComparer : IEqualityComparer<IEntity>
+	{
+		// Used when adding to and fetching from HashSet, and testing for equality
+		public bool Equals(IEntity x, IEntity y) {
+			return x.FuzzyHash == y.FuzzyHash;
+		}
+
+		public int GetHashCode(IEntity obj) {
+			return obj.FuzzyHash;
+		}
+	}
+
 	public class EntityController : IEnumerable<IEntity>, ICloneable {
 		public Game Game { get; }
 		public int NextEntityId = 1;

@@ -82,6 +82,142 @@ namespace BrimstoneTests
 		}
 
 		[Test]
+		public void TestFuzzyGameEquivalence() {
+			// Arrange
+			const int MaxMinions = 7;
+
+			var game = new Game(HeroClass.Druid, HeroClass.Warrior, PowerHistory: true);
+			game.Player1.Deck.Fill();
+			game.Player2.Deck.Fill();
+			game.Start();
+
+			// We create a scenario with 7 Totem Golems on one side of the board
+			// and a single Boom Bot on the other side
+
+			// Totem Golem IDs: firstId - firstId+6 inclusive
+			// Boom Bot ID: firstId+7
+			int firstId = -1;
+			for (int i = 0; i < MaxMinions; i++) {
+				int id = game.CurrentPlayer.Give(Cards.FromName("Totem Golem")).Play().Id;
+				if (i == 0)
+					firstId = id;
+			}
+			game.BeginTurn();
+			var boomBot = game.CurrentPlayer.Give(Cards.FromName("Boom Bot")).Play() as Minion;
+
+			// Act
+
+			// First, kill a couple of Totem Golems directly and compare for equivalence
+			var game1 = game.CloneState() as Game;
+			var game2 = game.CloneState() as Game;
+			var game3 = game.CloneState() as Game;
+
+			Assert.IsTrue(game1.EquivalentTo(game2));
+
+			// Kill first golem in first game, second golem in second game
+			((Minion)game2.Entities[firstId]).Hit(4);
+			((Minion)game3.Entities[firstId + 1]).Hit(4);
+
+			// Assert
+
+			// Make sure golems are dead
+			Assert.AreEqual((int)Zone.GRAVEYARD, game2.Entities[firstId][GameTag.ZONE]);
+			Assert.AreEqual((int)Zone.GRAVEYARD, game3.Entities[firstId + 1][GameTag.ZONE]);
+
+			// Compare games
+			Assert.IsTrue(game2.EquivalentTo(game3));
+
+			// Act
+
+			// This time, do a point of damage to two different golems
+			// Game state should not be equivalent
+			var game4 = game.CloneState() as Game;
+			var game5 = game.CloneState() as Game;
+
+			((Minion)game4.Entities[firstId]).Hit(1);
+			((Minion)game5.Entities[firstId+1]).Hit(1);
+
+			// Assert
+
+			Assert.IsFalse(game4.EquivalentTo(game5));
+			Assert.IsFalse(game4.PowerHistory.EquivalentTo(game5.PowerHistory));
+
+			// Now damage the undamaged ones and this should make the game state equivalent again
+			((Minion)game4.Entities[firstId+1]).Hit(1);
+			((Minion)game5.Entities[firstId]).Hit(1);
+
+			Assert.IsTrue(game4.EquivalentTo(game5));
+			Assert.IsTrue(game4.PowerHistory.EquivalentTo(game5.PowerHistory));
+			Assert.IsFalse(game4.PowerHistory.EquivalentTo(game5.PowerHistory, Pure: true));
+
+			// Act
+
+			// Swap hand positions of a couple of cards
+			var wisp1 = game4.Player1.Give(Cards.FromName("Wisp"));
+			var raptor1 = game4.Player1.Give(Cards.FromName("Bloodfen Raptor"));
+			var wisp2 = game5.Player1.Give(Cards.FromName("Wisp"));
+			var raptor2 = game5.Player1.Give(Cards.FromName("Bloodfen Raptor"));
+			var wisp2Pos = wisp2[GameTag.ZONE_POSITION];
+			wisp2[GameTag.ZONE_POSITION] = raptor2[GameTag.ZONE_POSITION];
+			raptor2[GameTag.ZONE_POSITION] = wisp2Pos;
+
+			// Assert
+
+			// Hand position should be ignored in fuzzy comparison
+			Assert.IsTrue(game4.EquivalentTo(game5));
+			Assert.IsTrue(game4.PowerHistory.EquivalentTo(game5.PowerHistory, IgnoreHandOrder: true));
+			Assert.IsFalse(game4.PowerHistory.EquivalentTo(game5.PowerHistory, IgnoreHandOrder: false));
+
+			// Arrange
+
+			// Make Boom Bot death clone for every possible combination of minion choice and damage amount
+			var clones = new List<Game>();
+
+			game.ActionQueue.OnActionStarting += (o, e) => {
+				ActionQueue queue = o as ActionQueue;
+				if (e.Action is RandomChoice) {
+					foreach (var entity in e.Args[RandomChoice.ENTITIES]) {
+						Game cloned = (Game)e.Game.CloneState();
+						cloned.ActionQueue.InsertPaused(e.Source, new LazyEntity { EntityId = entity.Id });
+						cloned.ActionQueue.ProcessAll();
+						if (!cloned.EquivalentTo(e.Game))
+							clones.Add(cloned);
+						e.Cancel = true;
+					}
+				}
+				if (e.Action is RandomAmount) {
+					for (int i = e.Args[RandomAmount.MIN]; i <= e.Args[RandomAmount.MAX]; i++) {
+						Game cloned = (Game)e.Game.CloneState();
+						cloned.ActionQueue.InsertPaused(e.Source, new FixedNumber { Num = i });
+						cloned.ActionQueue.ProcessAll();
+						if (!cloned.EquivalentTo(e.Game))
+							clones.Add(cloned);
+						e.Cancel = true;
+					}
+				}
+			};
+
+			// Act
+
+			// Kill the Boom Bot and generate all possible outcomes
+			boomBot.Hit(1);
+
+			// Assert
+
+			// There are 8 * 4 = 32 ways the Boom Bot could trigger
+			// TODO: At the moment Boom Bot will not target face, so 28 combinations only
+			Assert.AreEqual(28, clones.Count);
+
+			// 7 of these states kill a minion outright, leaving 6 Totem Golems on the board
+			// The entity IDs / zone positions may not match, but the game state is essentially the same
+			// Therefore there are (7 * 3) + 1 + 4 = 26 or (8 * 4) - 7 + 1 = 26 unique game states
+			// TODO: At the moment Boom Bot will not target face, so 22 combinations only
+
+			HashSet<Game> fuzzyUniqueGames = new HashSet<Game>(clones, new FuzzyGameComparer());
+			Assert.AreEqual(22, fuzzyUniqueGames.Count);
+		}
+
+		[Test]
 		public void TestPowerHistoryEquivalence() {
 			// Arrange
 
