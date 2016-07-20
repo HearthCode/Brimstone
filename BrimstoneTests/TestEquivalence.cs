@@ -215,6 +215,62 @@ namespace BrimstoneTests
 
 			HashSet<Game> fuzzyUniqueGames = new HashSet<Game>(clones, new FuzzyGameComparer());
 			Assert.AreEqual(22, fuzzyUniqueGames.Count);
+
+			// Arrange
+
+			// Do the same thing again but with Bloodfen Raptors
+			game = new Game(HeroClass.Druid, HeroClass.Warrior, PowerHistory: true);
+			game.Player1.Deck.Fill();
+			game.Player2.Deck.Fill();
+			game.Start();
+
+			firstId = -1;
+			for (int i = 0; i < MaxMinions; i++) {
+				int id = game.CurrentPlayer.Give(Cards.FromName("Bloodfen Raptor")).Play().Id;
+				if (i == 0)
+					firstId = id;
+			}
+			game.BeginTurn();
+			boomBot = game.CurrentPlayer.Give(Cards.FromName("Boom Bot")).Play() as Minion;
+			clones.Clear();
+
+			game.ActionQueue.OnActionStarting += (o, e) => {
+				ActionQueue queue = o as ActionQueue;
+				if (e.Action is RandomChoice) {
+					foreach (var entity in e.Args[RandomChoice.ENTITIES]) {
+						Game cloned = (Game)e.Game.CloneState();
+						cloned.ActionQueue.InsertPaused(e.Source, new LazyEntity { EntityId = entity.Id });
+						cloned.ActionQueue.ProcessAll();
+						if (!cloned.EquivalentTo(e.Game))
+							clones.Add(cloned);
+						e.Cancel = true;
+					}
+				}
+				if (e.Action is RandomAmount) {
+					for (int i = e.Args[RandomAmount.MIN]; i <= e.Args[RandomAmount.MAX]; i++) {
+						Game cloned = (Game)e.Game.CloneState();
+						cloned.ActionQueue.InsertPaused(e.Source, new FixedNumber { Num = i });
+						cloned.ActionQueue.ProcessAll();
+						if (!cloned.EquivalentTo(e.Game))
+							clones.Add(cloned);
+						e.Cancel = true;
+					}
+				}
+			};
+
+			// Act
+
+			// Kill the Boom Bot and generate all possible outcomes
+			boomBot.Hit(1);
+
+			// Assert
+
+			// 2 damage is enough to kill a Bloodfen Raptor, so 2, 3 or 4 damage to a given minion
+			// has the same outcome. 8 possible fuzzy unique outcomes.
+
+			Assert.AreEqual(28, clones.Count);
+			fuzzyUniqueGames = new HashSet<Game>(clones, new FuzzyGameComparer());
+			Assert.AreEqual(8, fuzzyUniqueGames.Count);
 		}
 
 		[Test]
