@@ -49,11 +49,9 @@ namespace Brimstone
 
 		public CardDefs() {
 			// Get XML definitions from assembly embedded resource
-			XDocument def;
 			var assembly = Assembly.GetExecutingAssembly();
-			var resourceName = "Brimstone.Data.CardDefs.xml";
-			using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-				def = XDocument.Load(stream);
+			var def = XDocument.Load(assembly.GetManifestResourceStream("Brimstone.Data.CardDefs.xml"));
+			var dbfDef = XDocument.Load(assembly.GetManifestResourceStream("Brimstone.Data.CARD.xml"));
 
 			// Parse XML
 			var cards = (from r in def.Descendants("Entity")
@@ -82,11 +80,24 @@ namespace Brimstone
 											select ent.Attribute("cardID").Value).ToList()
 						}).ToList();
 
+			var dbfCards = (from r in dbfDef.Descendants("Record")
+							select new {
+								AssetId = (from field in r.Descendants("Field") where field.Attribute("column").Value == "ID" select int.Parse(field.Value)).FirstOrDefault(),
+								CardId = (from field in r.Descendants("Field") where field.Attribute("column").Value == "NOTE_MINI_GUID" select field.Value).FirstOrDefault(),
+								Guid = (from field in r.Descendants("Field") where field.Attribute("column").Value == "LONG_GUID" select field.Value).FirstOrDefault()
+							}).ToDictionary(x => x.CardId, x => x);
+
 			// Build card database
 			Cards = new Dictionary<string, Card>();
 
 			foreach (var card in cards) {
+				// Skip PlaceholderCard etc.
+				if (!dbfCards.ContainsKey(card.Id))
+					continue;
+
 				var c = new Card() {
+					AssetId = dbfCards[card.Id].AssetId,
+					Guid = Guid.Parse(dbfCards[card.Id].Guid),
 					Id = card.Id,
 					Tags = new Dictionary<GameTag, int>(),
 					Requirements = card.Requirements
@@ -119,6 +130,8 @@ namespace Brimstone
 
 			// Add in placeholder cards
 			Cards.Add("Game", new Card {
+				AssetId = -1,
+				Guid = new Guid("00000000-0000-0000-0000-000000000001"),
 				Id = "Game",
 				Name = "Game",
 				Tags = new Dictionary<GameTag, int> { { GameTag.CARDTYPE, (int)CardType.GAME } },
@@ -126,6 +139,8 @@ namespace Brimstone
 				Behaviour = null
 			});
 			Cards.Add("Player", new Card {
+				AssetId = -2,
+				Guid = new Guid("00000000-0000-0000-0000-000000000002"),
 				Id = "Player",
 				Name = "Player",
 				Tags = new Dictionary<GameTag, int> { { GameTag.CARDTYPE, (int)CardType.PLAYER } },

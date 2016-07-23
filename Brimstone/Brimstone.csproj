@@ -87,7 +87,9 @@
     </None>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
+    <EmbeddedResource Include="Data\CARD.xml" />
     <EmbeddedResource Include="Data\CardDefs.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

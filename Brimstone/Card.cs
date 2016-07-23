@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Brimstone
 {
 	public class Card
 	{
+		public int AssetId { get; set; }
+		public Guid Guid { get; set; }
 		public string Id { get; set; }
 		public string Name { get; set; }
 		public Dictionary<GameTag, int> Tags { get; set; }
