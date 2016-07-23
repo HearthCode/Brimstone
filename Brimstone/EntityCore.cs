@@ -216,10 +216,8 @@ namespace Brimstone
 			get {
 				bool inHand = _entity.Tags.ContainsKey(GameTag.ZONE) && _entity.Tags[GameTag.ZONE] == (int)Zone.HAND;
 				int hash = 17;
-				foreach (var kv in _entity.Card.Tags) {
-					hash = hash * 31 + (int)kv.Key;
-					hash = hash * 31 + kv.Value;
-				}
+				// The card's asset ID uniquely identifies the set of immutable starting tags for the card
+				hash = hash * 31 + _entity.Card.AssetId;
 				foreach (var kv in _entity.Tags)
 					if (kv.Key != GameTag.ZONE_POSITION || !inHand) {
 						hash = hash * 31 + (int)kv.Key;
