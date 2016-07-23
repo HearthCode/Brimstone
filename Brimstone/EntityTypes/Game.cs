@@ -3,6 +3,19 @@ using System.Collections.Generic;
 
 namespace Brimstone
 {
+	public class FuzzyGameComparer : IEqualityComparer<Game>
+	{
+		// Used when adding to and fetching from HashSet, and testing for equality
+		public bool Equals(Game x, Game y) {
+			return x.FuzzyGameHash == y.FuzzyGameHash;
+		}
+
+		public int GetHashCode(Game obj) {
+			return obj.FuzzyGameHash;
+		}
+	}
+
+	// TODO: Abstract this so that Game is just another Entity (GameEntity) and make a new Game class that manages a game
 	public partial class Game : Entity, IZones
 	{
 		public EntityController Entities;
@@ -26,6 +39,10 @@ namespace Brimstone
 
 		// Required by IEntity
 		public Game(Game cloneFrom) : base(cloneFrom) {
+			_gameHash = cloneFrom._gameHash;
+			_undoHash = cloneFrom._undoHash;
+			_changedHashes = new HashSet<int>(cloneFrom._changedHashes);
+
 			// Generate zones owned by game
 			Zones[Zone.SETASIDE] = new ZoneEntities(this, this, Zone.SETASIDE);
 			Zones[Zone.PLAY] = new ZoneEntities(this, this, Zone.PLAY);
@@ -51,6 +68,9 @@ namespace Brimstone
 			ActionQueue = new ActionQueue(this);
 			Entities = new EntityController(this);
 			ActiveTriggers = new TriggerManager(this);
+
+			// Fuzzy hashing
+			_changedHashes = new HashSet<int>();
 
 			// Generate game
 			Controller = this;
@@ -125,6 +145,37 @@ namespace Brimstone
 			ActionQueue.Enqueue(this, CardBehaviour.BeginTurn);
 		}
 
+		// Calculate a fuzzy hash for the whole game state
+		// WARNING: The hash algorithm MUST be designed in such a way that the order
+		// in which the entities are hashed doesn't matter
+		private int _gameHash = 0;
+		private int _undoHash = 0;
+		private HashSet<int> _changedHashes;
+
+		public void EntityChanging(int id, int previousHash) {
+			// Only undo hash once if multiple changes occur since we last re-calculated
+			if (!_changedHashes.Contains(id)) {
+				_undoHash ^= previousHash;
+				_changedHashes.Add(id);
+			}
+		}
+
+		public int FuzzyGameHash {
+			get {
+				_gameHash ^= _undoHash;
+				foreach (var eId in _changedHashes)
+					_gameHash ^= Entities[eId].FuzzyHash;
+				_changedHashes.Clear();
+				_undoHash = 0;
+				return _gameHash;
+			}
+		}
+
+		// Perform a fuzzy equivalence between two game states
+		public bool EquivalentTo(Game game) {
+			return FuzzyGameHash == game.FuzzyGameHash;
+		}
+
 		public override IEntity CloneState() {
 			var entities = ((EntityController)Entities.Clone());
 			Game game = entities.FindGame();
@@ -144,7 +195,7 @@ namespace Brimstone
 			// Clone triggers
 			game.ActiveTriggers = ((TriggerManager)ActiveTriggers.Clone());
 			game.ActiveTriggers.Game = game;
-			// TODO: Link PowerHistory
+			// Link PowerHistory
 			game.PowerHistory.Attach(game, this);
 			return game;
 		}

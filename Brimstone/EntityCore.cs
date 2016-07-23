@@ -20,11 +20,6 @@ namespace Brimstone
 		IEntity CloneState();
 	}
 
-	public interface ICopyOnWrite
-	{
-		void CopyOnWrite();
-	}
-
 	public interface IPlayable : IEntity
 	{
 		IPlayable Play();
@@ -88,7 +83,7 @@ namespace Brimstone
 		public int Count { get; set; }
 	}
 
-	public partial class Entity : IEntity, ICopyOnWrite
+	public partial class Entity : IEntity
 	{
 		private BaseEntityData _entity;
 		private ReferenceCount _referenceCount;
@@ -100,6 +95,7 @@ namespace Brimstone
 		public IEntity Controller { get; set; }
 
 		public Entity(Entity cloneFrom) {
+			_fuzzyHash = cloneFrom._fuzzyHash;
 			_entity = cloneFrom._entity;
 			_referenceCount = cloneFrom._referenceCount;
 			_referenceCount.Count++;
@@ -111,8 +107,10 @@ namespace Brimstone
 			_entity = new BaseEntityData(game, card, tags);
 			_referenceCount = new ReferenceCount();
 			Controller = controller;
-			if (game != null)
+			if (game != null) {
 				game.Entities.Add(this);
+				game.EntityChanging(_entity.Id, 0);
+			}
 		}
 
 		public int this[GameTag t] {
@@ -131,10 +129,10 @@ namespace Brimstone
 					Controller = Game.Entities[(int)value];
 				}
 				else if (t == GameTag.ENTITY_ID) {
-					CopyOnWrite();
+					Changing();
 					_entity.Id = (int)value;
 				} else {
-					CopyOnWrite();
+					Changing();
 					_entity[t] = value;
 				}
 				if (Game != null)
@@ -154,7 +152,6 @@ namespace Brimstone
 			}
 
 			set {
-				CopyOnWrite();
 				_entity.Id = value;
 			}
 		}
@@ -169,7 +166,14 @@ namespace Brimstone
 			return Clone() as IEntity;
 		}
 
-		public void CopyOnWrite() {
+		private void Changing() {
+			// TODO: Replace with a C# event
+			Game.EntityChanging(Id, _fuzzyHash);
+			_fuzzyHash = 0;
+			CopyOnWrite();
+		}
+
+		private void CopyOnWrite() {
 			if (_referenceCount.Count > 1) {
 				_entity = (BaseEntityData)_entity.Clone();
 				_referenceCount.Count--;
@@ -211,9 +215,12 @@ namespace Brimstone
 		// This is used for testing fuzzy entity equality across games
 		// The ENTITY_ID is left out, and the ZONE_POSITION is left out if the entity is in the player's hand
 		// All underlying card tags are included to differentiate cards from each other. CONTROLLER is included
+		private int _fuzzyHash = 0;
 		public int FuzzyHash {
 			// TODO: Caching
 			get {
+				if (_fuzzyHash != 0)
+					return _fuzzyHash;
 				bool inHand = _entity.Tags.ContainsKey(GameTag.ZONE) && _entity.Tags[GameTag.ZONE] == (int)Zone.HAND;
 				int hash = 17;
 				// The card's asset ID uniquely identifies the set of immutable starting tags for the card
@@ -225,7 +232,8 @@ namespace Brimstone
 					}
 				hash = hash * 31 + (int)GameTag.CONTROLLER;
 				hash = hash * 31 + Controller.Id;
-				return hash;
+				_fuzzyHash = hash;
+				return _fuzzyHash;
 			}
 		}
 
