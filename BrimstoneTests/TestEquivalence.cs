@@ -171,7 +171,7 @@ namespace BrimstoneTests
 			// Arrange
 
 			// Make Boom Bot death clone for every possible combination of minion choice and damage amount
-			var clones = new List<Game>();
+			var clones = new Queue<Game>();
 
 			game.ActionQueue.OnActionStarting += (o, e) => {
 				ActionQueue queue = o as ActionQueue;
@@ -181,7 +181,7 @@ namespace BrimstoneTests
 						cloned.ActionQueue.InsertPaused(e.Source, new LazyEntity { EntityId = entity.Id });
 						cloned.ActionQueue.ProcessAll();
 						if (!cloned.EquivalentTo(e.Game))
-							clones.Add(cloned);
+							clones.Enqueue(cloned);
 						e.Cancel = true;
 					}
 				}
@@ -191,7 +191,7 @@ namespace BrimstoneTests
 						cloned.ActionQueue.InsertPaused(e.Source, new FixedNumber { Num = i });
 						cloned.ActionQueue.ProcessAll();
 						if (!cloned.EquivalentTo(e.Game))
-							clones.Add(cloned);
+							clones.Enqueue(cloned);
 						e.Cancel = true;
 					}
 				}
@@ -242,7 +242,7 @@ namespace BrimstoneTests
 						cloned.ActionQueue.InsertPaused(e.Source, new LazyEntity { EntityId = entity.Id });
 						cloned.ActionQueue.ProcessAll();
 						if (!cloned.EquivalentTo(e.Game))
-							clones.Add(cloned);
+							clones.Enqueue(cloned);
 						e.Cancel = true;
 					}
 				}
@@ -252,7 +252,7 @@ namespace BrimstoneTests
 						cloned.ActionQueue.InsertPaused(e.Source, new FixedNumber { Num = i });
 						cloned.ActionQueue.ProcessAll();
 						if (!cloned.EquivalentTo(e.Game))
-							clones.Add(cloned);
+							clones.Enqueue(cloned);
 						e.Cancel = true;
 					}
 				}
