@@ -9,7 +9,9 @@ namespace Brimstone
 
 		public HeroClass HeroClass { get; }
 
-		public Deck(Game game, HeroClass hero, IZones controller) : base(game, controller, Zone.DECK) { }
+		public Deck(Game game, HeroClass hero, IZones controller) : base(game, controller, Zone.DECK) {
+			HeroClass = hero;
+		}
 
 		public void Add(Card card) {
 			Add(new List<Card> { card });
@@ -54,6 +56,7 @@ namespace Brimstone
 			var fillCards = new List<Card>(cardsToAdd);
 
 			while (fillCards.Count < cardsToAdd) {
+				// TODO: Change Cards.All to a Linq statement selecting only relevant cards
 				var chosenCard = RNG<Card>.Choose(Cards.All);
 				if (chosenCard.Collectible && chosenCard.Class == (CardClass)HeroClass && chosenCard.Type != CardType.HERO)
 					fillCards.Add(chosenCard);
