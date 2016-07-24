@@ -22,7 +22,7 @@ namespace BrimstoneTests
 
 			// Add items to zones
 			for (int i = 0; i < 5; i++)
-				items.Add(p1.Board.Add(game.Add(new Minion(p1, Cards.FromName("River Crocolisk")))));
+				items.Add(p1.Board.Add(new Minion(p1, Cards.FromName("River Crocolisk"))));
 
 			// Assert
 			Assert.IsFalse(p1.Board.IsEmpty);
@@ -66,13 +66,13 @@ namespace BrimstoneTests
 
 			// Add items to zones
 			for (int i = 0; i < 5; i++)
-				items.Add(p1.Board.Add(game.Add(new Minion(p1, Cards.FromName("River Crocolisk")))));
+				items.Add(p1.Board.Add(new Minion(p1, Cards.FromName("River Crocolisk"))));
 
 			// Add a new item at the middle, beginning and end and test
 			var posList = new List<int> { 2, 1, 8 };
 			foreach (var pos in posList) {
 				var oldCount = p1.Board.Count;
-				var inserted = p1.Board.Add(game.Add(new Minion(p1, Cards.FromName("Wisp"))), pos);
+				var inserted = p1.Board.Add(new Minion(p1, Cards.FromName("Wisp")), pos);
 				items.Insert(pos - 1, inserted);
 				// Assert
 				Assert.AreEqual(oldCount + 1, p1.Board.Count);
@@ -93,7 +93,7 @@ namespace BrimstoneTests
 
 			// Add items to zones
 			for (int i = 0; i < 5; i++)
-				items.Add(p1.Board.Add(game.Add(new Minion(p1, Cards.FromName("River Crocolisk")))));
+				items.Add(p1.Board.Add(new Minion(p1, Cards.FromName("River Crocolisk"))));
 
 			// Move an item from the middle, beginning and end and test
 			var posList = new List<int> { 3, 1, 3 };
@@ -124,7 +124,7 @@ namespace BrimstoneTests
 			// Act
 			// Add items to zones
 			for (int i = 0; i < 5; i++)
-				p1.Board.Add(game.Add(new Minion(p1, Cards.FromName("River Crocolisk"))));
+				p1.Board.Add(new Minion(p1, Cards.FromName("River Crocolisk")));
 
 			var item = p1.Board[1];
 
@@ -195,7 +195,7 @@ namespace BrimstoneTests
 				Cards.FromName("Murloc Tinyfin"),
 				Cards.FromName("Wisp"),
 			});
-			var chromaggus = game.Add(new Minion(p1, Cards.FromName("Chromaggus")));
+			var chromaggus = new Minion(p1, Cards.FromName("Chromaggus"));
 			p1.Deck.Add(chromaggus);
 
 			// Assert

@@ -91,6 +91,8 @@ namespace Brimstone
 				return _controller;
 			}
 			set {
+				if (_controller == value)
+					return;
 				if (Game != null)
 					if (Game.Entities != null)
 						Changing(false);

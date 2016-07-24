@@ -122,6 +122,10 @@ namespace Brimstone
 		}
 
 		public IEntity Add(IEntity Entity, int ZonePosition = -1) {
+			// Update ownership
+			if (Entity.Game == null)
+				Game.Add(Entity);
+
 			if (ZonePosition == -1)
 				if (Entity is Minion)
 					ZonePosition = Count + 1;
@@ -142,6 +146,7 @@ namespace Brimstone
 
 			if (ZonePosition != 0)
 				UpdateZonePositions();
+
 			return Entity;
 		}
 

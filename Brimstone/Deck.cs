@@ -29,12 +29,15 @@ namespace Brimstone
 				};
 
 				if (card[GameTag.CARDTYPE] == (int)CardType.MINION) {
-					e = Game.Add(new Minion((IEntity)Controller, card, tags));
+					e = new Minion((IEntity)Controller, card, tags);
 				}
 				else if (card[GameTag.CARDTYPE] == (int)CardType.SPELL) {
-					e = Game.Add(new Spell((IEntity)Controller, card, tags));
+					e = new Spell((IEntity)Controller, card, tags);
 				}
 				// TODO: Weapons
+				if (e != null)
+
+				Game.Add(e);
 			}
 			// Force deck zone contents to update
 			Init();
