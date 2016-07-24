@@ -15,12 +15,12 @@ namespace BrimstoneTests
 			var game2 = new Game(HeroClass.Druid, HeroClass.Warrior, PowerHistory: true);
 
 			// Act
-			var wisp1 = game1.Player1.Give(Cards.FromName("Wisp"));
+			var wisp1 = game1.Player1.Give("Wisp");
 
 			// Assert
 
 			// Different wisp, same entity ID, same controller, same game, same hand position
-			var wisp2 = game2.Player1.Give(Cards.FromName("Wisp"));
+			var wisp2 = game2.Player1.Give("Wisp");
 
 			Assert.AreEqual(wisp1.Id, wisp2.Id);
 			Assert.AreEqual(wisp1[GameTag.ZONE_POSITION], wisp2[GameTag.ZONE_POSITION]);
@@ -29,7 +29,7 @@ namespace BrimstoneTests
 			Assert.AreEqual(wisp1.FuzzyHash, wisp2.FuzzyHash);
 
 			// Different wisp, different entity ID, same controller, same/different game, different hand position
-			var wisp3 = game1.Player1.Give(Cards.FromName("Wisp"));
+			var wisp3 = game1.Player1.Give("Wisp");
 
 			Assert.AreNotEqual(wisp1.Id, wisp3.Id);
 			Assert.AreEqual(wisp1.Controller.Id, wisp3.Controller.Id);
@@ -52,7 +52,7 @@ namespace BrimstoneTests
 
 			// Clone a wisp, check their states are equal
 			// NOTE: Cloning an entity detaches it from game and controller by default
-			var wisp4 = game1.Player1.Give(Cards.FromName("Wisp"));
+			var wisp4 = game1.Player1.Give("Wisp");
 			var wisp5 = wisp4.CloneState();
 			wisp5.Game = game1;
 			wisp5.Controller = wisp4.Controller;
@@ -101,12 +101,12 @@ namespace BrimstoneTests
 			// Boom Bot ID: firstId+7
 			int firstId = -1;
 			for (int i = 0; i < MaxMinions; i++) {
-				int id = game.CurrentPlayer.Give(Cards.FromName("Totem Golem")).Play().Id;
+				int id = game.CurrentPlayer.Give("Totem Golem").Play().Id;
 				if (i == 0)
 					firstId = id;
 			}
 			game.BeginTurn();
-			var boomBot = game.CurrentPlayer.Give(Cards.FromName("Boom Bot")).Play() as Minion;
+			var boomBot = game.CurrentPlayer.Give("Boom Bot").Play() as Minion;
 
 			// Act
 
@@ -156,10 +156,10 @@ namespace BrimstoneTests
 			// Act
 
 			// Swap hand positions of a couple of cards
-			var wisp1 = game4.Player1.Give(Cards.FromName("Wisp"));
-			var raptor1 = game4.Player1.Give(Cards.FromName("Bloodfen Raptor"));
-			var wisp2 = game5.Player1.Give(Cards.FromName("Wisp"));
-			var raptor2 = game5.Player1.Give(Cards.FromName("Bloodfen Raptor"));
+			var wisp1 = game4.Player1.Give("Wisp");
+			var raptor1 = game4.Player1.Give("Bloodfen Raptor");
+			var wisp2 = game5.Player1.Give("Wisp");
+			var raptor2 = game5.Player1.Give("Bloodfen Raptor");
 			var wisp2Pos = wisp2[GameTag.ZONE_POSITION];
 			wisp2[GameTag.ZONE_POSITION] = raptor2[GameTag.ZONE_POSITION];
 			raptor2[GameTag.ZONE_POSITION] = wisp2Pos;
@@ -229,12 +229,12 @@ namespace BrimstoneTests
 
 			firstId = -1;
 			for (int i = 0; i < MaxMinions; i++) {
-				int id = game.CurrentPlayer.Give(Cards.FromName("Bloodfen Raptor")).Play().Id;
+				int id = game.CurrentPlayer.Give("Bloodfen Raptor").Play().Id;
 				if (i == 0)
 					firstId = id;
 			}
 			game.BeginTurn();
-			boomBot = game.CurrentPlayer.Give(Cards.FromName("Boom Bot")).Play() as Minion;
+			boomBot = game.CurrentPlayer.Give("Boom Bot").Play() as Minion;
 			clones.Clear();
 
 			game.ActionQueue.OnActionStarting += (o, e) => {
@@ -284,14 +284,14 @@ namespace BrimstoneTests
 
 			// Game1: Player1 <- Wisp
 			var game1 = new Game(HeroClass.Druid, HeroClass.Warrior, PowerHistory: true);
-			game1.Player1.Give(Cards.FromName("Wisp"));
+			game1.Player1.Give("Wisp");
 
 			// Game1 ==> Game2, Game3
 			var game2 = game1.CloneState() as Game;
 			var game3 = game1.CloneState() as Game;
 
 			// Game2: Player 2 <- Wisp
-			game2.Player2.Give(Cards.FromName("Wisp"));
+			game2.Player2.Give("Wisp");
 
 			// Game2 ==> Game4, Game5, Game6
 			var game4 = game2.CloneState() as Game;
@@ -299,7 +299,7 @@ namespace BrimstoneTests
 			var game6 = game2.CloneState() as Game;
 
 			// Game4: Player1 <- Deathwing
-			game4.Player1.Give(Cards.FromName("Deathwing"));
+			game4.Player1.Give("Deathwing");
 
 			// Game4 ==> Game7, Game8, Game9
 			var game7 = game4.CloneState() as Game;
@@ -307,13 +307,13 @@ namespace BrimstoneTests
 			var game9 = game4.CloneState() as Game;
 
 			// Game7: Player1 <- Boom Bot
-			game7.Player1.Give(Cards.FromName("Boom Bot"));
+			game7.Player1.Give("Boom Bot");
 
 			// Game8: Player1 <- Murloc Tinyfin
-			game8.Player1.Give(Cards.FromName("Murloc Tinyfin"));
+			game8.Player1.Give("Murloc Tinyfin");
 
 			// Game9: Player1 <- Knife Juggler
-			game9.Player1.Give(Cards.FromName("Knife Juggler"));
+			game9.Player1.Give("Knife Juggler");
 
 			// Game9 ==> Game10, Game11, Game12
 			var game10 = game9.CloneState() as Game;
@@ -324,7 +324,7 @@ namespace BrimstoneTests
 			var game13 = game4.CloneState() as Game;
 
 			// Game13: Player1 <- Murloc Tinyfin
-			game13.Player1.Give(Cards.FromName("Murloc Tinyfin"));
+			game13.Player1.Give("Murloc Tinyfin");
 
 			// Game13 ==> Game14, Game15
 			var game14 = game13.CloneState() as Game;
@@ -403,7 +403,7 @@ namespace BrimstoneTests
 
 			// Test the case where the LCA has been modified after branching
 			// (every entry after the branch should be ignored)
-			game13.Player1.Give(Cards.FromName("River Crocolisk"));
+			game13.Player1.Give("River Crocolisk");
 			game14.Step = Step.FINAL_GAMEOVER;
 			game15.Step = Step.FINAL_GAMEOVER;
 
@@ -413,11 +413,11 @@ namespace BrimstoneTests
 			Assert.AreEqual(1 + 3, game15.PowerHistory.DeltaSince(game13).Count);
 
 			// Change a base game and its branched game at the same time with different ordering
-			game9.Player1.Give(Cards.FromName("Bloodfen Raptor"));
+			game9.Player1.Give("Bloodfen Raptor");
 			game9.Step = Step.FINAL_GAMEOVER;
 
 			game12.Step = Step.FINAL_GAMEOVER;
-			game12.Player1.Give(Cards.FromName("Bloodfen Raptor"));
+			game12.Player1.Give("Bloodfen Raptor");
 
 			// Tag order should be ignored, Game9 and Game12 are equivalent
 			Assert.True(game9.PowerHistory.EquivalentTo(game12.PowerHistory, Pure: false));
@@ -426,17 +426,17 @@ namespace BrimstoneTests
 			Assert.False(game9.PowerHistory.EquivalentTo(game12.PowerHistory, Pure: true));
 
 			// Branch from a game at two different points and test for equivalence
-			game8.Player1.Give(Cards.FromName("River Crocolisk"));
+			game8.Player1.Give("River Crocolisk");
 
 			var game16 = game8.CloneState() as Game;
-			game16.Player1.Give(Cards.FromName("Wisp"));
+			game16.Player1.Give("Wisp");
 
-			game8.Player1.Give(Cards.FromName("Wisp"));
+			game8.Player1.Give("Wisp");
 
 			var game17 = game8.CloneState() as Game;
 
-			game16.Player1.Give(Cards.FromName("Dr. Boom"));
-			game17.Player1.Give(Cards.FromName("Dr. Boom"));
+			game16.Player1.Give("Dr. Boom");
+			game17.Player1.Give("Dr. Boom");
 
 			Assert.True(game17.PowerHistory.EquivalentTo(game16.PowerHistory, Pure: true));
 
@@ -446,10 +446,10 @@ namespace BrimstoneTests
 
 			// NOTE: This doesn't ignore the entity IDs, so if we care about that, we must disable it separately
 			// Here we ensure that the entities have the same IDs even though they are placed in hand in a different order
-			var wisp18 = new Minion(Cards.FromName("Wisp"));
-			var fin18 = new Minion(Cards.FromName("Murloc Tinyfin"));
-			var fin19 = new Minion(Cards.FromName("Murloc Tinyfin"));
-			var wisp19 = new Minion(Cards.FromName("Wisp"));
+			var wisp18 = new Minion("Wisp");
+			var fin18 = new Minion("Murloc Tinyfin");
+			var fin19 = new Minion("Murloc Tinyfin");
+			var wisp19 = new Minion("Wisp");
 
 			game18.Player1.Hand.MoveTo(fin18, 2);
 			game18.Player1.Hand.MoveTo(wisp18, 2);

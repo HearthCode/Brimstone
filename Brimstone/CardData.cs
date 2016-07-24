@@ -13,7 +13,9 @@ namespace Brimstone
 		private static CardDefs data = new CardDefs();
 		
 		public static Card FromId(string cardId) {
-			return data.Cards[cardId];
+			if (data.Cards.ContainsKey(cardId))
+				return data.Cards[cardId];
+			return null;
 		}
 
 		public static Card FromName(string cardName) {
@@ -26,10 +28,6 @@ namespace Brimstone
 
 		public static int Count {
 			get { return data.Cards.Count; }
-		}
-
-		public static Card TheCoin {
-			get { return data.Cards["GAME_005"]; }
 		}
 	}
 
@@ -44,7 +42,7 @@ namespace Brimstone
 		}
 
 		public Card ByName(string cardName) {
-			return Cards.First(x => x.Value.Name == cardName).Value;
+			return Cards.FirstOrDefault(x => x.Value.Name == cardName).Value;
 		}
 
 		public CardDefs() {

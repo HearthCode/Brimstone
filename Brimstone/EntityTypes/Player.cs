@@ -66,7 +66,7 @@ namespace Brimstone
 
 			// Give 2nd player the coin
 			if (Game.FirstPlayer != this)
-				Give(Cards.TheCoin);
+				Give("The Coin");
 		}
 
 		public List<IEntity> StartMulligan() {

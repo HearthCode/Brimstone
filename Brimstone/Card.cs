@@ -38,6 +38,10 @@ namespace Brimstone
 			get { return this[GameTag.RARITY] == (int)Rarity.LEGENDARY ? 1 : 2; }
 		}
 
+		public static implicit operator Card(string name) {
+			return Cards.FromName(name) ?? Cards.FromId(name);
+		}
+
 		public override string ToString() {
 			return "[CARD: " + Name + "]";
 		}

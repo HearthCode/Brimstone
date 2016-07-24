@@ -20,16 +20,16 @@ namespace Test1
 						var p2 = game.Player2;
 
 						p1.Deck.Add(new List<Card> {
-							Cards.FromName("Bloodfen Raptor"),
-							Cards.FromName("Wisp"),
+							"Bloodfen Raptor",
+							"Wisp",
 						});
-						p1.Deck.Add(Cards.FromName("Knife Juggler"));
+						p1.Deck.Add("Knife Juggler");
 						p1.Deck.Add(new List<Card> {
-							Cards.FromName("Murloc Tinyfin"),
-							Cards.FromName("Wisp"),
+							"Murloc Tinyfin",
+							"Wisp",
 						});
 
-						var chromaggus = new Minion(game, p1, Cards.FromName("Chromaggus"));
+						var chromaggus = new Minion(game, p1, "Chromaggus");
 						p1.Deck.Add(chromaggus);
 						/*
 						// TODO: Add helper functions for these
@@ -55,7 +55,7 @@ namespace Test1
 						game.ActiveTriggers.When(CardBehaviour.Damage(CardBehaviour.AllMinions), (Action<IEntity>)(g => {
 							Console.WriteLine("A MINION IS ABOUT TO BE DAMAGED!");
 						}));
-						game.ActiveTriggers.When(CardBehaviour.Damage(CardBehaviour.AllMinions), CardBehaviour.Give(CardBehaviour.CurrentPlayer, Cards.FromName("Wisp")));
+						game.ActiveTriggers.When(CardBehaviour.Damage(CardBehaviour.AllMinions), CardBehaviour.Give(CardBehaviour.CurrentPlayer, "Wisp"));
 
 						//p1.Deck.Fill();
 						//p2.Deck.Fill();
@@ -63,43 +63,43 @@ namespace Test1
 						game.Start();
 
 						// Put a Piloted Shredder and Flame Juggler in each player's hand
-						p1.Give(Cards.FromName("Piloted Shredder"));
-						p1.Give(Cards.FromName("Flame Juggler"));
-						p2.Give(Cards.FromName("Piloted Shredder"));
-						p2.Give(Cards.FromName("Flame Juggler"));
+						p1.Give("Piloted Shredder");
+						p1.Give("Flame Juggler");
+						p2.Give("Piloted Shredder");
+						p2.Give("Flame Juggler");
 
 						Console.WriteLine(game);
 
 						// Fill the board with Flame Jugglers
 						for (int i = 0; i < MaxMinions - 2; i++) {
-							var fj = p1.Give(Cards.FromName("Flame Juggler"));
+							var fj = p1.Give("Flame Juggler");
 							fj.Play();
 						}
 
 						game.BeginTurn();
 
 						for (int i = 0; i < MaxMinions - 2; i++) {
-							var fj = p2.Give(Cards.FromName("Flame Juggler"));
+							var fj = p2.Give("Flame Juggler");
 							fj.Play();
 						}
 						// Throw in a couple of Boom Bots
-						p2.Give(Cards.FromName("Boom Bot")).Play();
-						p2.Give(Cards.FromName("Boom Bot")).Play();
+						p2.Give("Boom Bot").Play();
+						p2.Give("Boom Bot").Play();
 
 						game.BeginTurn();
 
-						p1.Give(Cards.FromName("Boom Bot")).Play();
-						p1.Give(Cards.FromName("Boom Bot")).Play();
+						p1.Give("Boom Bot").Play();
+						p1.Give("Boom Bot").Play();
 
-						//p1.Give(Cards.FromName("Acolyte of Pain")).Play();
+						//p1.Give("Acolyte of Pain").Play();
 
 						// Bombs away!
-						//p1.Give(Cards.FromName("Whirlwind")).Play();
+						//p1.Give("Whirlwind").Play();
 
 						// Normal game has 68 entities: Game + 2 players + 2 heroes + 2 hero powers + 30 cards each + coin = 68
 
 						while (game.Entities.Count < 68) {
-							p1.Give(Cards.FromName("Flame Juggler"));
+							p1.Give("Flame Juggler");
 						}
 						Console.WriteLine("Entities to clone: " + game.Entities.Count);
 
@@ -166,40 +166,45 @@ namespace Test1
 			game.Player2.Deck.Fill();
 			game.Start();
 
-			for (int i = 0; i < MaxMinions - 3; i++)
-				game.CurrentPlayer.Give(Cards.FromName("Bloodfen Raptor")).Play();
-			for (int i = 0; i < 3; i++)
-				game.CurrentPlayer.Give(Cards.FromName("Boom Bot")).Play();
+			for (int i = 0; i < MaxMinions - 2; i++)
+				game.CurrentPlayer.Give("Bloodfen Raptor").Play();
+			for (int i = 0; i < 2; i++)
+				game.CurrentPlayer.Give("Boom Bot").Play();
 			game.BeginTurn();
-			for (int i = 0; i < MaxMinions - 3; i++)
-				game.CurrentPlayer.Give(Cards.FromName("Bloodfen Raptor")).Play();
-			for (int i = 0; i < 3; i++)
-				game.CurrentPlayer.Give(Cards.FromName("Boom Bot")).Play();
+			for (int i = 0; i < MaxMinions - 2; i++)
+				game.CurrentPlayer.Give("Bloodfen Raptor").Play();
+			for (int i = 0; i < 2; i++)
+				game.CurrentPlayer.Give("Boom Bot").Play();
 
-			int clones = 0;
-			int cloneDepth = 0;
+			int cloneCount = 0;
+			int keptClonesCount = 0;
+			var fuzzyUniqueGames = new HashSet<Game>(new FuzzyGameComparer());
 
 			game.ActionQueue.OnActionStarting += (o, e) => {
 				ActionQueue queue = o as ActionQueue;
 				if (e.Action is RandomChoice) {
 					foreach (var entity in e.Args[RandomChoice.ENTITIES]) {
-						clones++;
-						cloneDepth++;
 						Game cloned = (Game)e.Game.CloneState();
+						cloneCount++;
 						cloned.ActionQueue.InsertPaused(e.Source, new LazyEntity { EntityId = entity.Id });
 						cloned.ActionQueue.ProcessAll();
-						cloneDepth--;
+						if (!cloned.PowerHistory.EquivalentTo(e.Game.PowerHistory)) {
+							keptClonesCount++;
+							fuzzyUniqueGames.Add(cloned);
+						}
 						e.Cancel = true;
 					}
 				}
 				if (e.Action is RandomAmount) {
 					for (int i = e.Args[RandomAmount.MIN]; i <= e.Args[RandomAmount.MAX]; i++) {
-						clones++;
-						cloneDepth++;
 						Game cloned = (Game)e.Game.CloneState();
+						cloneCount++;
 						cloned.ActionQueue.InsertPaused(e.Source, new FixedNumber { Num = i });
 						cloned.ActionQueue.ProcessAll();
-						cloneDepth--;
+						if (!cloned.PowerHistory.EquivalentTo(e.Game.PowerHistory)) {
+							keptClonesCount++;
+							fuzzyUniqueGames.Add(cloned);
+						}
 						e.Cancel = true;
 					}
 				}
@@ -210,7 +215,9 @@ namespace Test1
 			sw.Start();
 			BoomBot.Hit(1);
 			Console.SetOut(cOut);
-			Console.WriteLine("{0} branches in {1}ms", clones, sw.ElapsedMilliseconds);
+			Console.WriteLine("{0} branches in {1}ms", cloneCount, sw.ElapsedMilliseconds);
+			Console.WriteLine("{0} intermediate clones pruned ({1} unique branches kept)", cloneCount - keptClonesCount, keptClonesCount);
+			Console.WriteLine("{0} fuzzy unique game states found", fuzzyUniqueGames.Count);
 		}
 	}
 }
