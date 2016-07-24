@@ -322,7 +322,8 @@ namespace Brimstone
 			entity.Id = NextEntityId++;
 			Entities[entity.Id] = entity;
 			EntityChanging(entity.Id, 0);
-			PowerHistory.Add(new CreateEntity(entity));
+			if (PowerHistory != null)
+				PowerHistory.Add(new CreateEntity(entity));
 			Game.ActiveTriggers.Add(entity);
 			return entity;
 		}
@@ -353,7 +354,8 @@ namespace Brimstone
 		}
 		
 		public void EntityChanged(int id, GameTag tag, int value) {
-			PowerHistory.Add(new TagChange(id, tag, value));
+			if (PowerHistory != null)
+				PowerHistory.Add(new TagChange(id, tag, value));
 		}
 
 		public int FuzzyGameHash {

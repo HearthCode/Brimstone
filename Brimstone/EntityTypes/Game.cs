@@ -28,7 +28,7 @@ namespace Brimstone
 		public ZoneEntities Setaside { get; private set; }
 		public ZoneGroup Zones { get; } = new ZoneGroup();
 
-		public PowerHistory PowerHistory = new PowerHistory();
+		public PowerHistory PowerHistory;
 		public ActionQueue ActionQueue;
 
 		// Game clones n-tree traversal
@@ -59,7 +59,7 @@ namespace Brimstone
 					}) {
 			// Start Power log
 			if (PowerHistory) {
-				this.PowerHistory.Attach(this);
+				this.PowerHistory = new PowerHistory(this);
 			}
 
 			ActionQueue = new ActionQueue(this);
@@ -168,7 +168,9 @@ namespace Brimstone
 			game.ActiveTriggers = ((TriggerManager)ActiveTriggers.Clone());
 			game.ActiveTriggers.Game = game;
 			// Link PowerHistory
-			game.PowerHistory.Attach(game, this);
+			if (PowerHistory != null) {
+				game.PowerHistory = new PowerHistory(game, this);
+			}
 			return game;
 		}
 

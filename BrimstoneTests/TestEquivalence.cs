@@ -151,7 +151,7 @@ namespace BrimstoneTests
 
 			Assert.IsTrue(game4.EquivalentTo(game5));
 			Assert.IsTrue(game4.PowerHistory.EquivalentTo(game5.PowerHistory));
-			Assert.IsFalse(game4.PowerHistory.EquivalentTo(game5.PowerHistory, Pure: true));
+			Assert.IsFalse(game4.PowerHistory.EquivalentTo(game5.PowerHistory, Ordered: true));
 
 			// Act
 
@@ -168,8 +168,8 @@ namespace BrimstoneTests
 
 			// Hand position should be ignored in fuzzy comparison
 			Assert.IsTrue(game4.EquivalentTo(game5));
-			Assert.IsTrue(game4.PowerHistory.EquivalentTo(game5.PowerHistory, IgnoreHandOrder: true));
-			Assert.IsFalse(game4.PowerHistory.EquivalentTo(game5.PowerHistory, IgnoreHandOrder: false));
+			Assert.IsTrue(game4.PowerHistory.EquivalentTo(game5.PowerHistory, IgnoreHandPosition: true));
+			Assert.IsFalse(game4.PowerHistory.EquivalentTo(game5.PowerHistory, IgnoreHandPosition: false));
 
 			// Arrange
 
@@ -396,10 +396,10 @@ namespace BrimstoneTests
 			game11.Step = Step.FINAL_GAMEOVER;
 
 			// Tag order should be ignored, Game10 and Game11 are equivalent
-			Assert.True(game10.PowerHistory.EquivalentTo(game11.PowerHistory, Pure: false));
+			Assert.True(game10.PowerHistory.EquivalentTo(game11.PowerHistory, Ordered: false));
 
 			// But with precise tag order, they are different
-			Assert.False(game10.PowerHistory.EquivalentTo(game11.PowerHistory, Pure: true));
+			Assert.False(game10.PowerHistory.EquivalentTo(game11.PowerHistory, Ordered: true));
 
 			// Test the case where the LCA has been modified after branching
 			// (every entry after the branch should be ignored)
@@ -420,10 +420,10 @@ namespace BrimstoneTests
 			game12.Player1.Give("Bloodfen Raptor");
 
 			// Tag order should be ignored, Game9 and Game12 are equivalent
-			Assert.True(game9.PowerHistory.EquivalentTo(game12.PowerHistory, Pure: false));
+			Assert.True(game9.PowerHistory.EquivalentTo(game12.PowerHistory, Ordered: false));
 
 			// But with precise tag order, they are different
-			Assert.False(game9.PowerHistory.EquivalentTo(game12.PowerHistory, Pure: true));
+			Assert.False(game9.PowerHistory.EquivalentTo(game12.PowerHistory, Ordered: true));
 
 			// Branch from a game at two different points and test for equivalence
 			game8.Player1.Give("River Crocolisk");
@@ -438,7 +438,7 @@ namespace BrimstoneTests
 			game16.Player1.Give("Dr. Boom");
 			game17.Player1.Give("Dr. Boom");
 
-			Assert.True(game17.PowerHistory.EquivalentTo(game16.PowerHistory, Pure: true));
+			Assert.True(game17.PowerHistory.EquivalentTo(game16.PowerHistory, Ordered: true));
 
 			// Hand order should be ignored
 			var game18 = game1.CloneState() as Game;
@@ -466,7 +466,7 @@ namespace BrimstoneTests
 			Assert.True(game18.PowerHistory.EquivalentTo(game19.PowerHistory));
 
 			// But the games are different if hand order is not ignored
-			Assert.False(game18.PowerHistory.EquivalentTo(game19.PowerHistory, IgnoreHandOrder: false));
+			Assert.False(game18.PowerHistory.EquivalentTo(game19.PowerHistory, IgnoreHandPosition: false));
 		}
 	}
 }

@@ -187,7 +187,7 @@ namespace Brimstone
 
 		public event EventHandler<PowerActionEventArgs> OnPowerAction;
 
-		public void Attach(Game game, Game parent = null) {
+		public PowerHistory(Game game, Game parent = null) {
 			Game = game;
 			if (parent != null) {
 				SequenceNumber = parent.PowerHistory.SequenceNumber;
@@ -196,9 +196,6 @@ namespace Brimstone
 				SequenceNumber = 0;
 				ParentBranchEntry = 0;
 			}
-		}
-		public void Detach() {
-			Game = null;
 		}
 
 		public void Add(PowerAction a) {
@@ -258,7 +255,7 @@ namespace Brimstone
 		}
 
 		// Compare two PowerHistory logs to see if they are functionally equivalent
-		public bool EquivalentTo(PowerHistory History, bool Pure = false, bool IgnoreHandOrder = true, bool IgnoreEntityIds = true) {
+		public bool EquivalentTo(PowerHistory History, bool Ordered = false, bool IgnoreHandPosition = true) {
 			if (ReferenceEquals(History, null))
 				return false;
 
@@ -301,7 +298,7 @@ namespace Brimstone
 			// TODO: Tag exclusion filters
 
 			// Pure equality
-			if (Pure) {
+			if (Ordered) {
 				foreach (var pair in deltaA.Zip(deltaB, (x, y) => new { A = x, B = y }))
 					// Cannot use == operator because it is not overridden in base PowerAction
 					// and will do reference equality only. Use IEquatable<T> instead.
@@ -319,7 +316,7 @@ namespace Brimstone
 				// TODO: What happens when an entity moves from HAND to PLAY without changing its zone position? Bug or not?
 
 				// Remove ZONE_POSITION from entities in hand if we don't care about them
-				if (IgnoreHandOrder) {
+				if (IgnoreHandPosition) {
 					IEnumerable<int> entitiesInHand;
 					entitiesInHand = cDeltaA.Where(x => x.Tag.Name == GameTag.ZONE && x.Tag.Value == (int)Zone.HAND).Select(x => x.EntityId);
 					cDeltaA.RemoveWhere(x => x.Tag.Name == GameTag.ZONE_POSITION && entitiesInHand.Contains(x.EntityId));
