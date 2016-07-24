@@ -82,7 +82,7 @@ namespace Brimstone
 		}
 
 		public override int GetHashCode() {
-			return (17 * 31 + EntityId) * 31 + Tag.GetHashCode();
+			return ((17 * 31 + EntityId) * 31 + (int)Tag.Name) * 31 + Tag.Value;
 		}
 	}
 
@@ -295,7 +295,7 @@ namespace Brimstone
 			var deltaB = History.DeltaSince(lca);
 
 			// TODO: Naive equivalence comparison
-			// TODO: Local equivalence if we know in advance both games have the same ancestor
+			// TODO: Local equivalence if we know in advance both games have the same immediate and unchanged parent
 			// TODO: Ignore entity IDs if all other tags same
 			// TODO: Ignore board ordering if all other tags same
 			// TODO: Tag exclusion filters
@@ -315,6 +315,8 @@ namespace Brimstone
 				// Crunch
 				var cDeltaA = CrunchedDelta(deltaA);
 				var cDeltaB = CrunchedDelta(deltaB);
+
+				// TODO: What happens when an entity moves from HAND to PLAY without changing its zone position? Bug or not?
 
 				// Remove ZONE_POSITION from entities in hand if we don't care about them
 				if (IgnoreHandOrder) {
