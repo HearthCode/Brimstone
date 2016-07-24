@@ -94,6 +94,9 @@ namespace Brimstone
 			foreach (var p in Players)
 				p.Start();
 
+			// Give 2nd player the coin
+			FirstPlayer.Opponent.Give("The Coin");
+
 			// TODO: Insert event call here so KettleSharp can iterate all created entities
 
 			StartMulligan();
