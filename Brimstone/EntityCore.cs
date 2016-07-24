@@ -92,7 +92,17 @@ namespace Brimstone
 		public BaseEntityData BaseEntityData { get { return _entity; } }
 
 		public Game Game { get; set; }
-		public IEntity Controller { get; set; }
+		private IEntity _controller;
+		public IEntity Controller {
+			get {
+				return _controller;
+			}
+			set {
+				if (Game != null)
+					Changing(false);
+				_controller = value;
+			}
+		}
 
 		public Entity(Entity cloneFrom) {
 			_fuzzyHash = cloneFrom._fuzzyHash;
@@ -100,13 +110,13 @@ namespace Brimstone
 			_referenceCount = cloneFrom._referenceCount;
 			_referenceCount.Count++;
 			Game = cloneFrom.Game;
-			Controller = Game.Entities[cloneFrom.Controller.Id];
+			_controller = Game.Entities[cloneFrom.Controller.Id];
 		}
 
 		public Entity(Game game, IEntity controller, Card card, Dictionary<GameTag, int> tags = null) {
 			_entity = new BaseEntityData(game, card, tags);
 			_referenceCount = new ReferenceCount();
-			Controller = controller;
+			_controller = controller;
 			if (game != null) {
 				game.Entities.Add(this);
 				game.EntityChanging(_entity.Id, 0);
@@ -166,11 +176,11 @@ namespace Brimstone
 			return Clone() as IEntity;
 		}
 
-		private void Changing() {
+		private void Changing(bool cow = true) {
 			// TODO: Replace with a C# event
 			Game.EntityChanging(Id, _fuzzyHash);
 			_fuzzyHash = 0;
-			CopyOnWrite();
+			if (cow) CopyOnWrite();
 		}
 
 		private void CopyOnWrite() {
