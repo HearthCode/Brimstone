@@ -118,7 +118,6 @@ namespace Brimstone
 			_controller = controller;
 			if (game != null) {
 				game.Entities.Add(this);
-				game.Entities.EntityChanging(_entity.Id, 0);
 			}
 		}
 
@@ -323,6 +322,7 @@ namespace Brimstone
 			entity.Game = Game;
 			entity.Id = NextEntityId++;
 			Entities[entity.Id] = entity;
+			EntityChanging(entity.Id, 0);
 			Game.PowerHistory.Add(new CreateEntity(entity));
 			Game.ActiveTriggers.Add(entity);
 			return entity.Id;
