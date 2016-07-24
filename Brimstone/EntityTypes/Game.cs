@@ -51,7 +51,7 @@ namespace Brimstone
 		}
 
 		public Game(HeroClass Hero1, HeroClass Hero2, string Player1Name = "", string Player2Name = "", bool PowerHistory = false)
-					: base(null, null, Cards.FromId("Game"), new Dictionary<GameTag, int> {
+					: base(null, Cards.FromId("Game"), new Dictionary<GameTag, int> {
 						{ GameTag.TURN, 1 },
 						{ GameTag.ZONE, (int) Zone.PLAY },
 						{ GameTag.NEXT_STEP, (int) Step.BEGIN_MULLIGAN },
@@ -71,8 +71,8 @@ namespace Brimstone
 
 			// Generate players and empty decks
 			SetPlayers(
-				new Player(this, Hero1, (Player1Name.Length > 0) ? Player1Name : "Player 1", 1),
-				new Player(this, Hero2, (Player2Name.Length > 0) ? Player2Name : "Player 2", 2)
+				(Player) Add(new Player(this, Hero1, (Player1Name.Length > 0) ? Player1Name : "Player 1", 1)),
+				(Player) Add(new Player(this, Hero2, (Player2Name.Length > 0) ? Player2Name : "Player 2", 2))
 			);
 
 			// Generate zones owned by game
@@ -83,6 +83,10 @@ namespace Brimstone
 			// No parent or children
 			GameId = ++SequenceNumber;
 			Parent = null;
+		}
+
+		public IEntity Add(IEntity newEntity) {
+			return Entities.Add(newEntity);
 		}
 
 		public void Start() {
@@ -114,6 +118,15 @@ namespace Brimstone
 			}
 		}
 
+		public void BeginTurn() {
+			ActionQueue.Enqueue(this, CardBehaviour.BeginTurn);
+		}
+
+		// Perform a fuzzy equivalence between two game states
+		public bool EquivalentTo(Game game) {
+			return Entities.FuzzyGameHash == game.Entities.FuzzyGameHash;
+		}
+
 		public override string ToString() {
 			string s = "Board state: ";
 			var players = new List<Player> { Player1, Player2 };
@@ -132,15 +145,6 @@ namespace Brimstone
 			foreach (var item in PowerHistory)
 				s += item + "\n";
 			return s;
-		}
-
-		public void BeginTurn() {
-			ActionQueue.Enqueue(this, CardBehaviour.BeginTurn);
-		}
-
-		// Perform a fuzzy equivalence between two game states
-		public bool EquivalentTo(Game game) {
-			return Entities.FuzzyGameHash == game.Entities.FuzzyGameHash;
 		}
 
 		public override IEntity CloneState() {

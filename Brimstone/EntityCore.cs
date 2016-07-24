@@ -108,13 +108,10 @@ namespace Brimstone
 			_referenceCount.Count++;
 		}
 
-		public Entity(Game game, IEntity controller, Card card, Dictionary<GameTag, int> tags = null) {
+		public Entity(IEntity controller, Card card, Dictionary<GameTag, int> tags = null) {
 			_entity = new BaseEntityData(card, tags);
 			_referenceCount = new ReferenceCount();
 			_controller = controller;
-			if (game != null) {
-				game.Entities.Add(this);
-			}
 		}
 
 		public int this[GameTag t] {
@@ -316,14 +313,14 @@ namespace Brimstone
 				entity.Value.Controller = Entities[es.Entities[entity.Key].Controller.Id];
 		}
 
-		public int Add(IEntity entity) {
+		public IEntity Add(IEntity entity) {
 			entity.Game = Game;
 			entity.Id = NextEntityId++;
 			Entities[entity.Id] = entity;
 			EntityChanging(entity.Id, 0);
 			PowerHistory.Add(new CreateEntity(entity));
 			Game.ActiveTriggers.Add(entity);
-			return entity.Id;
+			return entity;
 		}
 
 		public Game FindGame() {

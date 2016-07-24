@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Brimstone
+﻿namespace Brimstone
 {
 	public partial class Game : Entity, IZones
 	{
@@ -74,9 +72,6 @@ namespace Brimstone
 
 	public abstract partial class CanBeDamaged : Entity
 	{
-		public CanBeDamaged(Game game, IEntity controller, Card card, Dictionary<GameTag, int> tags = null) : base(game, controller, card, tags) { }
-		public CanBeDamaged(CanBeDamaged cloneFrom) : base(cloneFrom) { }
-
 		public int StartingHealth {
 			get {
 				return Card[GameTag.HEALTH];

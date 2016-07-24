@@ -22,7 +22,7 @@ namespace Brimstone
 			// TODO: Shallow clone choices
 		}
 
-		public Player(Game game, HeroClass hero, string name, int playerId, int teamId = 0) : base(game, game, Cards.FromId("Player"),
+		public Player(Game game, HeroClass hero, string name, int playerId, int teamId = 0) : base(game, Cards.FromId("Player"),
 			new Dictionary<GameTag, int> {
 				{ GameTag.PLAYSTATE, (int) PlayState.PLAYING },
 				{ GameTag.MAXHANDSIZE, 10 },
@@ -62,7 +62,7 @@ namespace Brimstone
 			Deck.Shuffle();
 
 			// Generate hero
-			new Hero(Game, this, DefaultHero.For(HeroClass));
+			Game.Add(new Hero(this, DefaultHero.For(HeroClass)));
 
 			// Draw cards
 			Draw((Game.FirstPlayer == this ? 3 : 4));

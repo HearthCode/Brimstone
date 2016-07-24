@@ -1,9 +1,12 @@
-﻿using System;
+﻿using System.Collections.Generic;
 
 namespace Brimstone
 {
 	public abstract partial class CanBeDamaged : Entity
 	{
+		public CanBeDamaged(IEntity controller, Card card, Dictionary<GameTag, int> tags = null) : base(controller, card, tags) { }
+		public CanBeDamaged(CanBeDamaged cloneFrom) : base(cloneFrom) { }
+
 		public void Hit(int amount) {
 			Game.ActionQueue.Enqueue(this, CardBehaviour.Damage(this, amount));
 		}

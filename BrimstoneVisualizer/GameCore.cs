@@ -44,7 +44,7 @@ namespace BrimstoneVisualizer
 				Cards.FromName("Murloc Tinyfin"),
 				Cards.FromName("Wisp"),
 			});
-			var chromaggus = new Minion(Game, p1, Cards.FromName("Chromaggus"));
+			var chromaggus = Game.Add(new Minion(p1, Cards.FromName("Chromaggus")));
 			p1.Deck.Add(chromaggus);
 
 			p1.Deck.Fill();
