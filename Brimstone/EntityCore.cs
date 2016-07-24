@@ -54,7 +54,7 @@ namespace Brimstone
 			}
 		}
 
-		public BaseEntityData(Game game, Card card, Dictionary<GameTag, int> tags = null) {
+		public BaseEntityData(Card card, Dictionary<GameTag, int> tags = null) {
 			Card = card;
 			if (tags != null)
 				Tags = tags;
@@ -114,7 +114,7 @@ namespace Brimstone
 		}
 
 		public Entity(Game game, IEntity controller, Card card, Dictionary<GameTag, int> tags = null) {
-			_entity = new BaseEntityData(game, card, tags);
+			_entity = new BaseEntityData(card, tags);
 			_referenceCount = new ReferenceCount();
 			_controller = controller;
 			if (game != null) {
