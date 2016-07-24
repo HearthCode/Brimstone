@@ -61,13 +61,12 @@ namespace Brimstone
 			if (PowerHistory) {
 				this.PowerHistory.Attach(this);
 			}
+
 			ActionQueue = new ActionQueue(this);
-			Entities = new EntityController(this);
 			ActiveTriggers = new TriggerManager(this);
 
-			// Generate game
 			Controller = this;
-			Entities.Add(this);
+			Entities = new EntityController(this);
 
 			// Generate players and empty decks
 			SetPlayers(

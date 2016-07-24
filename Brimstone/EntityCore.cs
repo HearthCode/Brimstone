@@ -294,6 +294,7 @@ namespace Brimstone
 
 			// Fuzzy hashing
 			_changedHashes = new HashSet<int>();
+			Add(game);
 		}
 
 		public EntityController(EntityController es) {
