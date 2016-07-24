@@ -51,8 +51,11 @@ namespace BrimstoneTests
 			Assert.AreNotEqual(wisp1.FuzzyHash, wisp2.FuzzyHash);
 
 			// Clone a wisp, check their states are equal
+			// NOTE: Cloning an entity detaches it from game and controller by default
 			var wisp4 = game1.Player1.Give(Cards.FromName("Wisp"));
 			var wisp5 = wisp4.CloneState();
+			wisp5.Game = game1;
+			wisp5.Controller = wisp4.Controller;
 
 			Assert.AreEqual(wisp4, wisp5);
 			Assert.AreEqual(wisp4.FuzzyHash, wisp5.FuzzyHash);

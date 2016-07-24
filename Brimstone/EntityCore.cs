@@ -109,8 +109,6 @@ namespace Brimstone
 			_entity = cloneFrom._entity;
 			_referenceCount = cloneFrom._referenceCount;
 			_referenceCount.Count++;
-			Game = cloneFrom.Game;
-			_controller = Game.Entities[cloneFrom.Controller.Id];
 		}
 
 		public Entity(Game game, IEntity controller, Card card, Dictionary<GameTag, int> tags = null) {
