@@ -328,13 +328,6 @@ namespace Brimstone
 			return entity.Id;
 		}
 
-		public int Remove(IEntity entity) {
-			Entities.Remove(entity.Id);
-
-			// TODO: Remove active triggers for entity
-			return entity.Id;
-		}
-
 		public Game FindGame() {
 			// Game is always entity ID 1
 			return (Game)Entities[1];
