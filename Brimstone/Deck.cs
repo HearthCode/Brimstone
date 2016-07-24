@@ -9,7 +9,7 @@ namespace Brimstone
 
 		public HeroClass HeroClass { get; }
 
-		public Deck(Game game, HeroClass hero, IZones controller) : base(game, controller, Zone.DECK) {
+		public Deck(Game game, HeroClass hero, IZoneOwner controller) : base(game, controller, Zone.DECK) {
 			HeroClass = hero;
 		}
 
@@ -29,15 +29,15 @@ namespace Brimstone
 				};
 
 				if (card[GameTag.CARDTYPE] == (int)CardType.MINION) {
-					e = new Minion((IEntity)Controller, card, tags);
+					e = new Minion(card, tags);
 				}
 				else if (card[GameTag.CARDTYPE] == (int)CardType.SPELL) {
-					e = new Spell((IEntity)Controller, card, tags);
+					e = new Spell(card, tags);
 				}
 				// TODO: Weapons
 				if (e != null)
 
-				Game.Add(e);
+					Game.Add(e, (IEntity)Controller);
 			}
 			// Force deck zone contents to update
 			Init();

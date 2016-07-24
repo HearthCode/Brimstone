@@ -446,16 +446,16 @@ namespace BrimstoneTests
 
 			// NOTE: This doesn't ignore the entity IDs, so if we care about that, we must disable it separately
 			// Here we ensure that the entities have the same IDs even though they are placed in hand in a different order
-			var wisp18 = game18.Add(new Minion(game18.Player1, Cards.FromName("Wisp")));
-			var fin18 = game18.Add(new Minion(game18.Player1, Cards.FromName("Murloc Tinyfin")));
-			var wisp19 = game19.Add(new Minion(game19.Player1, Cards.FromName("Wisp")));
-			var fin19 = game19.Add(new Minion(game19.Player1, Cards.FromName("Murloc Tinyfin")));
+			var wisp18 = new Minion(Cards.FromName("Wisp"));
+			var fin18 = new Minion(Cards.FromName("Murloc Tinyfin"));
+			var fin19 = new Minion(Cards.FromName("Murloc Tinyfin"));
+			var wisp19 = new Minion(Cards.FromName("Wisp"));
 
-			game18.Player1.Hand.MoveTo(wisp18);
-			game18.Player1.Hand.MoveTo(fin18);
+			game18.Player1.Hand.MoveTo(fin18, 2);
+			game18.Player1.Hand.MoveTo(wisp18, 2);
 
-			game19.Player1.Hand.MoveTo(fin19);
-			game19.Player1.Hand.MoveTo(wisp19);
+			game19.Player1.Hand.MoveTo(fin19, 2);
+			game19.Player1.Hand.MoveTo(wisp19, 3);
 
 			Assert.AreEqual(2, wisp18[GameTag.ZONE_POSITION]);
 			Assert.AreEqual(3, fin18[GameTag.ZONE_POSITION]);

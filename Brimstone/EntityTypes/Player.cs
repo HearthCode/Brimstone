@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Brimstone
 {
-	public partial class Player : Entity, IZones {
+	public partial class Player : Entity, IZoneOwner {
 		public string FriendlyName { get; }
 
 		public Deck Deck { get; private set; }
@@ -22,7 +22,7 @@ namespace Brimstone
 			// TODO: Shallow clone choices
 		}
 
-		public Player(HeroClass hero, string name, int playerId, int teamId = 0) : base(null, Cards.FromId("Player"),
+		public Player(HeroClass hero, string name, int playerId, int teamId = 0) : base(Cards.FromId("Player"),
 			new Dictionary<GameTag, int> {
 				{ GameTag.PLAYSTATE, (int) PlayState.PLAYING },
 				{ GameTag.MAXHANDSIZE, 10 },
@@ -59,7 +59,7 @@ namespace Brimstone
 			Deck.Shuffle();
 
 			// Generate hero
-			Game.Add(new Hero(this, DefaultHero.For(HeroClass)));
+			Hero = Game.Add(new Hero(DefaultHero.For(HeroClass)), this) as Hero;
 
 			// Draw cards
 			Draw((Game.FirstPlayer == this ? 3 : 4));

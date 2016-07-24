@@ -16,7 +16,7 @@ namespace Brimstone
 	}
 
 	// TODO: Abstract this so that Game is just another Entity (GameEntity) and make a new Game class that manages a game
-	public partial class Game : Entity, IZones
+	public partial class Game : Entity, IZoneOwner
 	{
 		public EntityController Entities;
 		public TriggerManager ActiveTriggers;
@@ -51,7 +51,7 @@ namespace Brimstone
 		}
 
 		public Game(HeroClass Hero1, HeroClass Hero2, string Player1Name = "", string Player2Name = "", bool PowerHistory = false)
-					: base(null, Cards.FromId("Game"), new Dictionary<GameTag, int> {
+					: base(Cards.FromId("Game"), new Dictionary<GameTag, int> {
 						{ GameTag.TURN, 1 },
 						{ GameTag.ZONE, (int) Zone.PLAY },
 						{ GameTag.NEXT_STEP, (int) Step.BEGIN_MULLIGAN },
@@ -64,14 +64,12 @@ namespace Brimstone
 
 			ActionQueue = new ActionQueue(this);
 			ActiveTriggers = new TriggerManager(this);
-
-			Controller = this;
 			Entities = new EntityController(this);
 
 			// Generate players and empty decks
 			SetPlayers(
-				(Player) Add(new Player(Hero1, (Player1Name.Length > 0) ? Player1Name : "Player 1", 1)),
-				(Player) Add(new Player(Hero2, (Player2Name.Length > 0) ? Player2Name : "Player 2", 2))
+				(Player) Add(new Player(Hero1, (Player1Name.Length > 0) ? Player1Name : "Player 1", 1), this),
+				(Player) Add(new Player(Hero2, (Player2Name.Length > 0) ? Player2Name : "Player 2", 2), this)
 			);
 
 			// Generate zones owned by game
@@ -84,7 +82,8 @@ namespace Brimstone
 			Parent = null;
 		}
 
-		public IEntity Add(IEntity newEntity) {
+		public IEntity Add(IEntity newEntity, IEntity controller) {
+			newEntity.Controller = controller;
 			return Entities.Add(newEntity);
 		}
 

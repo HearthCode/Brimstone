@@ -1,6 +1,6 @@
 ﻿namespace Brimstone
 {
-	public partial class Game : Entity, IZones
+	public partial class Game : Entity, IZoneOwner
 	{
 		public int Turn {
 			get { return this[GameTag.TURN]; }
@@ -46,8 +46,17 @@
 		}
 	}
 
-	public partial class Player : Entity, IZones
+	public partial class Player : Entity, IZoneOwner
 	{
+		public Hero Hero {
+			get {
+				return Game.Entities[this[GameTag.HERO_ENTITY]] as Hero;
+			}
+			set {
+				this[GameTag.HERO_ENTITY] = value.Id;
+			}
+		}
+
 		public Player Opponent {
 			get {
 				return Game.Player1 == this ? Game.Player2 : Game.Player1;

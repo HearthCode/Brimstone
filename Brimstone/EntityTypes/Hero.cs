@@ -8,10 +8,7 @@ namespace Brimstone
 		// TODO: Add hero powers
 
 		public Hero(Hero cloneFrom) : base(cloneFrom) { }
-		public Hero(IEntity controller, Card card, Dictionary<GameTag, int> tags = null) : base(controller, card, tags) {
-			// Set player's hero entity tag
-			controller[GameTag.HERO_ENTITY] = Id;
-		}
+		public Hero(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
 
 		public override object Clone() {
 			return new Hero(this);

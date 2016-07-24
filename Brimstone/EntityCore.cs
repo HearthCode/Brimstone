@@ -110,10 +110,9 @@ namespace Brimstone
 			_referenceCount.Count++;
 		}
 
-		public Entity(IEntity controller, Card card, Dictionary<GameTag, int> tags = null) {
+		public Entity(Card card, Dictionary<GameTag, int> tags = null) {
 			_entity = new BaseEntityData(card, tags);
 			_referenceCount = new ReferenceCount();
-			_controller = controller;
 		}
 
 		public int this[GameTag t] {
@@ -294,6 +293,7 @@ namespace Brimstone
 
 		public EntityController(Game game) {
 			Game = game;
+			Game.Controller = game;
 
 			// Fuzzy hashing
 			_changedHashes = new HashSet<int>();

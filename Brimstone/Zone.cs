@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Brimstone
 {
-	public interface IZones
+	public interface IZoneOwner
 	{
 		ZoneGroup Zones { get; }
 	}
@@ -38,7 +38,7 @@ namespace Brimstone
 	{
 		public Game Game { get; }
 		public Zone Zone { get; }
-		public IZones Controller { get; }
+		public IZoneOwner Controller { get; }
 
 		private List<IEntity> _cachedEntities;
 		private int _cachedCount;
@@ -66,7 +66,7 @@ namespace Brimstone
 				ze[GameTag.ZONE_POSITION] = p++;
 		}
 
-		public ZoneEntities(Game game, IZones controller, Zone zone) {
+		public ZoneEntities(Game game, IZoneOwner controller, Zone zone) {
 			Game = game;
 			Zone = zone;
 			Controller = controller;
@@ -123,8 +123,9 @@ namespace Brimstone
 
 		public IEntity Add(IEntity Entity, int ZonePosition = -1) {
 			// Update ownership
-			if (Entity.Game == null)
-				Game.Add(Entity);
+			if (Entity.Game == null) {
+				Game.Add(Entity, (IEntity)Controller);
+			}
 
 			if (ZonePosition == -1)
 				if (Entity is Minion)
