@@ -5,8 +5,7 @@ using System.Linq;
 
 namespace Brimstone
 {
-	public interface IEntity : IEnumerable<KeyValuePair<GameTag, int>>, ICloneable
-	{
+	public interface IEntity : IEnumerable<KeyValuePair<GameTag, int>>, ICloneable {
 		int Id { get; set; }
 		// Allow owner game and controller to be changed for state cloning
 		Game Game { get; set; }
@@ -20,22 +19,18 @@ namespace Brimstone
 		IEntity CloneState();
 	}
 
-	public interface IPlayable : IEntity
-	{
+	public interface IPlayable : IEntity {
 		IPlayable Play();
 	}
 
-	public interface IMinion : IPlayable
-	{
+	public interface IMinion : IPlayable {
 		void Hit(int amount);
 	}
 
-	public interface ISpell : IPlayable
-	{
+	public interface ISpell : IPlayable {
 	}
 
-	public class BaseEntityData : ICloneable
-	{
+	public class BaseEntityData : ICloneable {
 		public int Id { get; set; }
 		public Card Card { get; }
 		public Dictionary<GameTag, int> Tags { get; }
@@ -74,8 +69,7 @@ namespace Brimstone
 		}
 	}
 
-	public class ReferenceCount
-	{
+	public class ReferenceCount {
 		public ReferenceCount() {
 			Count = 1;
 		}
@@ -83,8 +77,7 @@ namespace Brimstone
 		public int Count { get; set; }
 	}
 
-	public partial class Entity : IEntity
-	{
+	public partial class Entity : IEntity {
 		private BaseEntityData _entity;
 		private ReferenceCount _referenceCount;
 
@@ -102,6 +95,9 @@ namespace Brimstone
 					if (Game.Entities != null)
 						Changing(false);
 				_controller = value;
+				if (Game != null)
+					if (Game.Entities != null)
+						Game.Entities.EntityChanged(Id, GameTag.CONTROLLER, value.Id);
 			}
 		}
 
@@ -143,8 +139,8 @@ namespace Brimstone
 					Changing();
 					_entity[t] = value;
 				}
-				if (Game != null)
-					Game.PowerHistory.Add(new TagChange(this, new Tag(t, value)));
+				if (Game != null && t != GameTag.CONTROLLER)
+					Game.Entities.EntityChanged(Id, t, value);
 			}
 		}
 
@@ -192,7 +188,7 @@ namespace Brimstone
 		// Returns a *copy* of all tags from both the entity and the underlying card
 		public Dictionary<GameTag, int> CopyTags() {
 			var allTags = new Dictionary<GameTag, int>(_entity.Card.Tags);
-			
+
 			// Entity tags override card tags
 			foreach (var tag in _entity.Tags)
 				allTags[tag.Key] = tag.Value;
@@ -254,8 +250,7 @@ namespace Brimstone
 		}
 	}
 
-	public class FuzzyEntityComparer : IEqualityComparer<IEntity>
-	{
+	public class FuzzyEntityComparer : IEqualityComparer<IEntity> {
 		// Used when adding to and fetching from HashSet, and testing for equality
 		public bool Equals(IEntity x, IEntity y) {
 			return x.FuzzyHash == y.FuzzyHash;
@@ -268,6 +263,9 @@ namespace Brimstone
 
 	public class EntityController : IEnumerable<IEntity>, ICloneable {
 		public Game Game { get; }
+		// TODO: Move PowerHistory ownership to EntityController
+		public PowerHistory PowerHistory { get {return Game.PowerHistory; } }
+
 		public int NextEntityId = 1;
 
 		private Dictionary<int, IEntity> Entities = new Dictionary<int, IEntity>();
@@ -323,7 +321,7 @@ namespace Brimstone
 			entity.Id = NextEntityId++;
 			Entities[entity.Id] = entity;
 			EntityChanging(entity.Id, 0);
-			Game.PowerHistory.Add(new CreateEntity(entity));
+			PowerHistory.Add(new CreateEntity(entity));
 			Game.ActiveTriggers.Add(entity);
 			return entity.Id;
 		}
@@ -351,6 +349,10 @@ namespace Brimstone
 				_undoHash ^= previousHash;
 				_changedHashes.Add(id);
 			}
+		}
+		
+		public void EntityChanged(int id, GameTag tag, int value) {
+			PowerHistory.Add(new TagChange(id, tag, value));
 		}
 
 		public int FuzzyGameHash {
