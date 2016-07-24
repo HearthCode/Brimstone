@@ -191,7 +191,8 @@ namespace Brimstone
 				allTags[tag.Key] = tag.Value;
 
 			// Specially handled tags
-			allTags[GameTag.CONTROLLER] = Controller.Id;
+			if (Controller != null)
+				allTags[GameTag.CONTROLLER] = Controller.Id;
 			allTags[GameTag.ENTITY_ID] = _entity.Id;
 			return allTags;
 		}

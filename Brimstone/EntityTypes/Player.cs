@@ -22,7 +22,7 @@ namespace Brimstone
 			// TODO: Shallow clone choices
 		}
 
-		public Player(Game game, HeroClass hero, string name, int playerId, int teamId = 0) : base(game, Cards.FromId("Player"),
+		public Player(HeroClass hero, string name, int playerId, int teamId = 0) : base(null, Cards.FromId("Player"),
 			new Dictionary<GameTag, int> {
 				{ GameTag.PLAYSTATE, (int) PlayState.PLAYING },
 				{ GameTag.MAXHANDSIZE, 10 },
@@ -34,17 +34,12 @@ namespace Brimstone
 			}) {
 			HeroClass = hero;
 			FriendlyName = name;
-			setZones();
 		}
 
 		public void Attach(Game game) {
 			Game = game;
 			Controller = game;
-			setZones();
-			// TODO: Update choices to point to new game entities
-		}
 
-		private void setZones() {
 			Deck = new Deck(Game, HeroClass, this);
 			Hand = new ZoneEntities(Game, this, Zone.HAND);
 			Board = new ZoneEntities(Game, this, Zone.PLAY);
@@ -55,6 +50,8 @@ namespace Brimstone
 			Zones[Zone.PLAY] = Board;
 			Zones[Zone.GRAVEYARD] = Graveyard;
 			Zones[Zone.SECRET] = Secrets;
+
+			// TODO: Update choices to point to new game entities
 		}
 
 		public void Start() {
