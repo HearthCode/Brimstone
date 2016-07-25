@@ -220,7 +220,6 @@ namespace Brimstone
 		// All underlying card tags are included to differentiate cards from each other. CONTROLLER is included
 		private int _fuzzyHash = 0;
 		public int FuzzyHash {
-			// TODO: Caching
 			get {
 				if (_fuzzyHash != 0)
 					return _fuzzyHash;
@@ -262,11 +261,7 @@ namespace Brimstone
 
 	public class EntityController : IEnumerable<IEntity>, ICloneable {
 		public Game Game { get; }
-		// TODO: Move PowerHistory ownership to EntityController
-		public PowerHistory PowerHistory { get {return Game.PowerHistory; } }
-
 		public int NextEntityId = 1;
-
 		private Dictionary<int, IEntity> Entities = new Dictionary<int, IEntity>();
 
 		public IEntity this[int id] {
@@ -325,8 +320,8 @@ namespace Brimstone
 			entity.Id = NextEntityId++;
 			Entities[entity.Id] = entity;
 			EntityChanging(entity.Id, 0);
-			if (PowerHistory != null)
-				PowerHistory.Add(new CreateEntity(entity));
+			if (Game.PowerHistory != null)
+				Game.PowerHistory.Add(new CreateEntity(entity));
 			Game.ActiveTriggers.Add(entity);
 			return entity;
 		}
@@ -357,8 +352,8 @@ namespace Brimstone
 		}
 
 		public void EntityChanged(int id, GameTag tag, int value) {
-			if (PowerHistory != null)
-				PowerHistory.Add(new TagChange(id, tag, value));
+			if (Game.PowerHistory != null)
+				Game.PowerHistory.Add(new TagChange(id, tag, value));
 		}
 
 		public int FuzzyGameHash {
