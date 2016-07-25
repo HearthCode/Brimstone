@@ -116,7 +116,8 @@ namespace Brimstone
 					}
 				}
 				// Get behaviour script and compile ActionGraph for cards with behaviours
-				var b = typeof(CardBehaviour).GetField(c.Id, BindingFlags.Static | BindingFlags.Public);
+				// TODO: Allow fetch from card name as well as ID
+				var b = typeof(BehaviourScripts).GetField(c.Id, BindingFlags.Static | BindingFlags.Public);
 				if (b != null) {
 					var script = b.GetValue(null) as Behaviour;
 					c.Behaviour = CompiledBehaviour.Compile(script);

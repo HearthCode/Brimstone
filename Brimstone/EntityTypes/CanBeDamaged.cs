@@ -8,12 +8,12 @@ namespace Brimstone
 		public CanBeDamaged(CanBeDamaged cloneFrom) : base(cloneFrom) { }
 
 		public void Hit(int amount) {
-			Game.ActionQueue.Enqueue(this, CardBehaviour.Damage(this, amount));
+			Game.Action(this, Actions.Damage(this, amount));
 		}
 
 		public void CheckForDeath() {
 			if (Health <= 0) {
-				Game.ActionQueue.EnqueuePaused(this, CardBehaviour.Death(this));
+				Game.ActionQueue.EnqueuePaused(this, Actions.Death(this));
 			}
 		}
 	}

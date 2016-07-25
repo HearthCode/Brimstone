@@ -1,6 +1,6 @@
 ﻿namespace Brimstone
 {
-	public partial class CardBehaviour
+	public partial class BehaviourScripts : Actions
 	{
 		// Flame Juggler
 		public static Behaviour AT_094 = new Behaviour {

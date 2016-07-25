@@ -100,7 +100,9 @@ namespace Brimstone
 			return Entities.Add(newEntity);
 		}
 
-		// TODO: Add Action helper
+		public ActionResult Action(IEntity source, ActionGraph g) {
+			return ActionQueue.Enqueue(source, g);
+		}
 
 		public void Start() {
 			// Pick a random starting player
@@ -125,7 +127,7 @@ namespace Brimstone
 		}
 
 		public void BeginTurn() {
-			ActionQueue.Enqueue(this, CardBehaviour.BeginTurn);
+			ActionQueue.Enqueue(this, Actions.BeginTurn);
 		}
 
 		// Perform a fuzzy equivalence between two game states

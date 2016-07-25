@@ -11,7 +11,7 @@ namespace Brimstone
 		public List<Trigger> Triggers = new List<Trigger>();
 	}
 
-	public partial class CardBehaviour {
+	public partial class Actions {
 		// Factory functions for DSL syntax
 		public static ActionGraph BeginTurn { get { return new BeginTurn(); } }
 

@@ -123,7 +123,7 @@ namespace Brimstone
 			game.Step = Step.MAIN_ACTION;
 			game.NextStep = Step.MAIN_END;
 
-			game.ActionQueue.EnqueuePaused(game.CurrentPlayer, CardBehaviour.Draw(game.CurrentPlayer));
+			game.ActionQueue.EnqueuePaused(game.CurrentPlayer, Actions.Draw(game.CurrentPlayer));
 
 			return ActionResult.None;
 		}
