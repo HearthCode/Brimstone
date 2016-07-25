@@ -32,7 +32,7 @@ namespace BrimstoneTests
 			Assert.AreEqual(30, game.Entities.Count);
 
 			// Put a referenced entity on the stack
-			game.ActionQueue.EnqueuePaused(game, Actions.Draw(p1));
+			game.Queue(game, Actions.Draw(p1));
 			game.ActionQueue.ProcessOne(); // places reference to player 1 on the stack
 
 			// Act

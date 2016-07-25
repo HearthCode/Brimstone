@@ -110,7 +110,7 @@ namespace Brimstone
 
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			for (int i = 0; i < args[AMOUNT]; i++)
-				game.ActionQueue.EnqueuePaused(source, Actions);
+				game.Queue(source, Actions);
 			game.ActionQueue.ProcessAll();
 			return ActionResult.None;
 		}
@@ -123,7 +123,7 @@ namespace Brimstone
 			game.Step = Step.MAIN_ACTION;
 			game.NextStep = Step.MAIN_END;
 
-			game.ActionQueue.EnqueuePaused(game.CurrentPlayer, Actions.Draw(game.CurrentPlayer));
+			game.Queue(game.CurrentPlayer, Actions.Draw(game.CurrentPlayer));
 
 			return ActionResult.None;
 		}
@@ -185,7 +185,7 @@ namespace Brimstone
 
 			Console.WriteLine("{0} is playing {1}", player.FriendlyName, entity.ShortDescription);
 
-			game.ActionQueue.EnqueuePaused(entity, entity.Card.Behaviour.Battlecry);
+			game.Queue(entity, entity.Card.Behaviour.Battlecry);
 			return entity;
 		}
 	}
@@ -221,7 +221,7 @@ namespace Brimstone
 					if (e is Minion) {
 						((Player)e.Controller).Graveyard.MoveTo(e);
 						((Minion)e).Damage = 0;
-						game.ActionQueue.EnqueuePaused(e, e.Card.Behaviour.Deathrattle);
+						game.Queue(e, e.Card.Behaviour.Deathrattle);
 					}
 				}
 			return ActionResult.None;

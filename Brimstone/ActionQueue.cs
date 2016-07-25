@@ -79,19 +79,6 @@ namespace Brimstone
 			Queue.AddFront(a);
 		}
 
-		public void EnqueuePaused(IEntity source, List<QueueAction> qa) {
-			if (qa != null)
-				foreach (var a in qa)
-					EnqueuePaused(source, a);
-		}
-
-		public void EnqueuePaused(IEntity source, ActionGraph g) {
-			// Don't queue unimplemented cards
-			if (g != null)
-				// Unravel the graph into a list of actions
-				g.Queue(source, this);
-		}
-
 		public List<ActionResult> EnqueueMultiResult(IEntity source, List<QueueAction> qa) {
 			EnqueuePaused(source, qa);
 			return ProcessAll();
@@ -99,6 +86,11 @@ namespace Brimstone
 
 		public List<ActionResult> EnqueueMultiResult(IEntity source, ActionGraph g) {
 			EnqueuePaused(source, g);
+			return ProcessAll();
+		}
+
+		public List<ActionResult> EnqueueMultiResult(IEntity source, QueueAction a) {
+			EnqueuePaused(source, a);
 			return ProcessAll();
 		}
 
@@ -118,17 +110,25 @@ namespace Brimstone
 			return ActionResult.None;
 		}
 
-		public List<ActionResult> EnqueueMultiResult(IEntity source, QueueAction a) {
-			EnqueuePaused(source, a);
-			return ProcessAll();
-		}
-
 		public ActionResult Enqueue(IEntity source, QueueAction a) {
 			EnqueuePaused(source, a);
 			var result = ProcessAll();
 			if (result.Count > 0)
 				return result[0];
 			return ActionResult.None;
+		}
+
+		public void EnqueuePaused(IEntity source, List<QueueAction> qa) {
+			if (qa != null)
+				foreach (var a in qa)
+					EnqueuePaused(source, a);
+		}
+
+		public void EnqueuePaused(IEntity source, ActionGraph g) {
+			// Don't queue unimplemented cards
+			if (g != null)
+				// Unravel the graph into a list of actions
+				g.Queue(source, this);
 		}
 
 		public void EnqueuePaused(IEntity source, QueueAction a) {

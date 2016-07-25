@@ -104,6 +104,18 @@ namespace Brimstone
 			return ActionQueue.Enqueue(source, g);
 		}
 
+		public void Queue(IEntity source, ActionGraph g) {
+			ActionQueue.EnqueuePaused(source, g);
+		}
+
+		public void Queue(IEntity source, List<QueueAction> l) {
+			ActionQueue.EnqueuePaused(source, l);
+		}
+
+		public void Queue(IEntity source, QueueAction a) {
+			ActionQueue.EnqueuePaused(source, a);
+		}
+
 		public void Start() {
 			// Pick a random starting player
 			FirstPlayer = Players[RNG.Between(0, 1)];

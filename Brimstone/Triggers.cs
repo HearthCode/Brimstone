@@ -127,7 +127,7 @@ namespace Brimstone
 							break;
 					}
 					if (match)
-						Game.ActionQueue.EnqueuePaused(Game.Entities[trigger.EntityId], trigger.Action);
+						Game.Queue(Game.Entities[trigger.EntityId], trigger.Action);
 				}
 		}
 

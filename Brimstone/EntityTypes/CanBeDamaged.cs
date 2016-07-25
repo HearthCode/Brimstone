@@ -13,7 +13,7 @@ namespace Brimstone
 
 		public void CheckForDeath() {
 			if (Health <= 0) {
-				Game.ActionQueue.EnqueuePaused(this, Actions.Death(this));
+				Game.Queue(this, Actions.Death(this));
 			}
 		}
 	}
