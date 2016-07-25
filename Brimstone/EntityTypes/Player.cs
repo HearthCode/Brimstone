@@ -20,13 +20,13 @@ namespace Brimstone
 			FriendlyName = cloneFrom.FriendlyName;
 			HeroClass = cloneFrom.HeroClass;
 			// TODO: Shallow clone choices
+			// TODO: Update choices to point to new game entities
 		}
 
 		public Player(HeroClass hero, string name, int playerId, int teamId = 0) : base(Cards.FromId("Player"),
 			new Dictionary<GameTag, int> {
 				{ GameTag.PLAYSTATE, (int) PlayState.PLAYING },
 				{ GameTag.MAXHANDSIZE, 10 },
-				{ GameTag.ZONE, (int) Zone.PLAY },
 				{ GameTag.MAXRESOURCES, 10 },
 				{ GameTag.PLAYER_ID, playerId },
 				{ GameTag.TEAM_ID, (teamId != 0? teamId : playerId) },
@@ -36,22 +36,18 @@ namespace Brimstone
 			FriendlyName = name;
 		}
 
-		public void Attach(Game game) {
-			Game = game;
-			Controller = game;
-
-			Deck = new Deck(Game, HeroClass, this);
-			Hand = new ZoneEntities(Game, this, Zone.HAND);
-			Board = new ZoneEntities(Game, this, Zone.PLAY);
-			Graveyard = new ZoneEntities(Game, this, Zone.GRAVEYARD);
-			Secrets = new ZoneEntities(Game, this, Zone.SECRET);
-			Zones[Zone.DECK] = Deck;
-			Zones[Zone.HAND] = Hand;
-			Zones[Zone.PLAY] = Board;
-			Zones[Zone.GRAVEYARD] = Graveyard;
-			Zones[Zone.SECRET] = Secrets;
-
-			// TODO: Update choices to point to new game entities
+		public override Game Game {
+			get {
+				return base.Game;
+			}
+			set {
+				base.Game = value;
+				Zones[Zone.DECK] = Deck = new Deck(value, HeroClass, this);
+				Zones[Zone.HAND] = Hand = new ZoneEntities(value, this, Zone.HAND);
+				Zones[Zone.PLAY] = Board = new ZoneEntities(value, this, Zone.PLAY);
+				Zones[Zone.GRAVEYARD] = Graveyard = new ZoneEntities(value, this, Zone.GRAVEYARD);
+				Zones[Zone.SECRET] = Secrets = new ZoneEntities(value, this, Zone.SECRET);
+			}
 		}
 
 		public void Start() {

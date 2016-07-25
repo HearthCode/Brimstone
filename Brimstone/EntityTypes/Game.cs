@@ -22,10 +22,25 @@ namespace Brimstone
 		public TriggerManager ActiveTriggers;
 
 		public Player[] Players { get; private set; } = new Player[2];
-		public Player Player1 { get; private set; }
-		public Player Player2 { get; private set; }
+		public Player Player1 {
+			get {
+				return Players[0];
+			}
+			set {
+				Players[0] = value;
+			}
+		}
+		public Player Player2 {
+			get {
+				return Players[1];
+			}
+			set {
+				Players[1] = value;
+			}
+		}
 
 		public ZoneEntities Setaside { get; private set; }
+		public ZoneEntities Board { get; private set; }
 		public ZoneGroup Zones { get; } = new ZoneGroup();
 
 		public PowerHistory PowerHistory;
@@ -40,9 +55,8 @@ namespace Brimstone
 		// Required by IEntity
 		public Game(Game cloneFrom) : base(cloneFrom) {
 			// Generate zones owned by game
-			Zones[Zone.SETASIDE] = new ZoneEntities(this, this, Zone.SETASIDE);
-			Zones[Zone.PLAY] = new ZoneEntities(this, this, Zone.PLAY);
-			Setaside = Zones[Zone.SETASIDE];
+			Board = Zones[Zone.PLAY] = new ZoneEntities(this, this, Zone.PLAY);
+			Setaside = Zones[Zone.SETASIDE] = new ZoneEntities(this, this, Zone.SETASIDE);
 
 			// Update tree
 			GameId = ++SequenceNumber;
@@ -66,16 +80,15 @@ namespace Brimstone
 			ActiveTriggers = new TriggerManager(this);
 			Entities = new EntityController(this);
 
-			// Generate players and empty decks
-			SetPlayers(
-				(Player) Add(new Player(Hero1, (Player1Name.Length > 0) ? Player1Name : "Player 1", 1), this),
-				(Player) Add(new Player(Hero2, (Player2Name.Length > 0) ? Player2Name : "Player 2", 2), this)
-			);
-
 			// Generate zones owned by game
-			Zones[Zone.SETASIDE] = new ZoneEntities(this, this, Zone.SETASIDE);
-			Zones[Zone.PLAY] = new ZoneEntities(this, this, Zone.PLAY);
-			Setaside = Zones[Zone.SETASIDE];
+			Board = Zones[Zone.PLAY] = new ZoneEntities(this, this, Zone.SETASIDE);
+			Setaside = Zones[Zone.SETASIDE] = new ZoneEntities(this, this, Zone.PLAY);
+
+			// Generate players and empty decks
+			Player1 = new Player(Hero1, (Player1Name.Length > 0) ? Player1Name : "Player 1", 1);
+			Player2 = new Player(Hero2, (Player2Name.Length > 0) ? Player2Name : "Player 2", 2);
+			Board.MoveTo(Player1);
+			Board.MoveTo(Player2);
 
 			// No parent or children
 			GameId = ++SequenceNumber;
@@ -86,6 +99,8 @@ namespace Brimstone
 			newEntity.Controller = controller;
 			return Entities.Add(newEntity);
 		}
+
+		// TODO: Add Action helper
 
 		public void Start() {
 			// Pick a random starting player
@@ -107,16 +122,6 @@ namespace Brimstone
 			Step = Step.BEGIN_MULLIGAN;
 			foreach (var p in Players)
 				p.StartMulligan();
-		}
-
-		public void SetPlayers(Player Player1, Player Player2) {
-			this.Player1 = Player1;
-			this.Player2 = Player2;
-			Players[0] = Player1;
-			Players[1] = Player2;
-			foreach (var p in Players) {
-				p.Attach(this);
-			}
 		}
 
 		public void BeginTurn() {
@@ -149,18 +154,12 @@ namespace Brimstone
 		}
 
 		public override IEntity CloneState() {
-			var entities = ((EntityController)Entities.Clone());
+			var entities = new EntityController(Entities);
 			Game game = entities.FindGame();
-			game.Entities = entities;
 			// Set references to the new player proxies (no additional cloning)
 			game.Player1 = entities.FindPlayer(1);
 			game.Player2 = entities.FindPlayer(2);
-			game.Players[0] = game.Player1;
-			game.Players[1] = game.Player2;
 			game.CurrentPlayer = (CurrentPlayer.Id == game.Player1.Id ? game.Player1 : game.Player2);
-			// Re-assign zone references
-			foreach (var p in game.Players)
-				p.Attach(game);
 			// Clone queue, stack and events
 			game.ActionQueue = ((ActionQueue)ActionQueue.Clone());
 			game.ActionQueue.Attach(game);

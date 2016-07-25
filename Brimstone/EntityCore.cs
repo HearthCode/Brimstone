@@ -84,7 +84,7 @@ namespace Brimstone
 		public int ReferenceCount { get { return _referenceCount.Count; } }
 		public BaseEntityData BaseEntityData { get { return _entity; } }
 
-		public Game Game { get; set; }
+		public virtual Game Game { get; set; }
 		private IEntity _controller;
 		public IEntity Controller {
 			get {
@@ -315,6 +315,9 @@ namespace Brimstone
 				entity.Value.Game = Game;
 			foreach (var entity in Entities)
 				entity.Value.Controller = Entities[es.Entities[entity.Key].Controller.Id];
+
+			// Do this last so that changing Controller doesn't trigger EntityChanging
+			Game.Entities = this;
 		}
 
 		public IEntity Add(IEntity entity) {
@@ -352,7 +355,7 @@ namespace Brimstone
 				_changedHashes.Add(id);
 			}
 		}
-		
+
 		public void EntityChanged(int id, GameTag tag, int value) {
 			if (PowerHistory != null)
 				PowerHistory.Add(new TagChange(id, tag, value));
