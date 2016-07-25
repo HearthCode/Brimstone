@@ -188,7 +188,7 @@ namespace Test1
 						cloneCount++;
 						cloned.ActionQueue.InsertPaused(e.Source, new LazyEntity { EntityId = entity.Id });
 						cloned.ActionQueue.ProcessAll();
-						if (!cloned.PowerHistory.EquivalentTo(e.Game.PowerHistory)) {
+						if (!cloned.EquivalentTo(e.Game)) {
 							keptClonesCount++;
 							fuzzyUniqueGames.Add(cloned);
 						}
@@ -201,7 +201,7 @@ namespace Test1
 						cloneCount++;
 						cloned.ActionQueue.InsertPaused(e.Source, new FixedNumber { Num = i });
 						cloned.ActionQueue.ProcessAll();
-						if (!cloned.PowerHistory.EquivalentTo(e.Game.PowerHistory)) {
+						if (!cloned.EquivalentTo(e.Game)) {
 							keptClonesCount++;
 							fuzzyUniqueGames.Add(cloned);
 						}
