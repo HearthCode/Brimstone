@@ -185,6 +185,9 @@ namespace Brimstone
 		public int SequenceNumber { get; private set; }
 		public int ParentBranchEntry { get; private set; }
 
+		public int OrderedHash { get; private set; }
+		public int UnorderedHash { get; private set; }
+
 		public event EventHandler<PowerActionEventArgs> OnPowerAction;
 
 		public PowerHistory(Game game, Game parent = null) {
@@ -192,9 +195,13 @@ namespace Brimstone
 			if (parent != null) {
 				SequenceNumber = parent.PowerHistory.SequenceNumber;
 				ParentBranchEntry = SequenceNumber;
+				OrderedHash = parent.PowerHistory.OrderedHash;
+				UnorderedHash = parent.PowerHistory.UnorderedHash;
 			} else {
 				SequenceNumber = 0;
 				ParentBranchEntry = 0;
+				OrderedHash = 17;
+				UnorderedHash = 0;
 			}
 		}
 
@@ -207,6 +214,10 @@ namespace Brimstone
 			if (a.EntityId != 0) {
 				Delta.Add(a);
 				SequenceNumber++;
+
+				var hash = a.GetHashCode();
+				OrderedHash = OrderedHash * 31 + hash;
+				UnorderedHash += hash;
 			}
 
 			if (OnPowerAction != null)
