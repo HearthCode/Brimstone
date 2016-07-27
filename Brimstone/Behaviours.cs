@@ -19,47 +19,66 @@ namespace Brimstone
 		public static ActionGraph Give(ActionGraph Player = null, ActionGraph Card = null) { return new Give { Args = { Player, Card } }; }
 		public static ActionGraph Play(ActionGraph Entity = null) { return new Play { Args = { Entity } }; }
 
-		public static ActionGraph CreateMulligan { get { return Select(p => p.Hand.Slice(p.NumCardsDrawnThisTurn)); } }
+		public static ActionGraph CreateMulligan { get { return Select(e => ((Player)e).Hand.Slice(((Player)e).NumCardsDrawnThisTurn)); } }
 
 		// TODO: Write all common selectors
-		public static ActionGraph Self { get { return Select(e => e); } }
-		public static ActionGraph Controller { get { return Select(e => e.Controller); } }
-		public static ActionGraph CurrentPlayer { get { return Select(e => e.Game.CurrentPlayer); } }
-		public static ActionGraph AllMinions { get { return Select(g => g.Player1.Board.Concat(g.Player2.Opponent.Board)); } }
-		public static ActionGraph OpponentMinions { get { return Select(p => p.Opponent.Board); } }
-		public static ActionGraph AllCharacters { get { return Select(g => g.Player1.Board.Concat(g.Player2.Board)
-														.Concat(new List<IEntity> { g.Player1.Hero, g.Player2.Hero })); } }
-		public static ActionGraph Random(ActionGraph s) { return new RandomChoice { Args = { s } }; }
+		public static Selector Self { get { return Select(e => e); } }
+		public static Selector Controller { get { return Select(e => e.Controller); } }
+		public static Selector CurrentPlayer { get { return Select(e => e.Game.CurrentPlayer); } }
+		public static Selector FriendlyHero { get { return Select(e => ((Player)e.Controller).Hero); } }
+		public static Selector OpponentHero { get { return Select(e => ((Player)e.Controller).Opponent.Hero); } }
+		public static Selector AllMinions { get { return Select(e => e.Game.Player1.Board.Concat(e.Game.Player2.Opponent.Board)); } }
+		public static Selector OpponentCharacters { get { return Union(OpponentMinions, OpponentHero); } }
+		public static Selector OpponentMinions { get { return Select(e => ((Player)e.Controller).Opponent.Board); } }
+		public static Selector AllCharacters { get { return Union(AllMinions, FriendlyHero, OpponentHero); } }
+		public static ActionGraph Random(Selector s) { return new RandomChoice { Args = { s } }; }
 		public static ActionGraph RandomOpponentMinion { get { return Random(OpponentMinions); } }
 		public static ActionGraph RandomAmount(ActionGraph Min, ActionGraph Max) { return new RandomAmount { Args = { Min, Max } }; }
 
 		// TODO: Add selector set ops
+		public static Selector Union(params Selector[] s) {
+			if (s.Length < 2)
+				throw new ArgumentException();
 
-		public static ActionGraph Select(Func<IEntity, IEntity> selector) {
+			if (s.Length > 2)
+				s[1] = Union(s.Skip(1).ToArray());
+
+			if (s[0].SelectionSource != s[1].SelectionSource)
+				throw new ArgumentException();
+
+			var sel = new Selector {
+				SelectionSource = s[0].SelectionSource,
+				Lambda = e => s[0].Lambda(e).Concat(s[1].Lambda(e))
+			};
+			return sel;
+		}
+
+		public static Selector Select(Func<IEntity, IEntity> selector) {
 			return new Selector {
 				SelectionSource = SelectionSource.ActionSource,
 				Lambda = e => new List<IEntity> { selector(e) }
 			};
 		}
-		public static ActionGraph Select(Func<IEntity, IEnumerable<IEntity>> selector) {
+		public static Selector Select(Func<IEntity, IEnumerable<IEntity>> selector) {
 			return new Selector {
 				SelectionSource = SelectionSource.ActionSource,
 				Lambda = selector
 			};
 		}
-		public static ActionGraph Select(Func<Player, IEnumerable<IEntity>> selector) {
+		/*
+		public static Selector Select(Func<Player, IEnumerable<IEntity>> selector) {
 			return new Selector {
 				SelectionSource = SelectionSource.Player,
 				Lambda = e => selector((Player)e)
 			};
 		}
-		public static ActionGraph Select(Func<Game, IEnumerable<IEntity>> selector) {
+		public static Selector Select(Func<Game, IEnumerable<IEntity>> selector) {
 			return new Selector {
 				SelectionSource = SelectionSource.Game,
 				Lambda = e => selector((Game)e)
 			};
 		}
-
+		*/
 		public static ActionGraph Damage(ActionGraph Targets = null, ActionGraph Amount = null) { return new Damage { Args = { Targets, Amount } }; }
 		public static ActionGraph Death(ActionGraph Targets = null) { return new Death { Args = { Targets } }; }
 
