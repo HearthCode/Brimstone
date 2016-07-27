@@ -24,6 +24,11 @@
 			}
 		};
 
+		// Arcane Missiles
+		public static Behaviour EX1_277 = new Behaviour {
+			Battlecry = Damage(Random(AllCharacters), 1) * 3
+		};
+
 		// Armorsmith
 		// Imp Gang Boss
 	}
