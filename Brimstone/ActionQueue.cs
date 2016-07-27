@@ -33,6 +33,8 @@ namespace Brimstone
 		public event EventHandler<QueueActionEventArgs> OnActionStarting;
 		public event EventHandler<QueueActionEventArgs> OnAction;
 
+		public int Count { get { return Queue.Count; } }
+
 		public ActionQueue(Game game) {
 			Game = game;
 			Paused = false;
