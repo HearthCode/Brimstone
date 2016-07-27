@@ -203,9 +203,13 @@ namespace Brimstone
 			var result = action.Execute(Game, source, args);
 			if (result.HasResult)
 				ResultStack.Push(result);
-			if (OnAction != null)
-				OnAction(this, new QueueActionEventArgs(Game, source, action, args));
 
+			if (OnAction != null) {
+				var e = new QueueActionEventArgs(Game, source, action, args);
+				OnAction(this, e);
+				if (e.Cancel)
+					return false;
+			}
 			return true;
 		}
 
