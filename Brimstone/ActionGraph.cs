@@ -55,7 +55,7 @@ namespace Brimstone
 			foreach (var action in Graph) {
 				foreach (var arg in action.Args)
 					arg.Queue(source, queue);
-				queue.EnqueuePaused(source, action);
+				queue.EnqueueDeferred(source, action);
 			}
 		}
 

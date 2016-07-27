@@ -26,6 +26,7 @@ namespace Brimstone
 		public Game Game { get; private set; }
 		public Deque<QueueAction> Queue = new Deque<QueueAction>();
 		public Stack<ActionResult> ResultStack = new Stack<ActionResult>();
+		public bool Paused { get; set; }
 
 		public event EventHandler<QueueActionEventArgs> OnQueueing;
 		public event EventHandler<QueueActionEventArgs> OnQueued;
@@ -34,6 +35,7 @@ namespace Brimstone
 
 		public ActionQueue(Game game) {
 			Game = game;
+			Paused = false;
 		}
 
 		public ActionQueue(ActionQueue cloneFrom) {
@@ -43,6 +45,7 @@ namespace Brimstone
 			stack.Reverse();
 			foreach (var item in stack)
 				ResultStack.Push((ActionResult)item.Clone());
+			Paused = cloneFrom.Paused;
 			// Events are immutable so this creates copies
 			OnQueueing = cloneFrom.OnQueueing;
 			OnQueued = cloneFrom.OnQueued;
@@ -71,7 +74,7 @@ namespace Brimstone
 		}
 
 
-		public void InsertPaused(IEntity source, List<QueueAction> qa) {
+		public void InsertDeferred(IEntity source, List<QueueAction> qa) {
 			if (qa != null) {
 				foreach (var a in qa)
 					a.SourceEntityId = source.Id;
@@ -79,11 +82,11 @@ namespace Brimstone
 			}
 		}
 
-		public void InsertPaused(IEntity source, ActionGraph g) {
-			InsertPaused(source, g.Unravel());
+		public void InsertDeferred(IEntity source, ActionGraph g) {
+			InsertDeferred(source, g.Unravel());
 		}
 
-		public void InsertPaused(IEntity source, QueueAction a) {
+		public void InsertDeferred(IEntity source, QueueAction a) {
 			if (a == null)
 				return;
 			// No event triggers when inserting at front of queue
@@ -92,22 +95,22 @@ namespace Brimstone
 		}
 
 		public List<ActionResult> EnqueueMultiResult(IEntity source, List<QueueAction> qa) {
-			EnqueuePaused(source, qa);
+			EnqueueDeferred(source, qa);
 			return ProcessAll();
 		}
 
 		public List<ActionResult> EnqueueMultiResult(IEntity source, ActionGraph g) {
-			EnqueuePaused(source, g);
+			EnqueueDeferred(source, g);
 			return ProcessAll();
 		}
 
 		public List<ActionResult> EnqueueMultiResult(IEntity source, QueueAction a) {
-			EnqueuePaused(source, a);
+			EnqueueDeferred(source, a);
 			return ProcessAll();
 		}
 
 		public ActionResult Enqueue(IEntity source, List<QueueAction> qa) {
-			EnqueuePaused(source, qa);
+			EnqueueDeferred(source, qa);
 			var result = ProcessAll();
 			if (result.Count > 0)
 				return result[0];
@@ -115,7 +118,7 @@ namespace Brimstone
 		}
 
 		public ActionResult Enqueue(IEntity source, ActionGraph g) {
-			EnqueuePaused(source, g);
+			EnqueueDeferred(source, g);
 			var result = ProcessAll();
 			if (result.Count > 0)
 				return result[0];
@@ -123,27 +126,27 @@ namespace Brimstone
 		}
 
 		public ActionResult Enqueue(IEntity source, QueueAction a) {
-			EnqueuePaused(source, a);
+			EnqueueDeferred(source, a);
 			var result = ProcessAll();
 			if (result.Count > 0)
 				return result[0];
 			return ActionResult.None;
 		}
 
-		public void EnqueuePaused(IEntity source, List<QueueAction> qa) {
+		public void EnqueueDeferred(IEntity source, List<QueueAction> qa) {
 			if (qa != null)
 				foreach (var a in qa)
-					EnqueuePaused(source, a);
+					EnqueueDeferred(source, a);
 		}
 
-		public void EnqueuePaused(IEntity source, ActionGraph g) {
+		public void EnqueueDeferred(IEntity source, ActionGraph g) {
 			// Don't queue unimplemented cards
 			if (g != null)
 				// Unravel the graph into a list of actions
 				g.Queue(source, this);
 		}
 
-		public void EnqueuePaused(IEntity source, QueueAction a) {
+		public void EnqueueDeferred(IEntity source, QueueAction a) {
 			if (a == null)
 				return;
 
@@ -179,12 +182,17 @@ namespace Brimstone
 				;
 			// Return whatever is left on the stack
 			var stack = new List<ActionResult>(ResultStack);
+			if (Paused || Queue.Count != 0)
+				return stack;
 			ResultStack.Clear();
 			stack.Reverse();
 			return stack;
 		}
 
 		public bool ProcessOne() {
+			if (Paused)
+				return false;
+
 			if (Queue.Count == 0)
 				return false;
 

@@ -105,15 +105,15 @@ namespace Brimstone
 		}
 
 		public void Queue(IEntity source, ActionGraph g) {
-			ActionQueue.EnqueuePaused(source, g);
+			ActionQueue.EnqueueDeferred(source, g);
 		}
 
 		public void Queue(IEntity source, List<QueueAction> l) {
-			ActionQueue.EnqueuePaused(source, l);
+			ActionQueue.EnqueueDeferred(source, l);
 		}
 
 		public void Queue(IEntity source, QueueAction a) {
-			ActionQueue.EnqueuePaused(source, a);
+			ActionQueue.EnqueueDeferred(source, a);
 		}
 
 		public void Start() {

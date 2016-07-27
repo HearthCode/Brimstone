@@ -181,7 +181,7 @@ namespace BrimstoneTests
 				if (e.Action is RandomChoice) {
 					foreach (var entity in e.Args[RandomChoice.ENTITIES]) {
 						Game cloned = (Game)e.Game.CloneState();
-						cloned.ActionQueue.InsertPaused(e.Source, new LazyEntity { EntityId = entity.Id });
+						cloned.ActionQueue.InsertDeferred(e.Source, new LazyEntity { EntityId = entity.Id });
 						cloned.ActionQueue.ProcessAll();
 						if (!cloned.EquivalentTo(e.Game))
 							clones.Enqueue(cloned);
@@ -191,7 +191,7 @@ namespace BrimstoneTests
 				if (e.Action is RandomAmount) {
 					for (int i = e.Args[RandomAmount.MIN]; i <= e.Args[RandomAmount.MAX]; i++) {
 						Game cloned = (Game)e.Game.CloneState();
-						cloned.ActionQueue.InsertPaused(e.Source, new FixedNumber { Num = i });
+						cloned.ActionQueue.InsertDeferred(e.Source, new FixedNumber { Num = i });
 						cloned.ActionQueue.ProcessAll();
 						if (!cloned.EquivalentTo(e.Game))
 							clones.Enqueue(cloned);
@@ -242,7 +242,7 @@ namespace BrimstoneTests
 				if (e.Action is RandomChoice) {
 					foreach (var entity in e.Args[RandomChoice.ENTITIES]) {
 						Game cloned = (Game)e.Game.CloneState();
-						cloned.ActionQueue.InsertPaused(e.Source, new LazyEntity { EntityId = entity.Id });
+						cloned.ActionQueue.InsertDeferred(e.Source, new LazyEntity { EntityId = entity.Id });
 						cloned.ActionQueue.ProcessAll();
 						if (!cloned.EquivalentTo(e.Game))
 							clones.Enqueue(cloned);
@@ -252,7 +252,7 @@ namespace BrimstoneTests
 				if (e.Action is RandomAmount) {
 					for (int i = e.Args[RandomAmount.MIN]; i <= e.Args[RandomAmount.MAX]; i++) {
 						Game cloned = (Game)e.Game.CloneState();
-						cloned.ActionQueue.InsertPaused(e.Source, new FixedNumber { Num = i });
+						cloned.ActionQueue.InsertDeferred(e.Source, new FixedNumber { Num = i });
 						cloned.ActionQueue.ProcessAll();
 						if (!cloned.EquivalentTo(e.Game))
 							clones.Enqueue(cloned);
