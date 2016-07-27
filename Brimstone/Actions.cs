@@ -192,8 +192,8 @@ namespace Brimstone
 
 	public class Damage : QueueAction
 	{
-		private const int TARGETS = 0;
-		private const int DAMAGE = 1;
+		public const int TARGETS = 0;
+		public const int DAMAGE = 1;
 
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			if (args[TARGETS].HasResult)
@@ -211,7 +211,7 @@ namespace Brimstone
 
 	public class Death : QueueAction
 	{
-		private const int TARGETS = 0;
+		public const int TARGETS = 0;
 
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			if (args[TARGETS].HasResult)
