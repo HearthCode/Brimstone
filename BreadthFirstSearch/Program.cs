@@ -123,11 +123,11 @@ namespace Test1
 
 			// Find the Boom Bot to kill
 			var BoomBot = game.CurrentPlayer.Board.First(t => t.Card.Id == "GVG_110t") as Minion;
-			
+
 			// Add the action to the game's action queue but don't process it yet
-			game.ActionQueue.Paused = true;
-			BoomBot.Hit(1);
-			game.ActionQueue.Paused = false;
+			game.Queue(() => {
+				BoomBot.Hit(1);
+			});
 
 			// Breadth-first processing loop
 			while (searchQueue.Count > 0) {

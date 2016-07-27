@@ -166,6 +166,12 @@ namespace Brimstone
 				OnQueued(this, new QueueActionEventArgs(Game, source, a));
 		}
 
+		public void EnqueueDeferred(Action a) {
+			Paused = true;
+			a();
+			Paused = false;
+		}
+
 		public void ReplaceArg(ActionResult newArg) {
 			ReplaceArgs(new List<ActionResult> { newArg });
 		}

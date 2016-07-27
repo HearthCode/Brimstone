@@ -116,6 +116,10 @@ namespace Brimstone
 			ActionQueue.EnqueueDeferred(source, a);
 		}
 
+		public void Queue(Action a) {
+			ActionQueue.EnqueueDeferred(a);
+		}
+
 		public void Start() {
 			// Pick a random starting player
 			FirstPlayer = Players[RNG.Between(0, 1)];
