@@ -70,7 +70,19 @@ namespace Brimstone
 			}
 		}
 
-		// TODO: Other Insert functions
+
+		public void InsertPaused(IEntity source, List<QueueAction> qa) {
+			if (qa != null) {
+				foreach (var a in qa)
+					a.SourceEntityId = source.Id;
+				Queue.AddFrontRange(qa);
+			}
+		}
+
+		public void InsertPaused(IEntity source, ActionGraph g) {
+			InsertPaused(source, g.Unravel());
+		}
+
 		public void InsertPaused(IEntity source, QueueAction a) {
 			if (a == null)
 				return;
