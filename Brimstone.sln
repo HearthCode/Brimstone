@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Brimstone", "Brimstone\Brimstone.csproj", "{2ACA22D8-ED17-4BB0-BD5B-E0A435D180B8}"
 EndProject
@@ -15,6 +15,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrimstoneVisualizer", "BrimstoneVisualizer\BrimstoneVisualizer.csproj", "{328FFE6A-F79D-4D79-B6D0-7488D5665AC0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrimstoneTests", "BrimstoneTests\BrimstoneTests.csproj", "{067456C0-086C-46A8-B37F-1405717B7BFC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreadthFirstSearch", "BreadthFirstSearch\BreadthFirstSearch.csproj", "{0346012E-573F-440B-BDEA-6AD50DE9E3FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +40,10 @@ Global
 		{067456C0-086C-46A8-B37F-1405717B7BFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{067456C0-086C-46A8-B37F-1405717B7BFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{067456C0-086C-46A8-B37F-1405717B7BFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0346012E-573F-440B-BDEA-6AD50DE9E3FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0346012E-573F-440B-BDEA-6AD50DE9E3FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0346012E-573F-440B-BDEA-6AD50DE9E3FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0346012E-573F-440B-BDEA-6AD50DE9E3FF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -45,5 +51,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{5D1FBC0E-35B0-4D5F-9F7A-6D17930F71AD} = {54428178-5816-4B2E-B62F-07D40D57758A}
 		{328FFE6A-F79D-4D79-B6D0-7488D5665AC0} = {54428178-5816-4B2E-B62F-07D40D57758A}
+		{0346012E-573F-440B-BDEA-6AD50DE9E3FF} = {54428178-5816-4B2E-B62F-07D40D57758A}
 	EndGlobalSection
 EndGlobal
