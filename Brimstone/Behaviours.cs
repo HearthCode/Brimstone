@@ -25,10 +25,12 @@ namespace Brimstone
 		public static ActionGraph Self { get { return Select(e => e); } }
 		public static ActionGraph Controller { get { return Select(e => e.Controller); } }
 		public static ActionGraph CurrentPlayer { get { return Select(e => e.Game.CurrentPlayer); } }
-		public static ActionGraph AllMinions { get { return Select(g => g.CurrentPlayer.Board.Concat(g.CurrentPlayer.Opponent.Board)); } }
+		public static ActionGraph AllMinions { get { return Select(g => g.Player1.Board.Concat(g.Player2.Opponent.Board)); } }
 		public static ActionGraph OpponentMinions { get { return Select(p => p.Opponent.Board); } }
-
-		public static ActionGraph RandomOpponentMinion { get { return new RandomChoice { Args = { OpponentMinions } }; } }
+		public static ActionGraph AllCharacters { get { return Select(g => g.Player1.Board.Concat(g.Player2.Board)
+														.Concat(new List<IEntity> { g.Player1.Hero, g.Player2.Hero })); } }
+		public static ActionGraph Random(ActionGraph s) { return new RandomChoice { Args = { s } }; }
+		public static ActionGraph RandomOpponentMinion { get { return Random(OpponentMinions); } }
 		public static ActionGraph RandomAmount(ActionGraph Min, ActionGraph Max) { return new RandomAmount { Args = { Min, Max } }; }
 
 		// TODO: Add selector set ops
