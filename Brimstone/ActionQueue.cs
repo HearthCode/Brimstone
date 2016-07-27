@@ -250,13 +250,8 @@ namespace Brimstone
 
 		public override string ToString() {
 			string s = string.Empty;
-			int p = 0;
-			foreach (var a in Queue) {
+			foreach (var a in Queue)
 				s += a + "\n";
-				p++;
-				if (p == Count)
-					break;
-			}
 			return s;
 		}
 

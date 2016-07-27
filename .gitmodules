@@ -1,0 +1,3 @@
+[submodule "Deque"]
+	path = Deque
+	url = https://github.com/tejacques/Deque
