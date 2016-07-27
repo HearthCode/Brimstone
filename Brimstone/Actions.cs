@@ -111,7 +111,6 @@ namespace Brimstone
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			for (int i = 0; i < args[AMOUNT]; i++)
 				game.Queue(source, Actions);
-			game.ActionQueue.ProcessAll();
 			return ActionResult.None;
 		}
 	}
