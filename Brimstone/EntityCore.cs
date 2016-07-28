@@ -128,11 +128,11 @@ namespace Brimstone
 				if (_entity.Tags.ContainsKey(t) && _entity[t] == value)
 					return;
 				else if (t == GameTag.CONTROLLER) {
-					Controller = Game.Entities[(int)value];
+					Controller = Game.Entities[value];
 				}
 				else if (t == GameTag.ENTITY_ID) {
 					Changing();
-					_entity.Id = (int)value;
+					_entity.Id = value;
 				} else {
 					Changing();
 					_entity[t] = value;
@@ -223,18 +223,22 @@ namespace Brimstone
 			get {
 				if (_fuzzyHash != 0)
 					return _fuzzyHash;
+				uint prime = 16777219;
 				bool inHand = _entity.Tags.ContainsKey(GameTag.ZONE) && _entity.Tags[GameTag.ZONE] == (int)Zone.HAND;
-				int hash = 17;
+				uint hash = 2166136261;
 				// The card's asset ID uniquely identifies the set of immutable starting tags for the card
-				hash = hash * 31 + _entity.Card.AssetId;
+				hash = (hash * prime) ^ (uint)(_entity.Card.AssetId >> 8);
+				hash = (hash * prime) ^ (uint)(_entity.Card.AssetId & 0xff);
 				foreach (var kv in _entity.Tags)
 					if (kv.Key != GameTag.ZONE_POSITION || !inHand) {
-						hash = hash * 31 + (int)kv.Key;
-						hash = hash * 31 + kv.Value;
+						hash = (hash * prime) ^ ((uint)kv.Key >> 8);
+						hash = (hash * prime) ^ ((uint)kv.Key & 0xff);
+						hash = (hash * prime) ^ (uint)(kv.Value >> 8);
+						hash = (hash * prime) ^ (uint)(kv.Value & 0xff);
 					}
-				hash = hash * 31 + (int)GameTag.CONTROLLER;
-				hash = hash * 31 + Controller.Id;
-				_fuzzyHash = hash;
+				hash = (hash * prime) ^ (uint)GameTag.CONTROLLER;
+				hash = (hash * prime) ^ (uint)Controller.Id;
+				_fuzzyHash = (int)hash;
 				return _fuzzyHash;
 			}
 		}
