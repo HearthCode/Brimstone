@@ -187,8 +187,8 @@ namespace Test1
 						// Check for game state hash collision (if this fires, it's a bug in the hashing algorithm)
 						if (root.Entities.FuzzyGameHash == g.Entities.FuzzyGameHash)
 							Console.WriteLine("Game hash collision on two unique game states");
-						else
-							different.Add(g);
+
+						different.Add(g);
 					}
 				}
 				uniqueGames.Add(root);
