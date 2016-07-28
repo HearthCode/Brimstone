@@ -1,6 +1,8 @@
 ﻿// This program guarantees to find the number of unique board states (excluding entity IDs)
 // for a given play scenario - used for testing purposes against tree search results
 
+// It also checks the game hashing algorithm for hash collisions
+
 // This is very slow and consumes a lot of memory but gives an accurate count of
 // unique game states resulting from any scenario
 
@@ -139,51 +141,54 @@ namespace Test1
 				leafNodeGames.Remove(root);
 				var different = new HashSet<Game>();
 
+				// Hash every entity
+				// WARNING: This relies on a good hash function!
+				var e1 = new HashSet<IEntity>(root.Entities, new FuzzyEntityComparer());
+
 				foreach (var g in leafNodeGames) {
 					if (g.Entities.Count != root.Entities.Count) {
 						different.Add(g);
 						continue;
 					}
-					bool diff = false;
-					// We have to search by zone so we can ignore entity ID for in-play minions
-					var zg1 = new List<ZoneGroup> { g.Zones, g.Player1.Zones, g.Player2.Zones };
-					var zg2 = new List<ZoneGroup> { root.Zones, root.Player1.Zones, root.Player2.Zones };
+					var e2 = new HashSet<IEntity>(g.Entities, new FuzzyEntityComparer());
 
-					foreach (var zgPair in zg1.Zip(zg2, (x, y) => new { ZG1 = x, ZG2 = y })) {
-						foreach (var zPair in zgPair.ZG1.Zip(zgPair.ZG2, (x, y) => new { Z1 = x, Z2 = y })) {
-							if (zPair.Z1 == null)
-								continue;
-							if (zPair.Z1.Count != zPair.Z2.Count) {
-								different.Add(g);
-								diff = true;
-								break;
-							}
-							foreach (var ePair in zPair.Z1.Zip(zPair.Z2, (x, y) => new { A = x, B = y })) {
-								if (!g.Entities.ContainsKey(ePair.B.Id)) {
-									different.Add(g);
-									diff = true;
-									break;
-								}
-								var tagsA = ePair.A.CopyTags();
-								var tagsB = ePair.B.CopyTags();
-
-								foreach (var tagPair in tagsA.Zip(tagsB, (x, y) => new { T1 = x, T2 = y })) {
-									if (tagPair.T1.Key == GameTag.ENTITY_ID && tagPair.T2.Key == GameTag.ENTITY_ID)
+					if (e2.Count < g.Entities.Count || e1.Count < root.Entities.Count) {
+						// Potential hash collision
+						var c = (e2.Count < g.Entities.Count ? e2 : e1);
+						var g2 = (c == e2 ? g : root);
+						var ent = g2.Entities.Select(x => x.FuzzyHash).ToList();
+						// Build list of collisions
+						var collisions = new Dictionary<int, IEntity>();
+						foreach (var e in g2.Entities) {
+							if (collisions.ContainsKey(e.FuzzyHash)) {
+								// It's not a coliision if the tag set differs only by entity ID
+								bool collide = false;
+								foreach (var tagPair in e.Zip(collisions[e.FuzzyHash], (x, y) => new { A = x, B = y })) {
+									if (tagPair.A.Key == GameTag.ENTITY_ID && tagPair.B.Key == GameTag.ENTITY_ID)
 										continue;
-									if (tagPair.T1.Key != tagPair.T2.Key || tagPair.T1.Value != tagPair.T2.Value) {
-										different.Add(g);
-										diff = true;
+									if (tagPair.A.Key != tagPair.A.Key || tagPair.B.Value != tagPair.B.Value) {
+										collide = true;
 										break;
 									}
 								}
-								if (diff)
-									break;
+								if (collide) {
+									Console.WriteLine(collisions[e.FuzzyHash]);
+									Console.WriteLine(e);
+									Console.WriteLine(collisions[e.FuzzyHash].FuzzyHash + " " + e.FuzzyHash);
+									throw new Exception("Hash collision - not safe to compare games");
+								}
 							}
-							if (diff)
-								break;
+							else
+								collisions.Add(e.FuzzyHash, e);
 						}
-						if (diff)
-							break;
+					}
+
+					if (!e2.SetEquals(e1)) {
+						// Check for game state hash collision (if this fires, it's a bug in the hashing algorithm)
+						if (root.Entities.FuzzyGameHash == g.Entities.FuzzyGameHash)
+							Console.WriteLine("Game hash collision on two unique game states");
+						else
+							different.Add(g);
 					}
 				}
 				uniqueGames.Add(root);
@@ -192,8 +197,8 @@ namespace Test1
 			}
 
 			foreach (var g in uniqueGames) {
-				Console.WriteLine("Player 1:\r\n" + g.Player1.Board);
-				Console.WriteLine("Player 2:\r\n" + g.Player2.Board);
+				Console.WriteLine("Player 1:\r\n" + g.Player1 + "\r\n" + g.Player1.Board);
+				Console.WriteLine("Player 2:\r\n" + g.Player2 + "\r\n" + g.Player2.Board);
 				Console.WriteLine("");
 			}
 			Console.WriteLine("{0} unique games found", uniqueGames.Count);
