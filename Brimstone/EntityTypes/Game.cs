@@ -15,7 +15,6 @@ namespace Brimstone
 		}
 	}
 
-	// TODO: Abstract this so that Game is just another Entity (GameEntity) and make a new Game class that manages a game
 	public partial class Game : Entity, IZoneOwner
 	{
 		public EntityController Entities;
@@ -52,6 +51,7 @@ namespace Brimstone
 		public Game Parent { get; }
 		public HashSet<int> Children { get; } = new HashSet<int>();
 
+		public int Depth { get; } = 0;
 		// Required by IEntity
 		public Game(Game cloneFrom) : base(cloneFrom) {
 			// Generate zones owned by game
@@ -62,6 +62,7 @@ namespace Brimstone
 			GameId = ++SequenceNumber;
 			Parent = cloneFrom;
 			cloneFrom.Children.Add(GameId);
+			Depth = cloneFrom.Depth + 1;
 		}
 
 		public Game(HeroClass Hero1, HeroClass Hero2, string Player1Name = "", string Player2Name = "", bool PowerHistory = false)
