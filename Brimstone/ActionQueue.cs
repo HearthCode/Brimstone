@@ -26,6 +26,7 @@ namespace Brimstone
 		public Game Game { get; private set; }
 		public Deque<QueueAction> Queue = new Deque<QueueAction>();
 		public Stack<ActionResult> ResultStack = new Stack<ActionResult>();
+		public List<QueueActionEventArgs> History;
 		public bool Paused { get; set; }
 
 		public event EventHandler<QueueActionEventArgs> OnQueueing;
@@ -38,6 +39,7 @@ namespace Brimstone
 		public ActionQueue(Game game) {
 			Game = game;
 			Paused = false;
+			History = new List<QueueActionEventArgs>();
 		}
 
 		public ActionQueue(ActionQueue cloneFrom) {
@@ -45,8 +47,10 @@ namespace Brimstone
 				Queue.AddBack((QueueAction)item.Clone());
 			var stack = new List<ActionResult>(cloneFrom.ResultStack);
 			stack.Reverse();
+			// TODO: Doesn't this clone some items twice?
 			foreach (var item in stack)
 				ResultStack.Push((ActionResult)item.Clone());
+			History = new List<QueueActionEventArgs>(cloneFrom.History);
 			Paused = cloneFrom.Paused;
 			// Events are immutable so this creates copies
 			OnQueueing = cloneFrom.OnQueueing;
@@ -216,28 +220,26 @@ namespace Brimstone
 				args.Add(ResultStack.Pop());
 			args.Reverse();
 
+			var e = new QueueActionEventArgs(Game, source, action, args);
 			if (OnActionStarting != null) {
-				var e = new QueueActionEventArgs(Game, source, action, args);
 				OnActionStarting(this, e);
-				source = e.Source;
-				action = e.Action;
-				args = e.Args;
 				if (e.Cancel)
 					return false;
 			}
 
 			// TODO: Replace with async/await later
 			// Run action and push results onto stack
-			var result = action.Execute(Game, source, args);
+			var result = e.Action.Execute(e.Game, e.Source, e.Args);
 			if (result.HasResult)
 				ResultStack.Push(result);
 
 			if (OnAction != null) {
-				var e = new QueueActionEventArgs(Game, source, action, args);
 				OnAction(this, e);
 				if (e.Cancel)
 					return false;
 			}
+			History.Add(e);
+
 			return true;
 		}
 
