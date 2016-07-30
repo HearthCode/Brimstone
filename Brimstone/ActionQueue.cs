@@ -19,6 +19,17 @@ namespace Brimstone
 			Args = p;
 			Cancel = false;
 		}
+
+		public override string ToString() {
+			string s = string.Format("Game {0:x8}: {1} ({2}) -> {3}", Game.Entities.FuzzyGameHash, Source.Card.Name, Source.Id, Action.GetType().Name);
+			if (Args.Count > 0) {
+				s += "(";
+				foreach (var a in Args)
+					s += a + ", ";
+				s = s.Substring(0, s.Length - 2) + ")";
+			}
+			return s;
+		}
 	}
 
 	public class ActionQueue : ICloneable
@@ -226,6 +237,7 @@ namespace Brimstone
 				if (e.Cancel)
 					return false;
 			}
+			History.Add(e);
 
 			// TODO: Replace with async/await later
 			// Run action and push results onto stack
@@ -238,8 +250,6 @@ namespace Brimstone
 				if (e.Cancel)
 					return false;
 			}
-			History.Add(e);
-
 			return true;
 		}
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Brimstone
 {
@@ -36,6 +37,12 @@ namespace Brimstone
 
 		public int MaxAllowedInDeck {
 			get { return this[GameTag.RARITY] == (int)Rarity.LEGENDARY ? 1 : 2; }
+		}
+
+		public string AbbrieviatedName {
+			get {
+				return new string(Name.Split(new[] { ' ' }).Select(word => word.First()).ToArray());
+			}
 		}
 
 		public static implicit operator Card(string name) {
