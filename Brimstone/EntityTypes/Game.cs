@@ -145,7 +145,7 @@ namespace Brimstone
 		}
 
 		public void BeginTurn() {
-			ActionQueue.Enqueue(this, Actions.BeginTurn);
+			Action(this, Actions.BeginTurn);
 		}
 
 		// Perform a fuzzy equivalence between two game states
