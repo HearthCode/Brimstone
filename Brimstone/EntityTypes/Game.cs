@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Brimstone
 {
@@ -15,7 +16,7 @@ namespace Brimstone
 		}
 	}
 
-	public partial class Game : Entity, IZoneOwner
+	public partial class Game : Entity, IZoneOwner, IFormattable
 	{
 		public EntityController Entities;
 		public TriggerManager ActiveTriggers;
@@ -153,23 +154,55 @@ namespace Brimstone
 		}
 
 		public override string ToString() {
-			string s = "Board state: ";
-			var players = new List<Player> { Player1, Player2 };
-			foreach (var player in players) {
-				s += "Player " + player.Card.Id + " - ";
-				s += "HAND: ";
-				foreach (var entity in player.Hand) {
-					s += entity.ToString() + ", ";
-				}
-				s += "PLAY: ";
-				foreach (var entity in player.Board) {
-					s += entity.ToString() + ", ";
-				}
+			return ToString("G", null);
+		}
+
+		public string ToString(string format, IFormatProvider formatProvider) {
+			if (format == null)
+				format = "G";
+
+			if (formatProvider != null) {
+				ICustomFormatter formatter = formatProvider.GetFormat(this.GetType()) as ICustomFormatter;
+				if (formatter != null)
+					return formatter.Format(format, this, formatProvider);
 			}
-			s = s.Substring(0, s.Length - 2) + "\nPower log: ";
-			foreach (var item in PowerHistory)
-				s += item + "\n";
-			return s;
+
+			string s = string.Format("Game hash: {0:x8}", Entities.FuzzyGameHash) + "\r\n";
+
+			switch (format) {
+				case "G":
+					s += "Board state: ";
+					var players = new List<Player> { Player1, Player2 };
+					foreach (var player in players) {
+						s += "Player " + player.Card.Id + " - ";
+						s += "HAND: ";
+						foreach (var entity in player.Hand) {
+							s += entity.ToString() + ", ";
+						}
+						s += "PLAY: ";
+						foreach (var entity in player.Board) {
+							s += entity.ToString() + ", ";
+						}
+					}
+					s = s.Substring(0, s.Length - 2) + "\nPower log: ";
+					foreach (var item in PowerHistory)
+						s += item + "\n";
+					return s;
+
+				case "S":
+					s += "Player 1 (health " + Player1.Hero.Health + "): ";
+					foreach (var e in Player1.Board)
+						s += "[" + e[GameTag.ZONE_POSITION] + ":" + e.Card.AbbrieviatedName + "](" + ((CanBeDamaged)e).Damage + ") ";
+					s += "\r\nPlayer 2 (health " + Player2.Hero.Health + "): ";
+					foreach (var e in Player2.Board)
+						s += "[" + e[GameTag.ZONE_POSITION] + ":" + e.Card.AbbrieviatedName + "](" + ((CanBeDamaged)e).Damage + ") ";
+					s += "\r\n";
+					foreach (var pa in PowerHistory.Skip(PowerHistory.Count() - 20))
+						s += pa + "\r\n";
+					return s;
+				default:
+					return "Game (no format specified)";
+			}
 		}
 
 		public override IEntity CloneState() {
