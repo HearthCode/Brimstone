@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace Brimstone
 {
-	public class QueueActionEventArgs : EventArgs
+	public class QueueActionEventArgs : EventArgs, ICloneable
 	{
-		public Game Game { get; }
+		public Game Game { get; set; }
 		public IEntity Source { get; set; }
 		public QueueAction Action { get; set; }
 		public List<ActionResult> Args { get; set; }
@@ -21,7 +21,7 @@ namespace Brimstone
 		}
 
 		public override string ToString() {
-			string s = string.Format("Game {0:x8}: {1} ({2}) -> {3}", Game.Entities.FuzzyGameHash, Source.Card.Name, Source.Id, Action.GetType().Name);
+			string s = string.Format("Game {0:x8}: {1} ({2}) -> {3}", Game.Entities.FuzzyGameHash, Source.Card.Name, Source.Id, Action);
 			if (Args.Count > 0) {
 				s += "(";
 				foreach (var a in Args)
@@ -30,12 +30,17 @@ namespace Brimstone
 			}
 			return s;
 		}
+
+		public object Clone() {
+			// NOTE: Cancel flag is cleared when cloning
+			return new QueueActionEventArgs(Game, Source, Action, Args);
+		}
 	}
 
 	public class ActionQueue : ICloneable
 	{
 		public Game Game { get; private set; }
-		public Deque<QueueAction> Queue = new Deque<QueueAction>();
+		public Deque<QueueActionEventArgs> Queue = new Deque<QueueActionEventArgs>();
 		public Stack<ActionResult> ResultStack = new Stack<ActionResult>();
 		public List<QueueActionEventArgs> History;
 		public bool Paused { get; set; }
@@ -55,7 +60,7 @@ namespace Brimstone
 
 		public ActionQueue(ActionQueue cloneFrom) {
 			foreach (var item in cloneFrom.Queue)
-				Queue.AddBack((QueueAction)item.Clone());
+				Queue.AddBack((QueueActionEventArgs)item.Clone());
 			var stack = new List<ActionResult>(cloneFrom.ResultStack);
 			stack.Reverse();
 			// TODO: Doesn't this clone some items twice?
@@ -90,12 +95,16 @@ namespace Brimstone
 			}
 		}
 
+		// Gets a QueueAction that can put into the queue
+		private QueueActionEventArgs initializeAction(IEntity source, QueueAction qa) {
+			return new QueueActionEventArgs(Game, source, qa);
+		}
 
 		public void InsertDeferred(IEntity source, List<QueueAction> qa) {
 			if (qa != null) {
-				foreach (var a in qa)
-					a.SourceEntityId = source.Id;
-				Queue.AddFrontRange(qa);
+				foreach (var a in qa) {
+					Queue.AddFront(initializeAction(source, a));
+				}
 			}
 		}
 
@@ -107,8 +116,7 @@ namespace Brimstone
 			if (a == null)
 				return;
 			// No event triggers when inserting at front of queue
-			a.SourceEntityId = source.Id;
-			Queue.AddFront(a);
+			Queue.AddFront(initializeAction(source, a));
 		}
 
 		public List<ActionResult> EnqueueMultiResult(IEntity source, List<QueueAction> qa) {
@@ -167,20 +175,18 @@ namespace Brimstone
 			if (a == null)
 				return;
 
-			a.SourceEntityId = source.Id;
-
+			var e = initializeAction(source, a);
 			if (OnQueueing != null) {
-				var e = new QueueActionEventArgs(Game, source, a);
 				OnQueueing(this, e);
 				// TODO: Count the number of arguments the cancelled action would take and remove those too
 				if (!e.Cancel)
-					Queue.AddBack(a);
+					Queue.AddBack(e);
 			}
 			else
-				Queue.AddBack(a);
+				Queue.AddBack(e);
 
 			if (OnQueued != null)
-				OnQueued(this, new QueueActionEventArgs(Game, source, a));
+				OnQueued(this, e);
 		}
 
 		public void EnqueueDeferred(Action a) {
@@ -197,7 +203,7 @@ namespace Brimstone
 			for (int i = 0; i < newArgs.Count; i++)
 				ResultStack.Pop();
 			foreach (var a in newArgs)
-				ResultStack.Push(a); ;
+				ResultStack.Push(a);
 		}
 
 		public List<ActionResult> ProcessAll() {
@@ -219,35 +225,36 @@ namespace Brimstone
 			if (Queue.Count == 0)
 				return false;
 
-			// Get next action
+			// Get next action and make sure it's up to date if cloned from another game
 			var action = Queue.RemoveFront();
-			var source = Game.Entities[action.SourceEntityId];
+			action.Game = Game;
+			if (action.Source.Game.GameId != Game.GameId)
+				action.Source = Game.Entities[action.Source.Id];
 
 			// TODO: Fix stack modifying on OnActionStarting
 
 			// Get arguments for action from stack
-			var args = new List<ActionResult>();
-			for (int i = 0; i < action.Args.Count; i++)
-				args.Add(ResultStack.Pop());
-			args.Reverse();
+			action.Args = new List<ActionResult>();
+			for (int i = 0; i < action.Action.Args.Count; i++)
+				action.Args.Add(ResultStack.Pop());
+			action.Args.Reverse();
 
-			var e = new QueueActionEventArgs(Game, source, action, args);
 			if (OnActionStarting != null) {
-				OnActionStarting(this, e);
-				if (e.Cancel)
+				OnActionStarting(this, action);
+				if (action.Cancel)
 					return false;
 			}
-			History.Add(e);
+			History.Add(action);
 
 			// TODO: Replace with async/await later
 			// Run action and push results onto stack
-			var result = e.Action.Execute(e.Game, e.Source, e.Args);
+			var result = action.Action.Execute(action.Game, action.Source, action.Args);
 			if (result.HasResult)
 				ResultStack.Push(result);
 
 			if (OnAction != null) {
-				OnAction(this, e);
-				if (e.Cancel)
+				OnAction(this, action);
+				if (action.Cancel)
 					return false;
 			}
 			return true;
