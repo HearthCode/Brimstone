@@ -9,7 +9,7 @@ using Brimstone;
 
 namespace Test1
 {
-	public class Brimstone
+	public class BreadthFirstSearch
 	{
 		public const int MaxMinions = 7;
 
@@ -19,12 +19,10 @@ namespace Test1
 			// =========================
 
 			var game = new Game(HeroClass.Druid, HeroClass.Druid, PowerHistory: true);
-			game.Player1.Deck.Fill();
-			game.Player2.Deck.Fill();
 			game.Start();
-
+	
 			// Change number of Boom Bots here!
-			const int boomBots = 3;
+			const int boomBots = 2;
 
 			for (int i = 0; i < MaxMinions - boomBots; i++)
 				game.CurrentPlayer.Give("Bloodfen Raptor").Play();
@@ -35,6 +33,8 @@ namespace Test1
 				game.CurrentPlayer.Give("Bloodfen Raptor").Play();
 			for (int i = 0; i < boomBots; i++)
 				game.CurrentPlayer.Give("Boom Bot").Play();
+
+			var ArcaneMissiles = game.CurrentPlayer.Give("Arcane Missiles");
 
 			// The total number of clones made
 			int cloneCount = 0;
@@ -59,6 +59,8 @@ namespace Test1
 				// Choosing a random entity (minion in this case)
 				// Clone and start processing for every possibility
 				if (e.Action is RandomChoice) {
+					Console.WriteLine("");
+					Console.WriteLine("--> Depth: " + e.Game.Depth);
 					foreach (Entity entity in e.Args[RandomChoice.ENTITIES]) {
 						// When cloning occurs, RandomChoice has been pulled from the action queue,
 						// so we can just insert a fixed item at the start of the queue and restart the queue
@@ -70,11 +72,15 @@ namespace Test1
 						// Stop action queue on this copy of the game (don't take random action or continue)
 						e.Cancel = true;
 					}
+					Console.WriteLine("<-- Depth: " + e.Game.Depth);
+					Console.WriteLine("");
 				}
 
 				// Choosing a random value (damage amount in this case)
 				// Clone and start processing for every possibility
 				if (e.Action is RandomAmount) {
+					Console.WriteLine("");
+					Console.WriteLine("--> Depth: " + e.Game.Depth);
 					for (int i = e.Args[RandomAmount.MIN]; i <= e.Args[RandomAmount.MAX]; i++) {
 						// When cloning occurs, RandomAmount has been pulled from the action queue,
 						// so we can just insert a fixed number at the start of the queue and restart the queue
@@ -86,6 +92,8 @@ namespace Test1
 						// Stop action queue on this copy of the game (don't take random action or continue)
 						e.Cancel = true;
 					}
+					Console.WriteLine("<-- Depth: " + e.Game.Depth);
+					Console.WriteLine("");
 				}
 			};
 
@@ -97,15 +105,22 @@ namespace Test1
 					// If the action queue is empty, we have reached a leaf node game state
 					// so compare it for equality with other final game states
 					if (e.Game.ActionQueue.Queue.Count == 0) {
-						// This will cause the game to be discarded if its fuzzy hash matches any other final game state
-						uniqueGames.Add(e.Game);
 						keptClonesCount++;
+						// This will cause the game to be discarded if its fuzzy hash matches any other final game state
+						var oc = uniqueGames.Count;
+						uniqueGames.Add(e.Game);
+						if (oc < uniqueGames.Count)
+							Console.WriteLine("UNIQUE GAME FOUND ({0})", oc + 1);
+						else
+							Console.WriteLine("DUPLICATE GAME FOUND");
 					}
 					else {
 						// The game state has changed but there are more actions to do
 						// (which may or may not involve further cloning) so add it to the search queue
+						Console.WriteLine("QUEUEING FOR NEXT SEARCH");
 						searchQueue.Add(e.Game);
 					}
+					Console.WriteLine("");
 					e.Cancel = true;
 				}
 			};
@@ -118,16 +133,9 @@ namespace Test1
 			var sw = new Stopwatch();
 			sw.Start();
 
-			// Add the root node (initial game state) as the only item in the search queue
-			searchQueue.Add(game);
-
-			// Find the Boom Bot to kill
-			var BoomBot = game.CurrentPlayer.Board.First(t => t.Card.Id == "GVG_110t") as Minion;
-
-			// Add the action to the game's action queue but don't process it yet
-			game.Queue(() => {
-				BoomBot.Hit(1);
-			});
+			// Create first layer of nodes underneath the root node
+			// and add them to the search queue
+			ArcaneMissiles.Play();
 
 			// Breadth-first processing loop
 			while (searchQueue.Count > 0) {
@@ -142,16 +150,14 @@ namespace Test1
 					originalHash = g.Entities.FuzzyGameHash;
 					g.ActionQueue.ProcessAll();
 				}
-
 				Console.WriteLine("=======================");
 				Console.WriteLine("CLONES SO FAR: " + cloneCount + " / " + keptClonesCount);
 				Console.WriteLine("UNIQUE GAMES SO FAR: " + uniqueGames.Count);
 				Console.WriteLine("NEW QUEUE SIZE: " + searchQueue.Count + "\r\n");
 			}
 
-			Console.SetOut(cOut);
-
 			// Print benchmark results
+			Console.SetOut(cOut);
 			Console.WriteLine("{0} branches in {1}ms", cloneCount, sw.ElapsedMilliseconds);
 			Console.WriteLine("{0} intermediate clones pruned ({1} unique branches kept)", cloneCount - keptClonesCount, keptClonesCount);
 			Console.WriteLine("{0} fuzzy unique game states found", uniqueGames.Count);
