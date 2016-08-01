@@ -19,8 +19,6 @@ namespace Test1
 			// =========================
 
 			var game = new Game(HeroClass.Druid, HeroClass.Druid, PowerHistory: true);
-			game.Player1.Deck.Fill();
-			game.Player2.Deck.Fill();
 			game.Start();
 
 			// Change number of Boom Bots here!
@@ -52,6 +50,8 @@ namespace Test1
 				// Choosing a random entity (minion in this case)
 				// Clone and start processing for every possibility
 				if (e.Action is RandomChoice) {
+					Console.WriteLine("");
+					Console.WriteLine("--> Depth: " + e.Game.Depth);
 					foreach (Entity entity in e.Args[RandomChoice.ENTITIES]) {
 						// When cloning occurs, RandomChoice has been pulled from the action queue,
 						// so we can just insert a fixed item at the start of the queue and restart the queue
@@ -66,16 +66,25 @@ namespace Test1
 							if (!cloned.EquivalentTo(e.Game)) {
 								keptClonesCount++;
 								// This will cause the game to be discarded if its fuzzy hash matches any other final game state
+								var oc = uniqueGames.Count;
 								uniqueGames.Add(cloned);
+								if (oc < uniqueGames.Count)
+									Console.WriteLine("UNIQUE GAME FOUND ({0})", oc + 1);
+								else
+									Console.WriteLine("DUPLICATE GAME FOUND");
 							}
 						// Stop action queue on this copy of the game (don't take random action or continue)
 						e.Cancel = true;
 					}
+					Console.WriteLine("<-- Depth: " + e.Game.Depth);
+					Console.WriteLine("");
 				}
 
 				// Choosing a random value (damage amount in this case)
 				// Clone and start processing for every possibility
 				if (e.Action is RandomAmount) {
+					Console.WriteLine("");
+					Console.WriteLine("--> Depth: " + e.Game.Depth);
 					for (int i = e.Args[RandomAmount.MIN]; i <= e.Args[RandomAmount.MAX]; i++) {
 						// When cloning occurs, RandomAmount has been pulled from the action queue,
 						// so we can just insert a fixed number at the start of the queue and restart the queue
@@ -90,11 +99,18 @@ namespace Test1
 							if (!cloned.EquivalentTo(e.Game)) {
 								keptClonesCount++;
 								// This will cause the game to be discarded if its fuzzy hash matches any other final game state
+								var oc = uniqueGames.Count;
 								uniqueGames.Add(cloned);
+								if (oc < uniqueGames.Count)
+									Console.WriteLine("UNIQUE GAME FOUND ({0})", oc + 1);
+								else
+									Console.WriteLine("DUPLICATE GAME FOUND");
 							}
 						// Stop action queue on this copy of the game (don't take random action or continue)
 						e.Cancel = true;
 					}
+					Console.WriteLine("<-- Depth: " + e.Game.Depth);
+					Console.WriteLine("");
 				}
 			};
 
@@ -106,17 +122,36 @@ namespace Test1
 			var sw = new Stopwatch();
 			sw.Start();
 
-			// Find the Boom Bot to kill
-			var BoomBot = game.CurrentPlayer.Board.First(t => t.Card.Id == "GVG_110t") as Minion;
-
 			// Perform the search
-			BoomBot.Hit(1);
+			game.CurrentPlayer.Give("Arcane Missiles").Play();
 
 			// Print benchmark results
 			Console.SetOut(cOut);
+
 			Console.WriteLine("{0} branches in {1}ms", cloneCount, sw.ElapsedMilliseconds);
 			Console.WriteLine("{0} intermediate clones pruned ({1} unique branches kept)", cloneCount - keptClonesCount, keptClonesCount);
 			Console.WriteLine("{0} fuzzy unique game states found", uniqueGames.Count);
+			/*
+			var noBoomBotsDead = uniqueGames.Where(x => x.Player1.Board.Concat(x.Player2.Board).Where(y => y.Card.Name == "Boom Bot").Count() == 4);
+			var oneBoomBotDead = uniqueGames.Where(x => x.Player1.Board.Concat(x.Player2.Board).Where(y => y.Card.Name == "Boom Bot").Count() == 3);
+			var bothOpponentBoomBotsDead = uniqueGames.Where(x => x.CurrentPlayer.Board.Where(y => y.Card.Name == "Boom Bot").Count() == 2
+														&& x.CurrentPlayer.Opponent.Board.Where(y => y.Card.Name == "Boom Bot").Count() == 0);
+			var oneFoneOBoomBotsDead = uniqueGames.Where(x => x.CurrentPlayer.Board.Where(y => y.Card.Name == "Boom Bot").Count() == 1
+														&& x.CurrentPlayer.Opponent.Board.Where(y => y.Card.Name == "Boom Bot").Count() == 1);
+			var oneFtwoOBoomBotsDead = uniqueGames.Where(x => x.CurrentPlayer.Board.Where(y => y.Card.Name == "Boom Bot").Count() == 1
+														&& x.CurrentPlayer.Opponent.Board.Where(y => y.Card.Name == "Boom Bot").Count() == 0);
+			var twoFoneOBoomBotsDead = uniqueGames.Where(x => x.CurrentPlayer.Board.Where(y => y.Card.Name == "Boom Bot").Count() == 0
+														&& x.CurrentPlayer.Opponent.Board.Where(y => y.Card.Name == "Boom Bot").Count() == 1);
+			var allBoomBotsDead = uniqueGames.Where(x => x.Player1.Board.Concat(x.Player2.Board).Where(y => y.Card.Name == "Boom Bot").Count() == 0);
+
+			Console.WriteLine(noBoomBotsDead.Count());
+			Console.WriteLine(oneBoomBotDead.Count());
+			Console.WriteLine(bothOpponentBoomBotsDead.Count());
+			Console.WriteLine(oneFoneOBoomBotsDead.Count());
+			Console.WriteLine(oneFtwoOBoomBotsDead.Count());
+			Console.WriteLine(twoFoneOBoomBotsDead.Count());
+			Console.WriteLine(allBoomBotsDead.Count());
+			*/
 		}
 	}
 }
