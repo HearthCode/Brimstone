@@ -260,6 +260,15 @@ namespace Brimstone
 			return true;
 		}
 
+		public void ReplaceAction<QAT>(Action<ActionQueue, QueueActionEventArgs> evt) {
+			OnActionStarting += (o, e) => {
+				if (e.Action is QAT) {
+					evt(o as ActionQueue, e);
+					e.Cancel = true;
+				}
+			};
+		}
+
 		public string StackToString() {
 			string s = string.Empty;
 			foreach (var r in ResultStack)
