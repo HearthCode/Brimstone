@@ -245,3 +245,5 @@ ModelManifest.xml
 .fake/
 /Brimstone/Data/CardDefs.xml
 /Brimstone/Data/CARD.xml
+/TreeSearchStates.txt
+/TreeSearchMetrics.xlsx
