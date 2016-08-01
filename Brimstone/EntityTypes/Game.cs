@@ -49,10 +49,10 @@ namespace Brimstone
 		// Game clones n-tree traversal
 		private static int SequenceNumber { get; set; }
 		public int GameId { get; }
-		public Game Parent { get; }
-		public HashSet<int> Children { get; } = new HashSet<int>();
-
 		public int Depth { get; } = 0;
+
+		public object CustomData { get; set; } = null;
+
 		// Required by IEntity
 		public Game(Game cloneFrom) : base(cloneFrom) {
 			// Generate zones owned by game
@@ -61,9 +61,8 @@ namespace Brimstone
 
 			// Update tree
 			GameId = ++SequenceNumber;
-			Parent = cloneFrom;
-			cloneFrom.Children.Add(GameId);
 			Depth = cloneFrom.Depth + 1;
+			CustomData = cloneFrom.CustomData;
 		}
 
 		public Game(HeroClass Hero1, HeroClass Hero2, string Player1Name = "", string Player2Name = "", bool PowerHistory = false)
@@ -94,7 +93,6 @@ namespace Brimstone
 
 			// No parent or children
 			GameId = ++SequenceNumber;
-			Parent = null;
 		}
 
 		public IEntity Add(IEntity newEntity, IEntity controller) {

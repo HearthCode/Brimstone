@@ -181,6 +181,7 @@ namespace Brimstone
 	public class PowerHistory : IEnumerable<PowerAction>
 	{
 		public Game Game { get; private set; }
+		public Game Parent { get; }
 		public List<PowerAction> Delta { get; } = new List<PowerAction>();
 		public int SequenceNumber { get; private set; }
 		public int ParentBranchEntry { get; private set; }
@@ -193,11 +194,13 @@ namespace Brimstone
 		public PowerHistory(Game game, Game parent = null) {
 			Game = game;
 			if (parent != null) {
+				Parent = parent;
 				SequenceNumber = parent.PowerHistory.SequenceNumber;
 				ParentBranchEntry = SequenceNumber;
 				OrderedHash = parent.PowerHistory.OrderedHash;
 				UnorderedHash = parent.PowerHistory.UnorderedHash;
 			} else {
+				Parent = null;
 				SequenceNumber = 0;
 				ParentBranchEntry = 0;
 				OrderedHash = 17;
@@ -240,7 +243,8 @@ namespace Brimstone
 
 			bool found = false;
 			int branchPoint = SequenceNumber;
-			for (Game g = Game; g != null && !found; g = g.Parent) {
+
+			for (Game g = Game; g != null && !found; g = g.PowerHistory.Parent) {
 				delta = g.PowerHistory.DeltaTo(branchPoint).Concat(delta).ToList();
 				branchPoint = g.PowerHistory.ParentBranchEntry;
 				found = g == game;
@@ -281,12 +285,12 @@ namespace Brimstone
 			// Get all ancestors of each PowerHistory log
 			var ancestorsA = new Stack<Game>();
 			var ancestorsB = new Stack<Game>();
-
-			for (Game g = Game; g != null; g = g.Parent)
+			
+			for (Game g = Game; g != null; g = g.PowerHistory.Parent)
 				ancestorsA.Push(g);
-			for (Game g = History.Game; g != null; g = g.Parent)
+			for (Game g = History.Game; g != null; g = g.PowerHistory.Parent)
 				ancestorsB.Push(g);
-
+				
 			// Search from root game to find lowest common ancestor of each game
 			Game lca = null;
 			foreach (var pair in ancestorsA.Zip(ancestorsB, (x, y) => new { A = x, B = y }))
@@ -346,7 +350,7 @@ namespace Brimstone
 			if (ParentBranchEntry == 0)
 				return Delta.GetEnumerator();
 
-			return Game.Parent.PowerHistory.Concat(Delta).GetEnumerator();
+			return Parent.PowerHistory.Concat(Delta).GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() {
