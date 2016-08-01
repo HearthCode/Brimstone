@@ -19,11 +19,12 @@ namespace Test1
 	{
 		// Configure test parameters here
 		public const int MaxMinions = 7;
-		public const int NumBoomBots = 1;
+		public const int NumBoomBots = 2;
 		public const string FillMinion = "Bloodfen Raptor";
 		public static bool BoomBotTest = false;
 		public static bool ArcaneMissilesTest = true;
 		public static bool ConsoleOutput = false;
+		public static bool CheckHashCollisions = false;
 
 		static void Main(string[] args) {
 			var cOut = Console.Out;
@@ -63,7 +64,7 @@ namespace Test1
 				// Clone and start processing for every possibility
 				if (e.Action is RandomChoice) {
 					Console.WriteLine("");
-					Console.WriteLine("Depth: " + e.Game.Depth);
+					Console.WriteLine("--> Depth: " + e.Game.Depth);
 					foreach (Entity entity in e.Args[RandomChoice.ENTITIES]) {
 						// When cloning occurs, RandomChoice has been pulled from the action queue,
 						// so we can just insert a fixed item at the start of the queue and restart the queue
@@ -78,7 +79,7 @@ namespace Test1
 						// Stop action queue on this copy of the game (don't take random action or continue)
 						e.Cancel = true;
 					}
-					Console.WriteLine("Dpeth: " + (e.Game.Depth - 1));
+					Console.WriteLine("<-- Depth: " + e.Game.Depth);
 					Console.WriteLine("");
 				}
 
@@ -86,7 +87,7 @@ namespace Test1
 				// Clone and start processing for every possibility
 				if (e.Action is RandomAmount) {
 					Console.WriteLine("");
-					Console.WriteLine("Depth: " + e.Game.Depth);
+					Console.WriteLine("--> Depth: " + e.Game.Depth);
 					for (int i = e.Args[RandomAmount.MIN]; i <= e.Args[RandomAmount.MAX]; i++) {
 						// When cloning occurs, RandomAmount has been pulled from the action queue,
 						// so we can just insert a fixed number at the start of the queue and restart the queue
@@ -100,9 +101,8 @@ namespace Test1
 							leafNodeGames.Add(cloned);
 						// Stop action queue on this copy of the game (don't take random action or continue)
 						e.Cancel = true;
-						Console.WriteLine("");
 					}
-					Console.WriteLine("Dpeth: " + (e.Game.Depth - 1));
+					Console.WriteLine("<-- Depth: " + e.Game.Depth);
 					Console.WriteLine("");
 				}
 			};
@@ -151,38 +151,38 @@ namespace Test1
 						continue;
 					}
 					var e2 = new HashSet<IEntity>(g.Entities, new FuzzyEntityComparer());
-
-					if (e2.Count < g.Entities.Count || e1.Count < root.Entities.Count) {
-						// Potential hash collision
-						var c = (e2.Count < g.Entities.Count ? e2 : e1);
-						var g2 = (c == e2 ? g : root);
-						var ent = g2.Entities.Select(x => x.FuzzyHash).ToList();
-						// Build list of collisions
-						var collisions = new Dictionary<int, IEntity>();
-						foreach (var e in g2.Entities) {
-							if (collisions.ContainsKey(e.FuzzyHash)) {
-								// It's not a coliision if the tag set differs only by entity ID
-								bool collide = false;
-								foreach (var tagPair in e.Zip(collisions[e.FuzzyHash], (x, y) => new { A = x, B = y })) {
-									if (tagPair.A.Key == GameTag.ENTITY_ID && tagPair.B.Key == GameTag.ENTITY_ID)
-										continue;
-									if (tagPair.A.Key != tagPair.A.Key || tagPair.B.Value != tagPair.B.Value) {
-										collide = true;
-										break;
+					if (CheckHashCollisions) {
+						if (e2.Count < g.Entities.Count || e1.Count < root.Entities.Count) {
+							// Potential hash collision
+							var c = (e2.Count < g.Entities.Count ? e2 : e1);
+							var g2 = (c == e2 ? g : root);
+							var ent = g2.Entities.Select(x => x.FuzzyHash).ToList();
+							// Build list of collisions
+							var collisions = new Dictionary<int, IEntity>();
+							foreach (var e in g2.Entities) {
+								if (collisions.ContainsKey(e.FuzzyHash)) {
+									// It's not a coliision if the tag set differs only by entity ID
+									bool collide = false;
+									foreach (var tagPair in e.Zip(collisions[e.FuzzyHash], (x, y) => new { A = x, B = y })) {
+										if (tagPair.A.Key == GameTag.ENTITY_ID && tagPair.B.Key == GameTag.ENTITY_ID)
+											continue;
+										if (tagPair.A.Key != tagPair.A.Key || tagPair.B.Value != tagPair.B.Value) {
+											collide = true;
+											break;
+										}
+									}
+									if (collide) {
+										Console.WriteLine(collisions[e.FuzzyHash]);
+										Console.WriteLine(e);
+										Console.WriteLine(collisions[e.FuzzyHash].FuzzyHash + " " + e.FuzzyHash);
+										throw new Exception("Hash collision - not safe to compare games");
 									}
 								}
-								if (collide) {
-									Console.WriteLine(collisions[e.FuzzyHash]);
-									Console.WriteLine(e);
-									Console.WriteLine(collisions[e.FuzzyHash].FuzzyHash + " " + e.FuzzyHash);
-									throw new Exception("Hash collision - not safe to compare games");
-								}
+								else
+									collisions.Add(e.FuzzyHash, e);
 							}
-							else
-								collisions.Add(e.FuzzyHash, e);
 						}
 					}
-
 					if (!e2.SetEquals(e1)) {
 						// Check for game state hash collision (if this fires, it's a bug in the hashing algorithm)
 						if (root.Entities.FuzzyGameHash == g.Entities.FuzzyGameHash)
@@ -195,13 +195,7 @@ namespace Test1
 				leafNodeGames = different;
 				Console.WriteLine("{0} games remaining to process ({1} unique games found so far)", different.Count, uniqueGames.Count);
 			}
-
-			foreach (var g in uniqueGames) {
-				Console.WriteLine("Player 1:\r\n" + g.Player1 + "\r\n" + g.Player1.Board);
-				Console.WriteLine("Player 2:\r\n" + g.Player2 + "\r\n" + g.Player2.Board);
-				Console.WriteLine("");
-			}
-			Console.WriteLine("{0} unique games found", uniqueGames.Count);
+			Console.WriteLine("{0} unique games found in {1}ms", uniqueGames.Count, sw.ElapsedMilliseconds);
 		}
 	}
 }
