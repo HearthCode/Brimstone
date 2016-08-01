@@ -245,7 +245,10 @@ namespace Brimstone
 
 		public override string ToString() {
 			string s = Card.Name + " - ";
-			foreach (var tag in this) {
+			s += new Tag(GameTag.ENTITY_ID, _entity.Id) + ", ";
+			if (Controller != null)
+				s += new Tag(GameTag.CONTROLLER, Controller.Id) + ", ";
+			foreach (var tag in _entity.Tags) {
 				s += new Tag(tag.Key, tag.Value) + ", ";
 			}
 			return s.Substring(0, s.Length - 2);
@@ -350,7 +353,10 @@ namespace Brimstone
 		public void EntityChanging(int id, int previousHash) {
 			// Only undo hash once if multiple changes occur since we last re-calculated
 			if (!_changedHashes.Contains(id)) {
-				_undoHash ^= previousHash;
+				if (Entities[id][GameTag.ZONE] != (int)Zone.PLAY || Entities[id][GameTag.ZONE_POSITION] == 0)
+					_undoHash += previousHash;
+				else
+					_undoHash += (Entities[id].Controller.Id * 8 + Entities[id][GameTag.ZONE_POSITION]) * previousHash;
 				_changedHashes.Add(id);
 			}
 		}
@@ -362,9 +368,13 @@ namespace Brimstone
 
 		public int FuzzyGameHash {
 			get {
-				_gameHash ^= _undoHash;
+				// Hash board states (play zones) for both players in order, hash rest of game entities in any order
+				_gameHash -= _undoHash;
 				foreach (var eId in _changedHashes)
-					_gameHash ^= Entities[eId].FuzzyHash;
+					if (Entities[eId][GameTag.ZONE] != (int)Zone.PLAY || Entities[eId][GameTag.ZONE_POSITION] == 0)
+						_gameHash += Entities[eId].FuzzyHash;
+					else
+						_gameHash += (Entities[eId].Controller.Id * 8 + Entities[eId][GameTag.ZONE_POSITION]) * Entities[eId].FuzzyHash;
 				_changedHashes.Clear();
 				_undoHash = 0;
 				return _gameHash;
