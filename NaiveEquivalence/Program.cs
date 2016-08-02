@@ -57,7 +57,7 @@ namespace Test1
 			if (!ConsoleOutput)
 				Console.SetOut(TextWriter.Null);
 
-			var tree = NaiveGameTree.BuildFor(game, () => {
+			var tree = GameTree.BuildFor(Game: game, SearchMode: SearchMode.Naive, Action: () => {
 				if (BoomBotTest) {
 					var BoomBot = game.CurrentPlayer.Board.First(t => t.Card.Id == "GVG_110t") as Minion;
 					BoomBot.Hit(1);
