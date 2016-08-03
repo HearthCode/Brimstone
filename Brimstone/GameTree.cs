@@ -9,6 +9,8 @@ namespace Brimstone
 	public interface ITreeSearcher
 	{
 		void Visitor(Game cloned, GameTree tree, QueueActionEventArgs e);
+		void PostAction(ActionQueue q, GameTree tree, QueueActionEventArgs e);
+		void PostProcess(GameTree tree);
 		HashSet<Game> GetUniqueGames();
 	}
 
@@ -54,7 +56,11 @@ namespace Brimstone
 	{
 		public GameNode RootNode { get; }
 		public bool TrackChildren { get; set; }
+
+		// The total number of clones including the root node in this tree
 		public int NodeCount { get; protected set; } = 0;
+
+		// The total number of non-pruned leaf nodes kept
 		public int LeafNodeCount { get; set; } = 0;
 
 		private ITreeSearcher searcher = null;
@@ -74,20 +80,29 @@ namespace Brimstone
 			RootNode = new GameNode(Game: rootGame, TrackChildren: TrackChildren);
 
 			if (SearchMode != SearchMode.None) {
-				RootNode.Game.ActionQueue.ReplaceAction<RandomChoice>(replaceRandomChoice);
-				RootNode.Game.ActionQueue.ReplaceAction<RandomAmount>(replaceRandomAmount);
-				RootNode.Game.CustomData = RootNode;
-
 				switch (SearchMode) {
 					case SearchMode.Naive: searcher = new NaiveTreeSearch(); break;
 					case SearchMode.DepthFirst: searcher = new DepthFirstTreeSearch(); break;
+					case SearchMode.BreadthFirst: searcher = new BreadthFirstTreeSearch(); break;
 				}
+
+				RootNode.Game.ActionQueue.ReplaceAction<RandomChoice>(replaceRandomChoice);
+				RootNode.Game.ActionQueue.ReplaceAction<RandomAmount>(replaceRandomAmount);
+				RootNode.Game.ActionQueue.OnAction += (o, e) => {
+					searcher.PostAction(o as ActionQueue, this, e);
+				};
 			}
+			rootGame.CustomData = RootNode;
+		}
+
+		public void Run(Action Action) {
+			Action();
+			searcher.PostProcess(this);
 		}
 
 		public static GameTree BuildFor(Game Game, Action Action, SearchMode SearchMode = SearchMode.BreadthFirst) {
 			var tree = new GameTree(Game, SearchMode);
-			Action();
+			tree.Run(Action);
 			return tree;
 		}
 
@@ -149,6 +164,10 @@ namespace Brimstone
 				leafNodeGames.Add(cloned);
 			}
 		}
+
+		public void PostAction(ActionQueue q, GameTree t, QueueActionEventArgs e) {	}
+
+		public void PostProcess(GameTree t) { }
 
 		public HashSet<Game> GetUniqueGames() {
 			HashSet<Game> uniqueGames = new HashSet<Game>();
@@ -237,6 +256,89 @@ namespace Brimstone
 						Console.WriteLine("DUPLICATE GAME FOUND");
 #endif
 				}
+		}
+
+		public void PostAction(ActionQueue q, GameTree t, QueueActionEventArgs e) { }
+
+		public void PostProcess(GameTree t) { }
+
+		public HashSet<Game> GetUniqueGames() {
+			return uniqueGames;
+		}
+	}
+
+	public class BreadthFirstTreeSearch : ITreeSearcher
+	{
+		private HashSet<Game> uniqueGames = new HashSet<Game>(new FuzzyGameComparer());
+
+		// The pruned search queue for the current search depth
+		private HashSet<Game> searchQueue = new HashSet<Game>(new FuzzyGameComparer());
+
+		// The fuzzy game hash for the game state we are currently executing before exeuction started
+		// Used to check if the game state changes after an action completes
+		// TODO: Make thread-safe
+		private int preActionHash = 0;
+
+		public void Visitor(Game cloned, GameTree tree, QueueActionEventArgs e) { }
+
+		// When an in-game action completes, check if the game state has changed
+		// Some actions (like selectors) won't cause the game state to change,
+		// so we continue running these until a game state change occurs
+		public void PostAction(ActionQueue q, GameTree t, QueueActionEventArgs e) {
+			if (e.Game.Entities.FuzzyGameHash != preActionHash) {
+				// If the action queue is empty, we have reached a leaf node game state
+				// so compare it for equality with other final game states
+				if (e.Game.ActionQueue.Queue.Count == 0) {
+					t.LeafNodeCount++;
+					// This will cause the game to be discarded if its fuzzy hash matches any other final game state
+#if _TREE_DEBUG
+					var oc = uniqueGames.Count;
+#endif
+					uniqueGames.Add(e.Game);
+#if _TREE_DEBUG
+					if (oc < uniqueGames.Count)
+						Console.WriteLine("UNIQUE GAME FOUND ({0})", oc + 1);
+					else
+						Console.WriteLine("DUPLICATE GAME FOUND");
+#endif
+				}
+				else {
+					// The game state has changed but there are more actions to do
+					// (which may or may not involve further cloning) so add it to the search queue
+#if _TREE_DEBUG
+					Console.WriteLine("QUEUEING FOR NEXT SEARCH");
+#endif
+					searchQueue.Add(e.Game);
+				}
+#if _TREE_DEBUG
+				Console.WriteLine("");
+#endif
+				e.Cancel = true;
+			}
+		}
+
+		public void PostProcess(GameTree t) {
+			// Breadth-first processing loop
+			while (searchQueue.Count > 0) {
+#if _TREE_DEBUG
+				Console.WriteLine("QUEUE SIZE: " + searchQueue.Count);
+#endif
+				// Copy the search queue and clear the current one; it will be refilled
+				var nextQueue = new HashSet<Game>(searchQueue);
+				searchQueue.Clear();
+
+				// Process each game's action queue until it is interrupted by OnAction above
+				foreach (var g in nextQueue) {
+					preActionHash = g.Entities.FuzzyGameHash;
+					g.ActionQueue.ProcessAll();
+				}
+#if _TREE_DEBUG
+				Console.WriteLine("=======================");
+				Console.WriteLine("CLONES SO FAR: " + t.NodeCount + " / " + t.LeafNodeCount);
+				Console.WriteLine("UNIQUE GAMES SO FAR: " + uniqueGames.Count);
+				Console.WriteLine("NEW QUEUE SIZE: " + searchQueue.Count + "\r\n");
+#endif
+			}
 		}
 
 		public HashSet<Game> GetUniqueGames() {

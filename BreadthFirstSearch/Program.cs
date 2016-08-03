@@ -36,95 +36,6 @@ namespace Test1
 
 			var ArcaneMissiles = game.CurrentPlayer.Give("Arcane Missiles");
 
-			// The total number of clones made
-			int cloneCount = 0;
-
-			// The number of clones kept for equality testing (not pruned)
-			int keptClonesCount = 0;
-
-			// All of the unique game states found
-			var uniqueGames = new HashSet<Game>(new FuzzyGameComparer());
-
-			// The pruned search queue for the current search depth
-			var searchQueue = new HashSet<Game>(new FuzzyGameComparer());
-
-			// The fuzzy game hash for the game state we are currently executing before exeuction started
-			// Used to check if the game state changes after an action completes
-			int originalHash = 0;
-
-			// Subvert the Action processor to spawn clones when random decisions would be taken
-			game.ActionQueue.OnActionStarting += (o, e) => {
-				ActionQueue queue = o as ActionQueue;
-
-				// Choosing a random entity (minion in this case)
-				// Clone and start processing for every possibility
-				if (e.Action is RandomChoice) {
-					Console.WriteLine("");
-					Console.WriteLine("--> Depth: " + e.Game.Depth);
-					foreach (Entity entity in e.Args[RandomChoice.ENTITIES]) {
-						// When cloning occurs, RandomChoice has been pulled from the action queue,
-						// so we can just insert a fixed item at the start of the queue and restart the queue
-						// to effectively replace it
-						Game cloned = (Game)e.Game.CloneState();
-						cloneCount++;
-						cloned.ActionQueue.InsertDeferred(e.Source, entity);
-						cloned.ActionQueue.ProcessAll();
-						// Stop action queue on this copy of the game (don't take random action or continue)
-						e.Cancel = true;
-					}
-					Console.WriteLine("<-- Depth: " + e.Game.Depth);
-					Console.WriteLine("");
-				}
-
-				// Choosing a random value (damage amount in this case)
-				// Clone and start processing for every possibility
-				if (e.Action is RandomAmount) {
-					Console.WriteLine("");
-					Console.WriteLine("--> Depth: " + e.Game.Depth);
-					for (int i = e.Args[RandomAmount.MIN]; i <= e.Args[RandomAmount.MAX]; i++) {
-						// When cloning occurs, RandomAmount has been pulled from the action queue,
-						// so we can just insert a fixed number at the start of the queue and restart the queue
-						// to effectively replace it
-						Game cloned = (Game)e.Game.CloneState();
-						cloneCount++;
-						cloned.ActionQueue.InsertDeferred(e.Source, i);
-						cloned.ActionQueue.ProcessAll();
-						// Stop action queue on this copy of the game (don't take random action or continue)
-						e.Cancel = true;
-					}
-					Console.WriteLine("<-- Depth: " + e.Game.Depth);
-					Console.WriteLine("");
-				}
-			};
-
-			// When an in-game action completes, check if the game state has changed
-			// Some actions (like selectors) won't cause the game state to change,
-			// so we continue running these until a game state change occurs
-			game.ActionQueue.OnAction += (o, e) => {
-				if (e.Game.Entities.FuzzyGameHash != originalHash) {
-					// If the action queue is empty, we have reached a leaf node game state
-					// so compare it for equality with other final game states
-					if (e.Game.ActionQueue.Queue.Count == 0) {
-						keptClonesCount++;
-						// This will cause the game to be discarded if its fuzzy hash matches any other final game state
-						var oc = uniqueGames.Count;
-						uniqueGames.Add(e.Game);
-						if (oc < uniqueGames.Count)
-							Console.WriteLine("UNIQUE GAME FOUND ({0})", oc + 1);
-						else
-							Console.WriteLine("DUPLICATE GAME FOUND");
-					}
-					else {
-						// The game state has changed but there are more actions to do
-						// (which may or may not involve further cloning) so add it to the search queue
-						Console.WriteLine("QUEUEING FOR NEXT SEARCH");
-						searchQueue.Add(e.Game);
-					}
-					Console.WriteLine("");
-					e.Cancel = true;
-				}
-			};
-
 			// Turn off console output because it affects the benchmark results
 			var cOut = Console.Out;
 			Console.SetOut(TextWriter.Null);
@@ -134,33 +45,16 @@ namespace Test1
 			sw.Start();
 
 			// Create first layer of nodes underneath the root node
-			// and add them to the search queue
-			ArcaneMissiles.Play();
-
-			// Breadth-first processing loop
-			while (searchQueue.Count > 0) {
-				Console.WriteLine("QUEUE SIZE: " + searchQueue.Count);
-
-				// Copy the search queue and clear the current one; it will be refilled
-				var nextQueue = new HashSet<Game>(searchQueue);
-				searchQueue.Clear();
-
-				// Process each game's action queue until it is interrupted by OnAction above
-				foreach (var g in nextQueue) {
-					originalHash = g.Entities.FuzzyGameHash;
-					g.ActionQueue.ProcessAll();
-				}
-				Console.WriteLine("=======================");
-				Console.WriteLine("CLONES SO FAR: " + cloneCount + " / " + keptClonesCount);
-				Console.WriteLine("UNIQUE GAMES SO FAR: " + uniqueGames.Count);
-				Console.WriteLine("NEW QUEUE SIZE: " + searchQueue.Count + "\r\n");
-			}
+			// and add them to the search queue, then do breadth-first search
+			var tree = GameTree.BuildFor(Game: game, SearchMode: SearchMode.BreadthFirst, Action: () => {
+				ArcaneMissiles.Play();
+			});
 
 			// Print benchmark results
 			Console.SetOut(cOut);
-			Console.WriteLine("{0} branches in {1}ms", cloneCount, sw.ElapsedMilliseconds);
-			Console.WriteLine("{0} intermediate clones pruned ({1} unique branches kept)", cloneCount - keptClonesCount, keptClonesCount);
-			Console.WriteLine("{0} fuzzy unique game states found", uniqueGames.Count);
+			Console.WriteLine("{0} branches in {1}ms", tree.NodeCount, sw.ElapsedMilliseconds);
+			Console.WriteLine("{0} intermediate clones pruned ({1} unique branches kept)", tree.NodeCount - tree.LeafNodeCount, tree.LeafNodeCount);
+			Console.WriteLine("{0} fuzzy unique game states found", tree.GetUniqueGames().Count);
 		}
 	}
 }
