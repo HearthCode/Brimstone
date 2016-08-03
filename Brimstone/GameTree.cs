@@ -14,14 +14,6 @@ namespace Brimstone
 		HashSet<Game> GetUniqueGames();
 	}
 
-	public enum SearchMode
-	{
-		None,
-		Naive,
-		DepthFirst,
-		BreadthFirst
-	}
-
 	public class GameNode
 	{
 		public Game Game { get; }
@@ -73,19 +65,13 @@ namespace Brimstone
 			return uniqueGames;
 		}
 
-		public GameTree(Game Root, SearchMode SearchMode, bool CloneRoot = false) {
+		public GameTree(Game Root, ITreeSearcher SearchMode = null, bool CloneRoot = false) {
 			var rootGame = CloneRoot ? Root.CloneState() as Game : Root;
 
-			TrackChildren = (SearchMode == SearchMode.None);
+			TrackChildren = (SearchMode == null);
 			RootNode = new GameNode(Game: rootGame, TrackChildren: TrackChildren);
 
-			if (SearchMode != SearchMode.None) {
-				switch (SearchMode) {
-					case SearchMode.Naive: searcher = new NaiveTreeSearch(); break;
-					case SearchMode.DepthFirst: searcher = new DepthFirstTreeSearch(); break;
-					case SearchMode.BreadthFirst: searcher = new BreadthFirstTreeSearch(); break;
-				}
-
+			if (SearchMode != null) {
 				RootNode.Game.ActionQueue.ReplaceAction<RandomChoice>(replaceRandomChoice);
 				RootNode.Game.ActionQueue.ReplaceAction<RandomAmount>(replaceRandomAmount);
 				RootNode.Game.ActionQueue.OnAction += (o, e) => {
@@ -93,6 +79,7 @@ namespace Brimstone
 				};
 			}
 			rootGame.CustomData = RootNode;
+			searcher = SearchMode;
 		}
 
 		public void Run(Action Action) {
@@ -100,7 +87,9 @@ namespace Brimstone
 			searcher.PostProcess(this);
 		}
 
-		public static GameTree BuildFor(Game Game, Action Action, SearchMode SearchMode = SearchMode.BreadthFirst) {
+		public static GameTree BuildFor(Game Game, Action Action, ITreeSearcher SearchMode = null) {
+			if (SearchMode == null)
+				SearchMode = new BreadthFirstTreeSearch();
 			var tree = new GameTree(Game, SearchMode);
 			tree.Run(Action);
 			return tree;

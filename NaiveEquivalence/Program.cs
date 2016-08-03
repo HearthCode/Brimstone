@@ -57,16 +57,20 @@ namespace Test1
 			if (!ConsoleOutput)
 				Console.SetOut(TextWriter.Null);
 
-			var tree = GameTree.BuildFor(Game: game, SearchMode: SearchMode.Naive, Action: () => {
-				if (BoomBotTest) {
-					var BoomBot = game.CurrentPlayer.Board.First(t => t.Card.Id == "GVG_110t") as Minion;
-					BoomBot.Hit(1);
-				}
+			var tree = GameTree.BuildFor(
+				Game: game,
+				SearchMode: new NaiveTreeSearch(),
+				Action: () => {
+					if (BoomBotTest) {
+						var BoomBot = game.CurrentPlayer.Board.First(t => t.Card.Id == "GVG_110t") as Minion;
+						BoomBot.Hit(1);
+					}
 
-				if (ArcaneMissilesTest) {
-					game.CurrentPlayer.Give("Arcane Missiles").Play();
+					if (ArcaneMissilesTest) {
+						game.CurrentPlayer.Give("Arcane Missiles").Play();
+					}
 				}
-			});
+			);
 
 			// Print intermediate results
 			Console.SetOut(cOut);

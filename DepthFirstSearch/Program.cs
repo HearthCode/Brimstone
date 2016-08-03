@@ -43,9 +43,11 @@ namespace Test1
 			sw.Start();
 
 			// Perform the search
-			var tree = GameTree.BuildFor(Game: game, SearchMode: SearchMode.DepthFirst, Action: () => {
-				game.CurrentPlayer.Give("Arcane Missiles").Play();
-			});
+			var tree = GameTree.BuildFor(
+				Game: game,
+				SearchMode: new DepthFirstTreeSearch(),
+				Action: () => { game.CurrentPlayer.Give("Arcane Missiles").Play(); }
+			);
 
 			// Print benchmark results
 			Console.SetOut(cOut);

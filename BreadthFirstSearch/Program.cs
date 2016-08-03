@@ -46,9 +46,11 @@ namespace Test1
 
 			// Create first layer of nodes underneath the root node
 			// and add them to the search queue, then do breadth-first search
-			var tree = GameTree.BuildFor(Game: game, SearchMode: SearchMode.BreadthFirst, Action: () => {
-				ArcaneMissiles.Play();
-			});
+			var tree = GameTree.BuildFor(
+				Game: game,
+				SearchMode: new BreadthFirstTreeSearch(),
+				Action: () => { ArcaneMissiles.Play(); }
+			);
 
 			// Print benchmark results
 			Console.SetOut(cOut);
