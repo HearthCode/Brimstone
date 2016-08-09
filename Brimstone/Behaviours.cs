@@ -33,6 +33,7 @@ namespace Brimstone
 		public static Selector AllCharacters { get { return Union(AllMinions, FriendlyHero, OpponentHero); } }
 		public static ActionGraph Random(Selector s) { return new RandomChoice { Args = { s } }; }
 		public static ActionGraph RandomOpponentMinion { get { return Random(OpponentMinions); } }
+		public static ActionGraph RandomOpponentCharacter { get { return Random(OpponentCharacters); } }
 		public static ActionGraph RandomAmount(ActionGraph Min, ActionGraph Max) { return new RandomAmount { Args = { Min, Max } }; }
 
 		// TODO: Add selector set ops
