@@ -208,16 +208,14 @@ namespace BrimstoneTests
 			// Assert
 
 			// There are 8 * 4 = 32 ways the Boom Bot could trigger
-			// TODO: At the moment Boom Bot will not target face, so 28 combinations only
-			Assert.AreEqual(28, clones.Count);
+			Assert.AreEqual(32, clones.Count);
 
 			// 7 of these states kill a minion outright, leaving 6 Totem Golems on the board
 			// The entity IDs / zone positions may not match, but the game state is essentially the same
 			// Therefore there are (7 * 3) + 1 + 4 = 26 or (8 * 4) - 7 + 1 = 26 unique game states
-			// TODO: At the moment Boom Bot will not target face, so 22 combinations only
 
 			HashSet<Game> fuzzyUniqueGames = new HashSet<Game>(clones, new FuzzyGameComparer());
-			Assert.AreEqual(22, fuzzyUniqueGames.Count);
+			Assert.AreEqual(26, fuzzyUniqueGames.Count);
 
 			// Arrange
 
@@ -269,11 +267,11 @@ namespace BrimstoneTests
 			// Assert
 
 			// 2 damage is enough to kill a Bloodfen Raptor, so 2, 3 or 4 damage to a given minion
-			// has the same outcome. 8 possible fuzzy unique outcomes.
+			// has the same outcome. 8 possible fuzzy unique outcomes + 4 face hits = 12
 
-			Assert.AreEqual(28, clones.Count);
+			Assert.AreEqual(32, clones.Count);
 			fuzzyUniqueGames = new HashSet<Game>(clones, new FuzzyGameComparer());
-			Assert.AreEqual(8, fuzzyUniqueGames.Count);
+			Assert.AreEqual(12, fuzzyUniqueGames.Count);
 		}
 
 		[Test]
