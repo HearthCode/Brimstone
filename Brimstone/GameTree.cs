@@ -90,8 +90,8 @@ namespace Brimstone
 		}
 
 		public static GameTree BuildFor(Game Game, Action Action, ITreeSearcher SearchMode = null) {
-			/*if (SearchMode == null)
-				SearchMode = new BreadthFirstTreeSearch();*/
+			if (SearchMode == null)
+				SearchMode = new BreadthFirstTreeSearch();
 			var tree = new GameTree(Game, SearchMode);
 			tree.Run(Action);
 			return tree;
