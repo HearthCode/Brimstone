@@ -198,6 +198,16 @@ namespace Brimstone
 					foreach (var pa in PowerHistory.Skip(PowerHistory.Count() - 20))
 						s += pa + "\r\n";
 					return s;
+
+				case "s":
+					s += "Player 1 (health " + Player1.Hero.Health + "): ";
+					foreach (var e in Player1.Board)
+						s += "[" + e[GameTag.ZONE_POSITION] + ":" + e.Card.AbbrieviatedName + "](" + ((CanBeDamaged)e).Damage + ") ";
+					s += "\r\nPlayer 2 (health " + Player2.Hero.Health + "): ";
+					foreach (var e in Player2.Board)
+						s += "[" + e[GameTag.ZONE_POSITION] + ":" + e.Card.AbbrieviatedName + "](" + ((CanBeDamaged)e).Damage + ") ";
+					s += "\r\n";
+					return s;
 				default:
 					return "Game (no format specified)";
 			}
