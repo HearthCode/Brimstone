@@ -4,12 +4,12 @@
 	{
 		// Flame Juggler
 		public static Behaviour AT_094 = new Behaviour {
-			Battlecry = Damage(RandomOpponentMinion, 1)
+			Battlecry = Damage(RandomOpponentCharacter, 1)
 		};
 
 		// Boom Bot
 		public static Behaviour GVG_110t = new Behaviour {
-			Deathrattle = Damage(RandomOpponentMinion, RandomAmount(1, 4))
+			Deathrattle = Damage(RandomOpponentCharacter, RandomAmount(1, 4))
 		};
 
 		// Whirlwind
@@ -26,7 +26,7 @@
 
 		// Arcane Missiles
 		public static Behaviour EX1_277 = new Behaviour {
-			Battlecry = Damage(Random(OpponentCharacters), 1) * 3
+			Battlecry = Damage(RandomOpponentCharacter, 1) * 3
 		};
 
 		// Armorsmith
