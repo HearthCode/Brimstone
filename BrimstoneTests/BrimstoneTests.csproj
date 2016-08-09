@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TestEquivalence.cs" />
+    <Compile Include="TestGameTree.cs" />
     <Compile Include="TestZoneManagement.cs" />
     <Compile Include="TestClone.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
