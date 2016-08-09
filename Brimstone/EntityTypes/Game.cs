@@ -120,15 +120,18 @@ namespace Brimstone
 			ActionQueue.EnqueueDeferred(a);
 		}
 
-		public void Start() {
+		public void Start(int FirstPlayer = 0) {
 			// Pick a random starting player
-			FirstPlayer = Players[RNG.Between(0, 1)];
-			CurrentPlayer = FirstPlayer;
+			if (FirstPlayer == 0)
+				this.FirstPlayer = Players[RNG.Between(0, 1)];
+			else
+				this.FirstPlayer = Players[FirstPlayer - 1];
+			CurrentPlayer = this.FirstPlayer;
 			foreach (var p in Players)
 				p.Start();
 
 			// Give 2nd player the coin
-			FirstPlayer.Opponent.Give("The Coin");
+			this.FirstPlayer.Opponent.Give("The Coin");
 
 			// TODO: Insert event call here so KettleSharp can iterate all created entities
 
