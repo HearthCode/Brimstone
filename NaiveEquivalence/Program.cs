@@ -17,11 +17,11 @@ namespace Test1
 	public class Brimstone
 	{
 		// Configure test parameters here
-		public const int MaxMinions = 7;
-		public const int NumBoomBots = 2;
-		public const string FillMinion = "Bloodfen Raptor";
-		public static bool BoomBotTest = false;
-		public static bool ArcaneMissilesTest = true;
+		public const int MaxMinions = 3;
+		public const int NumBoomBots = 1;
+		public const string FillMinion = "River Crocolisk";
+		public static bool BoomBotTest = true;
+		public static bool ArcaneMissilesTest = false;
 		public static bool ConsoleOutput = false;
 
 		static void Main(string[] args) {
@@ -34,7 +34,7 @@ namespace Test1
 			var game = new Game(HeroClass.Druid, HeroClass.Druid, PowerHistory: true);
 			game.Player1.Deck.Fill();
 			game.Player2.Deck.Fill();
-			game.Start();
+			game.Start(1);
 
 			for (int i = 0; i < MaxMinions - NumBoomBots; i++)
 				game.CurrentPlayer.Give(FillMinion).Play();
@@ -82,7 +82,12 @@ namespace Test1
 			Console.WriteLine("Finding unique game states...");
 
 			var uniqueGames = tree.GetUniqueGames();
+			sw.Stop();
 
+			foreach (var kv in uniqueGames) {
+				Console.WriteLine(Math.Round(kv.Value * 100, 2) + "%: ");
+				Console.WriteLine("{0:s}", kv.Key);
+			}
 			Console.WriteLine("{0} unique games found in {1}ms", uniqueGames.Count, sw.ElapsedMilliseconds);
 		}
 	}
