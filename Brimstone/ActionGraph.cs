@@ -45,6 +45,11 @@ namespace Brimstone
 			return new Func { F = x };
 		}
 
+		// Unravel graph implicitly
+		public static implicit operator List<QueueAction>(ActionGraph g) {
+			return g.Unravel();
+		}
+
 		// Repeated action
 		public static ActionGraph operator *(ActionGraph x, ActionGraph y) {
 			return x.Repeat(y);
