@@ -9,8 +9,9 @@ namespace BrimstoneTests
 	public class TestClone
 	{
 		[Test]
-		public void TestCopyOnWriteClone() {
+		public void TestCloning([Values(true, false)] bool copyOnWrite) {
 			// Arrange
+			Settings.CopyOnWrite = copyOnWrite;
 
 			// Create game with players
 			Game game = new Game(HeroClass.Druid, HeroClass.Druid, PowerHistory: true);
@@ -111,15 +112,29 @@ namespace BrimstoneTests
 				Assert.AreNotSame(i1, i2);
 			}
 
-			// All proxies must point to original entities
-			foreach (Entity e in game.Entities)
-				Assert.AreSame(e.BaseEntityData, ((Entity)clone.Entities[e.Id]).BaseEntityData);
+			if (copyOnWrite)
+				// All proxies must point to original entities
+				foreach (Entity e in game.Entities)
+					Assert.AreSame(e.BaseEntityData, ((Entity)clone.Entities[e.Id]).BaseEntityData);
+			else
+				// All proxies must point to new entities
+				foreach (Entity e in game.Entities)
+					Assert.AreNotSame(e.BaseEntityData, ((Entity)clone.Entities[e.Id]).BaseEntityData);
 
-			// All reference counts must be 2
-			foreach (Entity e in game.Entities)
-				Assert.AreEqual(2, e.ReferenceCount);
-			foreach (Entity e in clone.Entities)
-				Assert.AreEqual(2, e.ReferenceCount);
+			if (copyOnWrite) {
+				// All reference counts must be 2
+				foreach (Entity e in game.Entities)
+					Assert.AreEqual(2, e.ReferenceCount);
+				foreach (Entity e in clone.Entities)
+					Assert.AreEqual(2, e.ReferenceCount);
+			}
+			else {
+				// All reference counts must be 1
+				foreach (Entity e in game.Entities)
+					Assert.AreEqual(1, e.ReferenceCount);
+				foreach (Entity e in clone.Entities)
+					Assert.AreEqual(1, e.ReferenceCount);
+			}
 
 			// All zone managers must be re-created
 			foreach (var z in game.Zones)

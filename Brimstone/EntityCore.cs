@@ -105,9 +105,13 @@ namespace Brimstone
 
 		public Entity(Entity cloneFrom) {
 			_fuzzyHash = cloneFrom._fuzzyHash;
-			_entity = cloneFrom._entity;
 			_referenceCount = cloneFrom._referenceCount;
-			_referenceCount.Count++;
+			if (Settings.CopyOnWrite) {
+				_entity = cloneFrom._entity;
+				_referenceCount.Count++;
+			} else {
+				_entity = (BaseEntityData)cloneFrom._entity.Clone();
+			}
 		}
 
 		public Entity(Card card, Dictionary<GameTag, int> tags = null) {

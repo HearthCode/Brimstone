@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Brimstone;
 
 namespace Brimstone.Benchmark
 {
@@ -15,16 +13,17 @@ namespace Brimstone.Benchmark
 
 		public void LoadDefinitions() {
 			Tests = new Dictionary<string, Test>() {
-				{ "RawClone", new Test("Raw cloning speed (68 entities)", Test_RawClone) },
-				{ "BoomBotPreHit", new Test("Boom Bot pre-hit cloning test; 5 RC + 2 BB per side", Test_BoomBotPreHit) },
-				{ "BoomBotPreDeathrattle", new Test("Boom Bot pre-deathrattle cloning test; 5 RC + 2 BB per side", Test_BoomBotPreDeathrattle) },
+				{ "RawCloneDeepCopy", new Test("Raw cloning speed; naive deep copy (68 entities)", Test_RawClone_DeepCopy) },
+				{ "RawCloneCopyOnWrite", new Test("Raw cloning speed; copy-on-write (68 entities)", Test_RawClone_CopyOnWrite) },
+				{ "BoomBotPreHit", new Test("Boom Bot pre-hit cloning test; copy-on-write; 5 RC + 2 BB per side", Test_BoomBotPreHit) },
+				{ "BoomBotPreDeathrattleCopyOnWrite", new Test("Boom Bot pre-deathrattle cloning test; copy-on-write; 5 RC + 2 BB per side", Test_BoomBotPreDeathrattle_CopyOnWrite) },
+				{ "BoomBotPreDeathrattleDeepCopy", new Test("Boom Bot pre-deathrattle cloning test; naive deep copy; 5 RC + 2 BB per side", Test_BoomBotPreDeathrattle_DeepCopy) },
 				{ "BoomBotUniqueStatesNS", new Test("Boom Bot hit; fuzzy unique states; Naive; 5 BR + 2 BB per side", Test_BoomBotUniqueStatesNS, Default_Setup2, 1) },
 				{ "BoomBotUniqueStatesDSF", new Test("Boom Bot hit; fuzzy unique states; DSF; 5 BR + 2 BB per side", Test_BoomBotUniqueStatesDSF, Default_Setup2, 1) },
 				{ "BoomBotUniqueStatesBSF", new Test("Boom Bot hit; fuzzy unique states; BSF; 5 BR + 2 BB per side", Test_BoomBotUniqueStatesBSF, Default_Setup2, 1) },
 				{ "ArcaneMissiles2UniqueStatesNS", new Test("Arcane Missiles (2); fuzzy unique game states; Naive; 5 BR + 2 BB per side", Test_2AMUniqueStatesNS, Default_Setup2, 1) },
 				{ "ArcaneMissiles2UniqueStatesDSF", new Test("Arcane Missiles (2); fuzzy unique game states; DSF; 5 BR + 2 BB per side", Test_2AMUniqueStatesDSF, Default_Setup2, 1) },
 				{ "ArcaneMissiles2UniqueStatesBSF", new Test("Arcane Missiles (2); fuzzy unique game states; BSF; 5 BR + 2 BB per side", Test_2AMUniqueStatesBSF, Default_Setup2, 1) },
-				{ "ArcaneMissiles3UniqueStatesDSF", new Test("Arcane Missiles (3); fuzzy unique game states; DSF; 5 BR + 2 BB per side", Test_3AMUniqueStatesDSF, Default_Setup2, 1) },
 				{ "ArcaneMissiles3UniqueStatesBSF", new Test("Arcane Missiles (3); fuzzy unique game states; BSF; 5 BR + 2 BB per side", Test_3AMUniqueStatesBSF, Default_Setup2, 1) },
 			};
 		}
@@ -40,10 +39,22 @@ namespace Brimstone.Benchmark
 			return NewScenarioGame(MaxMinions: 7, NumBoomBots: 2, FillMinion: "Bloodfen Raptor", FillDeck: false);
 		}
 
-		public void Test_RawClone(Game g, int it) {
+
+		private void _clone(Game g, int it) {
 			for (int i = 0; i < it; i++)
 				g.CloneState();
 		}
+		public void Test_RawClone_CopyOnWrite(Game g, int it) {
+			Settings.CopyOnWrite = true;
+			_clone(g, it);
+		}
+		public void Test_RawClone_DeepCopy(Game g, int it) {
+			Settings.CopyOnWrite = false;
+			Test_RawClone_CopyOnWrite(g, it);
+			_clone(g, it);
+			Settings.CopyOnWrite = true;
+		}
+
 		public void Test_BoomBotPreHit(Game g, int it) {
 			var BoomBotId = g.Player1.Board.First(t => t.Card.Name == "Boom Bot").Id;
 			for (int i = 0; i < it; i++) {
@@ -51,7 +62,7 @@ namespace Brimstone.Benchmark
 				((Minion)cloned.Entities[BoomBotId]).Hit(1);
 			}
 		}
-		public void Test_BoomBotPreDeathrattle(Game g, int it) {
+		private void _boomBotPreDeathrattle(Game g, int it) {
 			// Capture after Boom Bot has died but before Deathrattle executes
 			var BoomBot = g.Player1.Board.First(t => t.Card.Name == "Boom Bot") as Minion;
 			g.ActionQueue.OnAction += (o, e) => {
@@ -64,6 +75,15 @@ namespace Brimstone.Benchmark
 				}
 			};
 			BoomBot.Hit(1);
+		}
+		public void Test_BoomBotPreDeathrattle_DeepCopy(Game g, int it) {
+			Settings.CopyOnWrite = false;
+			_boomBotPreDeathrattle(g, it);
+			Settings.CopyOnWrite = true;
+		}
+		public void Test_BoomBotPreDeathrattle_CopyOnWrite(Game g, int it) {
+			Settings.CopyOnWrite = true;
+			_boomBotPreDeathrattle(g, it);
 		}
 
 		private void _boomBotUniqueStates(Game g, int it, ITreeSearcher search) {
@@ -112,10 +132,6 @@ namespace Brimstone.Benchmark
 
 		public void Test_2AMUniqueStatesBSF(Game g, int it) {
 			_missilesUniqueStates(g, it, 2, new BreadthFirstTreeSearch());
-		}
-
-		public void Test_3AMUniqueStatesDSF(Game g, int it) {
-			_missilesUniqueStates(g, it, 3, new DepthFirstTreeSearch());
 		}
 
 		public void Test_3AMUniqueStatesBSF(Game g, int it) {
