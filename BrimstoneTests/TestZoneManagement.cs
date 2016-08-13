@@ -9,8 +9,10 @@ namespace BrimstoneTests
 	public class TestZoneManagement
 	{
 		[Test]
-		public void TestZoneAddRemove() {
+		public void TestZoneAddRemove([Values(true, false)] bool zoneCaching) {
 			// Arrange
+			Settings.ZoneCaching = zoneCaching;
+
 			var game = new Game(HeroClass.Druid, HeroClass.Druid);
 			var p1 = game.Player1;
 			var p2 = game.Player2;
@@ -55,8 +57,10 @@ namespace BrimstoneTests
 		}
 
 		[Test]
-		public void TestZoneInsert() {
+		public void TestZoneInsert([Values(true, false)] bool zoneCaching) {
 			// Arrange
+			Settings.ZoneCaching = zoneCaching;
+
 			var game = new Game(HeroClass.Druid, HeroClass.Druid);
 			var p1 = game.Player1;
 			var p2 = game.Player2;
@@ -82,8 +86,10 @@ namespace BrimstoneTests
 		}
 
 		[Test]
-		public void TestZoneMove() {
+		public void TestZoneMove([Values(true, false)] bool zoneCaching) {
 			// Arrange
+			Settings.ZoneCaching = zoneCaching;
+
 			var game = new Game(HeroClass.Druid, HeroClass.Druid);
 			var p1 = game.Player1;
 			var p2 = game.Player2;
@@ -115,8 +121,10 @@ namespace BrimstoneTests
 		}
 
 		[Test]
-		public void TestZonePositionZero() {
+		public void TestZonePositionZero([Values(true, false)] bool zoneCaching) {
 			// Arrange
+			Settings.ZoneCaching = zoneCaching;
+
 			var game = new Game(HeroClass.Druid, HeroClass.Druid);
 			var p1 = game.Player1;
 			var p2 = game.Player2;
@@ -139,8 +147,10 @@ namespace BrimstoneTests
 		}
 
 		[Test]
-		public void TestZoneSlice() {
+		public void TestZoneSlice([Values(true, false)] bool zoneCaching) {
 			// Arrange
+			Settings.ZoneCaching = zoneCaching;
+
 			var game = new Game(HeroClass.Druid, HeroClass.Druid);
 			var p1 = game.Player1;
 			var p2 = game.Player2;
@@ -179,8 +189,10 @@ namespace BrimstoneTests
 		}
 
 		[Test]
-		public void TestDeck() {
+		public void TestDeck([Values(true, false)] bool zoneCaching) {
 			// Arrange
+			Settings.ZoneCaching = zoneCaching;
+
 			var game = new Game(HeroClass.Druid, HeroClass.Druid);
 			var p1 = game.Player1;
 			var p2 = game.Player2;

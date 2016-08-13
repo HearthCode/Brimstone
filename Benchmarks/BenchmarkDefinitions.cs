@@ -18,11 +18,13 @@ namespace Brimstone.Benchmark
 				{ "BoomBotPreHit", new Test("Boom Bot pre-hit cloning test; copy-on-write; 5 RC + 2 BB per side", Test_BoomBotPreHit) },
 				{ "BoomBotPreDeathrattleCopyOnWrite", new Test("Boom Bot pre-deathrattle cloning test; copy-on-write; 5 RC + 2 BB per side", Test_BoomBotPreDeathrattle_CopyOnWrite) },
 				{ "BoomBotPreDeathrattleDeepCopy", new Test("Boom Bot pre-deathrattle cloning test; naive deep copy; 5 RC + 2 BB per side", Test_BoomBotPreDeathrattle_DeepCopy) },
+				{ "BoomBotPreDeathrattleDeepCopyNoZoneCache", new Test("Boom Bot pre-deathrattle cloning test; naive deep copy; no zone caching; 5 RC + 2 BB per side", Test_BoomBotPreDeathrattle_DeepCopy_NoZoneCache) },
 				{ "BoomBotUniqueStatesNS", new Test("Boom Bot hit; fuzzy unique states; Naive; 5 BR + 2 BB per side", Test_BoomBotUniqueStatesNS, Default_Setup2, 1) },
 				{ "BoomBotUniqueStatesDSF", new Test("Boom Bot hit; fuzzy unique states; DSF; 5 BR + 2 BB per side", Test_BoomBotUniqueStatesDSF, Default_Setup2, 1) },
 				{ "BoomBotUniqueStatesBSF", new Test("Boom Bot hit; fuzzy unique states; BSF; 5 BR + 2 BB per side", Test_BoomBotUniqueStatesBSF, Default_Setup2, 1) },
 				{ "ArcaneMissiles2UniqueStatesNS", new Test("Arcane Missiles (2); fuzzy unique game states; Naive; 5 BR + 2 BB per side", Test_2AMUniqueStatesNS, Default_Setup2, 1) },
 				{ "ArcaneMissiles2UniqueStatesDSF", new Test("Arcane Missiles (2); fuzzy unique game states; DSF; 5 BR + 2 BB per side", Test_2AMUniqueStatesDSF, Default_Setup2, 1) },
+				{ "ArcaneMissiles2UniqueStatesDSFNoZoneCache", new Test("Arcane Missiles (2); fuzzy unique game states; DSF; no zone caching; 5 BR + 2 BB per side", Test_2AMUniqueStatesDSFNoZoneCache, Default_Setup2, 1) },
 				{ "ArcaneMissiles2UniqueStatesBSF", new Test("Arcane Missiles (2); fuzzy unique game states; BSF; 5 BR + 2 BB per side", Test_2AMUniqueStatesBSF, Default_Setup2, 1) },
 				{ "ArcaneMissiles3UniqueStatesBSF", new Test("Arcane Missiles (3); fuzzy unique game states; BSF; 5 BR + 2 BB per side", Test_3AMUniqueStatesBSF, Default_Setup2, 1) },
 			};
@@ -81,6 +83,13 @@ namespace Brimstone.Benchmark
 			_boomBotPreDeathrattle(g, it);
 			Settings.CopyOnWrite = true;
 		}
+		public void Test_BoomBotPreDeathrattle_DeepCopy_NoZoneCache(Game g, int it) {
+			Settings.ZoneCaching = false;
+			Settings.CopyOnWrite = false;
+			_boomBotPreDeathrattle(g, it);
+			Settings.CopyOnWrite = true;
+			Settings.ZoneCaching = true;
+		}
 		public void Test_BoomBotPreDeathrattle_CopyOnWrite(Game g, int it) {
 			Settings.CopyOnWrite = true;
 			_boomBotPreDeathrattle(g, it);
@@ -128,6 +137,12 @@ namespace Brimstone.Benchmark
 
 		public void Test_2AMUniqueStatesDSF(Game g, int it) {
 			_missilesUniqueStates(g, it, 2, new DepthFirstTreeSearch());
+		}
+
+		public void Test_2AMUniqueStatesDSFNoZoneCache(Game g, int it) {
+			Settings.ZoneCaching = false;
+			_missilesUniqueStates(g, it, 2, new DepthFirstTreeSearch());
+			Settings.ZoneCaching = true;
 		}
 
 		public void Test_2AMUniqueStatesBSF(Game g, int it) {

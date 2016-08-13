@@ -45,7 +45,7 @@ namespace Brimstone
 
 		private List<IEntity> Entities {
 			get {
-				if (_cachedEntities == null)
+				if (_cachedEntities == null || !Settings.ZoneCaching)
 					Init();
 				return _cachedEntities;
 			}
@@ -74,9 +74,7 @@ namespace Brimstone
 
 		public int Count {
 			get {
-				if (_cachedEntities == null)
-					Init();
-				return _cachedCount;
+				return Entities.Count;
 			}
 		}
 
@@ -88,9 +86,7 @@ namespace Brimstone
 
 		public IEntity this[int zone_position] {
 			get {
-				if (_cachedEntities == null)
-					Init();
-				return _cachedEntities[zone_position - 1];
+				return Entities[zone_position - 1];
 			}
 		}
 

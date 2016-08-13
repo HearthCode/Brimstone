@@ -24,7 +24,7 @@ namespace Brimstone.Benchmark
 
 		public void Start(string testName) {
 			if (!string.IsNullOrEmpty(testName))
-				Console.Write(testName.PadRight(100));
+				Console.Write(testName.PadRight(120));
 			cOut = Console.Out;
 			Console.SetOut(TextWriter.Null);
 			sw = new Stopwatch();
@@ -123,7 +123,7 @@ namespace Brimstone.Benchmark
 
 			foreach (var kv in Tests)
 				if (kv.Key.ToLower().Contains(filter)) {
-					Console.Write(("Test [" + kv.Key + "]: ").PadRight(40));
+					Console.Write(("Test [" + kv.Key + "]: ").PadRight(60));
 					benchmark.Run(kv.Value);
 				}
 
