@@ -225,7 +225,7 @@ namespace Brimstone
 		private int _fuzzyHash = 0;
 		public int FuzzyHash {
 			get {
-				if (_fuzzyHash != 0)
+				if (_fuzzyHash != 0 && Settings.EntityHashCaching)
 					return _fuzzyHash;
 				uint prime = 16777219;
 				bool inHand = _entity.Tags.ContainsKey(GameTag.ZONE) && _entity.Tags[GameTag.ZONE] == (int)Zone.HAND;
@@ -355,14 +355,15 @@ namespace Brimstone
 		private HashSet<int> _changedHashes;
 
 		public void EntityChanging(int id, int previousHash) {
-			// Only undo hash once if multiple changes occur since we last re-calculated
-			if (!_changedHashes.Contains(id)) {
-				if (Entities[id][GameTag.ZONE] != (int)Zone.PLAY || Entities[id][GameTag.ZONE_POSITION] == 0)
-					_undoHash += previousHash;
-				else
-					_undoHash += (Entities[id].Controller.Id * 8 + Entities[id][GameTag.ZONE_POSITION]) * previousHash;
-				_changedHashes.Add(id);
-			}
+			if (Settings.GameHashCaching)
+				// Only undo hash once if multiple changes occur since we last re-calculated
+				if (!_changedHashes.Contains(id)) {
+					if (Entities[id][GameTag.ZONE] != (int)Zone.PLAY || Entities[id][GameTag.ZONE_POSITION] == 0)
+						_undoHash += previousHash;
+					else
+						_undoHash += (Entities[id].Controller.Id * 8 + Entities[id][GameTag.ZONE_POSITION]) * previousHash;
+					_changedHashes.Add(id);
+				}
 		}
 
 		public void EntityChanged(int id, GameTag tag, int value) {
@@ -372,6 +373,16 @@ namespace Brimstone
 
 		public int FuzzyGameHash {
 			get {
+				if (!Settings.GameHashCaching) {
+					_gameHash = 0;
+					foreach (var entity in Entities.Values)
+						if (entity[GameTag.ZONE] != (int)Zone.PLAY || entity[GameTag.ZONE_POSITION] == 0)
+							_gameHash += entity.FuzzyHash;
+						else
+							_gameHash += (entity.Controller.Id * 8 + entity[GameTag.ZONE_POSITION]) * entity.FuzzyHash;
+					return _gameHash;
+				}
+
 				// Hash board states (play zones) for both players in order, hash rest of game entities in any order
 				_gameHash -= _undoHash;
 				foreach (var eId in _changedHashes)
