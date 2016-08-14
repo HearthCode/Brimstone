@@ -17,18 +17,22 @@ namespace Brimstone.Benchmark
 			var testName = test.Name + (test.Iterations > 1 ? "; " + test.Iterations + " iterations" : "");
 			var results = new List<long>();
 
-			for (int i = 0; i < 5; i++) {
+			for (int i = 0; i < 6; i++) {
 				Settings.CopyOnWrite = true;
 				Settings.ZoneCaching = true;
 				Settings.EntityHashCaching = true;
 				Settings.GameHashCaching = true;
+				Settings.UseGameHashForEquality = true;
 
 				switch (i) {
 					case 0: break;
 					case 1: Settings.CopyOnWrite = false; break;
 					case 2: Settings.ZoneCaching = false; break;
 					case 3: Settings.EntityHashCaching = Settings.GameHashCaching = false; break;
-					case 4: Settings.CopyOnWrite = Settings.ZoneCaching = Settings.EntityHashCaching = Settings.GameHashCaching = false; break;
+					case 4: Settings.UseGameHashForEquality = false; break;
+					case 5: Settings.CopyOnWrite = Settings.ZoneCaching =
+							Settings.EntityHashCaching = Settings.GameHashCaching =
+							Settings.UseGameHashForEquality = false; break;
 				}
 
 				var game = test.SetupCode();
@@ -68,7 +72,7 @@ namespace Brimstone.Benchmark
 			"Release " +
 #endif
 			Assembly.GetAssembly(typeof(Game)).GetName().Version + "\r\n" +
-			"\"\",\"\"\r\nTest Name,All Opts,CoW Disabled,Zone Cache Disabled,Hash Cache Disabled,No Opts\r\n");
+			"\"\",\"\"\r\nTest Name,All Opts,CoW Disabled,Zone Cache Disabled,Hash Cache Disabled,Hash Equality Disabled,No Opts\r\n");
 			File.WriteAllText(path, csv.ToString());
 		}
 	}

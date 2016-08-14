@@ -12,6 +12,6 @@ namespace Brimstone
 		public static bool ZoneCaching = true;
 		public static bool EntityHashCaching = true;
 		public static bool GameHashCaching = true;
-		public static bool PowerHistoryEquivalence = true;
+		public static bool UseGameHashForEquality = true;
 	}
 }
