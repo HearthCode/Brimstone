@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Brimstone.Benchmark
 {
@@ -12,6 +14,11 @@ namespace Brimstone.Benchmark
 		private TextWriter cOut;
 		private Stopwatch sw;
 		private StringBuilder csv = new StringBuilder();
+		private int timeoutMs = 0;
+
+		public Supervisor(int timeout) {
+			timeoutMs = timeout;
+		}
 
 		public void Run(Test test) {
 			var testName = test.Name + (test.Iterations > 1 ? "; " + test.Iterations + " iterations" : "");
@@ -36,8 +43,20 @@ namespace Brimstone.Benchmark
 				}
 
 				var game = test.SetupCode();
-				Start(i == 0 ? testName : "");
-				test.BenchmarkCode(game, test.Iterations);
+				var cts = new CancellationTokenSource();
+				Thread taskThread = null;
+				cts.CancelAfter(timeoutMs);
+				try {
+					Task.Run((() => {
+						taskThread = Thread.CurrentThread;
+						Start(i == 0 ? testName : "");
+						test.BenchmarkCode(game, test.Iterations);
+						sw.Stop();
+					})).Wait(cts.Token);
+				}
+				catch (OperationCanceledException) {
+					taskThread.Abort();
+				}
 				results.Add(Result().ElapsedMilliseconds);
 			}
 			Console.WriteLine();
@@ -143,8 +162,8 @@ namespace Brimstone.Benchmark
 			return game;
 		}
 
-		public void Run(string filter) {
-			var benchmark = new Supervisor();
+		public void Run(string filter, int timeout) {
+			var benchmark = new Supervisor(timeout);
 
 			foreach (var kv in Tests)
 				if (kv.Key.ToLower().Contains(filter)) {
@@ -159,6 +178,9 @@ namespace Brimstone.Benchmark
 
 		static void Main(string[] args) {
 			string filter = string.Empty;
+			int timeout = 7000;
+
+			string usage = "Usage: benchmarks [--filter=text] [--timeout=milliseconds]...";
 
 			foreach (string arg in args) {
 				try {
@@ -168,12 +190,18 @@ namespace Brimstone.Benchmark
 						case "--filter":
 							filter += value.ToLower();
 							break;
+						case "--timeout":
+							if (!int.TryParse(value, out timeout)) {
+								Console.WriteLine(usage);
+								return;
+							}
+							break;
 						default:
-							Console.WriteLine("Usage: benchmarks [--filter=text]...");
+							Console.WriteLine(usage);
 							return;
 					}
 				} catch (Exception) {
-					Console.WriteLine("Usage: benchmarks [--filter=text]...");
+					Console.WriteLine(usage);
 					return;
 				}
 			}
@@ -187,7 +215,7 @@ namespace Brimstone.Benchmark
 
 			var b = new Benchmarks();
 			b.LoadDefinitions();
-			b.Run(filter);
+			b.Run(filter, timeout);
 		}
 	}
 }
