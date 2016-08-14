@@ -14,15 +14,36 @@ namespace Brimstone.Benchmark
 		private StringBuilder csv = new StringBuilder();
 
 		public void Run(Test test) {
-			var game = test.SetupCode();
 			var testName = test.Name + (test.Iterations > 1 ? "; " + test.Iterations + " iterations" : "");
-			Start(testName);
-			test.BenchmarkCode(game, test.Iterations);
-			var result = Result();
-			csv.AppendLine(string.Format("{0},{1}", testName, sw.ElapsedMilliseconds));
+			var results = new List<long>();
+
+			for (int i = 0; i < 5; i++) {
+				Settings.CopyOnWrite = true;
+				Settings.ZoneCaching = true;
+				Settings.EntityHashCaching = true;
+				Settings.GameHashCaching = true;
+
+				switch (i) {
+					case 0: break;
+					case 1: Settings.CopyOnWrite = false; break;
+					case 2: Settings.ZoneCaching = false; break;
+					case 3: Settings.EntityHashCaching = Settings.GameHashCaching = false; break;
+					case 4: Settings.CopyOnWrite = Settings.ZoneCaching = Settings.EntityHashCaching = Settings.GameHashCaching = false; break;
+				}
+
+				var game = test.SetupCode();
+				Start(i == 0 ? testName : "");
+				test.BenchmarkCode(game, test.Iterations);
+				results.Add(Result().ElapsedMilliseconds);
+			}
+			Console.WriteLine();
+			csv.Append(testName);
+			foreach (var r in results)
+				csv.Append("," + r);
+			csv.AppendLine();
 		}
 
-		public void Start(string testName) {
+		public void Start(string testName = null) {
 			if (!string.IsNullOrEmpty(testName))
 				Console.Write(testName.PadRight(120));
 			cOut = Console.Out;
@@ -34,7 +55,7 @@ namespace Brimstone.Benchmark
 		public Stopwatch Result() {
 			sw.Stop();
 			Console.SetOut(cOut);
-			Console.WriteLine(sw.ElapsedMilliseconds + "ms");
+			Console.Write((sw.ElapsedMilliseconds + "ms").PadRight(12));
 			return sw;
 		}
 
@@ -47,7 +68,7 @@ namespace Brimstone.Benchmark
 			"Release " +
 #endif
 			Assembly.GetAssembly(typeof(Game)).GetName().Version + "\r\n" +
-			"\"\",\"\"\r\nTest Name,Result (ms)\r\n");
+			"\"\",\"\"\r\nTest Name,All Opts,CoW Disabled,Zone Cache Disabled,Hash Cache Disabled,No Opts\r\n");
 			File.WriteAllText(path, csv.ToString());
 		}
 	}
@@ -133,7 +154,7 @@ namespace Brimstone.Benchmark
 		}
 
 		static void Main(string[] args) {
-			string filter = "";
+			string filter = string.Empty;
 
 			foreach (string arg in args) {
 				try {
