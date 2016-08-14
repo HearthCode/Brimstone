@@ -302,14 +302,13 @@ namespace Brimstone
 			Game.Controller = game;
 
 			// Fuzzy hashing
-			_changedHashes = new HashSet<int>();
+			_changedHashes = false;
 			Add(game);
 		}
 
 		public EntityController(EntityController es) {
 			_gameHash = es._gameHash;
-			_undoHash = es._undoHash;
-			_changedHashes = new HashSet<int>(es._changedHashes);
+			_changedHashes = es._changedHashes;
 
 			NextEntityId = es.NextEntityId;
 			foreach (var entity in es) {
@@ -351,19 +350,11 @@ namespace Brimstone
 		// WARNING: The hash algorithm MUST be designed in such a way that the order
 		// in which the entities are hashed doesn't matter
 		private int _gameHash = 0;
-		private int _undoHash = 0;
-		private HashSet<int> _changedHashes;
+		private bool _changedHashes;
 
 		public void EntityChanging(int id, int previousHash) {
 			if (Settings.GameHashCaching)
-				// Only undo hash once if multiple changes occur since we last re-calculated
-				if (!_changedHashes.Contains(id)) {
-					if (Entities[id][GameTag.ZONE] != (int)Zone.PLAY || Entities[id][GameTag.ZONE_POSITION] == 0)
-						_undoHash += previousHash;
-					else
-						_undoHash += (Entities[id].Controller.Id * 8 + Entities[id][GameTag.ZONE_POSITION]) * previousHash;
-					_changedHashes.Add(id);
-				}
+				_changedHashes = true;
 		}
 
 		public void EntityChanged(int id, GameTag tag, int value) {
@@ -373,25 +364,16 @@ namespace Brimstone
 
 		public int FuzzyGameHash {
 			get {
-				if (!Settings.GameHashCaching) {
+				if (!Settings.GameHashCaching || _changedHashes) {
 					_gameHash = 0;
+					// Hash board states (play zones) for both players in order, hash rest of game entities in any order
 					foreach (var entity in Entities.Values)
 						if (entity[GameTag.ZONE] != (int)Zone.PLAY || entity[GameTag.ZONE_POSITION] == 0)
 							_gameHash += entity.FuzzyHash;
 						else
 							_gameHash += (entity.Controller.Id * 8 + entity[GameTag.ZONE_POSITION]) * entity.FuzzyHash;
-					return _gameHash;
+					_changedHashes = false;
 				}
-
-				// Hash board states (play zones) for both players in order, hash rest of game entities in any order
-				_gameHash -= _undoHash;
-				foreach (var eId in _changedHashes)
-					if (Entities[eId][GameTag.ZONE] != (int)Zone.PLAY || Entities[eId][GameTag.ZONE_POSITION] == 0)
-						_gameHash += Entities[eId].FuzzyHash;
-					else
-						_gameHash += (Entities[eId].Controller.Id * 8 + Entities[eId][GameTag.ZONE_POSITION]) * Entities[eId].FuzzyHash;
-				_changedHashes.Clear();
-				_undoHash = 0;
 				return _gameHash;
 			}
 		}
