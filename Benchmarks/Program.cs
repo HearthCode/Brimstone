@@ -14,7 +14,7 @@ namespace Brimstone.Benchmark
 		private TextWriter cOut;
 		private Stopwatch sw;
 		private StringBuilder csv = new StringBuilder();
-		private int timeoutMs = 0;
+		private int timeoutMs = -1;
 
 		public Supervisor(int timeout) {
 			timeoutMs = timeout;
@@ -43,19 +43,24 @@ namespace Brimstone.Benchmark
 				}
 
 				var game = test.SetupCode();
-				var cts = new CancellationTokenSource();
-				Thread taskThread = null;
-				cts.CancelAfter(timeoutMs);
-				try {
-					Task.Run((() => {
-						taskThread = Thread.CurrentThread;
-						Start(i == 0 ? testName : "");
-						test.BenchmarkCode(game, test.Iterations);
-						sw.Stop();
-					})).Wait(cts.Token);
-				}
-				catch (OperationCanceledException) {
-					taskThread.Abort();
+				if (timeoutMs != -1) {
+					var cts = new CancellationTokenSource();
+					Thread taskThread = null;
+					cts.CancelAfter(timeoutMs);
+					try {
+						Task.Run((() => {
+							taskThread = Thread.CurrentThread;
+							Start(i == 0 ? testName : "");
+							test.BenchmarkCode(game, test.Iterations);
+							sw.Stop();
+						})).Wait(cts.Token);
+					}
+					catch (OperationCanceledException) {
+						taskThread.Abort();
+					}
+				} else {
+					Start(i == 0 ? testName : "");
+					test.BenchmarkCode(game, test.Iterations);
 				}
 				results.Add(Result().ElapsedMilliseconds);
 			}
@@ -180,10 +185,13 @@ namespace Brimstone.Benchmark
 			string filter = string.Empty;
 			int timeout = 7000;
 
-			string usage = "Usage: benchmarks [--filter=text] [--timeout=milliseconds]...";
+			string usage = "Usage: benchmarks [--filter=text] [--timeout=milliseconds] [--disable-timeout]...";
 
-			foreach (string arg in args) {
+			foreach (string a in args) {
 				try {
+					var arg = a;
+					if (!arg.Contains("="))
+						arg += "=";
 					string name = arg.Substring(0, arg.IndexOf("=")).ToLower().Trim();
 					string value = arg.Substring(name.Length + 1);
 					switch (name) {
@@ -195,6 +203,9 @@ namespace Brimstone.Benchmark
 								Console.WriteLine(usage);
 								return;
 							}
+							break;
+						case "--disable-timeout":
+							timeout = -1;
 							break;
 						default:
 							Console.WriteLine(usage);
