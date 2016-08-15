@@ -8,12 +8,12 @@ namespace Brimstone
 	public partial class Player : Entity, IZoneOwner {
 		public string FriendlyName { get; }
 
-		public Deck Deck { get; private set; }
-		public ZoneEntities Hand { get; private set; }
-		public ZoneEntities Board { get; private set; }
-		public ZoneEntities Graveyard { get; private set; }
-		public ZoneEntities Secrets { get; private set; }
-		public ZoneGroup Zones { get; } = new ZoneGroup();
+		public Deck Deck { get { return (Deck)Zones[Zone.DECK]; } set { Zones[Zone.DECK] = value; } }
+		public ZoneEntities Hand { get { return Zones[Zone.HAND]; } }
+		public ZoneEntities Board { get { return Zones[Zone.PLAY]; } }
+		public ZoneEntities Graveyard { get { return Zones[Zone.GRAVEYARD]; } }
+		public ZoneEntities Secrets { get { return Zones[Zone.SECRET]; } }
+		public ZoneGroup Zones { get; private set; }
 		public HeroClass HeroClass { get; }
 
 		public Player(Player cloneFrom) : base(cloneFrom) {
@@ -42,11 +42,9 @@ namespace Brimstone
 			}
 			set {
 				base.Game = value;
-				Zones[Zone.DECK] = Deck = new Deck(value, HeroClass, this);
-				Zones[Zone.HAND] = Hand = new ZoneEntities(value, this, Zone.HAND);
-				Zones[Zone.PLAY] = Board = new ZoneEntities(value, this, Zone.PLAY);
-				Zones[Zone.GRAVEYARD] = Graveyard = new ZoneEntities(value, this, Zone.GRAVEYARD);
-				Zones[Zone.SECRET] = Secrets = new ZoneEntities(value, this, Zone.SECRET);
+
+				// Create zones
+				Zones = new ZoneGroup(Game, this);
 			}
 		}
 

@@ -2,8 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Brimstone
 {
@@ -14,12 +12,23 @@ namespace Brimstone
 
 	public class ZoneGroup : IEnumerable<ZoneEntities>
 	{
+		public Game Game { get; }
+		public IZoneOwner Owner { get; }
+
 		private ZoneEntities[] _zones = new ZoneEntities[(int)Zone._COUNT];
+
+		public ZoneGroup(Game game, IZoneOwner controller) {
+			Game = game;
+			Owner = controller;
+		}
 
 		public ZoneEntities this[Zone z] {
 			get {
+				if (_zones[(int)z] == null)
+					_zones[(int)z] = new ZoneEntities(Game, Owner, z);
 				return _zones[(int)z];
 			}
+			// For decks
 			set {
 				_zones[(int)z] = value;
 			}
@@ -40,12 +49,20 @@ namespace Brimstone
 		public Zone Zone { get; }
 		public IZoneOwner Controller { get; }
 
-		private List<IEntity> _cachedEntities;
-		private int _cachedCount;
+		private IEnumerable<IEntity> _cachedEntities;
+		private List<IEntity> _cachedEntitiesAsList;
 
-		private List<IEntity> Entities {
+		private IEnumerable<IEntity> Entities {
 			get {
-				if (_cachedEntities == null || !Settings.ZoneCaching)
+				if (!Settings.ZoneCaching) {
+					Init();
+					var v = _cachedEntities;
+					_cachedEntities = null;
+					return v;
+				}
+				if (_cachedEntitiesAsList != null)
+					return _cachedEntitiesAsList;
+				if (_cachedEntities == null)
 					Init();
 				return _cachedEntities;
 			}
@@ -54,15 +71,21 @@ namespace Brimstone
 		protected void Init() {
 			// Make sure that _cachedEntities[0] has ZONE_POSITION = 1 etc.
 			_cachedEntities = Game.Entities
-				.Where(e => e.Controller == Controller && e[GameTag.ZONE] == (int)Zone && e[GameTag.ZONE_POSITION] > 0)
-				.OrderBy(e => e[GameTag.ZONE_POSITION])
-				.ToList();
-			_cachedCount = _cachedEntities.Count();
+				.Where(e => e.Controller == Controller && e[GameTag.ZONE] == (int)Zone && e[GameTag.ZONE_POSITION] > 0);
+			_cachedEntitiesAsList = null;
 		}
 
-		protected void UpdateZonePositions() {
+		private List<IEntity> asList {
+			get {
+				if (_cachedEntitiesAsList == null || !Settings.ZoneCaching)
+					_cachedEntitiesAsList = Entities.OrderBy(e => e[GameTag.ZONE_POSITION]).ToList();
+				return _cachedEntitiesAsList;
+			}
+		}
+
+		private void updateZonePositions() {
 			int p = 1;
-			foreach (var ze in _cachedEntities)
+			foreach (var ze in _cachedEntitiesAsList)
 				ze[GameTag.ZONE_POSITION] = p++;
 		}
 
@@ -74,7 +97,7 @@ namespace Brimstone
 
 		public int Count {
 			get {
-				return Entities.Count;
+				return asList.Count;
 			}
 		}
 
@@ -86,35 +109,36 @@ namespace Brimstone
 
 		public IEntity this[int zone_position] {
 			get {
-				return Entities[zone_position - 1];
+				return asList[zone_position - 1];
 			}
 		}
 
 		public IEnumerable<IEntity> Slice(int? zpStart = null, int? zpEnd = null) {
+			int eCount = Count;
 			int start = 0, count = 0;
 
 			// First or last X elements
 			if (zpStart != null && zpEnd == null) {
-				start = (zpStart > 0? 0 : Entities.Count + (int)zpStart);
+				start = (zpStart > 0? 0 : eCount + (int)zpStart);
 				count = Math.Abs((int)zpStart);
 			}
 
 			// Range
 			if (zpStart != null && zpEnd != null) {
-				start = (zpStart > 0 ? (int)zpStart - 1 : Entities.Count + (int)zpStart);
+				start = (zpStart > 0 ? (int)zpStart - 1 : eCount + (int)zpStart);
 				count = ((int)zpEnd - (int)zpStart) + 1; // works when both numbers are same sign
 
 				if (zpStart > 0 && zpEnd < 0)
-					count = (Entities.Count + (int)zpEnd - (int)zpStart) + 2;
+					count = (eCount + (int)zpEnd - (int)zpStart) + 2;
 			}
 
 			// All
 			if (zpStart == null && zpEnd == null) {
 				start = 0;
-				count = Entities.Count;
+				count = eCount;
 			}
 
-			return Entities.Skip(start).Take(count);
+			return asList.Skip(start).Take(count);
 		}
 
 		public IEntity Add(IEntity Entity, int ZonePosition = -1) {
@@ -134,24 +158,22 @@ namespace Brimstone
 			if (Zone == Zone.SETASIDE || Zone == Zone.GRAVEYARD || (Zone == Zone.PLAY && Controller is Game))
 				ZonePosition = 0;
 			if (ZonePosition != 0) {
-				Entities.Insert(ZonePosition - 1, Entity);
-				_cachedCount++;
+				asList.Insert(ZonePosition - 1, Entity);
 			}
 			else
 				Entity[GameTag.ZONE_POSITION] = 0;
 			Entity[GameTag.ZONE] = (int)Zone;
 
 			if (ZonePosition != 0)
-				UpdateZonePositions();
+				updateZonePositions();
 
 			return Entity;
 		}
 
 		public IEntity Remove(IEntity Entity, bool ClearZone = true) {
-			bool removed = Entities.Remove(Entity);
+			bool removed = asList.Remove(Entity);
 			if (removed) {
-				_cachedCount--;
-				UpdateZonePositions();
+				updateZonePositions();
 				if (ClearZone) {
 					Entity[GameTag.ZONE_POSITION] = 0;
 					Entity[GameTag.ZONE] = (int)Zone.INVALID;

@@ -41,9 +41,9 @@ namespace Brimstone
 			}
 		}
 
-		public ZoneEntities Setaside { get; private set; }
-		public ZoneEntities Board { get; private set; }
-		public ZoneGroup Zones { get; } = new ZoneGroup();
+		public ZoneEntities Setaside { get { return Zones[Zone.SETASIDE]; } }
+		public ZoneEntities Board { get { return Zones[Zone.PLAY]; } }
+		public ZoneGroup Zones { get; }
 
 		public PowerHistory PowerHistory;
 		public ActionQueue ActionQueue;
@@ -58,9 +58,7 @@ namespace Brimstone
 		// Required by IEntity
 		public Game(Game cloneFrom) : base(cloneFrom) {
 			// Generate zones owned by game
-			Board = Zones[Zone.PLAY] = new ZoneEntities(this, this, Zone.PLAY);
-			Setaside = Zones[Zone.SETASIDE] = new ZoneEntities(this, this, Zone.SETASIDE);
-
+			Zones = new ZoneGroup(this, this);
 			// Update tree
 			GameId = ++SequenceNumber;
 			Depth = cloneFrom.Depth + 1;
@@ -84,14 +82,16 @@ namespace Brimstone
 			Entities = new EntityController(this);
 
 			// Generate zones owned by game
-			Board = Zones[Zone.PLAY] = new ZoneEntities(this, this, Zone.SETASIDE);
-			Setaside = Zones[Zone.SETASIDE] = new ZoneEntities(this, this, Zone.PLAY);
+			Zones = new ZoneGroup(this, this);
 
 			// Generate players and empty decks
 			Player1 = new Player(Hero1, (Player1Name.Length > 0) ? Player1Name : "Player 1", 1);
 			Player2 = new Player(Hero2, (Player2Name.Length > 0) ? Player2Name : "Player 2", 2);
 			Board.MoveTo(Player1);
 			Board.MoveTo(Player2);
+			for (int i = 0; i < 2; i++) {
+				Players[i].Deck = new Deck(this, Players[i].HeroClass, Players[i]);
+			}
 
 			// No parent or children
 			GameId = ++SequenceNumber;
@@ -227,6 +227,10 @@ namespace Brimstone
 			game.Player1 = entities.FindPlayer(1);
 			game.Player2 = entities.FindPlayer(2);
 			game.CurrentPlayer = (CurrentPlayer.Id == game.Player1.Id ? game.Player1 : game.Player2);
+			// Generate zones owned by game
+			for (int i = 0; i < 2; i++) {
+				game.Players[i].Zones[Zone.DECK] = new Deck(game, Players[i].Deck.HeroClass, game.Players[i]);
+			}
 			// Clone queue, stack and events
 			game.ActionQueue = ((ActionQueue)ActionQueue.Clone());
 			game.ActionQueue.Attach(game);
