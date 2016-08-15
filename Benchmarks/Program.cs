@@ -183,9 +183,9 @@ namespace Brimstone.Benchmark
 
 		static void Main(string[] args) {
 			string filter = string.Empty;
-			int timeout = 7000;
+			int timeout = -1;
 
-			string usage = "Usage: benchmarks [--filter=text] [--timeout=milliseconds] [--disable-timeout]...";
+			string usage = "Usage: benchmarks [--filter=text] [--timeout=milliseconds]...";
 
 			foreach (string a in args) {
 				try {
@@ -203,9 +203,6 @@ namespace Brimstone.Benchmark
 								Console.WriteLine(usage);
 								return;
 							}
-							break;
-						case "--disable-timeout":
-							timeout = -1;
 							break;
 						default:
 							Console.WriteLine(usage);
