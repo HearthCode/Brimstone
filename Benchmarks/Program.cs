@@ -76,6 +76,12 @@ namespace Brimstone.Benchmark
 				Console.Write(testName.PadRight(120));
 			cOut = Console.Out;
 			Console.SetOut(TextWriter.Null);
+
+			// Force wait until all garbage collection is completed
+			GC.Collect();
+			GC.WaitForPendingFinalizers();
+			GC.Collect();
+
 			sw = new Stopwatch();
 			sw.Start();
 		}
