@@ -53,10 +53,12 @@ namespace Brimstone
 		public bool TrackChildren { get; set; }
 
 		// The total number of clones including the root node in this tree
-		public int NodeCount { get; protected set; } = 0;
+		private volatile int _nodeCount = 0;
+		public int NodeCount { get { return _nodeCount; } protected set { _nodeCount = value; } }
 
 		// The total number of non-pruned leaf nodes kept
-		public int LeafNodeCount { get; set; } = 0;
+		private volatile int _leafNodeCount = 0;
+		public int LeafNodeCount { get { return _leafNodeCount; } set { _leafNodeCount = value; } }
 
 		private ITreeSearcher searcher = null;
 		private Dictionary<Game, double> uniqueGames = new Dictionary<Game, double>();
