@@ -261,7 +261,6 @@ namespace Brimstone
 			}
 			History.Add(action);
 
-			// TODO: Replace with async/await later
 			// Run action and push results onto stack
 			var result = action.Action.Execute(action.Game, action.Source, action.Args);
 			if (result.HasResult)

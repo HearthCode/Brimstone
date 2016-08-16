@@ -302,13 +302,13 @@ namespace Brimstone
 			Game.Controller = game;
 
 			// Fuzzy hashing
-			_changedHashes = false;
+			Changed = false;
 			Add(game);
 		}
 
 		public EntityController(EntityController es) {
 			_gameHash = es._gameHash;
-			_changedHashes = es._changedHashes;
+			Changed = es.Changed;
 
 			NextEntityId = es.NextEntityId;
 			foreach (var entity in es) {
@@ -350,11 +350,11 @@ namespace Brimstone
 		// WARNING: The hash algorithm MUST be designed in such a way that the order
 		// in which the entities are hashed doesn't matter
 		private int _gameHash = 0;
-		private bool _changedHashes;
+		public bool Changed { get; private set; }
 
 		public void EntityChanging(int id, int previousHash) {
 			if (Settings.GameHashCaching)
-				_changedHashes = true;
+				Changed = true;
 		}
 
 		public void EntityChanged(int id, GameTag tag, int value) {
@@ -364,7 +364,7 @@ namespace Brimstone
 
 		public int FuzzyGameHash {
 			get {
-				if (!Settings.GameHashCaching || _changedHashes) {
+				if (!Settings.GameHashCaching || Changed) {
 					_gameHash = 0;
 					// Hash board states (play zones) for both players in order, hash rest of game entities in any order
 					foreach (var entity in Entities.Values)
@@ -372,7 +372,7 @@ namespace Brimstone
 							_gameHash += entity.FuzzyHash;
 						else
 							_gameHash += (entity.Controller.Id * 8 + entity[GameTag.ZONE_POSITION]) * entity.FuzzyHash;
-					_changedHashes = false;
+					Changed = false;
 				}
 				return _gameHash;
 			}

@@ -341,18 +341,13 @@ namespace Brimstone
 		// The pruned search queue for the current search depth
 		private Dictionary<Game, double> searchQueue = new Dictionary<Game, double>(new FuzzyGameComparer());
 
-		// The fuzzy game hash for the game state we are currently executing before exeuction started
-		// Used to check if the game state changes after an action completes
-		// TODO: Make thread-safe
-		private int preActionHash = 0;
-
 		public void Visitor(Game cloned, GameTree tree, QueueActionEventArgs e) { }
 
 		// When an in-game action completes, check if the game state has changed
 		// Some actions (like selectors) won't cause the game state to change,
 		// so we continue running these until a game state change occurs
 		public void PostAction(ActionQueue q, GameTree t, QueueActionEventArgs e) {
-			if (e.Game.Entities.FuzzyGameHash != preActionHash) {
+			if (e.Game.Entities.Changed) {
 				// If the action queue is empty, we have reached a leaf node game state
 				// so compare it for equality with other final game states
 				if (e.Game.ActionQueue.Queue.Count == 0) {
@@ -406,7 +401,6 @@ namespace Brimstone
 				// Process each game's action queue until it is interrupted by OnAction above
 				foreach (var kv in nextQueue) {
 					((GameNode)kv.Key.CustomData).Probability = kv.Value;
-					preActionHash = kv.Key.Entities.FuzzyGameHash;
 					kv.Key.ActionQueue.ProcessAll();
 				}
 #if _TREE_DEBUG
