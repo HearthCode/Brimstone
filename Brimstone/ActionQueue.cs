@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 
 namespace Brimstone
 {
-	public class QueueActionEventArgs : EventArgs, ICloneable {
+	public class QueueActionEventArgs : EventArgs, ICloneable
+	{
 		public Game Game { get; set; }
 		public IEntity Source { get; set; }
 		public QueueAction Action { get; set; }
@@ -252,12 +253,11 @@ namespace Brimstone
 				if (action.Cancel)
 					return false;
 			}
-			foreach (var ta in ReplacedActions) {
-				if (action.Action.GetType() == ta.Key) {
-					await ta.Value(this, action);
-					// action.Cancel implied when actioin is replaced
-					return false;
-				}
+			var actionType = action.Action.GetType();
+			if (ReplacedActions.ContainsKey(actionType)) {
+				await ReplacedActions[actionType](this, action);
+				// action.Cancel implied when action is replaced
+				return false;
 			}
 			History.Add(action);
 
