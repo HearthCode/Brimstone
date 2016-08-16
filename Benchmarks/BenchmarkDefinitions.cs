@@ -66,7 +66,7 @@ namespace Brimstone.Benchmark
 
 		private void _boomBotUniqueStates(Game g, int it, ITreeSearcher search) {
 			var BoomBot = g.CurrentPlayer.Board.First(t => t.Card.Name == "Boom Bot") as Minion;
-			var tree = GameTree.BuildFor(
+			var tree = GameTree.Build(
 				Game: g,
 				SearchMode: search,
 				Action: () => {
@@ -91,7 +91,7 @@ namespace Brimstone.Benchmark
 			Cards.FromName("Boom Bot").Behaviour.Deathrattle = Actions.Damage(Actions.RandomOpponentMinion, Actions.RandomAmount(1, 4));
 
 			var ArcaneMissiles = g.CurrentPlayer.Give("Arcane Missiles");
-			var tree = GameTree.BuildFor(
+			var tree = GameTree.Build(
 				Game: g,
 				SearchMode: search,
 				Action: () => {

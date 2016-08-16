@@ -11,7 +11,7 @@ namespace Brimstone
 	{
 		void Visitor(Game cloned, GameTree tree, QueueActionEventArgs e);
 		void PostAction(ActionQueue q, GameTree tree, QueueActionEventArgs e);
-		void PostProcess(GameTree tree);
+		Task PostProcess(GameTree tree);
 		Dictionary<Game, double> GetUniqueGames();
 	}
 
@@ -95,14 +95,27 @@ namespace Brimstone
 
 		public void Run(Action Action) {
 			Action();
-			searcher.PostProcess(this);
+			searcher.PostProcess(this).Wait();
 		}
 
-		public static GameTree BuildFor(Game Game, Action Action, ITreeSearcher SearchMode = null) {
+		public async Task RunAsync(Action Action) {
+			Action();
+			await searcher.PostProcess(this);
+		}
+
+		public static GameTree Build(Game Game, Action Action, ITreeSearcher SearchMode = null) {
 			if (SearchMode == null)
 				SearchMode = new BreadthFirstTreeSearch();
 			var tree = new GameTree(Game, SearchMode);
 			tree.Run(Action);
+			return tree;
+		}
+
+		public static async Task<GameTree> BuildAsync(Game Game, Action Action, ITreeSearcher SearchMode = null) {
+			if (SearchMode == null)
+				SearchMode = new BreadthFirstTreeSearch();
+			var tree = new GameTree(Game, SearchMode);
+			await tree.RunAsync(Action);
 			return tree;
 		}
 
@@ -229,7 +242,7 @@ namespace Brimstone
 
 		public void PostAction(ActionQueue q, GameTree t, QueueActionEventArgs e) {	}
 
-		public void PostProcess(GameTree t) { }
+		public Task PostProcess(GameTree t) { return Task.FromResult(0); }
 
 		public Dictionary<Game, double> GetUniqueGames() {
 			var uniqueGames = new Dictionary<Game, double>();
@@ -327,7 +340,7 @@ namespace Brimstone
 
 		public void PostAction(ActionQueue q, GameTree t, QueueActionEventArgs e) { }
 
-		public void PostProcess(GameTree t) { }
+		public Task PostProcess(GameTree t) { return Task.FromResult(0); }
 
 		public Dictionary<Game, double> GetUniqueGames() {
 			return uniqueGames;
@@ -388,7 +401,7 @@ namespace Brimstone
 			}
 		}
 
-		public void PostProcess(GameTree t) {
+		public Task PostProcess(GameTree t) {
 			// Breadth-first processing loop
 			while (searchQueue.Count > 0) {
 #if _TREE_DEBUG
@@ -410,6 +423,7 @@ namespace Brimstone
 				Console.WriteLine("NEW QUEUE SIZE: " + searchQueue.Count + "\r\n");
 #endif
 			}
+			return Task.FromResult(0);
 		}
 
 		public Dictionary<Game, double> GetUniqueGames() {

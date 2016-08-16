@@ -105,7 +105,7 @@ namespace BrimstoneTests
 		}
 
 		private Dictionary<Game, double> _search(Game game, ITreeSearcher searcher, TestAction testAction) {
-			var tree = GameTree.BuildFor(
+			var tree = GameTree.Build(
 				Game: game,
 				SearchMode: searcher,
 				Action: () => {

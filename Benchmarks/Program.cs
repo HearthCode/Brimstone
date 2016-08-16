@@ -24,7 +24,7 @@ namespace Brimstone.Benchmark
 			var testName = test.Name + (test.Iterations > 1 ? "; " + test.Iterations + " iterations" : "");
 			var results = new List<long>();
 
-			for (int i = 0; i < 6; i++) {
+			for (int i = 0; i < 4; i++) {
 				Settings.CopyOnWrite = true;
 				Settings.ZoneCaching = true;
 				Settings.EntityHashCaching = true;

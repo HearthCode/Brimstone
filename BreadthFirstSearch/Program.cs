@@ -12,11 +12,11 @@ namespace Test1
 	public class BreadthFirstSearch
 	{
 		// Configure test parameters here
-		public const int MaxMinions = 3;
-		public const int NumBoomBots = 1;
-		public const string FillMinion = "River Crocolisk";
-		public static bool BoomBotTest = true;
-		public static bool ArcaneMissilesTest = false;
+		public const int MaxMinions = 7;
+		public const int NumBoomBots = 2;
+		public const string FillMinion = "Bloodfen Raptor";
+		public static bool BoomBotTest = false;
+		public static bool ArcaneMissilesTest = true;
 		public static bool ConsoleOutput = false;
 
 		static void Main(string[] args) {
@@ -27,8 +27,6 @@ namespace Test1
 			Console.SetOut(TextWriter.Null);
 
 			var game = new Game(HeroClass.Druid, HeroClass.Druid, PowerHistory: true);
-			game.Player1.Deck.Fill();
-			game.Player2.Deck.Fill();
 			game.Start(1);
 
 			for (int i = 0; i < MaxMinions - NumBoomBots; i++)
@@ -41,6 +39,8 @@ namespace Test1
 			for (int i = 0; i < NumBoomBots; i++)
 				game.CurrentPlayer.Give("Boom Bot").Play();
 
+			var ArcaneMissiles = game.CurrentPlayer.Give("Arcane Missiles");
+
 			Console.SetOut(cOut);
 
 			// Start timing
@@ -50,9 +50,12 @@ namespace Test1
 			if (!ConsoleOutput)
 				Console.SetOut(TextWriter.Null);
 
+			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Actions.Damage(Actions.RandomOpponentCharacter, 1) * 2;
+			Cards.FromName("Boom Bot").Behaviour.Deathrattle = Actions.Damage(Actions.RandomOpponentMinion, Actions.RandomAmount(1, 4));
+
 			// Create first layer of nodes underneath the root node
 			// and add them to the search queue, then do breadth-first search
-			var tree = GameTree.BuildFor(
+			var tree = GameTree.Build(
 				Game: game,
 				SearchMode: new BreadthFirstTreeSearch(),
 				Action: () => {
@@ -62,7 +65,7 @@ namespace Test1
 					}
 
 					if (ArcaneMissilesTest) {
-						game.CurrentPlayer.Give("Arcane Missiles").Play();
+						ArcaneMissiles.Play();
 					}
 				}
 			);
