@@ -68,15 +68,21 @@ namespace Brimstone
 			return uniqueGames;
 		}
 
-		public GameTree(Game Root, ITreeSearcher SearchMode = null, bool CloneRoot = false) {
+		public GameTree(Game Root, ITreeSearcher SearchMode = null, bool CloneRoot = false, bool? Parallel = null) {
 			var rootGame = CloneRoot ? Root.CloneState() as Game : Root;
+			var parallel = Parallel ?? Settings.ParallelTreeSearch;
 
 			TrackChildren = (SearchMode == null);
 			RootNode = new GameNode(Game: rootGame, TrackChildren: TrackChildren);
 
 			if (SearchMode != null) {
-				RootNode.Game.ActionQueue.ReplaceAction<RandomChoice>(replaceRandomChoice);
-				RootNode.Game.ActionQueue.ReplaceAction<RandomAmount>(replaceRandomAmount);
+				if (parallel) {
+					RootNode.Game.ActionQueue.ReplaceAction<RandomChoice>(replaceRandomChoiceParallel);
+					RootNode.Game.ActionQueue.ReplaceAction<RandomAmount>(replaceRandomAmountParallel);
+				} else {
+					RootNode.Game.ActionQueue.ReplaceAction<RandomChoice>(replaceRandomChoice);
+					RootNode.Game.ActionQueue.ReplaceAction<RandomAmount>(replaceRandomAmount);
+				}
 				RootNode.Game.ActionQueue.OnAction += (o, e) => {
 					searcher.PostAction(o as ActionQueue, this, e);
 				};
@@ -98,7 +104,7 @@ namespace Brimstone
 			return tree;
 		}
 
-		protected async Task replaceRandomChoice(ActionQueue q, QueueActionEventArgs e) {
+		protected Task replaceRandomChoice(ActionQueue q, QueueActionEventArgs e) {
 			// Choosing a random entity (minion in this case)
 			// Clone and start processing for every possibility
 #if _TREE_DEBUG
@@ -113,16 +119,17 @@ namespace Brimstone
 				var cloned = ((GameNode)e.Game.CustomData).Branch(perItemWeight).Game;
 				NodeCount++;
 				cloned.ActionQueue.InsertDeferred(e.Source, entity);
-				await cloned.ActionQueue.ProcessAllAsync();
+				cloned.ActionQueue.ProcessAll();
 				searcher.Visitor(cloned, this, e);
 			}
 #if _TREE_DEBUG
 			Console.WriteLine("<-- Depth: " + e.Game.Depth);
 			Console.WriteLine("");
 #endif
+			return Task.FromResult(0);
 		}
 
-		protected async Task replaceRandomAmount(ActionQueue q, QueueActionEventArgs e) {
+		protected Task replaceRandomAmount(ActionQueue q, QueueActionEventArgs e) {
 			// Choosing a random value (damage amount in this case)
 			// Clone and start processing for every possibility
 #if _TREE_DEBUG
@@ -137,9 +144,66 @@ namespace Brimstone
 				var cloned = ((GameNode)e.Game.CustomData).Branch(perItemWeight).Game;
 				NodeCount++;
 				cloned.ActionQueue.InsertDeferred(e.Source, i);
-				await cloned.ActionQueue.ProcessAllAsync();
+				cloned.ActionQueue.ProcessAll();
 				searcher.Visitor(cloned, this, e);
 			}
+#if _TREE_DEBUG
+			Console.WriteLine("<-- Depth: " + e.Game.Depth);
+			Console.WriteLine("");
+#endif
+			return Task.FromResult(0);
+		}
+
+		protected async Task replaceRandomChoiceParallel(ActionQueue q, QueueActionEventArgs e) {
+			// Choosing a random entity (minion in this case)
+			// Clone and start processing for every possibility
+#if _TREE_DEBUG
+			Console.WriteLine("");
+			Console.WriteLine("--> Depth: " + e.Game.Depth);
+#endif
+			double perItemWeight = 1.0 / e.Args[RandomChoice.ENTITIES].Count();
+			await Task.WhenAll(
+				e.Args[RandomChoice.ENTITIES].Select(entity =>
+					Task.Run(async () => {
+					// When cloning occurs, RandomChoice has been pulled from the action queue,
+					// so we can just insert a fixed item at the start of the queue and restart the queue
+					// to effectively replace it
+					var cloned = ((GameNode)e.Game.CustomData).Branch(perItemWeight).Game;
+						NodeCount++;
+						cloned.ActionQueue.InsertDeferred(e.Source, (Entity)entity);
+						await cloned.ActionQueue.ProcessAllAsync();
+						searcher.Visitor(cloned, this, e);
+					})
+				)
+			);
+#if _TREE_DEBUG
+			Console.WriteLine("<-- Depth: " + e.Game.Depth);
+			Console.WriteLine("");
+#endif
+		}
+
+		protected async Task replaceRandomAmountParallel(ActionQueue q, QueueActionEventArgs e) {
+			// Choosing a random value (damage amount in this case)
+			// Clone and start processing for every possibility
+#if _TREE_DEBUG
+			Console.WriteLine("");
+			Console.WriteLine("--> Depth: " + e.Game.Depth);
+#endif
+			double perItemWeight = 1.0 / ((e.Args[RandomAmount.MAX] - e.Args[RandomAmount.MIN]) + 1);
+			await Task.WhenAll(
+				Enumerable.Range(e.Args[RandomAmount.MIN], (e.Args[RandomAmount.MAX] - e.Args[RandomAmount.MIN]) + 1).Select(i =>
+					Task.Run(async () => {
+						// When cloning occurs, RandomAmount has been pulled from the action queue,
+						// so we can just insert a fixed number at the start of the queue and restart the queue
+						// to effectively replace it
+						var cloned = ((GameNode)e.Game.CustomData).Branch(perItemWeight).Game;
+						NodeCount++;
+						cloned.ActionQueue.InsertDeferred(e.Source, i);
+						await cloned.ActionQueue.ProcessAllAsync();
+						searcher.Visitor(cloned, this, e);
+					})
+				)
+			);
 #if _TREE_DEBUG
 			Console.WriteLine("<-- Depth: " + e.Game.Depth);
 			Console.WriteLine("");
@@ -155,7 +219,9 @@ namespace Brimstone
 			// If the action queue is empty, we have reached a leaf node game state
 			if (cloned.ActionQueue.Queue.Count == 0) {
 				tree.LeafNodeCount++;
-				leafNodeGames.Add(cloned);
+				lock (leafNodeGames) {
+					leafNodeGames.Add(cloned);
+				}
 			}
 		}
 
@@ -240,17 +306,19 @@ namespace Brimstone
 				if (!cloned.EquivalentTo(e.Game)) {
 					tree.LeafNodeCount++;
 					// This will cause the game to be discarded if its fuzzy hash matches any other final game state
-					if (!uniqueGames.ContainsKey(cloned)) {
-						uniqueGames.Add(cloned, ((GameNode)cloned.CustomData).Probability);
+					lock (uniqueGames) {
+						if (!uniqueGames.ContainsKey(cloned)) {
+							uniqueGames.Add(cloned, ((GameNode)cloned.CustomData).Probability);
 #if _TREE_DEBUG
-						Console.WriteLine("UNIQUE GAME FOUND ({0})", uniqueGames.Count);
+							Console.WriteLine("UNIQUE GAME FOUND ({0})", uniqueGames.Count);
 #endif
-					}
-					else {
-						uniqueGames[cloned] += ((GameNode)cloned.CustomData).Probability;
+						}
+						else {
+							uniqueGames[cloned] += ((GameNode)cloned.CustomData).Probability;
 #if _TREE_DEBUG
-						Console.WriteLine("DUPLICATE GAME FOUND");
+							Console.WriteLine("DUPLICATE GAME FOUND");
 #endif
+						}
 					}
 				}
 		}
@@ -288,17 +356,19 @@ namespace Brimstone
 				if (e.Game.ActionQueue.Queue.Count == 0) {
 					t.LeafNodeCount++;
 					// This will cause the game to be discarded if its fuzzy hash matches any other final game state
-					if (!uniqueGames.ContainsKey(e.Game)) {
-						uniqueGames.Add(e.Game, ((GameNode)e.Game.CustomData).Probability);
+					lock (uniqueGames) {
+						if (!uniqueGames.ContainsKey(e.Game)) {
+							uniqueGames.Add(e.Game, ((GameNode)e.Game.CustomData).Probability);
 #if _TREE_DEBUG
 						Console.WriteLine("UNIQUE GAME FOUND ({0})", uniqueGames.Count);
 #endif
-					}
-					else {
-						uniqueGames[e.Game] += ((GameNode)e.Game.CustomData).Probability;
+						}
+						else {
+							uniqueGames[e.Game] += ((GameNode)e.Game.CustomData).Probability;
 #if _TREE_DEBUG
 						Console.WriteLine("DUPLICATE GAME FOUND");
 #endif
+						}
 					}
 				}
 				else {
@@ -307,10 +377,12 @@ namespace Brimstone
 #if _TREE_DEBUG
 					Console.WriteLine("QUEUEING FOR NEXT SEARCH");
 #endif
-					if (!searchQueue.ContainsKey(e.Game))
-						searchQueue.Add(e.Game, ((GameNode)e.Game.CustomData).Probability);
-					else
-						searchQueue[e.Game] += ((GameNode)e.Game.CustomData).Probability;
+					lock (searchQueue) {
+						if (!searchQueue.ContainsKey(e.Game))
+							searchQueue.Add(e.Game, ((GameNode)e.Game.CustomData).Probability);
+						else
+							searchQueue[e.Game] += ((GameNode)e.Game.CustomData).Probability;
+					}
 				}
 #if _TREE_DEBUG
 				Console.WriteLine("");

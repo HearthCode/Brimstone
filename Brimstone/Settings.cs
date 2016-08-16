@@ -13,5 +13,6 @@ namespace Brimstone
 		public static bool EntityHashCaching = true;
 		public static bool GameHashCaching = true;
 		public static bool UseGameHashForEquality = true;
+		public static bool ParallelTreeSearch = true;
 	}
 }
