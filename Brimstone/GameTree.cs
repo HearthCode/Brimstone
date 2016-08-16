@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Brimstone
 {
@@ -97,7 +98,7 @@ namespace Brimstone
 			return tree;
 		}
 
-		protected void replaceRandomChoice(ActionQueue q, QueueActionEventArgs e) {
+		protected async Task replaceRandomChoice(ActionQueue q, QueueActionEventArgs e) {
 			// Choosing a random entity (minion in this case)
 			// Clone and start processing for every possibility
 #if _TREE_DEBUG
@@ -112,7 +113,7 @@ namespace Brimstone
 				var cloned = ((GameNode)e.Game.CustomData).Branch(perItemWeight).Game;
 				NodeCount++;
 				cloned.ActionQueue.InsertDeferred(e.Source, entity);
-				cloned.ActionQueue.ProcessAll();
+				await cloned.ActionQueue.ProcessAllAsync();
 				searcher.Visitor(cloned, this, e);
 			}
 #if _TREE_DEBUG
@@ -121,7 +122,7 @@ namespace Brimstone
 #endif
 		}
 
-		protected void replaceRandomAmount(ActionQueue q, QueueActionEventArgs e) {
+		protected async Task replaceRandomAmount(ActionQueue q, QueueActionEventArgs e) {
 			// Choosing a random value (damage amount in this case)
 			// Clone and start processing for every possibility
 #if _TREE_DEBUG
@@ -136,7 +137,7 @@ namespace Brimstone
 				var cloned = ((GameNode)e.Game.CustomData).Branch(perItemWeight).Game;
 				NodeCount++;
 				cloned.ActionQueue.InsertDeferred(e.Source, i);
-				cloned.ActionQueue.ProcessAll();
+				await cloned.ActionQueue.ProcessAllAsync();
 				searcher.Visitor(cloned, this, e);
 			}
 #if _TREE_DEBUG

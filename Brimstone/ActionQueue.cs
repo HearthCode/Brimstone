@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Brimstone
 {
-	public class QueueActionEventArgs : EventArgs, ICloneable
-	{
+	public class QueueActionEventArgs : EventArgs, ICloneable {
 		public Game Game { get; set; }
 		public IEntity Source { get; set; }
 		public QueueAction Action { get; set; }
@@ -50,12 +50,15 @@ namespace Brimstone
 		public event EventHandler<QueueActionEventArgs> OnActionStarting;
 		public event EventHandler<QueueActionEventArgs> OnAction;
 
+		private Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>> ReplacedActions;
+
 		public int Count { get { return Queue.Count; } }
 
 		public ActionQueue(Game game) {
 			Game = game;
 			Paused = false;
 			History = new List<QueueActionEventArgs>();
+			ReplacedActions = new Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>>();
 		}
 
 		public ActionQueue(ActionQueue cloneFrom) {
@@ -67,6 +70,7 @@ namespace Brimstone
 			foreach (var item in stack)
 				ResultStack.Push((ActionResult)item.Clone());
 			History = new List<QueueActionEventArgs>(cloneFrom.History);
+			ReplacedActions = new Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>>(cloneFrom.ReplacedActions);
 			Paused = cloneFrom.Paused;
 			// Events are immutable so this creates copies
 			OnQueueing = cloneFrom.OnQueueing;
@@ -207,7 +211,11 @@ namespace Brimstone
 		}
 
 		public List<ActionResult> ProcessAll() {
-			while (ProcessOne())
+			return ProcessAllAsync().Result;
+		}
+
+		public async Task<List<ActionResult>> ProcessAllAsync() {
+			while (await ProcessOne())
 				;
 			// Return whatever is left on the stack
 			var stack = new List<ActionResult>(ResultStack);
@@ -218,7 +226,7 @@ namespace Brimstone
 			return stack;
 		}
 
-		public bool ProcessOne() {
+		public async Task<bool> ProcessOne() {
 			if (Paused)
 				return false;
 
@@ -244,6 +252,13 @@ namespace Brimstone
 				if (action.Cancel)
 					return false;
 			}
+			foreach (var ta in ReplacedActions) {
+				if (action.Action.GetType() == ta.Key) {
+					await ta.Value(this, action);
+					// action.Cancel implied when actioin is replaced
+					return false;
+				}
+			}
 			History.Add(action);
 
 			// TODO: Replace with async/await later
@@ -260,13 +275,11 @@ namespace Brimstone
 			return true;
 		}
 
-		public void ReplaceAction<QAT>(Action<ActionQueue, QueueActionEventArgs> evt) {
-			OnActionStarting += (o, e) => {
-				if (e.Action is QAT) {
-					evt(o as ActionQueue, e);
-					e.Cancel = true;
-				}
-			};
+		public void ReplaceAction<QAT>(Func<ActionQueue, QueueActionEventArgs, Task> evt) {
+			if (!ReplacedActions.ContainsKey(typeof(QAT)))
+				ReplacedActions.Add(typeof(QAT), evt);
+			else
+				ReplacedActions[typeof(QAT)] = evt;
 		}
 
 		public string StackToString() {
