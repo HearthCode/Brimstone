@@ -70,6 +70,7 @@ namespace Brimstone
 			// TODO: Doesn't this clone some items twice?
 			foreach (var item in stack)
 				ResultStack.Push((ActionResult)item.Clone());
+			// TODO: This is ugly. Make History chain in a linked list like Delta does
 			History = new List<QueueActionEventArgs>(cloneFrom.History);
 			ReplacedActions = new Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>>(cloneFrom.ReplacedActions);
 			Paused = cloneFrom.Paused;

@@ -244,6 +244,8 @@ namespace Brimstone
 			return clones;
 		}
 
+		// WARNING: The Game must not be changing during this,
+		// ie. it is not thread-safe unless the game is inactive
 		public override IEntity CloneState() {
 			var entities = new EntityController(Entities);
 			Game game = entities.FindGame();

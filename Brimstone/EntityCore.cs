@@ -69,6 +69,7 @@ namespace Brimstone
 		}
 	}
 
+	// TODO: Do we need a spinlock here for multi-threaded cloning?
 	public class ReferenceCount {
 		public ReferenceCount() {
 			Count = 1;
