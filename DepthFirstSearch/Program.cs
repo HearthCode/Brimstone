@@ -55,7 +55,7 @@ namespace Test1
 			// Perform the search
 			var tree = RandomOutcomeSearch.Build(
 				Game: game,
-				SearchMode: new DepthFirstTreeSearch(),
+				SearchMode: new DepthFirstActionWalker(),
 				Action: () => {
 					if (BoomBotTest) {
 						var BoomBot = game.CurrentPlayer.Board.First(t => t.Card.Id == "GVG_110t") as Minion;

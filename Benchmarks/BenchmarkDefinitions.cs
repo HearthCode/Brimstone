@@ -87,7 +87,7 @@ namespace Brimstone.Benchmark
 			BoomBot.Hit(1);
 		}
 
-		private void _boomBotUniqueStates(Game g, int it, ITreeSearcher search) {
+		private void _boomBotUniqueStates(Game g, int it, ITreeActionWalker search) {
 			var BoomBot = g.CurrentPlayer.Board.First(t => t.Card.Name == "Boom Bot") as Minion;
 			var tree = RandomOutcomeSearch.Build(
 				Game: g,
@@ -98,18 +98,18 @@ namespace Brimstone.Benchmark
 			);
 		}
 		public void Test_BoomBotUniqueStatesNS(Game g, int it) {
-			_boomBotUniqueStates(g, it, new NaiveTreeSearch());
+			_boomBotUniqueStates(g, it, new NaiveActionWalker());
 		}
 
 		public void Test_BoomBotUniqueStatesDSF(Game g, int it) {
-			_boomBotUniqueStates(g, it, new DepthFirstTreeSearch());
+			_boomBotUniqueStates(g, it, new DepthFirstActionWalker());
 		}
 
 		public void Test_BoomBotUniqueStatesBSF(Game g, int it) {
-			_boomBotUniqueStates(g, it, new BreadthFirstTreeSearch());
+			_boomBotUniqueStates(g, it, new BreadthFirstActionWalker());
 		}
 
-		private void _missilesUniqueStates(Game g, int it, int missiles, ITreeSearcher search) {
+		private void _missilesUniqueStates(Game g, int it, int missiles, ITreeActionWalker search) {
 			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Actions.Damage(Actions.RandomOpponentCharacter, 1) * missiles;
 			Cards.FromName("Boom Bot").Behaviour.Deathrattle = Actions.Damage(Actions.RandomOpponentMinion, Actions.RandomAmount(1, 4));
 
@@ -124,29 +124,29 @@ namespace Brimstone.Benchmark
 		}
 
 		public void Test_2AMUniqueStatesDSF(Game g, int it) {
-			_missilesUniqueStates(g, it, 2, new DepthFirstTreeSearch());
+			_missilesUniqueStates(g, it, 2, new DepthFirstActionWalker());
 		}
 
 		public void Test_1AMUniqueStatesBSF(Game g, int it) {
-			_missilesUniqueStates(g, it, 1, new BreadthFirstTreeSearch());
+			_missilesUniqueStates(g, it, 1, new BreadthFirstActionWalker());
 		}
 
 		public void Test_2AMUniqueStatesBSF(Game g, int it) {
-			_missilesUniqueStates(g, it, 2, new BreadthFirstTreeSearch());
+			_missilesUniqueStates(g, it, 2, new BreadthFirstActionWalker());
 		}
 
 		public void Test_3AMUniqueStatesBSF(Game g, int it) {
-			_missilesUniqueStates(g, it, 3, new BreadthFirstTreeSearch());
+			_missilesUniqueStates(g, it, 3, new BreadthFirstActionWalker());
 		}
 
 		public void Test_4AMUniqueStatesBSF(Game g, int it) {
-			_missilesUniqueStates(g, it, 4, new BreadthFirstTreeSearch());
+			_missilesUniqueStates(g, it, 4, new BreadthFirstActionWalker());
 		}
 		public void Test_5AMUniqueStatesBSF(Game g, int it) {
-			_missilesUniqueStates(g, it, 5, new BreadthFirstTreeSearch());
+			_missilesUniqueStates(g, it, 5, new BreadthFirstActionWalker());
 		}
 		public void Test_6AMUniqueStatesBSF(Game g, int it) {
-			_missilesUniqueStates(g, it, 6, new BreadthFirstTreeSearch());
+			_missilesUniqueStates(g, it, 6, new BreadthFirstActionWalker());
 		}
 	}
 }

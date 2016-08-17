@@ -57,7 +57,7 @@ namespace Test1
 			// and add them to the search queue, then do breadth-first search
 			var tree = RandomOutcomeSearch.Build(
 				Game: game,
-				SearchMode: new BreadthFirstTreeSearch(),
+				SearchMode: new BreadthFirstActionWalker(),
 				Action: () => {
 					if (BoomBotTest) {
 						var BoomBot = game.CurrentPlayer.Board.First(t => t.Card.Id == "GVG_110t") as Minion;

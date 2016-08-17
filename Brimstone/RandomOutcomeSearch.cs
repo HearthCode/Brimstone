@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Brimstone
 {
-	public interface ITreeSearcher
+	public interface ITreeActionWalker
 	{
 		// (Optional) code to execute after each node's ActionQueue is processed or cancelled
 		void Visitor(Game cloned, GameTree<GameNode> tree, QueueActionEventArgs e);
@@ -26,15 +26,15 @@ namespace Brimstone
 	{
 		public bool Parallel { get; }
 
-		private ITreeSearcher searcher = null;
+		private ITreeActionWalker searcher = null;
 		private Dictionary<Game, double> uniqueGames = new Dictionary<Game, double>();
 
-		public RandomOutcomeSearch(Game Root, ITreeSearcher SearchMode = null, bool? Parallel = null)
+		public RandomOutcomeSearch(Game Root, ITreeActionWalker SearchMode = null, bool? Parallel = null)
 			: base(new ProbabilisticGameNode(Root, TrackChildren: false)) {
 			this.Parallel = Parallel ?? Settings.ParallelTreeSearch;
 
 			if (SearchMode == null)
-				SearchMode = new BreadthFirstTreeSearch();
+				SearchMode = new BreadthFirstActionWalker();
 
 			if (this.Parallel) {
 				RootNode.Game.ActionQueue.ReplaceAction<RandomChoice>(replaceRandomChoiceParallel);
@@ -69,23 +69,23 @@ namespace Brimstone
 			await searcher.PostProcess(this);
 		}
 
-		public static RandomOutcomeSearch Build(Game Game, Action Action, ITreeSearcher SearchMode = null) {
+		public static RandomOutcomeSearch Build(Game Game, Action Action, ITreeActionWalker SearchMode = null) {
 			var tree = new RandomOutcomeSearch(Game, SearchMode);
 			tree.Run(Action);
 			return tree;
 		}
 
-		public static async Task<RandomOutcomeSearch> BuildAsync(Game Game, Action Action, ITreeSearcher SearchMode = null) {
+		public static async Task<RandomOutcomeSearch> BuildAsync(Game Game, Action Action, ITreeActionWalker SearchMode = null) {
 			var tree = new RandomOutcomeSearch(Game, SearchMode);
 			await tree.RunAsync(Action);
 			return tree;
 		}
 
-		public static Dictionary<Game, double> Find(Game Game, Action Action, ITreeSearcher SearchMode = null) {
+		public static Dictionary<Game, double> Find(Game Game, Action Action, ITreeActionWalker SearchMode = null) {
 			return Build(Game, Action, SearchMode).GetUniqueGames();
 		}
 
-		public static async Task<Dictionary<Game, double>> FindAsync(Game Game, Action Action, ITreeSearcher SearchMode = null) {
+		public static async Task<Dictionary<Game, double>> FindAsync(Game Game, Action Action, ITreeActionWalker SearchMode = null) {
 			var tree = await BuildAsync(Game, Action, SearchMode);
 			return tree.GetUniqueGames();
 		}
@@ -197,7 +197,7 @@ namespace Brimstone
 		}
 	}
 
-	public abstract class TreeSearch : ITreeSearcher
+	public abstract class TreeActionWalker : ITreeActionWalker
 	{
 		public GameTree<GameNode> Tree { get; set; }
 
@@ -207,7 +207,7 @@ namespace Brimstone
 		public virtual void Visitor(Game cloned, GameTree<GameNode> tree, QueueActionEventArgs e) { }
 	}
 
-	public class NaiveTreeSearch : TreeSearch
+	public class NaiveActionWalker : TreeActionWalker
 	{
 		private HashSet<Game> leafNodeGames = new HashSet<Game>();
 
@@ -290,7 +290,7 @@ namespace Brimstone
 		}
 	}
 
-	public class DepthFirstTreeSearch : TreeSearch
+	public class DepthFirstActionWalker : TreeActionWalker
 	{
 		private Dictionary<Game, double> uniqueGames = new Dictionary<Game, double>(new FuzzyGameComparer());
 
@@ -324,7 +324,7 @@ namespace Brimstone
 		}
 	}
 
-	public class BreadthFirstTreeSearch : TreeSearch
+	public class BreadthFirstActionWalker : TreeActionWalker
 	{
 		// The maximum number of task threads to split the search queue up into
 		public int MaxDegreesOfParallelism { get; set; } = 5;

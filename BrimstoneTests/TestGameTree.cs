@@ -18,13 +18,13 @@ namespace BrimstoneTests
 
 		[Test]
 		public void TestTreeSearchProbabilities(
-			[Values(typeof(NaiveTreeSearch), typeof(DepthFirstTreeSearch), typeof(BreadthFirstTreeSearch))] Type SearchMode,
+			[Values(typeof(NaiveActionWalker), typeof(DepthFirstActionWalker), typeof(BreadthFirstActionWalker))] Type SearchMode,
 			[Values(true,false)] bool Parallel) {
 
 			Settings.ParallelTreeSearch = Parallel;
 
 			var game = _setupGame(MaxMinions: 3, NumBoomBots: 1, FillMinion: "River Crocolisk");
-			var uniqueGames = _search(game, (ITreeSearcher)Activator.CreateInstance(SearchMode), TestAction.BoomBot);
+			var uniqueGames = _search(game, (ITreeActionWalker)Activator.CreateInstance(SearchMode), TestAction.BoomBot);
 
 			// Check we got the expected number of unique game states
 			Assert.AreEqual(18, uniqueGames.Count);
@@ -71,7 +71,7 @@ namespace BrimstoneTests
 		// NOTE: Naive tree searching is too slow for this test so we omit it
 		[Test]
 		public void TestTreeSearchUniqueness(
-			[Values(typeof(DepthFirstTreeSearch), typeof(BreadthFirstTreeSearch))] Type SearchMode,
+			[Values(typeof(DepthFirstActionWalker), typeof(BreadthFirstActionWalker))] Type SearchMode,
 			[Values(true, false)] bool Parallel) {
 
 			Settings.ParallelTreeSearch = Parallel;
@@ -81,7 +81,7 @@ namespace BrimstoneTests
 			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Actions.Damage(Actions.RandomOpponentCharacter, 1) * 2;
 
 			var game = _setupGame(MaxMinions: 7, NumBoomBots: 2, FillMinion: "Bloodfen Raptor");
-			var uniqueGames = _search(game, (ITreeSearcher)Activator.CreateInstance(SearchMode), TestAction.ArcaneMissiles).Keys;
+			var uniqueGames = _search(game, (ITreeActionWalker)Activator.CreateInstance(SearchMode), TestAction.ArcaneMissiles).Keys;
 
 			// Check we got the expected number of unique game states
 			Assert.AreEqual(154, uniqueGames.Count);
@@ -110,7 +110,7 @@ namespace BrimstoneTests
 			Assert.AreEqual(154, 17 + 36 + 16 + 21 + 42 + 0 + 22);
 		}
 
-		private Dictionary<Game, double> _search(Game game, ITreeSearcher searcher, TestAction testAction) {
+		private Dictionary<Game, double> _search(Game game, ITreeActionWalker searcher, TestAction testAction) {
 			return RandomOutcomeSearch.Find(
 				Game: game,
 				SearchMode: searcher,
