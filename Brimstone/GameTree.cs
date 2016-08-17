@@ -11,8 +11,6 @@ namespace Brimstone
 {
 	public interface ITreeSearcher
 	{
-		// The tree which owns this search object
-		GameTree Tree { get; set; }
 		// (Optional) code to execute after each node's ActionQueue is processed or cancelled
 		void Visitor(Game cloned, GameTree tree, QueueActionEventArgs e);
 		// (Optional) code to execute after each non-cancelled action in a node's ActionQueue completes
@@ -105,13 +103,11 @@ namespace Brimstone
 		}
 
 		public void Run(Action Action) {
-			searcher.Tree = this;
 			Action();
 			searcher.PostProcess(this).Wait();
 		}
 
 		public async Task RunAsync(Action Action) {
-			searcher.Tree = this;
 			Action();
 			await searcher.PostProcess(this);
 		}
@@ -466,7 +462,7 @@ namespace Brimstone
 				searchQueue.Clear();
 
 				// Only parallelize if there are sufficient nodes to do so
-				if (nextQueue.Count >= MinNodesToParallelize && Tree.Parallel) {
+				if (nextQueue.Count >= MinNodesToParallelize && t.Parallel) {
 					// Process each game's action queue until it is interrupted by OnAction above
 					await Task.WhenAll(
 						// Split search queue into MaxDegreesOfParallelism partitions
