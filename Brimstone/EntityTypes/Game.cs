@@ -54,8 +54,6 @@ namespace Brimstone
 		public int GameId { get; }
 		public int Depth { get; } = 0;
 
-		public object CustomData { get; set; } = null;
-
 		// Required by IEntity
 		public Game(Game cloneFrom) : base(cloneFrom) {
 			// Generate zones owned by game
@@ -63,7 +61,6 @@ namespace Brimstone
 			// Update tree
 			GameId = ++SequenceNumber;
 			Depth = cloneFrom.Depth + 1;
-			CustomData = cloneFrom.CustomData;
 		}
 
 		public Game(HeroClass Hero1, HeroClass Hero2, string Player1Name = "", string Player2Name = "", bool PowerHistory = false)

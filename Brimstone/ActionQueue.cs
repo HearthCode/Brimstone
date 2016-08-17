@@ -259,7 +259,10 @@ namespace Brimstone
 				action.Args.Add(ResultStack.Pop());
 			action.Args.Reverse();
 
-			action.UserData = UserData ?? this.UserData;
+			// Replace current UserData with new UserData if supplied
+			if (UserData != null)
+				this.UserData = UserData;
+			action.UserData = this.UserData;
 
 			if (OnActionStarting != null) {
 				OnActionStarting(this, action);

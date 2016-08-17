@@ -12,7 +12,7 @@ namespace Brimstone
 	public interface ITreeActionWalker
 	{
 		// (Optional) code to execute after each node's ActionQueue is processed or cancelled
-		void Visitor(Game cloned, GameTree<GameNode> tree, QueueActionEventArgs e);
+		void Visitor(ProbabilisticGameNode cloned, GameTree<GameNode> tree, QueueActionEventArgs e);
 		// (Optional) code to execute after each non-cancelled action in a node's ActionQueue completes
 		void PostAction(ActionQueue q, GameTree<GameNode> tree, QueueActionEventArgs e);
 		// (Optional) code to execute after all nodes have been processed
@@ -48,7 +48,6 @@ namespace Brimstone
 			RootNode.Game.ActionQueue.OnAction += (o, e) => {
 				searcher.PostAction(o as ActionQueue, this, e);
 			};
-			Root.CustomData = RootNode;
 			searcher = SearchMode;
 		}
 
@@ -60,11 +59,13 @@ namespace Brimstone
 		}
 
 		public void Run(Action Action) {
+			RootNode.Game.ActionQueue.UserData = RootNode;
 			Action();
 			searcher.PostProcess(this).Wait();
 		}
 
 		public async Task RunAsync(Action Action) {
+			RootNode.Game.ActionQueue.UserData = RootNode;
 			Action();
 			await searcher.PostProcess(this);
 		}
@@ -102,11 +103,11 @@ namespace Brimstone
 				// When cloning occurs, RandomChoice has been pulled from the action queue,
 				// so we can just insert a fixed item at the start of the queue and restart the queue
 				// to effectively replace it
-				var cloned = ((ProbabilisticGameNode)e.Game.CustomData).Branch(perItemWeight).Game;
+				var clonedNode = ((ProbabilisticGameNode)e.UserData).Branch(perItemWeight);
 				NodeCount++;
-				cloned.ActionQueue.InsertDeferred(e.Source, entity);
-				cloned.ActionQueue.ProcessAll();
-				searcher.Visitor(cloned, this, e);
+				clonedNode.Game.ActionQueue.InsertDeferred(e.Source, entity);
+				clonedNode.Game.ActionQueue.ProcessAll(clonedNode);
+				searcher.Visitor(clonedNode, this, e);
 			}
 #if _TREE_DEBUG
 			DebugLog.WriteLine("<-- Depth: " + e.Game.Depth);
@@ -127,11 +128,11 @@ namespace Brimstone
 				// When cloning occurs, RandomAmount has been pulled from the action queue,
 				// so we can just insert a fixed number at the start of the queue and restart the queue
 				// to effectively replace it
-				var cloned = ((ProbabilisticGameNode)e.Game.CustomData).Branch(perItemWeight).Game;
+				var clonedNode = ((ProbabilisticGameNode)e.UserData).Branch(perItemWeight);
 				NodeCount++;
-				cloned.ActionQueue.InsertDeferred(e.Source, i);
-				cloned.ActionQueue.ProcessAll();
-				searcher.Visitor(cloned, this, e);
+				clonedNode.Game.ActionQueue.InsertDeferred(e.Source, i);
+				clonedNode.Game.ActionQueue.ProcessAll(clonedNode);
+				searcher.Visitor(clonedNode, this, e);
 			}
 #if _TREE_DEBUG
 			DebugLog.WriteLine("<-- Depth: " + e.Game.Depth);
@@ -154,11 +155,11 @@ namespace Brimstone
 						// When cloning occurs, RandomChoice has been pulled from the action queue,
 						// so we can just insert a fixed item at the start of the queue and restart the queue
 						// to effectively replace it
-						var cloned = ((ProbabilisticGameNode)e.Game.CustomData).Branch(perItemWeight).Game;
+						var clonedNode = ((ProbabilisticGameNode)e.UserData).Branch(perItemWeight);
 						NodeCount++;
-						cloned.ActionQueue.InsertDeferred(e.Source, (Entity)entity);
-						await cloned.ActionQueue.ProcessAllAsync();
-						searcher.Visitor(cloned, this, e);
+						clonedNode.Game.ActionQueue.InsertDeferred(e.Source, (Entity)entity);
+						await clonedNode.Game.ActionQueue.ProcessAllAsync(clonedNode);
+						searcher.Visitor(clonedNode, this, e);
 					})
 				)
 			);
@@ -182,11 +183,11 @@ namespace Brimstone
 						// When cloning occurs, RandomAmount has been pulled from the action queue,
 						// so we can just insert a fixed number at the start of the queue and restart the queue
 						// to effectively replace it
-						var cloned = ((ProbabilisticGameNode)e.Game.CustomData).Branch(perItemWeight).Game;
+						var clonedNode = ((ProbabilisticGameNode)e.UserData).Branch(perItemWeight);
 						NodeCount++;
-						cloned.ActionQueue.InsertDeferred(e.Source, i);
-						await cloned.ActionQueue.ProcessAllAsync();
-						searcher.Visitor(cloned, this, e);
+						clonedNode.Game.ActionQueue.InsertDeferred(e.Source, i);
+						await clonedNode.Game.ActionQueue.ProcessAllAsync(clonedNode);
+						searcher.Visitor(clonedNode, this, e);
 					})
 				)
 			);
@@ -204,17 +205,17 @@ namespace Brimstone
 		public abstract Dictionary<Game, double> GetUniqueGames();
 		public virtual void PostAction(ActionQueue q, GameTree<GameNode> tree, QueueActionEventArgs e) { }
 		public virtual Task PostProcess(GameTree<GameNode> tree) { return Task.FromResult(0); }
-		public virtual void Visitor(Game cloned, GameTree<GameNode> tree, QueueActionEventArgs e) { }
+		public virtual void Visitor(ProbabilisticGameNode cloned, GameTree<GameNode> tree, QueueActionEventArgs e) { }
 	}
 
 	public class NaiveActionWalker : TreeActionWalker
 	{
-		private HashSet<Game> leafNodeGames = new HashSet<Game>();
+		private HashSet<ProbabilisticGameNode> leafNodeGames = new HashSet<ProbabilisticGameNode>();
 
-		public override void Visitor(Game cloned, GameTree<GameNode> tree, QueueActionEventArgs e) {
+		public override void Visitor(ProbabilisticGameNode cloned, GameTree<GameNode> tree, QueueActionEventArgs e) {
 			// If the action queue is empty, we have reached a leaf node game state
 			// TODO: Optimize to use TLS and avoid spinlocks
-			if (cloned.ActionQueue.Queue.Count == 0) {
+			if (cloned.Game.ActionQueue.Queue.Count == 0) {
 				tree.LeafNodeCount++;
 				lock (leafNodeGames) {
 					leafNodeGames.Add(cloned);
@@ -229,24 +230,24 @@ namespace Brimstone
 			while (leafNodeGames.Count > 0) {
 				var root = leafNodeGames.Take(1).ToList()[0];
 				leafNodeGames.Remove(root);
-				uniqueGames.Add(root, ((ProbabilisticGameNode)root.CustomData).Probability);
-				var different = new HashSet<Game>();
+				uniqueGames.Add(root.Game, root.Probability);
+				var different = new HashSet<ProbabilisticGameNode>();
 
 				// Hash every entity
 				// WARNING: This relies on a good hash function!
-				var e1 = new HashSet<IEntity>(root.Entities, new FuzzyEntityComparer());
+				var e1 = new HashSet<IEntity>(root.Game.Entities, new FuzzyEntityComparer());
 
-				foreach (var g in leafNodeGames) {
-					if (g.Entities.Count != root.Entities.Count) {
-						different.Add(g);
+				foreach (var n in leafNodeGames) {
+					if (n.Game.Entities.Count != root.Game.Entities.Count) {
+						different.Add(n);
 						continue;
 					}
-					var e2 = new HashSet<IEntity>(g.Entities, new FuzzyEntityComparer());
+					var e2 = new HashSet<IEntity>(n.Game.Entities, new FuzzyEntityComparer());
 #if _TREE_DEBUG
-					if (e2.Count < g.Entities.Count || e1.Count < root.Entities.Count) {
+					if (e2.Count < n.Game.Entities.Count || e1.Count < root.Game.Entities.Count) {
 						// Potential hash collision
-						var c = (e2.Count < g.Entities.Count ? e2 : e1);
-						var g2 = (c == e2 ? g : root);
+						var c = (e2.Count < n.Game.Entities.Count ? e2 : e1);
+						var g2 = (c == e2 ? n.Game : root.Game);
 						var ent = g2.Entities.Select(x => x.FuzzyHash).ToList();
 						// Build list of collisions
 						var collisions = new Dictionary<int, IEntity>();
@@ -275,10 +276,10 @@ namespace Brimstone
 					}
 #endif
 					if (!e2.SetEquals(e1)) {
-						different.Add(g);
+						different.Add(n);
 					}
 					else {
-						uniqueGames[root] += ((ProbabilisticGameNode)g.CustomData).Probability;
+						uniqueGames[root.Game] += root.Probability;
 					}
 				}
 				leafNodeGames = different;
@@ -294,23 +295,23 @@ namespace Brimstone
 	{
 		private Dictionary<Game, double> uniqueGames = new Dictionary<Game, double>(new FuzzyGameComparer());
 
-		public override void Visitor(Game cloned, GameTree<GameNode> tree, QueueActionEventArgs e) {
+		public override void Visitor(ProbabilisticGameNode cloned, GameTree<GameNode> tree, QueueActionEventArgs e) {
 			// If the action queue is empty, we have reached a leaf node game state
 			// so compare it for equality with other final game states
-			if (cloned.ActionQueue.Queue.Count == 0)
-				if (!cloned.EquivalentTo(e.Game)) {
+			if (cloned.Game.ActionQueue.Queue.Count == 0)
+				if (!cloned.Game.EquivalentTo(e.Game)) {
 					tree.LeafNodeCount++;
 					// This will cause the game to be discarded if its fuzzy hash matches any other final game state
 					// TODO: Optimize to use TLS and avoid spinlocks
 					lock (uniqueGames) {
-						if (!uniqueGames.ContainsKey(cloned)) {
-							uniqueGames.Add(cloned, ((ProbabilisticGameNode)cloned.CustomData).Probability);
+						if (!uniqueGames.ContainsKey(cloned.Game)) {
+							uniqueGames.Add(cloned.Game, cloned.Probability);
 #if _TREE_DEBUG
 							DebugLog.WriteLine("UNIQUE GAME FOUND ({0})", uniqueGames.Count);
 #endif
 						}
 						else {
-							uniqueGames[cloned] += ((ProbabilisticGameNode)cloned.CustomData).Probability;
+							uniqueGames[cloned.Game] += cloned.Probability;
 #if _TREE_DEBUG
 							DebugLog.WriteLine("DUPLICATE GAME FOUND");
 #endif
@@ -334,15 +335,19 @@ namespace Brimstone
 		public int MinNodesToParallelize { get; set; } = 100;
 
 		// All of the unique leaf node games found
-		private Dictionary<Game, double> uniqueGames = new Dictionary<Game, double>(new FuzzyGameComparer());
+		private Dictionary<Game, ProbabilisticGameNode> uniqueGames = new Dictionary<Game, ProbabilisticGameNode>(new FuzzyGameComparer());
 
 		// The pruned search queue for the current search depth
-		private Dictionary<Game, double> searchQueue = new Dictionary<Game, double>(new FuzzyGameComparer());
+		private Dictionary<Game, ProbabilisticGameNode> searchQueue = new Dictionary<Game, ProbabilisticGameNode>(new FuzzyGameComparer());
 
 		// Per-thread storage for partitioned search queue and unique games found
 		// (merged with the main lists after each depth is searched)
-		private ThreadLocal<Dictionary<Game, double>> tlsSearchQueue = new ThreadLocal<Dictionary<Game, double>>(() => new Dictionary<Game, double>(new FuzzyGameComparer()), trackAllValues: true);
-		private ThreadLocal<Dictionary<Game, double>> tlsUniqueGames = new ThreadLocal<Dictionary<Game, double>>(() => new Dictionary<Game, double>(new FuzzyGameComparer()), trackAllValues: true);
+		private ThreadLocal<Dictionary<Game, ProbabilisticGameNode>> tlsSearchQueue
+			= new ThreadLocal<Dictionary<Game, ProbabilisticGameNode>>(
+				() => new Dictionary<Game, ProbabilisticGameNode>(new FuzzyGameComparer()), trackAllValues: true);
+		private ThreadLocal<Dictionary<Game, ProbabilisticGameNode>> tlsUniqueGames
+			= new ThreadLocal<Dictionary<Game, ProbabilisticGameNode>>(
+				() => new Dictionary<Game, ProbabilisticGameNode>(new FuzzyGameComparer()), trackAllValues: true);
 
 		// When an in-game action completes, check if the game state has changed
 		// Some actions (like selectors) won't cause the game state to change,
@@ -357,13 +362,13 @@ namespace Brimstone
 					t.LeafNodeCount++;
 					// This will cause the game to be discarded if its fuzzy hash matches any other final game state
 					if (!tlsUniqueGames.Value.ContainsKey(e.Game)) {
-						tlsUniqueGames.Value.Add(e.Game, ((ProbabilisticGameNode)e.Game.CustomData).Probability);
+						tlsUniqueGames.Value.Add(e.Game, e.UserData as ProbabilisticGameNode);
 #if _TREE_DEBUG
 						DebugLog.WriteLine("UNIQUE GAME FOUND ({0})", uniqueGames.Count);
 #endif
 					}
 					else {
-						tlsUniqueGames.Value[e.Game] += ((ProbabilisticGameNode)e.Game.CustomData).Probability;
+						tlsUniqueGames.Value[e.Game].Probability += ((ProbabilisticGameNode)e.UserData).Probability;
 #if _TREE_DEBUG
 						DebugLog.WriteLine("DUPLICATE GAME FOUND");
 #endif
@@ -376,9 +381,9 @@ namespace Brimstone
 					DebugLog.WriteLine("QUEUEING FOR NEXT SEARCH");
 #endif
 					if (!tlsSearchQueue.Value.ContainsKey(e.Game))
-						tlsSearchQueue.Value.Add(e.Game, ((ProbabilisticGameNode)e.Game.CustomData).Probability);
+						tlsSearchQueue.Value.Add(e.Game, e.UserData as ProbabilisticGameNode);
 					else
-						tlsSearchQueue.Value[e.Game] += ((ProbabilisticGameNode)e.Game.CustomData).Probability;
+						tlsSearchQueue.Value[e.Game].Probability += ((ProbabilisticGameNode)e.UserData).Probability;
 				}
 #if _TREE_DEBUG
 				DebugLog.WriteLine("");
@@ -398,7 +403,7 @@ namespace Brimstone
 						if (!searchQueue.ContainsKey(qi.Key))
 							searchQueue.Add(qi.Key, qi.Value);
 						else
-							searchQueue[qi.Key] += qi.Value;
+							searchQueue[qi.Key].Probability += qi.Value.Probability;
 					}
 				}
 				foreach (var ug in tlsUniqueGames.Values) {
@@ -406,22 +411,22 @@ namespace Brimstone
 						if (!uniqueGames.ContainsKey(qi.Key))
 							uniqueGames.Add(qi.Key, qi.Value);
 						else
-							uniqueGames[qi.Key] += qi.Value;
+							uniqueGames[qi.Key].Probability += qi.Value.Probability;
 					}
 				}
 #if _TREE_DEBUG
 				DebugLog.WriteLine("QUEUE SIZE: " + searchQueue.Count);
 #endif
 				// Wipe the TLS lists
-				tlsSearchQueue = new ThreadLocal<Dictionary<Game, double>>(() => new Dictionary<Game, double>(new FuzzyGameComparer()), trackAllValues: true);
-				tlsUniqueGames = new ThreadLocal<Dictionary<Game, double>>(() => new Dictionary<Game, double>(new FuzzyGameComparer()), trackAllValues: true);
+				tlsSearchQueue = new ThreadLocal<Dictionary<Game, ProbabilisticGameNode>>(() => new Dictionary<Game, ProbabilisticGameNode>(new FuzzyGameComparer()), trackAllValues: true);
+				tlsUniqueGames = new ThreadLocal<Dictionary<Game, ProbabilisticGameNode>>(() => new Dictionary<Game, ProbabilisticGameNode>(new FuzzyGameComparer()), trackAllValues: true);
 
 				// Quit if we have processed all nodes and none of them have children (all leaf nodes)
 				if (searchQueue.Count == 0)
 					break;
 
 				// Copy the search queue and clear the current one; it will be refilled
-				var nextQueue = new Dictionary<Game, double>(searchQueue);
+				var nextQueue = new Dictionary<Game, ProbabilisticGameNode>(searchQueue);
 				searchQueue.Clear();
 
 				// Only parallelize if there are sufficient nodes to do so
@@ -440,8 +445,7 @@ namespace Brimstone
 								while (partition.MoveNext()) {
 									// Process each node
 									var kv = partition.Current;
-									((ProbabilisticGameNode)kv.Key.CustomData).Probability = kv.Value;
-									await kv.Key.ActionQueue.ProcessAllAsync();
+									await kv.Key.ActionQueue.ProcessAllAsync(kv.Value);
 #if _TREE_DEBUG
 									count++;
 #endif
@@ -463,8 +467,7 @@ namespace Brimstone
 #endif
 					// Process each node in the search queue sequentially
 					foreach (var kv in nextQueue) {
-						((ProbabilisticGameNode)kv.Key.CustomData).Probability = kv.Value;
-						await kv.Key.ActionQueue.ProcessAllAsync();
+						await kv.Key.ActionQueue.ProcessAllAsync(kv.Value);
 					}
 #if _TREE_DEBUG
 					DebugLog.WriteLine("End single-threaded run");
@@ -474,7 +477,7 @@ namespace Brimstone
 		}
 
 		public override Dictionary<Game, double> GetUniqueGames() {
-			return uniqueGames;
+			return uniqueGames.ToDictionary(x => x.Key, x => x.Value.Probability);
 		}
 	}
 }

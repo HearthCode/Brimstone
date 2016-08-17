@@ -13,8 +13,6 @@
 
 		public GameTree(TNode RootNode) {
 			this.RootNode = RootNode;
-			// TODO: Remove
-			RootNode.Game.CustomData = RootNode;
 		}
 	}
 
