@@ -52,6 +52,12 @@ namespace Brimstone
 			clone.CustomData = node;
 			return node;
 		}
+
+		public IEnumerable<GameNode> Branch(int Quantity, double Weight = 1.0) {
+			var clones = Game.GetClones(Quantity);
+			var nodes = clones.Select(c => new GameNode(c, this, Weight, Children != null));
+			return nodes;
+		}
 	}
 
 	public class GameTree
