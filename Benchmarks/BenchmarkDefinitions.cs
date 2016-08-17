@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Brimstone;
+using System.Threading.Tasks;
 
 namespace Brimstone.Benchmark
 {
@@ -13,7 +13,8 @@ namespace Brimstone.Benchmark
 
 		public void LoadDefinitions() {
 			Tests = new Dictionary<string, Test>() {
-				{ "RawClone", new Test("Raw cloning speed (full game)", Test_RawClone) },
+				{ "RawClone", new Test("Raw cloning speed (full game; single-threaded)", Test_RawClone) },
+				{ "RawCloneMT", new Test("Raw cloning speed (full game; multi-threaded)", Test_RawClone_MT) },
 				{ "BoomBotPreHit", new Test("Boom Bot pre-hit cloning test; RC + 2 BB per side", Test_BoomBotPreHit) },
 				{ "BoomBotPreDeathrattle", new Test("Boom Bot pre-deathrattle cloning test; 5 RC + 2 BB per side", Test_BoomBotPreDeathrattle) },
 				{ "BoomBotUniqueStatesNS", new Test("Boom Bot hit; fuzzy unique states; Naive; 5 BR + 2 BB per side", Test_BoomBotUniqueStatesNS, Default_Setup2, 1) },
@@ -43,6 +44,12 @@ namespace Brimstone.Benchmark
 		public void Test_RawClone(Game g, int it) {
 			for (int i = 0; i < it; i++)
 				g.CloneState();
+		}
+
+		public void Test_RawClone_MT(Game g, int it) {
+			Parallel.For(0, it, i => {
+				g.CloneState();
+			});
 		}
 
 		public void Test_BoomBotPreHit(Game g, int it) {
