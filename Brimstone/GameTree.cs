@@ -2,7 +2,6 @@
 {
 	public class GameTree<TNode> where TNode : GameNode {
 		public TNode RootNode { get; }
-		public bool TrackChildren { get; set; }
 
 		// The total number of clones including the root node in this tree
 		private volatile int _nodeCount = 0;
@@ -13,7 +12,6 @@
 		public int LeafNodeCount { get { return _leafNodeCount; } set { _leafNodeCount = value; } }
 
 		public GameTree(TNode RootNode) {
-			TrackChildren = true;
 			this.RootNode = RootNode;
 			// TODO: Remove
 			RootNode.Game.CustomData = RootNode;
