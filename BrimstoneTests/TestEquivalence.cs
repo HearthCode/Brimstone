@@ -111,9 +111,9 @@ namespace BrimstoneTests
 			// Act
 
 			// First, kill a couple of Totem Golems directly and compare for equivalence
-			var game1 = game.CloneState() as Game;
-			var game2 = game.CloneState() as Game;
-			var game3 = game.CloneState() as Game;
+			var game1 = game.GetClone();
+			var game2 = game.GetClone();
+			var game3 = game.GetClone();
 
 			Assert.IsTrue(game1.EquivalentTo(game2));
 
@@ -134,8 +134,8 @@ namespace BrimstoneTests
 
 			// This time, do a point of damage to two different golems
 			// Game state should not be equivalent
-			var game4 = game.CloneState() as Game;
-			var game5 = game.CloneState() as Game;
+			var game4 = game.GetClone();
+			var game5 = game.GetClone();
 
 			((Minion)game4.Entities[firstId]).Hit(1);
 			((Minion)game5.Entities[firstId+1]).Hit(1);
@@ -285,24 +285,24 @@ namespace BrimstoneTests
 			game1.Player1.Give("Wisp");
 
 			// Game1 ==> Game2, Game3
-			var game2 = game1.CloneState() as Game;
-			var game3 = game1.CloneState() as Game;
+			var game2 = game1.GetClone();
+			var game3 = game1.GetClone();
 
 			// Game2: Player 2 <- Wisp
 			game2.Player2.Give("Wisp");
 
 			// Game2 ==> Game4, Game5, Game6
-			var game4 = game2.CloneState() as Game;
-			var game5 = game2.CloneState() as Game;
-			var game6 = game2.CloneState() as Game;
+			var game4 = game2.GetClone();
+			var game5 = game2.GetClone();
+			var game6 = game2.GetClone();
 
 			// Game4: Player1 <- Deathwing
 			game4.Player1.Give("Deathwing");
 
 			// Game4 ==> Game7, Game8, Game9
-			var game7 = game4.CloneState() as Game;
-			var game8 = game4.CloneState() as Game;
-			var game9 = game4.CloneState() as Game;
+			var game7 = game4.GetClone();
+			var game8 = game4.GetClone();
+			var game9 = game4.GetClone();
 
 			// Game7: Player1 <- Boom Bot
 			game7.Player1.Give("Boom Bot");
@@ -314,19 +314,19 @@ namespace BrimstoneTests
 			game9.Player1.Give("Knife Juggler");
 
 			// Game9 ==> Game10, Game11, Game12
-			var game10 = game9.CloneState() as Game;
-			var game11 = game9.CloneState() as Game;
-			var game12 = game9.CloneState() as Game;
+			var game10 = game9.GetClone();
+			var game11 = game9.GetClone();
+			var game12 = game9.GetClone();
 
 			// Game4 ==> Game13
-			var game13 = game4.CloneState() as Game;
+			var game13 = game4.GetClone();
 
 			// Game13: Player1 <- Murloc Tinyfin
 			game13.Player1.Give("Murloc Tinyfin");
 
 			// Game13 ==> Game14, Game15
-			var game14 = game13.CloneState() as Game;
-			var game15 = game13.CloneState() as Game;
+			var game14 = game13.GetClone();
+			var game15 = game13.GetClone();
 
 			// Game1: P1 Wisp
 			// Game2: P1 Wisp, P2 Wisp
@@ -426,12 +426,12 @@ namespace BrimstoneTests
 			// Branch from a game at two different points and test for equivalence
 			game8.Player1.Give("River Crocolisk");
 
-			var game16 = game8.CloneState() as Game;
+			var game16 = game8.GetClone();
 			game16.Player1.Give("Wisp");
 
 			game8.Player1.Give("Wisp");
 
-			var game17 = game8.CloneState() as Game;
+			var game17 = game8.GetClone();
 
 			game16.Player1.Give("Dr. Boom");
 			game17.Player1.Give("Dr. Boom");
@@ -439,8 +439,8 @@ namespace BrimstoneTests
 			Assert.True(game17.PowerHistory.EquivalentTo(game16.PowerHistory, Ordered: true));
 
 			// Hand order should be ignored
-			var game18 = game1.CloneState() as Game;
-			var game19 = game1.CloneState() as Game;
+			var game18 = game1.GetClone();
+			var game19 = game1.GetClone();
 
 			// NOTE: This doesn't ignore the entity IDs, so if we care about that, we must disable it separately
 			// Here we ensure that the entities have the same IDs even though they are placed in hand in a different order

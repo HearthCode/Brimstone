@@ -220,6 +220,17 @@ namespace Brimstone
 			}
 		}
 
+		public Game GetClone() {
+			return CloneState() as Game;
+		}
+
+		public HashSet<Game> GetClones(int qty) {
+			var clones = new HashSet<Game>();
+			for (int i = 0; i < qty; i++)
+				clones.Add(GetClone());
+			return clones;
+		}
+
 		public override IEntity CloneState() {
 			var entities = new EntityController(Entities);
 			Game game = entities.FindGame();

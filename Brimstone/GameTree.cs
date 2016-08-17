@@ -47,7 +47,7 @@ namespace Brimstone
 		}
 
 		public GameNode Branch(double Weight = 1.0) {
-			var clone = Game.CloneState() as Game;
+			var clone = Game.GetClone();
 			var node = new GameNode(clone, this, Weight, Children != null);
 			clone.CustomData = node;
 			return node;
@@ -81,7 +81,7 @@ namespace Brimstone
 		public GameTree(Game Root, ITreeSearcher SearchMode = null, bool CloneRoot = false, bool? Parallel = null) {
 			this.Parallel = Parallel ?? Settings.ParallelTreeSearch;
 
-			var rootGame = CloneRoot ? Root.CloneState() as Game : Root;
+			var rootGame = CloneRoot ? Root.GetClone() : Root;
 
 			TrackChildren = (SearchMode == null);
 			RootNode = new GameNode(Game: rootGame, TrackChildren: TrackChildren);
