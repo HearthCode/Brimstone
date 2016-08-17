@@ -24,7 +24,7 @@ namespace Brimstone.Benchmark
 			var testName = test.Name + (test.Iterations > 1 ? "; " + test.Iterations + " iterations" : "");
 			var results = new List<long>();
 
-			for (int i = 0; i < 7; i++) {
+			for (int i = 0; i < 4; i++) {
 				Settings.CopyOnWrite = true;
 				Settings.ZoneCaching = true;
 				Settings.EntityHashCaching = true;
@@ -104,7 +104,7 @@ namespace Brimstone.Benchmark
 			"Release " +
 #endif
 			Assembly.GetAssembly(typeof(Game)).GetName().Version + "\r\n" +
-			"\"\",\"\"\r\nTest Name,All Opts,CoW Disabled,Zone Cache Disabled,Hash Cache Disabled,Hash Equality Disabled,No Opts\r\n");
+			"\"\",\"\"\r\nTest Name,All Opts,Sequential,CoW Disabled,Zone Cache Disabled,Hash Cache Disabled,Hash Equality Disabled,No Opts\r\n");
 			File.WriteAllText(path, csv.ToString());
 		}
 	}
