@@ -15,6 +15,8 @@ namespace Brimstone.Benchmark
 			Tests = new Dictionary<string, Test>() {
 				{ "RawClone", new Test("Raw cloning speed (full game; single-threaded)", Test_RawClone) },
 				{ "RawCloneMT", new Test("Raw cloning speed (full game; multi-threaded)", Test_RawClone_MT) },
+				{ "EffectiveClone", new Test("Effective cloning speed (full game; single-threaded)", Test_StoredClone) },
+				{ "EffectiveCloneMT", new Test("Effective cloning speed (full game; multi-threaded)", Test_StoredClone_MT) },
 				{ "BoomBotPreHit", new Test("Boom Bot pre-hit cloning test; RC + 2 BB per side", Test_BoomBotPreHit) },
 				{ "BoomBotPreDeathrattle", new Test("Boom Bot pre-deathrattle cloning test; 5 RC + 2 BB per side", Test_BoomBotPreDeathrattle) },
 				{ "BoomBotUniqueStatesNS", new Test("Boom Bot hit; fuzzy unique states; Naive; 5 BR + 2 BB per side", Test_BoomBotUniqueStatesNS, Default_Setup2, 1) },
@@ -43,13 +45,23 @@ namespace Brimstone.Benchmark
 
 		public void Test_RawClone(Game g, int it) {
 			for (int i = 0; i < it; i++)
-				g.CloneState();
+				g.GetClone();
+		}
+		public void Test_RawClone_MT(Game g, int it) {
+			Parallel.For(0, it, i => g.GetClone());
+		}
+		public void Test_StoredClone(Game g, int it) {
+			var oldSetting = Settings.ParallelClone;
+			Settings.ParallelClone = false;
+			g.GetClones(it);
+			Settings.ParallelClone = oldSetting;
 		}
 
-		public void Test_RawClone_MT(Game g, int it) {
-			Parallel.For(0, it, i => {
-				g.CloneState();
-			});
+		public void Test_StoredClone_MT(Game g, int it) {
+			var oldSetting = Settings.ParallelClone;
+			Settings.ParallelClone = true;
+			g.GetClones(it);
+			Settings.ParallelClone = oldSetting;
 		}
 
 		public void Test_BoomBotPreHit(Game g, int it) {
