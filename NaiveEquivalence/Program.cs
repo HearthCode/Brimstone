@@ -57,7 +57,7 @@ namespace Test1
 			if (!ConsoleOutput)
 				Console.SetOut(TextWriter.Null);
 
-			var tree = GameTree.Build(
+			var tree = RandomOutcomeSearch.Build(
 				Game: game,
 				SearchMode: new NaiveTreeSearch(),
 				Action: () => {

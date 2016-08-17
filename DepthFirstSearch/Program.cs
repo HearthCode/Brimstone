@@ -53,7 +53,7 @@ namespace Test1
 			Cards.FromName("Boom Bot").Behaviour.Deathrattle = Actions.Damage(Actions.RandomOpponentMinion, Actions.RandomAmount(1, 4));
 
 			// Perform the search
-			var tree = GameTree.Build(
+			var tree = RandomOutcomeSearch.Build(
 				Game: game,
 				SearchMode: new DepthFirstTreeSearch(),
 				Action: () => {
