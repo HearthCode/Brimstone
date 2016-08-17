@@ -20,8 +20,16 @@ namespace Brimstone.Benchmark
 				{ "BoomBotUniqueStatesDSF", new Test("Boom Bot hit; fuzzy unique states; DSF; 5 BR + 2 BB per side", Test_BoomBotUniqueStatesDSF, Default_Setup2, 1) },
 				{ "BoomBotUniqueStatesBSF", new Test("Boom Bot hit; fuzzy unique states; BSF; 5 BR + 2 BB per side", Test_BoomBotUniqueStatesBSF, Default_Setup2, 1) },
 				{ "ArcaneMissiles2UniqueStatesDSF", new Test("Arcane Missiles (2); fuzzy unique game states; DSF; 5 BR + 2 BB per side", Test_2AMUniqueStatesDSF, Default_Setup2, 1) },
+				{ "ArcaneMissiles1UniqueStatesBSF", new Test("Arcane Missiles (1); fuzzy unique game states; BSF; 5 BR + 2 BB per side", Test_1AMUniqueStatesBSF, Default_Setup2, 1) },
 				{ "ArcaneMissiles2UniqueStatesBSF", new Test("Arcane Missiles (2); fuzzy unique game states; BSF; 5 BR + 2 BB per side", Test_2AMUniqueStatesBSF, Default_Setup2, 1) },
 				{ "ArcaneMissiles3UniqueStatesBSF", new Test("Arcane Missiles (3); fuzzy unique game states; BSF; 5 BR + 2 BB per side", Test_3AMUniqueStatesBSF, Default_Setup2, 1) },
+				{ "ArcaneMissiles4UniqueStatesBSF", new Test("Arcane Missiles (4); fuzzy unique game states; BSF; 5 BR + 2 BB per side", Test_4AMUniqueStatesBSF, Default_Setup2, 1) },
+				{ "ArcaneMissiles5UniqueStatesBSF", new Test("Arcane Missiles (5); fuzzy unique game states; BSF; 5 BR + 2 BB per side", Test_5AMUniqueStatesBSF, Default_Setup2, 1) },
+				{ "ArcaneMissiles6UniqueStatesBSF", new Test("Arcane Missiles (6); fuzzy unique game states; BSF; 5 BR + 2 BB per side", Test_6AMUniqueStatesBSF, Default_Setup2, 1) },
+				{ "ArcaneMissiles7UniqueStatesBSF", new Test("Arcane Missiles (7); fuzzy unique game states; BSF; 5 BR + 2 BB per side", Test_7AMUniqueStatesBSF, Default_Setup2, 1) },
+				{ "ArcaneMissiles8UniqueStatesBSF", new Test("Arcane Missiles (8); fuzzy unique game states; BSF; 5 BR + 2 BB per side", Test_8AMUniqueStatesBSF, Default_Setup2, 1) },
+				{ "ArcaneMissiles9UniqueStatesBSF", new Test("Arcane Missiles (9); fuzzy unique game states; BSF; 5 BR + 2 BB per side", Test_9AMUniqueStatesBSF, Default_Setup2, 1) },
+				{ "ArcaneMissiles10UniqueStatesBSF", new Test("Arcane Missiles (10); fuzzy unique game states; BSF; 5 BR + 2 BB per side", Test_10AMUniqueStatesBSF, Default_Setup2, 1) },
 			};
 		}
 
@@ -104,12 +112,38 @@ namespace Brimstone.Benchmark
 			_missilesUniqueStates(g, it, 2, new DepthFirstTreeSearch());
 		}
 
+		public void Test_1AMUniqueStatesBSF(Game g, int it) {
+			_missilesUniqueStates(g, it, 1, new BreadthFirstTreeSearch());
+		}
+
 		public void Test_2AMUniqueStatesBSF(Game g, int it) {
 			_missilesUniqueStates(g, it, 2, new BreadthFirstTreeSearch());
 		}
 
 		public void Test_3AMUniqueStatesBSF(Game g, int it) {
 			_missilesUniqueStates(g, it, 3, new BreadthFirstTreeSearch());
+		}
+
+		public void Test_4AMUniqueStatesBSF(Game g, int it) {
+			_missilesUniqueStates(g, it, 4, new BreadthFirstTreeSearch());
+		}
+		public void Test_5AMUniqueStatesBSF(Game g, int it) {
+			_missilesUniqueStates(g, it, 5, new BreadthFirstTreeSearch());
+		}
+		public void Test_6AMUniqueStatesBSF(Game g, int it) {
+			_missilesUniqueStates(g, it, 6, new BreadthFirstTreeSearch());
+		}
+		public void Test_7AMUniqueStatesBSF(Game g, int it) {
+			_missilesUniqueStates(g, it, 7, new BreadthFirstTreeSearch());
+		}
+		public void Test_8AMUniqueStatesBSF(Game g, int it) {
+			_missilesUniqueStates(g, it, 8, new BreadthFirstTreeSearch());
+		}
+		public void Test_9AMUniqueStatesBSF(Game g, int it) {
+			_missilesUniqueStates(g, it, 9, new BreadthFirstTreeSearch());
+		}
+		public void Test_10AMUniqueStatesBSF(Game g, int it) {
+			_missilesUniqueStates(g, it, 10, new BreadthFirstTreeSearch());
 		}
 	}
 }
