@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Brimstone
 {
@@ -224,10 +225,22 @@ namespace Brimstone
 			return CloneState() as Game;
 		}
 
-		public HashSet<Game> GetClones(int qty) {
-			var clones = new HashSet<Game>();
-			for (int i = 0; i < qty; i++)
-				clones.Add(GetClone());
+		public List<Game> GetClones(int qty) {
+			var clones = new List<Game>();
+
+			// Sequential cloning
+			if (!Settings.ParallelClone) {
+				for (int i = 0; i < qty; i++)
+					clones.Add(GetClone());
+				return clones;
+			}
+
+			// Parallel cloning
+			Parallel.For(0, qty,
+				() => new List<Game>(),
+				(i, state, localSet) => { localSet.Add(GetClone()); return localSet; },
+				(localSet) => { lock (clones) clones.AddRange(localSet); }
+			);
 			return clones;
 		}
 
