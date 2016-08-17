@@ -152,5 +152,69 @@ namespace BrimstoneTests
 			game.CurrentPlayer.Give("Arcane Missiles");
 			return game;
 		}
+
+		[Test]
+		public void TestTreeUsage([Values(true,false)] bool ParallelClone) {
+			Settings.ParallelClone = ParallelClone;
+
+			var game = _setupGame(7, 2, "Bloodfen Raptor");
+
+			// Make a new tree with the game as the root
+			var tree = new GameTree(game);
+
+			// Add arbitrary number of children
+			int children = 3;
+
+			var depth1Nodes = tree.RootNode.Branch(children).ToList();
+
+			// Check the correct number of games were cloned
+			Assert.AreEqual(children, depth1Nodes.Count);
+			Assert.AreEqual(children, tree.RootNode.Children.Count);
+
+			// Assert all children have correct parent in both GameNode and Game
+			foreach (var n in depth1Nodes) {
+				Assert.AreSame(game, n.Parent.Game);
+				Assert.AreSame(tree.RootNode, n.Parent);
+			}
+
+			// Check all child games are unique but exact clones
+			var childGameIds = new List<int>();
+			foreach (var n in depth1Nodes) {
+				Assert.False(childGameIds.Contains(n.Game.GameId));
+				Assert.True(game.EquivalentTo(n.Game));
+				childGameIds.Add(n.Game.GameId);
+			}
+
+			// Get all games from nodes
+			var depth1Games = depth1Nodes.Select(n => n.Game).ToList();
+
+			// Do something different on each child
+			depth1Games[0].CurrentPlayer.Give("Flame Juggler").Play();
+			depth1Games[1].CurrentPlayer.Give("Arcane Missiles").Play();
+			depth1Games[2].CurrentPlayer.Give("Whirlwind").Play();
+
+			// Check every game is different
+			var childHashes = new List<int>();
+			foreach (var g in depth1Games) {
+				Assert.False(childHashes.Contains(g.Entities.FuzzyGameHash));
+				childHashes.Add(g.Entities.FuzzyGameHash);
+			}
+
+			// Do a random action on the first game in depth 1 and add all possible outcomes as children
+			Minion FirstBoomBot = depth1Games[0].CurrentPlayer.Board.Where(x => x.Card.Name == "Boom Bot").First() as Minion;
+			var boomBotResults = GameTree.Build(depth1Games[0], () => FirstBoomBot.Hit(1)).GetUniqueGames();
+
+			var depth2Nodes = depth1Nodes[0].AddChildren(boomBotResults).ToList();
+
+			// Check the correct number of games were cloned
+			Assert.AreEqual(boomBotResults.Count, depth2Nodes.Count);
+			Assert.AreEqual(boomBotResults.Count, depth1Nodes[0].Children.Count);
+
+			// Assert all children have correct parent in both GameNode and Game
+			foreach (var n in depth2Nodes) {
+				Assert.AreSame(depth1Games[0], n.Parent.Game);
+				Assert.AreSame(depth1Nodes[0], n.Parent);
+			}
+		}
 	}
 }
