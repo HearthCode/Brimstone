@@ -47,6 +47,7 @@ namespace Brimstone
 		public Stack<ActionResult> ResultStack = new Stack<ActionResult>();
 		public List<QueueActionEventArgs> History;
 		public bool Paused { get; set; }
+		public object UserData { get; set; }
 
 		public event EventHandler<QueueActionEventArgs> OnQueueing;
 		public event EventHandler<QueueActionEventArgs> OnQueued;
@@ -57,9 +58,10 @@ namespace Brimstone
 
 		public int Count { get { return Queue.Count; } }
 
-		public ActionQueue(Game game) {
+		public ActionQueue(Game game, object userData = null) {
 			Game = game;
 			Paused = false;
+			UserData = userData;
 			History = new List<QueueActionEventArgs>();
 			ReplacedActions = new Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>>();
 		}
@@ -81,6 +83,8 @@ namespace Brimstone
 			OnQueued = cloneFrom.OnQueued;
 			OnActionStarting = cloneFrom.OnActionStarting;
 			OnAction = cloneFrom.OnAction;
+			// Copy user data
+			UserData = cloneFrom.UserData;
 		}
 
 		public void Attach(Game game) {
@@ -255,7 +259,7 @@ namespace Brimstone
 				action.Args.Add(ResultStack.Pop());
 			action.Args.Reverse();
 
-			action.UserData = UserData;
+			action.UserData = UserData ?? this.UserData;
 
 			if (OnActionStarting != null) {
 				OnActionStarting(this, action);
