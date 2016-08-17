@@ -240,6 +240,15 @@ namespace Brimstone
 			return tree;
 		}
 
+		public static Dictionary<Game, double> Find(Game Game, Action Action, ITreeSearcher SearchMode = null) {
+			return Build(Game, Action, SearchMode).GetUniqueGames();
+		}
+
+		public static async Task<Dictionary<Game, double>> FindAsync(Game Game, Action Action, ITreeSearcher SearchMode = null) {
+			var tree = await BuildAsync(Game, Action, SearchMode);
+			return tree.GetUniqueGames();
+		}
+
 		protected Task replaceRandomChoice(ActionQueue q, QueueActionEventArgs e) {
 			// Choosing a random entity (minion in this case)
 			// Clone and start processing for every possibility

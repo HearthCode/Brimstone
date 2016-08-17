@@ -111,7 +111,7 @@ namespace BrimstoneTests
 		}
 
 		private Dictionary<Game, double> _search(Game game, ITreeSearcher searcher, TestAction testAction) {
-			var tree = RandomOutcomeSearch.Build(
+			return RandomOutcomeSearch.Find(
 				Game: game,
 				SearchMode: searcher,
 				Action: () => {
@@ -127,7 +127,6 @@ namespace BrimstoneTests
 					}
 				}
 			);
-			return tree.GetUniqueGames();
 		}
 
 		private Game _setupGame(int MaxMinions, int NumBoomBots, string FillMinion) {
@@ -202,7 +201,7 @@ namespace BrimstoneTests
 
 			// Do a random action on the first game in depth 1 and add all possible outcomes as children
 			Minion FirstBoomBot = depth1Games[0].CurrentPlayer.Board.Where(x => x.Card.Name == "Boom Bot").First() as Minion;
-			var boomBotResults = RandomOutcomeSearch.Build(depth1Games[0], () => FirstBoomBot.Hit(1)).GetUniqueGames();
+			var boomBotResults = RandomOutcomeSearch.Find(depth1Games[0], () => FirstBoomBot.Hit(1));
 
 			var depth2Nodes = depth1Nodes[0].AddChildren(boomBotResults).ToList();
 
