@@ -34,7 +34,7 @@ namespace BrimstoneTests
 
 			// Put a referenced entity on the stack
 			game.Queue(game, Actions.Draw(p1));
-			game.ActionQueue.ProcessOne(); // places reference to player 1 on the stack
+			game.ActionQueue.ProcessOneAsync(); // places reference to player 1 on the stack
 
 			// Act
 

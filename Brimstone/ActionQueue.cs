@@ -12,12 +12,14 @@ namespace Brimstone
 		public QueueAction Action { get; set; }
 		public List<ActionResult> Args { get; set; }
 		public bool Cancel { get; set; }
+		public object UserData { get; set; }
 
-		public QueueActionEventArgs(Game g, IEntity s, QueueAction a, List<ActionResult> p = null) {
+		public QueueActionEventArgs(Game g, IEntity s, QueueAction a, List<ActionResult> p = null, object u = null) {
 			Game = g;
 			Source = s;
 			Action = a;
 			Args = p;
+			UserData = u;
 			Cancel = false;
 		}
 
@@ -34,7 +36,7 @@ namespace Brimstone
 
 		public object Clone() {
 			// NOTE: Cancel flag is cleared when cloning
-			return new QueueActionEventArgs(Game, Source, Action, Args);
+			return new QueueActionEventArgs(Game, Source, Action, Args, UserData);
 		}
 	}
 
@@ -212,12 +214,12 @@ namespace Brimstone
 				ResultStack.Push(a);
 		}
 
-		public List<ActionResult> ProcessAll() {
-			return ProcessAllAsync().Result;
+		public List<ActionResult> ProcessAll(object UserData = null) {
+			return ProcessAllAsync(UserData).Result;
 		}
 
-		public async Task<List<ActionResult>> ProcessAllAsync() {
-			while (await ProcessOne())
+		public async Task<List<ActionResult>> ProcessAllAsync(object UserData = null) {
+			while (await ProcessOneAsync(UserData))
 				;
 			// Return whatever is left on the stack
 			var stack = new List<ActionResult>(ResultStack);
@@ -228,7 +230,11 @@ namespace Brimstone
 			return stack;
 		}
 
-		public async Task<bool> ProcessOne() {
+		public bool ProcessOne(object UserData = null) {
+			return ProcessOneAsync(UserData).Result;
+		}
+
+		public async Task<bool> ProcessOneAsync(object UserData = null) {
 			if (Paused)
 				return false;
 
@@ -248,6 +254,8 @@ namespace Brimstone
 			for (int i = 0; i < action.Action.Args.Count; i++)
 				action.Args.Add(ResultStack.Pop());
 			action.Args.Reverse();
+
+			action.UserData = UserData;
 
 			if (OnActionStarting != null) {
 				OnActionStarting(this, action);
