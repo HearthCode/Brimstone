@@ -22,14 +22,10 @@ namespace Test1
 		public const string FillMinion = "River Crocolisk";
 		public static bool BoomBotTest = true;
 		public static bool ArcaneMissilesTest = false;
-		public static bool ConsoleOutput = false;
 
 		static void Main(string[] args) {
-			var cOut = Console.Out;
-
 			// Create initial game state
 			Console.WriteLine("Initializing game state...");
-			Console.SetOut(TextWriter.Null);
 
 			var game = new Game(HeroClass.Druid, HeroClass.Druid, PowerHistory: true);
 			game.Player1.Deck.Fill();
@@ -46,16 +42,12 @@ namespace Test1
 			for (int i = 0; i < NumBoomBots; i++)
 				game.CurrentPlayer.Give("Boom Bot").Play();
 
-			Console.SetOut(cOut);
-
 			// Start timing
 			var sw = new Stopwatch();
 			sw.Start();
 
 			// Build search tree
 			Console.WriteLine("Building search tree...");
-			if (!ConsoleOutput)
-				Console.SetOut(TextWriter.Null);
 
 			var tree = RandomOutcomeSearch.Build(
 				Game: game,
@@ -73,7 +65,6 @@ namespace Test1
 			);
 
 			// Print intermediate results
-			Console.SetOut(cOut);
 			Console.WriteLine("{0} branches in {1}ms", tree.NodeCount, sw.ElapsedMilliseconds);
 			Console.WriteLine("{0} leaf node games kept", tree.LeafNodeCount);
 			Console.WriteLine("");

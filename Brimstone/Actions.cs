@@ -138,7 +138,7 @@ namespace Brimstone
 			Player player = (Player)args[PLAYER];
 			Card card = args[CARD];
 
-			Console.WriteLine("Giving {0} to {1}", card.Name, player.FriendlyName);
+			DebugLog.WriteLine("Giving {0} to {1}", card.Name, player.FriendlyName);
 
 			if (card[GameTag.CARDTYPE] == (int)CardType.MINION) {
 				return (Minion)player.Hand.MoveTo(new Minion(card));
@@ -161,14 +161,14 @@ namespace Brimstone
 			if (!player.Deck.IsEmpty) {
 				Entity entity = (Entity)player.Deck[1];
 
-				Console.WriteLine("{0} draws {1}", player.FriendlyName, entity.ShortDescription);
+				DebugLog.WriteLine("{0} draws {1}", player.FriendlyName, entity.ShortDescription);
 
 				player.NumCardsDrawnThisTurn++;
 				player.Hand.MoveTo(entity);
 				return entity;
 			}
 
-			Console.WriteLine("{0} tries to draw but their deck is empty", player.FriendlyName);
+			DebugLog.WriteLine("{0} tries to draw but their deck is empty", player.FriendlyName);
 			return ActionResult.None;
 		}
 	}
@@ -183,7 +183,7 @@ namespace Brimstone
 
 			player.Board.MoveTo(entity);
 
-			Console.WriteLine("{0} is playing {1}", player.FriendlyName, entity.ShortDescription);
+			DebugLog.WriteLine("{0} is playing {1}", player.FriendlyName, entity.ShortDescription);
 
 			game.Queue(entity, entity.Card.Behaviour.Battlecry);
 			return entity;
@@ -198,7 +198,7 @@ namespace Brimstone
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			if (args[TARGETS].HasResult)
 				foreach (CanBeDamaged e in args[TARGETS]) {
-					Console.WriteLine("{0} is getting hit for {1} points of damage", e.ShortDescription, args[DAMAGE]);
+					DebugLog.WriteLine("{0} is getting hit for {1} points of damage", e.ShortDescription, args[DAMAGE]);
 
 					e.Damage += args[DAMAGE];
 					e.CheckForDeath();
@@ -216,7 +216,7 @@ namespace Brimstone
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			if (args[TARGETS].HasResult)
 				foreach (var e in args[TARGETS]) {
-					Console.WriteLine("{0} dies", e.ShortDescription);
+					DebugLog.WriteLine("{0} dies", e.ShortDescription);
 
 					if (e is Minion) {
 						((Player)e.Controller).Graveyard.MoveTo(e);

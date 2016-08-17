@@ -17,14 +17,10 @@ namespace Test1
 		public const string FillMinion = "Bloodfen Raptor";
 		public static bool BoomBotTest = false;
 		public static bool ArcaneMissilesTest = true;
-		public static bool ConsoleOutput = false;
 
 		static void Main(string[] args) {
-			var cOut = Console.Out;
-
 			// Create initial game state
 			Console.WriteLine("Initializing game state...");
-			Console.SetOut(TextWriter.Null);
 
 			var game = new Game(HeroClass.Druid, HeroClass.Druid, PowerHistory: true);
 			game.Start(1);
@@ -41,14 +37,9 @@ namespace Test1
 
 			var ArcaneMissiles = game.CurrentPlayer.Give("Arcane Missiles");
 
-			Console.SetOut(cOut);
-
 			// Start timing
 			var sw = new Stopwatch();
 			sw.Start();
-
-			if (!ConsoleOutput)
-				Console.SetOut(TextWriter.Null);
 
 			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Actions.Damage(Actions.RandomOpponentCharacter, 1) * 2;
 			Cards.FromName("Boom Bot").Behaviour.Deathrattle = Actions.Damage(Actions.RandomOpponentMinion, Actions.RandomAmount(1, 4));
@@ -71,7 +62,6 @@ namespace Test1
 			);
 
 			// Print benchmark results
-			Console.SetOut(cOut);
 			Console.WriteLine("{0} branches in {1}ms", tree.NodeCount, sw.ElapsedMilliseconds);
 			Console.WriteLine("{0} intermediate clones pruned ({1} unique branches kept)", tree.NodeCount - tree.LeafNodeCount, tree.LeafNodeCount);
 
