@@ -42,8 +42,30 @@ namespace Brimstone
 			}
 		}
 
-		public void AddChild(GameNode child) {
-			Children.Add(child);
+		public GameNode AddChild(Game Child, double Weight = 1.0) {
+			// Creating GameNode also calls AddChild
+			return new GameNode(Child, this, Weight);
+		}
+
+		public void AddChild(GameNode Child) {
+			Children.Add(Child);
+		}
+
+		public HashSet<GameNode> AddChildren(IEnumerable<Game> Children, double Weight = 1.0) {
+			var newChildren = new HashSet<GameNode>();
+			foreach (var child in Children)
+				newChildren.Add(AddChild(child, Weight));
+			return newChildren;
+		}
+
+		public IEnumerable<GameNode> AddChildren(Dictionary<Game, double> Children) {
+			// Creating GameNode also calls AddChild
+			return Children.Select(kv => new GameNode(kv.Key, this, kv.Value));
+		}
+
+		public void AddChildren(IEnumerable<GameNode> Children) {
+			foreach (var child in Children)
+				this.Children.Add(child);
 		}
 
 		public GameNode Branch(double Weight = 1.0) {
