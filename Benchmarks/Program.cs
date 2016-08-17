@@ -24,20 +24,22 @@ namespace Brimstone.Benchmark
 			var testName = test.Name + (test.Iterations > 1 ? "; " + test.Iterations + " iterations" : "");
 			var results = new List<long>();
 
-			for (int i = 0; i < 4; i++) {
+			for (int i = 0; i < 7; i++) {
 				Settings.CopyOnWrite = true;
 				Settings.ZoneCaching = true;
 				Settings.EntityHashCaching = true;
 				Settings.GameHashCaching = true;
 				Settings.UseGameHashForEquality = true;
+				Settings.ParallelTreeSearch = true;
 
 				switch (i) {
 					case 0: break;
-					case 1: Settings.CopyOnWrite = false; break;
-					case 2: Settings.ZoneCaching = false; break;
-					case 3: Settings.EntityHashCaching = Settings.GameHashCaching = false; break;
-					case 4: Settings.UseGameHashForEquality = false; break;
-					case 5: Settings.CopyOnWrite = Settings.ZoneCaching =
+					case 1: Settings.ParallelTreeSearch = false; break;
+					case 2: Settings.CopyOnWrite = false; break;
+					case 3: Settings.ZoneCaching = false; break;
+					case 4: Settings.EntityHashCaching = Settings.GameHashCaching = false; break;
+					case 5: Settings.UseGameHashForEquality = false; break;
+					case 6: Settings.CopyOnWrite = Settings.ZoneCaching =
 							Settings.EntityHashCaching = Settings.GameHashCaching =
 							Settings.UseGameHashForEquality = false; break;
 				}
