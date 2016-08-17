@@ -18,7 +18,10 @@ namespace BrimstoneTests
 
 		[Test]
 		public void TestTreeSearchProbabilities(
-			[Values(typeof(NaiveTreeSearch), typeof(DepthFirstTreeSearch), typeof(BreadthFirstTreeSearch))] Type SearchMode) {
+			[Values(typeof(NaiveTreeSearch), typeof(DepthFirstTreeSearch), typeof(BreadthFirstTreeSearch))] Type SearchMode,
+			[Values(true,false)] bool Parallel) {
+
+			Settings.ParallelTreeSearch = Parallel;
 
 			var game = _setupGame(MaxMinions: 3, NumBoomBots: 1, FillMinion: "River Crocolisk");
 			var uniqueGames = _search(game, (ITreeSearcher)Activator.CreateInstance(SearchMode), TestAction.BoomBot);
@@ -68,7 +71,10 @@ namespace BrimstoneTests
 		// NOTE: Naive tree searching is too slow for this test so we omit it
 		[Test]
 		public void TestTreeSearchUniqueness(
-			[Values(typeof(DepthFirstTreeSearch), typeof(BreadthFirstTreeSearch))] Type SearchMode) {
+			[Values(typeof(DepthFirstTreeSearch), typeof(BreadthFirstTreeSearch))] Type SearchMode,
+			[Values(true, false)] bool Parallel) {
+
+			Settings.ParallelTreeSearch = Parallel;
 
 			// Our paper-verified tests use Boom Bots that cannot go face, and Arcane Missiles which fires only 2 missiles
 			Cards.FromName("Boom Bot").Behaviour.Deathrattle = Actions.Damage(Actions.RandomOpponentMinion, Actions.RandomAmount(1, 4));
