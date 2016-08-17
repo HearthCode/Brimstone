@@ -24,4 +24,14 @@ namespace Brimstone
 
 		// TODO: Implement
 	}
+
+	public static class DebugLog {
+		public static void WriteLine(string s, params object[] p) {
+			System.Diagnostics.Debug.WriteLine(
+				string.Format("[{0}] Thread {1}: ",
+					DateTime.Now.ToString("HH:mm:ss.fff"),
+					System.Threading.Thread.CurrentThread.ManagedThreadId)
+				+ s, p);
+		}
+	}
 }
