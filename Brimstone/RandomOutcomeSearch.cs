@@ -66,7 +66,7 @@ namespace Brimstone
 
 		public async Task RunAsync(Action Action) {
 			RootNode.Game.ActionQueue.UserData = RootNode;
-			Action();
+			await Task.Run(() => Action());
 			await searcher.PostProcess(this);
 		}
 
