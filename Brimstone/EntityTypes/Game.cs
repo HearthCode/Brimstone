@@ -9,6 +9,8 @@ namespace Brimstone
 	{
 		// Used when adding to and fetching from HashSet, and testing for equality
 		public bool Equals(Game x, Game y) {
+			if (ReferenceEquals(x, y))
+				return true;
 			if (Settings.UseGameHashForEquality)
 				return x.Entities.FuzzyGameHash == y.Entities.FuzzyGameHash;
 			return x.PowerHistory.EquivalentTo(y.PowerHistory);
