@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 
 namespace Brimstone
 {
@@ -69,20 +69,32 @@ namespace Brimstone
 		}
 	}
 
-	// TODO: Do we need a spinlock here for multi-threaded cloning?
 	public class ReferenceCount {
+		private long _count;
 		public ReferenceCount() {
-			Count = 1;
+			_count = 1;
 		}
 
-		public int Count { get; set; }
+		public void Increment() {
+			Interlocked.Increment(ref _count);
+		}
+
+		public void Decrement() {
+			Interlocked.Decrement(ref _count);
+		}
+
+		public long Count {
+			get {
+				return Interlocked.Read(ref _count);
+			}
+		}
 	}
 
 	public partial class Entity : IEntity {
 		private BaseEntityData _entity;
 		private ReferenceCount _referenceCount;
 
-		public int ReferenceCount { get { return _referenceCount.Count; } }
+		public long ReferenceCount { get { return _referenceCount.Count; } }
 		public BaseEntityData BaseEntityData { get { return _entity; } }
 
 		public virtual Game Game { get; set; }
@@ -109,7 +121,7 @@ namespace Brimstone
 			_referenceCount = cloneFrom._referenceCount;
 			if (Settings.CopyOnWrite) {
 				_entity = cloneFrom._entity;
-				_referenceCount.Count++;
+				_referenceCount.Increment();
 			} else {
 				_entity = (BaseEntityData)cloneFrom._entity.Clone();
 			}
@@ -183,7 +195,7 @@ namespace Brimstone
 		private void CopyOnWrite() {
 			if (_referenceCount.Count > 1) {
 				_entity = (BaseEntityData)_entity.Clone();
-				_referenceCount.Count--;
+				_referenceCount.Decrement();
 				_referenceCount = new ReferenceCount();
 			}
 		}
