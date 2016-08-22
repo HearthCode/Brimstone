@@ -34,7 +34,7 @@ namespace BrimstoneTests
 
 			// Put a referenced entity on the stack
 			game.Queue(game, Actions.Draw(p1));
-			game.ActionQueue.ProcessOneAsync(); // places reference to player 1 on the stack
+			game.ActionQueue.ProcessOne(); // places reference to player 1 on the stack
 
 			// Act
 
@@ -194,6 +194,20 @@ namespace BrimstoneTests
 
 			// TODO: Check that ActiveTriggers is cloned correctly and only once
 			// TODO: Check Queue events are copied
+		}
+
+		[Test]
+		public void TestCloneThreadSafety() {
+			// Test that concurrent cloning updates ReferenceCount correctly
+			Settings.ParallelClone = true;
+			var game = new Game(HeroClass.Druid, HeroClass.Priest);
+			game.Player1.Deck.Fill();
+			game.Player2.Deck.Fill();
+			game.Start(1);
+
+			var clones = game.GetClones(1000);
+			foreach (Entity e in game.Entities)
+				Assert.AreEqual(1001, e.ReferenceCount);
 		}
 	}
 }
