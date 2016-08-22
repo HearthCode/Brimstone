@@ -93,6 +93,10 @@ namespace Brimstone
 				Players[i].Deck = new Deck(this, Players[i].HeroClass, Players[i]);
 			}
 
+			// Set initial game state and step
+			Game.State = GameState.LOADING;
+			Game.Step = Step.BEGIN_FIRST;
+
 			// No parent or children
 			GameId = ++SequenceNumber;
 		}
