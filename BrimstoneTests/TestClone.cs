@@ -200,12 +200,23 @@ namespace BrimstoneTests
 		public void TestCloneThreadSafety() {
 			// Test that concurrent cloning updates ReferenceCount correctly
 			Settings.ParallelClone = true;
+
+			// Without Hero/FirstPlayer/CurrentPlayer set
 			var game = new Game(HeroClass.Druid, HeroClass.Priest);
+			game.Player1.Deck.Fill();
+			game.Player2.Deck.Fill();
+
+			var clones = game.GetClones(1000);
+			foreach (Entity e in game.Entities)
+				Assert.AreEqual(1001, e.ReferenceCount);
+
+			// With everything set
+			game = new Game(HeroClass.Druid, HeroClass.Priest);
 			game.Player1.Deck.Fill();
 			game.Player2.Deck.Fill();
 			game.Start(1);
 
-			var clones = game.GetClones(1000);
+			clones = game.GetClones(1000);
 			foreach (Entity e in game.Entities)
 				Assert.AreEqual(1001, e.ReferenceCount);
 		}
