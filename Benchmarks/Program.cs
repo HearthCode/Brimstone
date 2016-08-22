@@ -24,13 +24,14 @@ namespace Brimstone.Benchmark
 			var testName = test.Name + (test.Iterations > 1 ? "; " + test.Iterations + " iterations" : "");
 			var results = new List<long>();
 
-			for (int i = 0; i < 4; i++) {
+			for (int i = 0; i < (Benchmarks.Extended? 7 : 4); i++) {
 				Settings.CopyOnWrite = true;
 				Settings.ZoneCaching = true;
 				Settings.EntityHashCaching = true;
 				Settings.GameHashCaching = true;
 				Settings.UseGameHashForEquality = true;
 				Settings.ParallelTreeSearch = true;
+				Settings.ParallelClone = false;
 
 				switch (i) {
 					case 0: break;
@@ -126,6 +127,7 @@ namespace Brimstone.Benchmark
 
 	internal partial class Benchmarks
 	{
+		public static bool Extended = false;
 		public Dictionary<string, Test> Tests;
 
 		// Create and start a game with Player 1 as the first player and no decks
@@ -193,7 +195,7 @@ namespace Brimstone.Benchmark
 			string filter = string.Empty;
 			int timeout = -1;
 
-			string usage = "Usage: benchmarks [--filter=text] [--timeout=milliseconds]...";
+			string usage = "Usage: benchmarks [--filter=text] [--timeout=milliseconds] [--extended]...";
 
 			foreach (string a in args) {
 				try {
@@ -211,6 +213,9 @@ namespace Brimstone.Benchmark
 								Console.WriteLine(usage);
 								return;
 							}
+							break;
+						case "--extended":
+							Extended = true;
 							break;
 						default:
 							Console.WriteLine(usage);

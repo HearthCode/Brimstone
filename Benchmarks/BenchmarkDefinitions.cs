@@ -44,24 +44,23 @@ namespace Brimstone.Benchmark
 		}
 
 		public void Test_RawClone(Game g, int it) {
+			Settings.ParallelClone = false;
 			for (int i = 0; i < it; i++)
 				g.GetClone();
 		}
 		public void Test_RawClone_MT(Game g, int it) {
+			Settings.ParallelClone = false;
 			Parallel.For(0, it, i => g.GetClone());
 		}
+
 		public void Test_StoredClone(Game g, int it) {
-			var oldSetting = Settings.ParallelClone;
 			Settings.ParallelClone = false;
 			g.GetClones(it);
-			Settings.ParallelClone = oldSetting;
 		}
 
 		public void Test_StoredClone_MT(Game g, int it) {
-			var oldSetting = Settings.ParallelClone;
 			Settings.ParallelClone = true;
 			g.GetClones(it);
-			Settings.ParallelClone = oldSetting;
 		}
 
 		public void Test_BoomBotPreHit(Game g, int it) {
@@ -142,9 +141,11 @@ namespace Brimstone.Benchmark
 		public void Test_4AMUniqueStatesBSF(Game g, int it) {
 			_missilesUniqueStates(g, it, 4, new BreadthFirstActionWalker());
 		}
+
 		public void Test_5AMUniqueStatesBSF(Game g, int it) {
 			_missilesUniqueStates(g, it, 5, new BreadthFirstActionWalker());
 		}
+
 		public void Test_6AMUniqueStatesBSF(Game g, int it) {
 			_missilesUniqueStates(g, it, 6, new BreadthFirstActionWalker());
 		}
