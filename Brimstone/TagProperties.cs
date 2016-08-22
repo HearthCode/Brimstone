@@ -78,6 +78,11 @@
 			get { return this[GameTag.NUM_CARDS_DRAWN_THIS_TURN]; }
 			set { this[GameTag.NUM_CARDS_DRAWN_THIS_TURN] = value; }
 		}
+
+		public int NumTurnsLeft {
+			get { return this[GameTag.NUM_TURNS_LEFT]; }
+			set { this[GameTag.NUM_TURNS_LEFT] = value; }
+		}
 	}
 
 	public abstract partial class CanBeDamaged : Entity

@@ -67,10 +67,8 @@ namespace Brimstone
 
 		public Game(HeroClass Hero1, HeroClass Hero2, string Player1Name = "", string Player2Name = "", bool PowerHistory = false)
 					: base(Cards.FromId("Game"), new Dictionary<GameTag, int> {
-						{ GameTag.TURN, 1 },
 						{ GameTag.ZONE, (int) Zone.PLAY },
-						{ GameTag.NEXT_STEP, (int) Step.BEGIN_MULLIGAN },
-						{ GameTag.STATE, (int) GameState.RUNNING }
+						{ GameTag.STATE, (int) GameState.LOADING }
 					}) {
 			// Start Power log
 			if (PowerHistory) {
@@ -92,10 +90,6 @@ namespace Brimstone
 			for (int i = 0; i < 2; i++) {
 				Players[i].Deck = new Deck(this, Players[i].HeroClass, Players[i]);
 			}
-
-			// Set initial game state and step
-			Game.State = GameState.LOADING;
-			Game.Step = Step.BEGIN_FIRST;
 
 			// No parent or children
 			GameId = ++SequenceNumber;
@@ -127,10 +121,21 @@ namespace Brimstone
 		}
 
 		public void Start(int FirstPlayer = 0) {
+			// Shuffle player decks
+			foreach (var p in Players)
+				p.Deck.Shuffle();
+
 			// Generate player heroes
 			// TODO: Add Start() parameters for non-default hero skins
 			foreach (var p in Players)
 				p.Hero = Add(new Hero(DefaultHero.For(p.HeroClass)), this) as Hero;
+
+			// TODO: Insert event call precisely here so our server can iterate all created entities
+
+			// Set game state
+			Game.State = GameState.RUNNING;
+			foreach (var p in Players)
+				p.PlayState = PlayState.PLAYING;
 
 			// Pick a random starting player
 			if (FirstPlayer == 0)
@@ -139,20 +144,22 @@ namespace Brimstone
 				this.FirstPlayer = Players[FirstPlayer - 1];
 			CurrentPlayer = this.FirstPlayer;
 
-			// Shuffle player decks
-			Step = Step.BEGIN_SHUFFLE;
-			foreach (var p in Players)
-				p.Deck.Shuffle();
+			// Set turn counter
+			Game.Turn = 1;
 
 			// Draw cards
-			Step = Step.BEGIN_DRAW;
-			foreach (var p in Players)
+			foreach (var p in Players) {
 				p.Draw((this.FirstPlayer == p ? 3 : 4));
+				p.NumTurnsLeft = 1;
 
-			// Give 2nd player the coin
-			this.FirstPlayer.Opponent.Give("The Coin");
+				// Give 2nd player the coin
+				if (p != this.FirstPlayer)
+					p.Give("The Coin");
+			}
 
-			// TODO: Insert event call here so KettleSharp can iterate all created entities
+			NextStep = Step.BEGIN_MULLIGAN;
+
+			// TODO: POWERED_UP settings and stuff go here
 
 			StartMulligan();
 		}

@@ -25,12 +25,12 @@ namespace Brimstone
 
 		public Player(HeroClass hero, string name, int playerId, int teamId = 0) : base(Cards.FromId("Player"),
 			new Dictionary<GameTag, int> {
-				{ GameTag.PLAYSTATE, (int) PlayState.PLAYING },
 				{ GameTag.MAXHANDSIZE, 10 },
 				{ GameTag.MAXRESOURCES, 10 },
 				{ GameTag.PLAYER_ID, playerId },
 				{ GameTag.TEAM_ID, (teamId != 0? teamId : playerId) },
-				{ GameTag.STARTHANDSIZE, 4 }
+				{ GameTag.STARTHANDSIZE, 4 },
+				{ GameTag.ZONE, (int) Zone.PLAY }
 			}) {
 			HeroClass = hero;
 			FriendlyName = name;

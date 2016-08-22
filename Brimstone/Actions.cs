@@ -163,8 +163,8 @@ namespace Brimstone
 
 				DebugLog.WriteLine("{0} draws {1}", player.FriendlyName, entity.ShortDescription);
 
-				player.NumCardsDrawnThisTurn++;
 				player.Hand.MoveTo(entity);
+				player.NumCardsDrawnThisTurn++;
 				return entity;
 			}
 
