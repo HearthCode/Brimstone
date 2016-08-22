@@ -268,7 +268,8 @@ namespace Brimstone
 			// Set references to the new player proxies (no additional cloning)
 			game.Player1 = entities.FindPlayer(1);
 			game.Player2 = entities.FindPlayer(2);
-			game.CurrentPlayer = (CurrentPlayer.Id == game.Player1.Id ? game.Player1 : game.Player2);
+			if (game.CurrentPlayer != null)
+				game.CurrentPlayer = (CurrentPlayer.Id == game.Player1.Id ? game.Player1 : game.Player2);
 			// Generate zones owned by game
 			for (int i = 0; i < 2; i++) {
 				game.Players[i].Zones[Zone.DECK] = new Deck(game, Players[i].Deck.HeroClass, game.Players[i]);
