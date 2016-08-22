@@ -38,11 +38,20 @@ namespace BrimstoneVisualizer
 		}
 
 		private void btnStepQueue_Click(object sender, RoutedEventArgs e) {
-			UpdateDisplay();
-			App.QueueRead.Set();
+			if (App.Game == null)
+				MessageBox.Show("No game script loaded", "Error", MessageBoxButton.OK);
+			else {
+				UpdateDisplay();
+				App.QueueRead.Set();
+			}
 		}
 
 		private void btnStepQueue5_Click(object sender, RoutedEventArgs e) {
+			if (App.Game == null) {
+				MessageBox.Show("No game script loaded", "Error", MessageBoxButton.OK);
+				return;
+			}
+
 			int i = 0;
 
 			EventHandler<QueueActionEventArgs> waiter = (o, ea) => {
