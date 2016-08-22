@@ -17,7 +17,7 @@
 
 		public Player FirstPlayer {
 			get {
-				return (Player1[GameTag.FIRST_PLAYER] == 1 ? Player1 : Player2);
+				return (Player1[GameTag.FIRST_PLAYER] == 1 ? Player1 : Player2[GameTag.FIRST_PLAYER] == 1? Player2 : null);
 			}
 			set {
 				// The opponent's FIRST_PLAYER tag won't be set so it will be zero by default
@@ -27,7 +27,7 @@
 
 		public Player CurrentPlayer {
 			get {
-				return (Player1[GameTag.CURRENT_PLAYER] == 1 ? Player1 : Player2);
+				return (Player1[GameTag.CURRENT_PLAYER] == 1 ? Player1 : Player2[GameTag.CURRENT_PLAYER] == 1? Player2 : null);
 			}
 			set {
 				value.Opponent[GameTag.CURRENT_PLAYER] = 0;
@@ -50,7 +50,8 @@
 	{
 		public Hero Hero {
 			get {
-				return Game.Entities[this[GameTag.HERO_ENTITY]] as Hero;
+				var heroEntityId = this[GameTag.HERO_ENTITY];
+				return (heroEntityId > 0 ? Game.Entities[heroEntityId] as Hero : null);
 			}
 			set {
 				this[GameTag.HERO_ENTITY] = value.Id;
