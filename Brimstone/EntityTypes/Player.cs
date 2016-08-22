@@ -48,17 +48,6 @@ namespace Brimstone
 			}
 		}
 
-		public void Start() {
-			// Shuffle deck
-			Deck.Shuffle();
-
-			// Generate hero
-			Hero = Game.Add(new Hero(DefaultHero.For(HeroClass)), this) as Hero;
-
-			// Draw cards
-			Draw((Game.FirstPlayer == this ? 3 : 4));
-		}
-
 		public List<IEntity> StartMulligan() {
 			MulliganState = MulliganState.INPUT;
 			return Game.Action(this, Actions.CreateMulligan);

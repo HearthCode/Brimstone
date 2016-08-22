@@ -127,14 +127,27 @@ namespace Brimstone
 		}
 
 		public void Start(int FirstPlayer = 0) {
+			// Generate player heroes
+			// TODO: Add Start() parameters for non-default hero skins
+			foreach (var p in Players)
+				p.Hero = Add(new Hero(DefaultHero.For(p.HeroClass)), this) as Hero;
+
 			// Pick a random starting player
 			if (FirstPlayer == 0)
 				this.FirstPlayer = Players[RNG.Between(0, 1)];
 			else
 				this.FirstPlayer = Players[FirstPlayer - 1];
 			CurrentPlayer = this.FirstPlayer;
+
+			// Shuffle player decks
+			Step = Step.BEGIN_SHUFFLE;
 			foreach (var p in Players)
-				p.Start();
+				p.Deck.Shuffle();
+
+			// Draw cards
+			Step = Step.BEGIN_DRAW;
+			foreach (var p in Players)
+				p.Draw((this.FirstPlayer == p ? 3 : 4));
 
 			// Give 2nd player the coin
 			this.FirstPlayer.Opponent.Give("The Coin");
@@ -144,7 +157,7 @@ namespace Brimstone
 			StartMulligan();
 		}
 
-		public void StartMulligan() {
+		private void StartMulligan() {
 			// TODO: Put the output into choices
 			Step = Step.BEGIN_MULLIGAN;
 			foreach (var p in Players)
