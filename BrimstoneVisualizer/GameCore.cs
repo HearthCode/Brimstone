@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading;
 using System.Windows;
 using Brimstone;
 
@@ -12,9 +7,10 @@ namespace BrimstoneVisualizer
 	public partial class App : Application
 	{
 		public static AutoResetEvent QueueRead = new AutoResetEvent(false);
+		public static AutoResetEvent GameStarted = new AutoResetEvent(false);
 		public static Game Game;
 		public static Thread GameThread;
-		public const int MaxMinions = 7;
+		public static IBrimstoneGame Script;
 
 		public static void StartGame() {
 			GameThread = new Thread(GameWorkerThread);
@@ -22,7 +18,9 @@ namespace BrimstoneVisualizer
 		}
 
 		public static void GameWorkerThread() {
-			Game = new Game(HeroClass.Hunter, HeroClass.Warlock, PowerHistory: true);
+			Game = Script.SetupGame();
+			Game.Start();
+			GameStarted.Set();
 
 			// Block every time we queue or perform action
 			Game.ActionQueue.OnQueued += (s, e) => {
@@ -32,27 +30,15 @@ namespace BrimstoneVisualizer
 				QueueRead.WaitOne();
 			};
 
-			var p1 = Game.Player1;
-			var p2 = Game.Player2;
+			Script.PlayGame(Game);
+		}
 
-			p1.Deck.Add(new List<Card> {
-				"Bloodfen Raptor",
-				"Wisp",
-			});
-			p1.Deck.Add("Knife Juggler");
-			p1.Deck.Add(new List<Card> {
-				"Murloc Tinyfin",
-				"Wisp",
-			});
-			var chromaggus = new Minion("Chromaggus");
-			p1.Deck.Add(chromaggus);
-
-			p1.Deck.Fill();
-			p2.Deck.Fill();
-
-			Game.Start();
-
-			PlayGame();
+		public static void EndGame() {
+			if (GameThread != null) {
+				GameThread.Abort();
+			}
+			Game = null;
+			GameThread = null;
 		}
 	}
 }

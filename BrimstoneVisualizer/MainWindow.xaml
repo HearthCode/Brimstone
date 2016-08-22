@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BrimstoneVisualizer"
         mc:Ignorable="d"
-        Title="Brimstone Visualizer" Height="780" Width="1200" Loaded="Window_Loaded" Closing="Window_Closing">
+        Title="Brimstone Visualizer" Height="780" Width="1200" Closing="Window_Closing">
+    <StackPanel>
+        <Button Content="Select Brimstone Game Script..." Click="Button_Click" />
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250"/>
@@ -60,4 +62,5 @@
                     ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"/>
         </ScrollViewer>
     </Grid>
+    </StackPanel>
 </Window>

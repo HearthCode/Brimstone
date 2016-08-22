@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Brimstone;
+using System.Reflection;
 
 namespace BrimstoneVisualizer
 {
@@ -25,7 +26,7 @@ namespace BrimstoneVisualizer
 			InitializeComponent();
 		}
 
-		private void UpdateDisplay() {
+		public void UpdateDisplay() {
 			tbActionQueue.Text = App.Game.ActionQueue.ToString();
 			tbActionResultStack.Text = App.Game.ActionQueue.StackToString();
 			tbPowerHistory.Text = App.Game.PowerHistory.ToString();
@@ -56,12 +57,35 @@ namespace BrimstoneVisualizer
 			UpdateDisplay();
 		}
 
-		private void Window_Loaded(object sender, RoutedEventArgs e) {
-			App.StartGame();
+		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+			App.EndGame();
 		}
 
-		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-			App.GameThread.Abort();
+		private void Button_Click(object sender, RoutedEventArgs e) {
+			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+
+			dlg.DefaultExt = ".dll";
+			dlg.Filter = "Brimstone Scripts (*.dll)|*.dll";
+
+			bool? result = dlg.ShowDialog();
+
+			if (result == true) {
+				string scriptDll = dlg.FileName;
+
+				try {
+					var asm = Assembly.LoadFile(scriptDll);
+					var type = asm.GetType("BrimstoneGameScript.BrimstoneGame");
+					App.Script = Activator.CreateInstance(type) as IBrimstoneGame;
+					App.EndGame();
+					App.StartGame();
+					App.GameStarted.WaitOne();
+					UpdateDisplay();
+				}
+				catch (Exception ex) {
+					MessageBox.Show("Could not load game script: " + ex.Message, "Error", MessageBoxButton.OK);
+					return;
+				}
+			}
 		}
 	}
 }
