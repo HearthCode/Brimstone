@@ -69,9 +69,39 @@ namespace Brimstone
 		}
 	}
 
-	public class ReferenceCount {
+	public interface IReferenceCount
+	{
+		void Increment();
+		void Decrement();
+		long Count { get; }
+	}
+
+	public class ReferenceCount : IReferenceCount
+	{
 		private long _count;
 		public ReferenceCount() {
+			_count = 1;
+		}
+
+		public void Increment() {
+			++_count;
+		}
+
+		public void Decrement() {
+			--_count;
+		}
+
+		public long Count {
+			get {
+				return _count;
+			}
+		}
+	}
+
+	public class ReferenceCountInterlocked : IReferenceCount
+	{
+		private long _count;
+		public ReferenceCountInterlocked() {
 			_count = 1;
 		}
 
@@ -92,7 +122,7 @@ namespace Brimstone
 
 	public partial class Entity : IEntity {
 		private BaseEntityData _entity;
-		private ReferenceCount _referenceCount;
+		private IReferenceCount _referenceCount;
 
 		public long ReferenceCount { get { return _referenceCount.Count; } }
 		public BaseEntityData BaseEntityData { get { return _entity; } }
@@ -129,7 +159,7 @@ namespace Brimstone
 
 		public Entity(Card card, Dictionary<GameTag, int> tags = null) {
 			_entity = new BaseEntityData(card, tags);
-			_referenceCount = new ReferenceCount();
+			_referenceCount = (Settings.ParallelClone ? (IReferenceCount) new ReferenceCountInterlocked() : new ReferenceCount());
 		}
 
 		public int this[GameTag t] {
@@ -196,7 +226,7 @@ namespace Brimstone
 			if (_referenceCount.Count > 1) {
 				_entity = (BaseEntityData)_entity.Clone();
 				_referenceCount.Decrement();
-				_referenceCount = new ReferenceCount();
+				_referenceCount = (Settings.ParallelClone ? (IReferenceCount)new ReferenceCountInterlocked() : new ReferenceCount());
 			}
 		}
 
