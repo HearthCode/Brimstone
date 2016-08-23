@@ -69,6 +69,16 @@
 			set { this[GameTag.PLAYSTATE] = (int)value; }
 		}
 
+		public int Mana {
+			get { return this[GameTag.RESOURCES]; }
+			set { this[GameTag.RESOURCES] = value; }
+		}
+
+		public bool IsComboActive {
+			get { return this[GameTag.COMBO_ACTIVE] == 1 ? true : false; }
+			set { this[GameTag.COMBO_ACTIVE] = value ? 1 : 0; }
+		}
+
 		public MulliganState MulliganState {
 			get { return (MulliganState)this[GameTag.MULLIGAN_STATE]; }
 			set { this[GameTag.MULLIGAN_STATE] = (int)value; }
@@ -87,10 +97,19 @@
 
 	public abstract partial class Character : Entity
 	{
-		public int StartingHealth {
-			get {
-				return Card[GameTag.HEALTH];
-			}
+		public int Attack {
+			get { return this[GameTag.ATK]; }
+			set { this[GameTag.ATK] = value; }
+		}
+
+		public bool CantBeTargetedByOpponents {
+			get { return this[GameTag.CANT_BE_TARGETED_BY_OPPONENTS] == 1; }
+			set { this[GameTag.CANT_BE_TARGETED_BY_OPPONENTS] = value ? 1 : 0; }
+		}
+
+		public int Damage {
+			get { return this[GameTag.DAMAGE]; }
+			set { this[GameTag.DAMAGE] = value; }
 		}
 
 		public int Health {
@@ -104,9 +123,81 @@
 			}
 		}
 
-		public int Damage {
-			get { return this[GameTag.DAMAGE]; }
-			set { this[GameTag.DAMAGE] = value; }
+		public int IncomingDamageMultiplier {
+			get { return this[GameTag.INCOMING_DAMAGE_MULTIPLIER]; }
+			set { this[GameTag.INCOMING_DAMAGE_MULTIPLIER] = value; }
+		}
+
+		public bool IsAttacking {
+			get { return this[GameTag.ATTACKING] == 1; }
+			set { this[GameTag.ATTACKING] = value ? 1 : 0; }
+		}
+
+		public bool IsDefending {
+			get { return this[GameTag.DEFENDING] == 1; }
+			set { this[GameTag.DEFENDING] = value ? 1 : 0; }
+		}
+
+		public bool IsExhausted {
+			get { return this[GameTag.EXHAUSTED] == 1; }
+			set { this[GameTag.EXHAUSTED] = value ? 1 : 0; }
+		}
+
+		public bool IsFrozen {
+			get { return this[GameTag.FROZEN] == 1; }
+			set { this[GameTag.FROZEN] = value ? 1 : 0; }
+		}
+
+		public int NumAttacksThisTurn {
+			get { return this[GameTag.NUM_ATTACKS_THIS_TURN]; }
+			set { this[GameTag.NUM_ATTACKS_THIS_TURN] = value; }
+		}
+
+		public int PreDamage {
+			get { return this[GameTag.PREDAMAGE]; }
+			set { this[GameTag.PREDAMAGE] = value; }
+		}
+
+		public Race Race {
+			get { return (Race)this[GameTag.CARDRACE]; }
+			set { this[GameTag.CARDRACE] = (int)value; }
+		}
+
+		public bool ShouldExitCombat {
+			get { return this[GameTag.SHOULDEXITCOMBAT] == 1; }
+			set { this[GameTag.SHOULDEXITCOMBAT] = value ? 1 : 0; }
+		}
+
+		public int StartingHealth {
+			get {
+				return Card[GameTag.HEALTH];
+			}
+		}
+	}
+
+	public partial class Minion : Character, IMinion
+	{
+		public bool CantBeTargetedByAbilities {
+			get { return this[GameTag.CANT_BE_TARGETED_BY_ABILITIES] == 1; }
+			set { this[GameTag.CANT_BE_TARGETED_BY_ABILITIES ] = value ? 1 : 0; }
+		}
+
+		public bool HasBattlecry {
+			get { return this[GameTag.BATTLECRY] == 1; }
+		}
+
+		public bool HasDeathrattle {
+			get { return this[GameTag.DEATHRATTLE] == 1; }
+		}
+
+		public bool HasStealth {
+			get { return this[GameTag.STEALTH] == 1; }
+			set { this[GameTag.STEALTH] = value ? 1 : 0; }
+		}
+
+		public bool HasTaunt {
+			get { return this[GameTag.TAUNT] == 1; }
+			set { this[GameTag.TAUNT] = value ? 1 : 0; }
 		}
 	}
 }
