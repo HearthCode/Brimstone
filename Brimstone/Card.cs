@@ -28,15 +28,29 @@ namespace Brimstone
 		}
 
 		public CardClass Class {
-			get { return (CardClass) this[GameTag.CLASS]; }
+			get { return (CardClass)this[GameTag.CLASS]; }
+		}
+
+		public bool HasCombo {
+			get { return this[GameTag.COMBO] == 1; }
+		}
+
+		public Rarity Rarity {
+			get { return (Rarity)this[GameTag.RARITY]; }
 		}
 
 		public CardType Type {
 			get { return (CardType)this[GameTag.CARDTYPE]; }
 		}
 
+		public bool RequiresTarget {
+			get {
+				return Requirements.ContainsKey(PlayRequirements.REQ_TARGET_TO_PLAY);
+			}
+		}
+
 		public int MaxAllowedInDeck {
-			get { return this[GameTag.RARITY] == (int)Rarity.LEGENDARY ? 1 : 2; }
+			get { return Rarity == Rarity.LEGENDARY ? 1 : 2; }
 		}
 
 		public string AbbrieviatedName {
