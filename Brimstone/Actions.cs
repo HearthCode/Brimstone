@@ -227,4 +227,28 @@ namespace Brimstone
 			return ActionResult.None;
 		}
 	}
+
+	public class CreateChoice : QueueAction
+	{
+		public const int PLAYER = 0;
+		public const int ENTITIES = 1;
+		public const int CHOICE_TYPE = 2;
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			var choice = new Choice {
+				ChoiceType = (ChoiceType)(int)args[CHOICE_TYPE],
+				Choices = args[ENTITIES]
+			};
+			((Player)args[PLAYER]).Choice = choice;
+
+			// The mulligan is the only situation where:
+			// 1. We are waiting for both players' input at the same time
+			// 2. There will not be an action chaining on from the result
+			// In all other cases, we must pause the queue until the user responds with a choice
+			if (choice.ChoiceType != ChoiceType.MULLIGAN)
+				game.ActionQueue.Paused = true;
+
+			return ActionResult.None;
+		}
+	}
 }

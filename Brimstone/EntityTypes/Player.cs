@@ -16,6 +16,8 @@ namespace Brimstone
 		public ZoneGroup Zones { get; private set; }
 		public HeroClass HeroClass { get; }
 
+		public Choice Choice { get; set; }
+
 		public Player(Player cloneFrom) : base(cloneFrom) {
 			FriendlyName = cloneFrom.FriendlyName;
 			HeroClass = cloneFrom.HeroClass;
@@ -50,18 +52,27 @@ namespace Brimstone
 
 		public List<IEntity> StartMulligan() {
 			MulliganState = MulliganState.INPUT;
-			return Game.Action(this, Actions.CreateMulligan);
+			return Game.Action(this, Actions.MulliganChoice(this));
 		}
 
 		public IPlayable Give(Card card) {
+			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
+				throw new PendingChoiceException();
+
 			return (IPlayable)(Entity)Game.Action(Game, Actions.Give(this, card));
 		}
 
 		public IPlayable Draw() {
+			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
+				throw new PendingChoiceException();
+
 			return (IPlayable)(Entity)Game.Action(Game, Actions.Draw(this));
 		}
 
 		public void Draw(ActionGraph qty) {
+			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
+				throw new PendingChoiceException();
+
 			Game.Action(this, Actions.Draw(this) * qty);
 		}
 

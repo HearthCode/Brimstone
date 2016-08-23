@@ -9,6 +9,9 @@ namespace Brimstone
 		public Spell(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
 
 		public IPlayable Play() {
+			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
+				throw new PendingChoiceException();
+
 			var played = (Entity)Game.Action(this, Actions.Play(this));
 
 			// Spells go to the graveyard after they are played

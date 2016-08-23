@@ -120,7 +120,7 @@ namespace Brimstone
 			ActionQueue.EnqueueDeferred(a);
 		}
 
-		public void Start(int FirstPlayer = 0) {
+		public void Start(int FirstPlayer = 0, bool SkipMulligan = false) {
 			// Shuffle player decks
 			foreach (var p in Players)
 				p.Deck.Shuffle();
@@ -157,11 +157,13 @@ namespace Brimstone
 					p.Give("The Coin");
 			}
 
-			NextStep = Step.BEGIN_MULLIGAN;
+			if (!SkipMulligan)
+				NextStep = Step.BEGIN_MULLIGAN;
 
 			// TODO: POWERED_UP settings and stuff go here
 
-			StartMulligan();
+			if (!SkipMulligan)
+				StartMulligan();
 		}
 
 		private void StartMulligan() {
@@ -172,6 +174,9 @@ namespace Brimstone
 		}
 
 		public void BeginTurn() {
+			if (Player1.Choice != null || Player2.Choice != null)
+				throw new PendingChoiceException();
+
 			Action(this, Actions.BeginTurn);
 		}
 

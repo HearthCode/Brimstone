@@ -19,8 +19,6 @@ namespace Brimstone
 		public static ActionGraph Give(ActionGraph Player = null, ActionGraph Card = null) { return new Give { Args = { Player, Card } }; }
 		public static ActionGraph Play(ActionGraph Entity = null) { return new Play { Args = { Entity } }; }
 
-		public static ActionGraph CreateMulligan { get { return Select(e => ((Player)e).Hand.Slice(((Player)e).NumCardsDrawnThisTurn)); } }
-
 		// TODO: Write all common selectors
 		public static Selector Self { get { return Select(e => e); } }
 		public static Selector Controller { get { return Select(e => e.Controller); } }
@@ -31,10 +29,13 @@ namespace Brimstone
 		public static Selector OpponentCharacters { get { return Union(OpponentMinions, OpponentHero); } }
 		public static Selector OpponentMinions { get { return Select(e => ((Player)e.Controller).Opponent.Board.Where(x => ((CanBeDamaged)x).Health > 0)); } }
 		public static Selector AllCharacters { get { return Union(AllMinions, FriendlyHero, OpponentHero); } }
-		public static ActionGraph Random(Selector s) { return new RandomChoice { Args = { s } }; }
+		public static ActionGraph MulliganChoice(ActionGraph Player = null) { return new CreateChoice { Args = { Player, MulliganSelector, (int)ChoiceType.MULLIGAN } }; }
+		public static ActionGraph Random(Selector Selector) { return new RandomChoice { Args = { Selector } }; }
 		public static ActionGraph RandomOpponentMinion { get { return Random(OpponentMinions); } }
 		public static ActionGraph RandomOpponentCharacter { get { return Random(OpponentCharacters); } }
 		public static ActionGraph RandomAmount(ActionGraph Min, ActionGraph Max) { return new RandomAmount { Args = { Min, Max } }; }
+
+		public static ActionGraph MulliganSelector { get { return Select(e => ((Player)e).Hand.Slice(((Player)e).NumCardsDrawnThisTurn)); } }
 
 		// TODO: Add selector set ops
 		public static Selector Union(params Selector[] s) {
