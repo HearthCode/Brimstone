@@ -61,7 +61,7 @@
     <Compile Include="Cards\All.cs" />
     <Compile Include="Deck.cs" />
     <Compile Include="EntityCore.cs" />
-    <Compile Include="EntityTypes\CanBeDamaged.cs" />
+    <Compile Include="EntityTypes\Character.cs" />
     <Compile Include="EntityTypes\Game.cs" />
     <Compile Include="EntityTypes\Hero.cs" />
     <Compile Include="EntityTypes\Minion.cs" />

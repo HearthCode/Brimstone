@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Brimstone
 {
-	public partial class Hero : CanBeDamaged
+	public partial class Hero : Character
 	{
 		// TODO: Add hero powers
 

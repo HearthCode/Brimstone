@@ -200,7 +200,7 @@ namespace Brimstone
 
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			if (args[TARGETS].HasResult)
-				foreach (CanBeDamaged e in args[TARGETS]) {
+				foreach (Character e in args[TARGETS]) {
 					DebugLog.WriteLine("{0} is getting hit for {1} points of damage", e.ShortDescription, args[DAMAGE]);
 
 					e.Damage += args[DAMAGE];

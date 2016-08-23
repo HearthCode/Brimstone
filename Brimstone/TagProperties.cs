@@ -85,7 +85,7 @@
 		}
 	}
 
-	public abstract partial class CanBeDamaged : Entity
+	public abstract partial class Character : Entity
 	{
 		public int StartingHealth {
 			get {
