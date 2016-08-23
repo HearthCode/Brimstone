@@ -267,7 +267,7 @@ namespace Brimstone
 									DebugLog.WriteLine(collisions[e.FuzzyHash].ToString());
 									DebugLog.WriteLine(e.ToString());
 									DebugLog.WriteLine(collisions[e.FuzzyHash].FuzzyHash + " " + e.FuzzyHash);
-									throw new Exception("Hash collision - not safe to compare games");
+									throw new TreeSearchException("Hash collision - not safe to compare games");
 								}
 							}
 							else
