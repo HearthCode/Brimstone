@@ -89,7 +89,7 @@
 			set { this[GameTag.PLAYSTATE] = (int)value; }
 		}
 
-		public int Mana {
+		public int BaseMana {
 			get { return this[GameTag.RESOURCES]; }
 			set { this[GameTag.RESOURCES] = value; }
 		}
@@ -141,11 +141,6 @@
 				this[GameTag.HEALTH] = value;
 				this[GameTag.DAMAGE] = 0;
 			}
-		}
-
-		public int IncomingDamageMultiplier {
-			get { return this[GameTag.INCOMING_DAMAGE_MULTIPLIER]; }
-			set { this[GameTag.INCOMING_DAMAGE_MULTIPLIER] = value; }
 		}
 
 		public bool IsAttacking {
@@ -200,10 +195,6 @@
 		public bool CantBeTargetedByAbilities {
 			get { return this[GameTag.CANT_BE_TARGETED_BY_ABILITIES] == 1; }
 			set { this[GameTag.CANT_BE_TARGETED_BY_ABILITIES ] = value ? 1 : 0; }
-		}
-
-		public bool HasBattlecry {
-			get { return this[GameTag.BATTLECRY] == 1; }
 		}
 
 		public bool HasDeathrattle {
