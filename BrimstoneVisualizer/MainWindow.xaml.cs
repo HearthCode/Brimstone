@@ -38,6 +38,8 @@ namespace BrimstoneVisualizer
 		}
 
 		private void btnStepQueue_Click(object sender, RoutedEventArgs e) {
+			// TODO: Don't crash when the queue is empty
+
 			if (App.Game == null)
 				MessageBox.Show("No game script loaded", "Error", MessageBoxButton.OK);
 			else {

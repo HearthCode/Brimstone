@@ -194,6 +194,7 @@ namespace BrimstoneTests
 
 			// TODO: Check that ActiveTriggers is cloned correctly and only once
 			// TODO: Check Queue events are copied
+			// TODO: Check that choices are cloned
 		}
 
 		[Test]

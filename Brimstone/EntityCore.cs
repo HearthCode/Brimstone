@@ -5,6 +5,15 @@ using System.Threading;
 
 namespace Brimstone
 {
+	// TODO: The base hierarchy needs to be refactored
+	// Entity base class, with:
+	// ICharacter implemented by IMinion, IHero
+	// ICanTarget implemented by IMinion, IHero, ISpell, IHeroPower
+	// IPlayable implemented by IMinion, ISpell, IWeapon
+	// ???
+
+	// TODO: Handle unknown entities
+
 	public interface IEntity : IEnumerable<KeyValuePair<GameTag, int>>, ICloneable {
 		int Id { get; set; }
 		// Allow owner game and controller to be changed for state cloning
@@ -128,6 +137,7 @@ namespace Brimstone
 		public BaseEntityData BaseEntityData { get { return _entity; } }
 
 		public virtual Game Game { get; set; }
+		// TODO: Re-do Controller code as normal tag property
 		private IEntity _controller;
 		public IEntity Controller {
 			get {
@@ -419,6 +429,7 @@ namespace Brimstone
 
 		public int FuzzyGameHash {
 			get {
+				// TODO: Take order-of-play semantics into account
 				if (!Settings.GameHashCaching || _changed) {
 					_gameHash = 0;
 					// Hash board states (play zones) for both players in order, hash rest of game entities in any order

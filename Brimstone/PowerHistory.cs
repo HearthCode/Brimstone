@@ -88,6 +88,8 @@ namespace Brimstone
 
 	public class CreateEntity : PowerAction, IEquatable<CreateEntity>
 	{
+		// TODO: Store card ID so we can display friendly entity name
+
 		public Dictionary<GameTag, int> Tags { get; }
 
 		public CreateEntity(IEntity e) : base(e) {
@@ -363,5 +365,7 @@ namespace Brimstone
 				ph += p.ToString() + "\n";
 			return ph;
 		}
+
+		// TODO: PowerHistory views for each player
 	}
 }

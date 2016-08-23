@@ -94,6 +94,8 @@ namespace Brimstone
 		}
 
 		public void Fire(TriggerEpoch epoch, QueueAction action, IEntity source, List<ActionResult> args) {
+			// TODO: This is all really slow, improve performance
+
 			Type me = action.GetType();
 			if (!Triggers.ContainsKey(me))
 				return;

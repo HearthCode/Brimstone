@@ -112,6 +112,7 @@ namespace Brimstone
 			return new QueueActionEventArgs(Game, source, qa);
 		}
 
+		// TODO: Insertion from multiple threads (eg. two players mulliganing simultaneously) is not thread-safe
 		public void InsertDeferred(IEntity source, List<QueueAction> qa) {
 			if (qa != null) {
 				foreach (var a in qa) {

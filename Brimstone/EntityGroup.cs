@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Brimstone
 {
+	// TODO: Get rid of this altogether
 	public class EntityGroup<T> where T : class, IEntity
 	{
 		// Use an array because it's faster

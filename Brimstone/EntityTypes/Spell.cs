@@ -14,6 +14,8 @@ namespace Brimstone
 
 			var played = (Entity)Game.Action(this, Actions.Play(this));
 
+			// TODO: This needs to go after the spell action completes, and before any triggers;
+			// it also needs to be part of an action
 			// Spells go to the graveyard after they are played
 			((Player)played.Controller).Graveyard.MoveTo(played);
 

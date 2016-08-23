@@ -175,6 +175,9 @@ namespace Brimstone
 
 	public class Play : QueueAction
 	{
+		// TODO: Deal with targeting
+		// TODO: Deal with spells moving to graveyard
+
 		public const int ENTITY = 0;
 
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
