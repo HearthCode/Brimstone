@@ -47,6 +47,8 @@ namespace Brimstone
 		public Stack<ActionResult> ResultStack = new Stack<ActionResult>();
 		public List<QueueActionEventArgs> History;
 		public bool Paused { get; set; }
+
+		// TODO: Remove - this should be transient
 		public object UserData { get; set; }
 
 		public event EventHandler<QueueActionEventArgs> OnQueueing;
@@ -75,6 +77,7 @@ namespace Brimstone
 			foreach (var item in stack)
 				ResultStack.Push((ActionResult)item.Clone());
 			// TODO: This is ugly. Make History chain in a linked list like Delta does
+			// TODO: Option to disable History
 			History = new List<QueueActionEventArgs>(cloneFrom.History);
 			ReplacedActions = new Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>>(cloneFrom.ReplacedActions);
 			Paused = cloneFrom.Paused;
@@ -253,6 +256,8 @@ namespace Brimstone
 				action.Source = Game.Entities[action.Source.Id];
 
 			// TODO: Fix stack modifying on OnActionStarting
+
+			// TODO: Make it work when not all of the arguments are supplied, for flexible syntax
 
 			// Get arguments for action from stack
 			action.Args = new List<ActionResult>();

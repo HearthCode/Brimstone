@@ -294,6 +294,7 @@ namespace Brimstone
 				ancestorsB.Push(g);
 				
 			// Search from root game to find lowest common ancestor of each game
+			// TODO: This also needs to work when there is no LCA
 			Game lca = null;
 			foreach (var pair in ancestorsA.Zip(ancestorsB, (x, y) => new { A = x, B = y }))
 				if (pair.A != pair.B)
