@@ -44,6 +44,26 @@
 			get { return (Step)this[GameTag.NEXT_STEP]; }
 			set { this[GameTag.NEXT_STEP] = (int)value; }
 		}
+
+		public Character ProposedAttacker {
+			get {
+				int id = this[GameTag.PROPOSED_ATTACKER];
+				return (id != 0 ? (Character)Game.Entities[id] : null);
+			}
+			set {
+				this[GameTag.PROPOSED_ATTACKER] = (value != null ? value.Id : 0);;
+			}
+		}
+
+		public Character ProposedDefender {
+			get {
+				int id = this[GameTag.PROPOSED_DEFENDER];
+				return (id != 0 ? (Character)Game.Entities[id] : null);
+			}
+			set {
+				this[GameTag.PROPOSED_DEFENDER] = (value != null ? value.Id : 0);
+			}
+		}
 	}
 
 	public partial class Player : Entity, IZoneOwner
