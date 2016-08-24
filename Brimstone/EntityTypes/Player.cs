@@ -13,6 +13,7 @@ namespace Brimstone
 		public ZoneEntities Board { get { return Zones[Zone.PLAY]; } }
 		public ZoneEntities Graveyard { get { return Zones[Zone.GRAVEYARD]; } }
 		public ZoneEntities Secrets { get { return Zones[Zone.SECRET]; } }
+		public ZoneEntities Setaside { get { return null; } }
 		public ZoneGroup Zones { get; private set; }
 		public HeroClass HeroClass { get; }
 
@@ -50,11 +51,6 @@ namespace Brimstone
 			}
 		}
 
-		public List<IEntity> StartMulligan() {
-			MulliganState = MulliganState.INPUT;
-			return Game.Action(this, Actions.MulliganChoice(this));
-		}
-
 		public IPlayable Give(Card card) {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
 				throw new PendingChoiceException();
@@ -75,8 +71,6 @@ namespace Brimstone
 
 			Game.Action(this, Actions.Draw(this) * qty);
 		}
-
-		// TODO: Add Zone move semantic helpers here
 
 		public override object Clone() {
 			return new Player(this);

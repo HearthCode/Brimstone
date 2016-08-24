@@ -8,6 +8,13 @@ namespace Brimstone
 	public interface IZoneOwner : IEntity
 	{
 		ZoneGroup Zones { get; }
+
+		Deck Deck { get; set; }
+		ZoneEntities Hand { get; }
+		ZoneEntities Board { get; }
+		ZoneEntities Graveyard { get; }
+		ZoneEntities Secrets { get; }
+		ZoneEntities Setaside { get; }
 	}
 
 	public class ZoneGroup : IEnumerable<ZoneEntities>

@@ -49,6 +49,11 @@ namespace Brimstone
 
 		public ZoneEntities Setaside { get { return Zones[Zone.SETASIDE]; } }
 		public ZoneEntities Board { get { return Zones[Zone.PLAY]; } }
+		public ZoneEntities Graveyard { get { return null; } }
+		public ZoneEntities Hand { get { return null; } }
+		public ZoneEntities Secrets { get { return null; } }
+		public Deck Deck { get { return null; } set { throw new NotImplementedException(); } }
+
 		public ZoneGroup Zones { get; }
 
 		public PowerHistory PowerHistory;
