@@ -275,10 +275,16 @@ namespace Brimstone
 		}
 
 		public void ZoneMove(int ZonePosition = -1) {
+			if (Controller == null)
+				throw new ZoneMoveException();
+
 			Controller.Zones[Zone].MoveTo(this, ZonePosition);
 		}
 
 		public void ZoneSwap(IEntity entity) {
+			if (Controller == null)
+				throw new ZoneMoveException();
+
 			Controller.Zones[Zone].Swap(this, entity);
 		}
 	}
