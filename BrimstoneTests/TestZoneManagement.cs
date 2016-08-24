@@ -146,6 +146,54 @@ namespace BrimstoneTests
 				Assert.AreEqual(i, p1.Board[i][GameTag.ZONE_POSITION]);
 
 			Assert.AreEqual(3, entity.ZonePosition);
+
+			// Move it back again
+			entity.ZoneMove(p1.Board, 1);
+
+			// Assert
+			Assert.AreEqual(oldBoardCount, p1.Board.Count);
+			for (int i = 1; i <= oldBoardCount; i++)
+				Assert.AreEqual(i, p1.Board[i][GameTag.ZONE_POSITION]);
+
+			Assert.AreEqual(1, entity.ZonePosition);
+		}
+
+		[Test]
+		public void TestZoneInPlaceSwap([Values(true, false)] bool zoneCaching) {
+			// Arrange
+			Settings.ZoneCaching = zoneCaching;
+
+			var game = new Game(HeroClass.Druid, HeroClass.Druid);
+			var p1 = game.Player1;
+
+			List<IEntity> items = new List<IEntity>(5);
+
+			// Add items to zones
+			for (int i = 0; i < 5; i++)
+				items.Add(p1.Hand.Add(new Minion("River Crocolisk")));
+
+			p1.Deck.Fill();
+
+			// Act
+
+			// Swap an item between hand and deck
+			int inHandPos = 3;
+			int inDeckPos = 16;
+
+			var inHand = p1.Hand[inHandPos];
+			var inDeck = p1.Deck[inDeckPos];
+
+			inHand.ZoneSwap(inDeck);
+
+			// Assert
+			Assert.AreEqual(5, p1.Hand.Count);
+			Assert.AreEqual(30, p1.Deck.Count);
+
+			Assert.AreEqual(inDeckPos, inHand.ZonePosition);
+			Assert.AreEqual(inHandPos, inDeck.ZonePosition);
+
+			Assert.AreSame(p1.Hand[inHandPos], inDeck);
+			Assert.AreSame(p1.Deck[inDeckPos], inHand);
 		}
 
 		[Test]
