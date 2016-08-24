@@ -228,16 +228,16 @@ namespace Brimstone
 		}
 
 		// Perform an in-replacement of one entity with another, without re-calculating zone positions
+		// NOTE: The item in New will be moved first
 		public void Swap(IEntity Old, IEntity New) {
-			// Swap zones
-			var z = Old.Zone.Type;
-			Old[GameTag.ZONE] = (int)New.Zone.Type;
-			New[GameTag.ZONE] = (int)z;
+			var z = New.Zone.Type;
+			int p = New.ZonePosition;
 
-			// Swap zone positions
-			int p = Old.ZonePosition;
-			Old[GameTag.ZONE_POSITION] = New.ZonePosition;
-			New[GameTag.ZONE_POSITION] = p;
+			// We have to do it in this order, because Blizzard
+			New[GameTag.ZONE] = (int) Old.Zone.Type;
+			New[GameTag.ZONE_POSITION] = Old.ZonePosition;
+			Old[GameTag.ZONE] = (int) z;
+			Old[GameTag.ZONE_POSITION] = p;
 
 			// Swap references
 			Old.Controller.Zones[Old.Zone.Type].SetDirty();
