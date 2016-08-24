@@ -212,4 +212,14 @@ namespace Brimstone
 			return s;
 		}
 	}
+
+	public partial class Entity : IEntity
+	{
+		public void ZoneMove(Zone Zone, int ZonePosition = -1) {
+			if (Controller == null)
+				throw new ZoneMoveException();
+
+			Controller.Zones[Zone].MoveTo(this, ZonePosition);
+		}
+	}
 }

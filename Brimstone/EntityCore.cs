@@ -22,6 +22,7 @@ namespace Brimstone
 		Card Card { get; }
 		Zone Zone { get; }
 		int ZonePosition { get; }
+		void ZoneMove(Zone Zone, int ZonePosition = -1);
 		Dictionary<GameTag, int> CopyTags();
 		int this[GameTag t] { get; set; }
 		string ShortDescription { get; }
@@ -220,8 +221,6 @@ namespace Brimstone
 				_entity.Id = value;
 			}
 		}
-
-		// TODO: Add Zone property helper semantics
 
 		public virtual object Clone() {
 			return new Entity(this);
