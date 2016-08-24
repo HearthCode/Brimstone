@@ -119,12 +119,73 @@ namespace Brimstone
 
 	public class BeginTurn : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
-			game.CurrentPlayer = game.CurrentPlayer.Opponent;
-			game.Step = Step.MAIN_ACTION;
-			game.NextStep = Step.MAIN_END;
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
+		{
+			game.Step = Step.MAIN_READY;
+
+			// Update the number of turns everything has been in play
+			game.CurrentPlayer.Hero.NumTurnsInPlay++;
+			// TODO: game.CurrentPlayer.HeroPower.NumTurnsInPlay++;
+			foreach (Minion e in game.CurrentPlayer.Board)
+				e.NumTurnsInPlay++;
+			game.CurrentOpponent.Hero.NumTurnsInPlay++;
+			// TODO: game.CurrentPlayer.HeroPower.NumTurnsInPlay++;
+			foreach (Minion e in game.CurrentOpponent.Board)
+				e.NumTurnsInPlay++;
+
+			// Give player a mana crystal
+			game.CurrentPlayer.BaseMana++;
+			game.CurrentPlayer.UsedMana = 0;
+
+			// De-activate combo buff
+			game.CurrentPlayer.IsComboActive = false;
+
+			// Reset counters
+			game.CurrentOpponent.Hero.NumAttacksThisTurn = 0;
+			foreach (Minion e in game.CurrentOpponent.Board)
+				e.NumAttacksThisTurn = 0;
+			game.CurrentPlayer.NumCardsPlayedThisTurn = 0;
+			game.CurrentPlayer.NumMinionsPlayedThisTurn = 0;
+			game.CurrentPlayer.NumOptionsPlayedThisTurn = 0;
+			game.CurrentPlayer.NumCardsDrawnThisTurn = 0;
+
+			// Ain't no rest for the triggered...
+			game.NextStep = Step.MAIN_START_TRIGGERS;
+
+			game.CurrentPlayer.NumFriendlyMinionsThatDiedThisTurn = 0;
+			game.CurrentOpponent.NumFriendlyMinionsThatDiedThisTurn = 0;
+
+			game.Step = Step.MAIN_START_TRIGGERS;
+			game.NextStep = Step.MAIN_START;
+			game.Step = Step.MAIN_START;
 
 			game.Queue(game.CurrentPlayer, Actions.Draw(game.CurrentPlayer));
+
+			// TODO: After the card has been drawn, sedt the remaining counters and go to MAIN_ACTION step
+
+			return ActionResult.None;
+		}
+	}
+
+	public class EndTurn : QueueAction
+	{
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
+		{
+			game.Step = Step.MAIN_END;
+			game.NextStep = Step.MAIN_CLEANUP;
+			game.Step = Step.MAIN_CLEANUP;
+			game.NextStep = Step.MAIN_NEXT;
+			game.Step = Step.MAIN_NEXT;
+
+			// This is probably going to be used to give players extra turns later
+			game.CurrentPlayer.NumTurnsLeft = 0;
+			game.CurrentOpponent.NumTurnsLeft = 1;
+
+			game.CurrentPlayer = game.CurrentOpponent;
+			game.Turn++;
+
+			game.NextStep = Step.MAIN_READY;
+			game.Queue(game, Actions.BeginTurn);
 
 			return ActionResult.None;
 		}
@@ -273,7 +334,10 @@ namespace Brimstone
 
 			// Start main game if both players have completed mulligan
 			if (p.Opponent.MulliganState == MulliganState.DONE)
+			{
+				p.Game.NextStep = Step.MAIN_READY;
 				p.Game.Queue(p.Game, Actions.BeginTurn);
+			}
 		}
 
 		private void chooseGeneral(Player p) {

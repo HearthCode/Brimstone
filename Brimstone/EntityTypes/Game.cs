@@ -185,7 +185,7 @@ namespace Brimstone
 			if (Player1.Choice != null || Player2.Choice != null)
 				throw new PendingChoiceException();
 
-			Action(this, Actions.BeginTurn);
+			Action(this, Actions.EndTurn);
 		}
 
 		// Perform a fuzzy equivalence between two game states
