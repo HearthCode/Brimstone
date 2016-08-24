@@ -193,6 +193,9 @@ namespace Brimstone
 				// Ignore unchanged data
 				if (_entity.Tags.ContainsKey(t) && _entity[t] == value)
 					return;
+				else if (value == 0 && !_entity.Tags.ContainsKey(t))
+					return;
+
 				else if (t == GameTag.CONTROLLER) {
 					Controller = (IZoneOwner) Game.Entities[value];
 				}
