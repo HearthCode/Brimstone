@@ -238,5 +238,9 @@ namespace Brimstone
 		public void ZoneMove(ZoneEntities Zone, int ZonePosition = -1) {
 			Zone.MoveTo(this, ZonePosition);
 		}
+
+		public void ZoneMove(int ZonePosition = -1) {
+			Controller.Zones[Zone].MoveTo(this, ZonePosition);
+		}
 	}
 }
