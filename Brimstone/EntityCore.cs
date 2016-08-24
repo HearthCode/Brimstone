@@ -20,7 +20,7 @@ namespace Brimstone
 		Game Game { get; set; }
 		IZoneOwner Controller { get; set; }
 		Card Card { get; }
-		Zone Zone { get; }
+		ZoneEntities Zone { get; }
 		int ZonePosition { get; set; }
 		void ZoneMove(Zone Zone, int ZonePosition = -1);
 		void ZoneMove(ZoneEntities Zone, int ZonePosition = -1);
@@ -288,7 +288,7 @@ namespace Brimstone
 				if (_fuzzyHash != 0 && Settings.EntityHashCaching)
 					return _fuzzyHash;
 				uint prime = 16777219;
-				bool inHand = Zone == Zone.HAND;
+				bool inHand = Zone == Controller.Hand;
 				uint hash = 2166136261;
 				// The card's asset ID uniquely identifies the set of immutable starting tags for the card
 				hash = (hash * prime) ^ (uint)(_entity.Card.AssetId >> 8);
@@ -441,7 +441,7 @@ namespace Brimstone
 					_gameHash = 0;
 					// Hash board states (play zones) for both players in order, hash rest of game entities in any order
 					foreach (var entity in Entities.Values)
-						if (entity.Zone != Zone.PLAY || entity.ZonePosition == 0)
+						if (entity.Zone.Type != Zone.PLAY || entity.ZonePosition == 0)
 							_gameHash += entity.FuzzyHash;
 						else
 							_gameHash += (entity.Controller.Id * 8 + entity.ZonePosition) * entity.FuzzyHash;

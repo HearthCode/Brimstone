@@ -53,7 +53,7 @@ namespace Brimstone
 	public class ZoneEntities : IEnumerable<IEntity>
 	{
 		public Game Game { get; }
-		public Zone Zone { get; }
+		public Zone Type { get; }
 		public IZoneOwner Controller { get; }
 
 		private IEnumerable<IEntity> _cachedEntities;
@@ -78,7 +78,7 @@ namespace Brimstone
 		protected void Init() {
 			// Make sure that _cachedEntities[0] has ZONE_POSITION = 1 etc.
 			_cachedEntities = Game.Entities
-				.Where(e => e.Controller == Controller && e.Zone == Zone && e.ZonePosition > 0);
+				.Where(e => e.Controller == Controller && e.Zone == this && e.ZonePosition > 0);
 			_cachedEntitiesAsList = null;
 		}
 
@@ -98,7 +98,7 @@ namespace Brimstone
 
 		public ZoneEntities(Game game, IZoneOwner controller, Zone zone) {
 			Game = game;
-			Zone = zone;
+			Type = zone;
 			Controller = controller;
 		}
 
@@ -173,18 +173,18 @@ namespace Brimstone
 				if (Entity is Minion)
 					ZonePosition = Count + 1;
 				else if (Entity is Spell)
-					if (Zone == Zone.PLAY)
+					if (Type == Zone.PLAY)
 						ZonePosition = 0;
 					else
 						ZonePosition = Count + 1;
-			if (Zone == Zone.SETASIDE || Zone == Zone.GRAVEYARD || (Zone == Zone.PLAY && Controller is Game))
+			if (Type == Zone.SETASIDE || Type == Zone.GRAVEYARD || (Type == Zone.PLAY && Controller is Game))
 				ZonePosition = 0;
 			if (ZonePosition != 0) {
 				asList.Insert(ZonePosition - 1, Entity);
 			}
 			else
 				Entity[GameTag.ZONE_POSITION] = 0;
-			Entity[GameTag.ZONE] = (int)Zone;
+			Entity[GameTag.ZONE] = (int)Type;
 
 			if (ZonePosition != 0)
 				updateZonePositions();
@@ -205,11 +205,12 @@ namespace Brimstone
 			return null;
 		}
 
-		public IEntity MoveTo(IEntity Entity, int ZonePosition = -1) {
-			Zone previous = Entity.Zone;
-			if (previous != Zone.INVALID) {
+		public IEntity MoveTo(IEntity Entity, int ZonePosition = -1)
+		{
+			var previous = Entity.Zone;
+			if (previous != null && previous.Type != Zone.INVALID) {
 				// Same zone move
-				if (previous == Zone && Entity.Controller == Controller && ZonePosition > 0 && Entity.ZonePosition != ZonePosition) {
+				if (previous == this && Entity.Controller == Controller && ZonePosition > 0 && Entity.ZonePosition != ZonePosition) {
 					// We have to take a copy of asList here in case zone caching is disabled!
 					var entities = asList;
 					entities.Remove(Entity);
@@ -219,7 +220,7 @@ namespace Brimstone
 				}
 				else {
 					// Other zone move
-					Controller.Zones[previous].Remove(Entity, ClearZone: false);
+					previous.Remove(Entity, ClearZone: false);
 				}
 			}
 			Add(Entity, ZonePosition);
@@ -229,8 +230,8 @@ namespace Brimstone
 		// Perform an in-replacement of one entity with another, without re-calculating zone positions
 		public void Swap(IEntity Old, IEntity New) {
 			// Swap zones
-			var z = Old.Zone;
-			Old[GameTag.ZONE] = (int)New.Zone;
+			var z = Old.Zone.Type;
+			Old[GameTag.ZONE] = (int)New.Zone.Type;
 			New[GameTag.ZONE] = (int)z;
 
 			// Swap zone positions
@@ -239,10 +240,10 @@ namespace Brimstone
 			New[GameTag.ZONE_POSITION] = p;
 
 			// Swap references
-			Old.Controller.Zones[Old.Zone].SetDirty();
-			New.Controller.Zones[Old.Zone].SetDirty();
-			Old.Controller.Zones[New.Zone].SetDirty();
-			New.Controller.Zones[New.Zone].SetDirty();
+			Old.Controller.Zones[Old.Zone.Type].SetDirty();
+			New.Controller.Zones[Old.Zone.Type].SetDirty();
+			Old.Controller.Zones[New.Zone.Type].SetDirty();
+			New.Controller.Zones[New.Zone.Type].SetDirty();
 		}
 
 		public IEnumerator<IEntity> GetEnumerator() {
@@ -275,17 +276,14 @@ namespace Brimstone
 		}
 
 		public void ZoneMove(int ZonePosition = -1) {
-			if (Controller == null)
-				throw new ZoneMoveException();
-
-			Controller.Zones[Zone].MoveTo(this, ZonePosition);
+			Zone.MoveTo(this, ZonePosition);
 		}
 
 		public void ZoneSwap(IEntity entity) {
 			if (Controller == null)
 				throw new ZoneMoveException();
 
-			Controller.Zones[Zone].Swap(this, entity);
+			Zone.Swap(this, entity);
 		}
 	}
 }

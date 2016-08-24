@@ -47,8 +47,8 @@ namespace Brimstone
 			}
 		}
 
-		public ZoneEntities Setaside { get { return Zones[Zone.SETASIDE]; } }
-		public ZoneEntities Board { get { return Zones[Zone.PLAY]; } }
+		public ZoneEntities Setaside { get { return Zones[Brimstone.Zone.SETASIDE]; } }
+		public ZoneEntities Board { get { return Zones[Brimstone.Zone.PLAY]; } }
 		public ZoneEntities Graveyard { get { return null; } }
 		public ZoneEntities Hand { get { return null; } }
 		public ZoneEntities Secrets { get { return null; } }
@@ -75,7 +75,7 @@ namespace Brimstone
 
 		public Game(HeroClass Hero1, HeroClass Hero2, string Player1Name = "", string Player2Name = "", bool PowerHistory = false)
 					: base(Cards.FromId("Game"), new Dictionary<GameTag, int> {
-						{ GameTag.ZONE, (int) Zone.PLAY },
+						{ GameTag.ZONE, (int) Brimstone.Zone.PLAY },
 						{ GameTag.STATE, (int) GameState.LOADING }
 					}) {
 			// Start Power log
@@ -293,7 +293,7 @@ namespace Brimstone
 				game.CurrentPlayer = (CurrentPlayer.Id == game.Player1.Id ? game.Player1 : game.Player2);
 			// Generate zones owned by game
 			for (int i = 0; i < 2; i++) {
-				game.Players[i].Zones[Zone.DECK] = new Deck(game, Players[i].Deck.HeroClass, game.Players[i]);
+				game.Players[i].Deck = new Deck(game, Players[i].Deck.HeroClass, game.Players[i]);
 			}
 			// Clone queue, stack and events
 			game.ActionQueue = ((ActionQueue)ActionQueue.Clone());

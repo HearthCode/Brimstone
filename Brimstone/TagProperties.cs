@@ -3,8 +3,8 @@
 	public partial class Entity
 	{
 		// Setting Zone directly moves the entity to the end of the specified zone
-		public Zone Zone {
-			get { return (Zone) this[GameTag.ZONE]; }
+		public ZoneEntities Zone {
+			get { return Controller?.Zones[(Zone)this[GameTag.ZONE]]; }
 			set { ZoneMove(value); }
 		}
 

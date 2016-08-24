@@ -139,12 +139,12 @@ namespace BrimstoneTests
 			// All zone managers must be re-created
 			foreach (var z in game.Zones)
 				if (z != null)
-					Assert.AreNotSame(z, clone.Zones[z.Zone]);
+					Assert.AreNotSame(z, clone.Zones[z.Type]);
 
 			foreach (var p in game.Players)
 				foreach (var z in p.Zones)
 					if (z != null)
-						Assert.AreNotSame(z, ((Player)clone.Entities[p.Id]).Zones[z.Zone]);
+						Assert.AreNotSame(z, ((Player)clone.Entities[p.Id]).Zones[z.Type]);
 
 			// All new zones must have re-assigned game and controllers
 			foreach (var z in clone.Zones) {
@@ -167,8 +167,8 @@ namespace BrimstoneTests
 					if (z != null)
 						for (int zp = 1; zp <= z.Count; zp++) {
 							if (z[zp] != null) {
-								Assert.AreEqual(z[zp].Id, ((Player)clone.Entities[p.Id]).Zones[z.Zone][zp].Id);
-								Assert.AreNotSame(z[zp], ((Player)clone.Entities[p.Id]).Zones[z.Zone][zp]);
+								Assert.AreEqual(z[zp].Id, ((Player)clone.Entities[p.Id]).Zones[z.Type][zp].Id);
+								Assert.AreNotSame(z[zp], ((Player)clone.Entities[p.Id]).Zones[z.Type][zp]);
 							}
 						}
 

@@ -8,11 +8,11 @@ namespace Brimstone
 	public partial class Player : Entity, IZoneOwner {
 		public string FriendlyName { get; }
 
-		public Deck Deck { get { return (Deck)Zones[Zone.DECK]; } set { Zones[Zone.DECK] = value; } }
-		public ZoneEntities Hand { get { return Zones[Zone.HAND]; } }
-		public ZoneEntities Board { get { return Zones[Zone.PLAY]; } }
-		public ZoneEntities Graveyard { get { return Zones[Zone.GRAVEYARD]; } }
-		public ZoneEntities Secrets { get { return Zones[Zone.SECRET]; } }
+		public Deck Deck { get { return (Deck)Zones[Brimstone.Zone.DECK]; } set { Zones[Brimstone.Zone.DECK] = value; } }
+		public ZoneEntities Hand { get { return Zones[Brimstone.Zone.HAND]; } }
+		public ZoneEntities Board { get { return Zones[Brimstone.Zone.PLAY]; } }
+		public ZoneEntities Graveyard { get { return Zones[Brimstone.Zone.GRAVEYARD]; } }
+		public ZoneEntities Secrets { get { return Zones[Brimstone.Zone.SECRET]; } }
 		public ZoneEntities Setaside { get { return null; } }
 		public ZoneGroup Zones { get; private set; }
 		public HeroClass HeroClass { get; }
@@ -33,7 +33,7 @@ namespace Brimstone
 				{ GameTag.PLAYER_ID, playerId },
 				{ GameTag.TEAM_ID, (teamId != 0? teamId : playerId) },
 				{ GameTag.STARTHANDSIZE, 4 },
-				{ GameTag.ZONE, (int) Zone.PLAY }
+				{ GameTag.ZONE, (int) Brimstone.Zone.PLAY }
 			}) {
 			HeroClass = hero;
 			FriendlyName = name;

@@ -31,7 +31,7 @@ namespace BrimstoneTests
 
 			// Check zones, zone positions and references are correct
 			for (int i = 1; i <= 5; i++) {
-				Assert.AreEqual(Zone.PLAY, p1.Board[i].Zone);
+				Assert.AreEqual(Zone.PLAY, p1.Board[i].Zone.Type);
 				Assert.AreEqual(i, p1.Board[i].ZonePosition);
 				Assert.AreSame(items[i - 1], p1.Board[i]);
 			}
@@ -51,7 +51,7 @@ namespace BrimstoneTests
 			}
 
 			// Check removed entity has correct zone data
-			Assert.AreEqual(Zone.INVALID, items[0].Zone);
+			Assert.AreEqual(Zone.INVALID, items[0].Zone.Type);
 			Assert.AreEqual(0, items[0].ZonePosition);
 		}
 
@@ -113,7 +113,7 @@ namespace BrimstoneTests
 				for (int i = 1; i <= oldPlay - 1; i++)
 					Assert.AreEqual(i, p1.Board[i].ZonePosition);
 				for (int i = 1; i <= oldHand + 1; i++) {
-					Assert.AreEqual(Zone.HAND, p1.Hand[i].Zone);
+					Assert.AreEqual(Zone.HAND, p1.Hand[i].Zone.Type);
 					Assert.AreEqual(i, p1.Hand[i].ZonePosition);
 				}
 			}
@@ -270,7 +270,7 @@ namespace BrimstoneTests
 			// Assert
 			// Position 0 items shouldn't be counted
 			Assert.AreEqual(0, p1.Graveyard.Count);
-			Assert.AreEqual(Zone.GRAVEYARD, item.Zone);
+			Assert.AreEqual(Zone.GRAVEYARD, item.Zone.Type);
 			Assert.AreEqual(0, item.ZonePosition);
 		}
 
