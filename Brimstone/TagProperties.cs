@@ -15,8 +15,7 @@
 		}
 
 		// Used only by heroes, hero powers and minions
-		public int NumTurnsInPlay
-		{
+		public int NumTurnsInPlay {
 			get { return this[GameTag.NUM_TURNS_IN_PLAY]; }
 			set { this[GameTag.NUM_TURNS_IN_PLAY] = value; }
 		}
@@ -94,6 +93,11 @@
 				this[GameTag.PROPOSED_DEFENDER] = (value != null ? value.Id : 0);
 			}
 		}
+
+		public int NumMinionsKilledThisTurn {
+			get { return this[GameTag.NUM_MINIONS_PLAYER_KILLED_THIS_TURN]; }
+			set { this[GameTag.NUM_MINIONS_PLAYER_KILLED_THIS_TURN] = value; }
+		}
 	}
 
 	public partial class Player : Entity, IZoneOwner
@@ -124,6 +128,11 @@
 			set { this[GameTag.RESOURCES] = value; }
 		}
 
+		public int UsedMana {
+			get { return this[GameTag.RESOURCES_USED]; }
+			set { this[GameTag.RESOURCES_USED] = value; }
+		}
+
 		public bool IsComboActive {
 			get { return this[GameTag.COMBO_ACTIVE] == 1 ? true : false; }
 			set { this[GameTag.COMBO_ACTIVE] = value ? 1 : 0; }
@@ -137,6 +146,56 @@
 		public int NumCardsDrawnThisTurn {
 			get { return this[GameTag.NUM_CARDS_DRAWN_THIS_TURN]; }
 			set { this[GameTag.NUM_CARDS_DRAWN_THIS_TURN] = value; }
+		}
+
+		public int NumAttacksThisTurn {
+			get { return this[GameTag.NUM_ATTACKS_THIS_TURN]; }
+			set { this[GameTag.NUM_ATTACKS_THIS_TURN] = value; }
+		}
+
+		public int NumCardsPlayedThisTurn {
+			get { return this[GameTag.NUM_CARDS_PLAYED_THIS_TURN]; }
+			set { this[GameTag.NUM_CARDS_PLAYED_THIS_TURN] = value; }
+		}
+
+		public int NumMinionsPlayedThisTurn {
+			get { return this[GameTag.NUM_MINIONS_PLAYED_THIS_TURN]; }
+			set { this[GameTag.NUM_MINIONS_PLAYED_THIS_TURN] = value; }
+		}
+
+		public int NumOptionsPlayedThisTurn {
+			get { return this[GameTag.NUM_OPTIONS_PLAYED_THIS_TURN]; }
+			set { this[GameTag.NUM_OPTIONS_PLAYED_THIS_TURN] = value; }
+		}
+
+		public int NumFriendlyMinionsThatAttackedThisTurn {
+			get { return this[GameTag.NUM_FRIENDLY_MINIONS_THAT_ATTACKED_THIS_TURN]; }
+			set { this[GameTag.NUM_FRIENDLY_MINIONS_THAT_ATTACKED_THIS_TURN] = value; }
+		}
+
+		public int NumFriendlyMinionsThatDiedThisTurn {
+			get { return this[GameTag.NUM_FRIENDLY_MINIONS_THAT_DIED_THIS_TURN]; }
+			set { this[GameTag.NUM_FRIENDLY_MINIONS_THAT_DIED_THIS_TURN] = value; }
+		}
+
+		public int NumFriendlyMinionsThatDiedThisGame {
+			get { return this[GameTag.NUM_FRIENDLY_MINIONS_THAT_DIED_THIS_GAME]; }
+			set { this[GameTag.NUM_FRIENDLY_MINIONS_THAT_DIED_THIS_GAME] = value; }
+		}
+
+		public int NumMinionsPlayerKilledThisTurn {
+			get { return this[GameTag.NUM_MINIONS_PLAYER_KILLED_THIS_TURN]; }
+			set { this[GameTag.NUM_MINIONS_PLAYER_KILLED_THIS_TURN] = value; }
+		}
+
+		public int TotalManaSpentThisGame {
+			get { return this[GameTag.NUM_RESOURCES_SPENT_THIS_GAME]; }
+			set { this[GameTag.NUM_RESOURCES_SPENT_THIS_GAME] = value; }
+		}
+
+		public int HeroPowerActivationsThisTurn {
+			get { return this[GameTag.HEROPOWER_ACTIVATIONS_THIS_TURN]; }
+			set { this[GameTag.HEROPOWER_ACTIVATIONS_THIS_TURN] = value; }
 		}
 
 		public int NumTurnsLeft {
