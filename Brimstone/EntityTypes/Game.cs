@@ -91,10 +91,8 @@ namespace Brimstone
 			Zones = new ZoneGroup(this, this);
 
 			// Generate players and empty decks
-			Player1 = new Player(Hero1, (Player1Name.Length > 0) ? Player1Name : "Player 1", 1);
-			Player2 = new Player(Hero2, (Player2Name.Length > 0) ? Player2Name : "Player 2", 2);
-			Board.MoveTo(Player1);
-			Board.MoveTo(Player2);
+			Player1 = new Player(Hero1, (Player1Name.Length > 0) ? Player1Name : "Player 1", 1) {Zone = Board};
+			Player2 = new Player(Hero2, (Player2Name.Length > 0) ? Player2Name : "Player 2", 2) {Zone = Board};
 			for (int i = 0; i < 2; i++) {
 				Players[i].Deck = new Deck(this, Players[i].HeroClass, Players[i]);
 			}

@@ -20,7 +20,7 @@ namespace Brimstone
 		Game Game { get; set; }
 		IZoneOwner Controller { get; set; }
 		Card Card { get; }
-		ZoneEntities Zone { get; }
+		ZoneEntities Zone { get; set; }
 		int ZonePosition { get; set; }
 		void ZoneMove(Zone Zone, int ZonePosition = -1);
 		void ZoneMove(ZoneEntities Zone, int ZonePosition = -1);

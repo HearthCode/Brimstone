@@ -141,12 +141,10 @@ namespace Brimstone
 
 			DebugLog.WriteLine("Giving {0} to {1}", card.Name, player.FriendlyName);
 
-			if (card.Type == CardType.MINION) {
-				return (Minion)player.Hand.MoveTo(new Minion(card));
-			}
-			else if (card.Type == CardType.SPELL) {
-				return (Spell)player.Hand.MoveTo(new Spell(card));
-			}
+			if (card.Type == CardType.MINION)
+				return new Minion(card) {Zone = player.Hand};
+			if (card.Type == CardType.SPELL)
+				return new Spell(card) {Zone = player.Hand};
 			// TODO: Weapons
 
 			return ActionResult.None;
@@ -165,7 +163,7 @@ namespace Brimstone
 
 				DebugLog.WriteLine("{0} draws {1}", player.FriendlyName, entity.ShortDescription);
 
-				player.Hand.MoveTo(entity);
+				entity.Zone = player.Hand;
 				player.NumCardsDrawnThisTurn++;
 				return entity;
 			}
@@ -186,7 +184,7 @@ namespace Brimstone
 			Player player = (Player)source.Controller;
 			Entity entity = args[ENTITY];
 
-			player.Board.MoveTo(entity);
+			entity.Zone = player.Board;
 
 			DebugLog.WriteLine("{0} is playing {1}", player.FriendlyName, entity.ShortDescription);
 
@@ -223,8 +221,9 @@ namespace Brimstone
 				foreach (var e in args[TARGETS]) {
 					DebugLog.WriteLine("{0} dies", e.ShortDescription);
 
-					if (e is Minion) {
-						((Player)e.Controller).Graveyard.MoveTo(e);
+					if (e is Minion)
+					{
+						e.Zone = e.Controller.Graveyard;
 						((Minion)e).Damage = 0;
 						game.Queue(e, e.Card.Behaviour.Deathrattle);
 					}
