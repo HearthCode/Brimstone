@@ -113,6 +113,12 @@ namespace Brimstone
 			}
 		}
 
+		// NOTE: For internal use only
+		public void SetDirty() {
+			_cachedEntities = null;
+			_cachedEntitiesAsList = null;
+		}
+
 		// Slice a zone
 		// If no arguments are supplied, return the entire zone
 		// If only one argument is supplied, return the first X elements (if X is positive) or last X elements (if X is negative)
@@ -147,7 +153,7 @@ namespace Brimstone
 			return asList.Skip(start).Take(count);
 		}
 
-		public IEntity Add(IEntity Entity, int ZonePosition = -1, bool InPlace = false) {
+		public IEntity Add(IEntity Entity, int ZonePosition = -1) {
 			// Update ownership
 			if (Entity.Game == null) {
 				Game.Add(Entity, Controller);
@@ -176,7 +182,7 @@ namespace Brimstone
 			return Entity;
 		}
 
-		public IEntity Remove(IEntity Entity, bool ClearZone = true, bool InPlace = false) {
+		public IEntity Remove(IEntity Entity, bool ClearZone = true) {
 			bool removed = asList.Remove(Entity);
 			if (removed) {
 				updateZonePositions();
@@ -189,7 +195,7 @@ namespace Brimstone
 			return null;
 		}
 
-		public IEntity MoveTo(IEntity Entity, int ZonePosition = -1, bool InPlace = false) {
+		public IEntity MoveTo(IEntity Entity, int ZonePosition = -1) {
 			Zone previous = Entity.Zone;
 			if (previous != Zone.INVALID) {
 				// Same zone move
@@ -208,6 +214,25 @@ namespace Brimstone
 			}
 			Add(Entity, ZonePosition);
 			return Entity;
+		}
+
+		// Perform an in-replacement of one entity with another, without re-calculating zone positions
+		public void Swap(IEntity Old, IEntity New) {
+			// Swap zones
+			var z = Old.Zone;
+			Old[GameTag.ZONE] = (int)New.Zone;
+			New[GameTag.ZONE] = (int)z;
+
+			// Swap zone positions
+			int p = Old.ZonePosition;
+			Old[GameTag.ZONE_POSITION] = New.ZonePosition;
+			New[GameTag.ZONE_POSITION] = p;
+
+			// Swap references
+			Old.Controller.Zones[Old.Zone].SetDirty();
+			New.Controller.Zones[Old.Zone].SetDirty();
+			Old.Controller.Zones[New.Zone].SetDirty();
+			New.Controller.Zones[New.Zone].SetDirty();
 		}
 
 		public IEnumerator<IEntity> GetEnumerator() {
@@ -241,6 +266,10 @@ namespace Brimstone
 
 		public void ZoneMove(int ZonePosition = -1) {
 			Controller.Zones[Zone].MoveTo(this, ZonePosition);
+		}
+
+		public void ZoneSwap(IEntity entity) {
+			Controller.Zones[Zone].Swap(this, entity);
 		}
 	}
 }

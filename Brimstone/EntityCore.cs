@@ -24,6 +24,7 @@ namespace Brimstone
 		int ZonePosition { get; set; }
 		void ZoneMove(Zone Zone, int ZonePosition = -1);
 		void ZoneMove(ZoneEntities Zone, int ZonePosition = -1);
+		void ZoneSwap(IEntity New);
 		Dictionary<GameTag, int> CopyTags();
 		int this[GameTag t] { get; set; }
 		string ShortDescription { get; }
