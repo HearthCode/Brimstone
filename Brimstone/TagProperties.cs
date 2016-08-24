@@ -133,6 +133,11 @@
 			set { this[GameTag.RESOURCES_USED] = value; }
 		}
 
+		public int TemporaryMana {
+			get { return this[GameTag.TEMP_RESOURCES]; }
+			set { this[GameTag.TEMP_RESOURCES] = value; }
+		}
+
 		public bool IsComboActive {
 			get { return this[GameTag.COMBO_ACTIVE] == 1; }
 			set { this[GameTag.COMBO_ACTIVE] = value ? 1 : 0; }
