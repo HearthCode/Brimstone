@@ -28,10 +28,10 @@ namespace Brimstone
 					{ GameTag.ZONE_POSITION, nextPos++ }
 				};
 
-				if (card[GameTag.CARDTYPE] == (int)CardType.MINION) {
+				if (card.Type == CardType.MINION) {
 					e = new Minion(card, tags);
 				}
-				else if (card[GameTag.CARDTYPE] == (int)CardType.SPELL) {
+				else if (card.Type == CardType.SPELL) {
 					e = new Spell(card, tags);
 				}
 				// TODO: Weapons
@@ -47,6 +47,7 @@ namespace Brimstone
 			var possiblePositions = Enumerable.Range(1, Count).ToList();
 			foreach (var c in this) {
 				int selIndex = RNG.Between(0, possiblePositions.Count - 1);
+				// Quicker to just set zone positions than do a ton of same-zone moves
 				c[GameTag.ZONE_POSITION] = possiblePositions[selIndex];
 				possiblePositions.RemoveAt(selIndex);
 			}

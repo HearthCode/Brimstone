@@ -46,7 +46,8 @@ namespace Brimstone
 		ActionSource
 	}
 
-	public class Selector : QueueAction {
+	public class Selector : QueueAction
+	{
 		public SelectionSource SelectionSource { get; set; }
 
 		public Func<IEntity, IEnumerable<IEntity>> Lambda { get; set; }
@@ -140,9 +141,10 @@ namespace Brimstone
 
 			DebugLog.WriteLine("Giving {0} to {1}", card.Name, player.FriendlyName);
 
-			if (card[GameTag.CARDTYPE] == (int)CardType.MINION) {
+			if (card.Type == CardType.MINION) {
 				return (Minion)player.Hand.MoveTo(new Minion(card));
-			} else if (card[GameTag.CARDTYPE] == (int)CardType.SPELL) {
+			}
+			else if (card.Type == CardType.SPELL) {
 				return (Spell)player.Hand.MoveTo(new Spell(card));
 			}
 			// TODO: Weapons
@@ -238,10 +240,11 @@ namespace Brimstone
 		public const int CHOICE_TYPE = 2;
 
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
-			var choice = new Choice {
-				ChoiceType = (ChoiceType)(int)args[CHOICE_TYPE],
-				Choices = args[ENTITIES]
-			};
+			var choice = new Choice(
+				Controller: (IZoneOwner)(Entity)args[PLAYER],
+				ChoiceType: (ChoiceType)(int)args[CHOICE_TYPE],
+				Choices: args[ENTITIES]
+			);
 			((Player)args[PLAYER]).Choice = choice;
 
 			// The mulligan is the only situation where:
