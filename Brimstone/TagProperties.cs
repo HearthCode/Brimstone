@@ -8,6 +8,7 @@
 
 		public int ZonePosition {
 			get { return this[GameTag.ZONE_POSITION]; }
+			set { ZoneMove(value); }
 		}
 	}
 

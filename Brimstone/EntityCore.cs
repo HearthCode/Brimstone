@@ -21,7 +21,7 @@ namespace Brimstone
 		IZoneOwner Controller { get; set; }
 		Card Card { get; }
 		Zone Zone { get; }
-		int ZonePosition { get; }
+		int ZonePosition { get; set; }
 		void ZoneMove(Zone Zone, int ZonePosition = -1);
 		void ZoneMove(ZoneEntities Zone, int ZonePosition = -1);
 		Dictionary<GameTag, int> CopyTags();
