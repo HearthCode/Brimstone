@@ -23,6 +23,7 @@ namespace Brimstone
 		Zone Zone { get; }
 		int ZonePosition { get; }
 		void ZoneMove(Zone Zone, int ZonePosition = -1);
+		void ZoneMove(ZoneEntities Zone, int ZonePosition = -1);
 		Dictionary<GameTag, int> CopyTags();
 		int this[GameTag t] { get; set; }
 		string ShortDescription { get; }

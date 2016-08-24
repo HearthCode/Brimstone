@@ -221,5 +221,9 @@ namespace Brimstone
 
 			Controller.Zones[Zone].MoveTo(this, ZonePosition);
 		}
+
+		public void ZoneMove(ZoneEntities Zone, int ZonePosition = -1) {
+			Zone.MoveTo(this, ZonePosition);
+		}
 	}
 }
