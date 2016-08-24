@@ -264,12 +264,16 @@ namespace Brimstone
 		private void chooseMulligan(Player p) {
 			p.MulliganState = MulliganState.DEALING;
 
-			// TODO: Perform mulligan
+			// Perform mulligan
+			foreach (var e in p.Choice.Discarding)
+				e.ZoneSwap(p.Deck[RNG.Between(1, p.Deck.Count)]);
 
 			p.MulliganState = MulliganState.WAITING;
 			p.MulliganState = MulliganState.DONE;
 
-			// TODO: Start main game if both players have completed mulligan
+			// Start main game if both players have completed mulligan
+			if (p.Opponent.MulliganState == MulliganState.DONE)
+				p.Game.Queue(p.Game, Actions.BeginTurn);
 		}
 
 		private void chooseGeneral(Player p) {

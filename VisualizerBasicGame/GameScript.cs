@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Brimstone;
 using BrimstoneVisualizer;
 
@@ -39,6 +40,10 @@ namespace BrimstoneGameScript
 		public void PlayGame(Game Game) {
 			var p1 = Game.Player1;
 			var p2 = Game.Player2;
+
+			// Do mulligan
+			p1.Choice.Keep(p1.Choice.Choices.Where(x => x[GameTag.COST] <= 2));
+			p2.Choice.Keep(p2.Choice.Choices.Where(x => x[GameTag.COST] <= 4));
 
 			// Fill the board with Flame Jugglers
 			for (int i = 0; i < MaxMinions - 2; i++) {

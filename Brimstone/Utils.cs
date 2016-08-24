@@ -23,7 +23,9 @@ namespace Brimstone
 		public IZoneOwner Controller { get; }
 		public ChoiceType ChoiceType { get; }
 		public List<IEntity> Choices { get; }
-		public List<IEntity> Selected { get; private set; } = null;
+		public List<IEntity> Keeping { get; private set; } = null;
+
+		public List<IEntity> Discarding => (Keeping != null)? Choices.Except(Keeping).ToList() : null;
 
 		public Choice(IZoneOwner Controller, List<IEntity> Choices, ChoiceType ChoiceType = ChoiceType.GENERAL) {
 			this.Controller = Controller;
@@ -31,37 +33,37 @@ namespace Brimstone
 			this.ChoiceType = ChoiceType;
 		}
 
-		public void Select(IEntity Choice) {
+		public void Pick(IEntity Choice) {
 			if (ChoiceType != ChoiceType.GENERAL)
 				throw new InvalidChoiceException();
 
 			if (!Choices.Contains(Choice))
 				throw new InvalidChoiceException();
 
-			Selected = new List<IEntity>() {Choice};
+			Keeping = new List<IEntity>() {Choice};
 			Controller.Game.Action(Controller, Actions.Choose((Player)Controller));
 		}
 
-		public void Keep(List<IEntity> Choices)
+		public void Keep(IEnumerable<IEntity> Choices)
 		{
 			if (ChoiceType != ChoiceType.MULLIGAN)
 				throw new InvalidChoiceException();
 
-			if (!Choices.Except(this.Choices).Any())
+			if (Choices.Except(this.Choices).Any())
 				throw new InvalidChoiceException();
 
-			Selected = new List<IEntity>(Choices);
+			Keeping = new List<IEntity>(Choices);
 			Controller.Game.Action(Controller, Actions.Choose((Player) Controller));
 		}
 
-		public void Discard(List<IEntity> Choices) {
+		public void Discard(IEnumerable<IEntity> Choices) {
 			if (ChoiceType != ChoiceType.MULLIGAN)
 				throw new InvalidChoiceException();
 
-			if (!Choices.Except(this.Choices).Any())
+			if (Choices.Except(this.Choices).Any())
 				throw new InvalidChoiceException();
 
-			Selected = new List<IEntity>(this.Choices.Except(Choices));
+			Keeping = new List<IEntity>(this.Choices.Except(Choices));
 			Controller.Game.Action(Controller, Actions.Choose((Player) Controller));
 		}
 	}

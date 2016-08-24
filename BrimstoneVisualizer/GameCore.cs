@@ -19,7 +19,7 @@ namespace BrimstoneVisualizer
 
 		public static void GameWorkerThread() {
 			Game = Script.SetupGame();
-			Game.Start();
+			Game.Start(SkipMulligan: false);
 			GameStarted.Set();
 
 			// Block every time we queue or perform action
