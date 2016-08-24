@@ -202,6 +202,21 @@
 			get { return this[GameTag.NUM_TURNS_LEFT]; }
 			set { this[GameTag.NUM_TURNS_LEFT] = value; }
 		}
+
+		public int OverloadNextTurn {
+			get { return this[GameTag.OVERLOAD_OWED]; }
+			set { this[GameTag.OVERLOAD_OWED] = value; }
+		}
+
+		public int Overload {
+			get { return this[GameTag.OVERLOAD_LOCKED]; }
+			set { this[GameTag.OVERLOAD_LOCKED] = value; }
+		}
+
+		public int OverloadThisGame {
+			get { return this[GameTag.OVERLOAD_THIS_GAME]; }
+			set { this[GameTag.OVERLOAD_THIS_GAME] = value; }
+		}
 	}
 
 	public abstract partial class Character : Entity

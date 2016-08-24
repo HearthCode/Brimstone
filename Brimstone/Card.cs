@@ -43,6 +43,14 @@ namespace Brimstone
 			get { return (CardType)this[GameTag.CARDTYPE]; }
 		}
 
+		public bool HasOverload {
+			get { return this[GameTag.OVERLOAD] == 1; }
+		}
+
+		public int Overload {
+			get { return this[GameTag.OVERLOAD_OWED]; }
+		}
+
 		public bool RequiresTarget {
 			get {
 				return Requirements.ContainsKey(PlayRequirements.REQ_TARGET_TO_PLAY);
