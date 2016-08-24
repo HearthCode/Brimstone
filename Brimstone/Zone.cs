@@ -256,7 +256,7 @@ namespace Brimstone
 
 		public override string ToString() {
 			string s = string.Empty;
-			foreach (var e in this)
+			foreach (var e in asList)
 				s += e + "\n";
 			return s;
 		}
