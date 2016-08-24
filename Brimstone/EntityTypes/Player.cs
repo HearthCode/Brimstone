@@ -51,6 +51,8 @@ namespace Brimstone
 			}
 		}
 
+		public int RemainingMana => (BaseMana + TemporaryMana) - (UsedMana + Overload);
+
 		public Choice StartMulligan() {
 			MulliganState = MulliganState.INPUT;
 			return new Choice(this, Game.Action(this, Actions.MulliganChoice(this)), ChoiceType.MULLIGAN);
