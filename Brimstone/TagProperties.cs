@@ -13,6 +13,13 @@
 			get { return this[GameTag.ZONE_POSITION]; }
 			set { ZoneMove(value); }
 		}
+
+		// Used only by heroes, hero powers and minions
+		public int NumTurnsInPlay
+		{
+			get { return this[GameTag.NUM_TURNS_IN_PLAY]; }
+			set { this[GameTag.NUM_TURNS_IN_PLAY] = value; }
+		}
 	}
 
 	public partial class Game : Entity, IZoneOwner
