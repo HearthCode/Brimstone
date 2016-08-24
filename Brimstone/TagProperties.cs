@@ -134,7 +134,7 @@
 		}
 
 		public bool IsComboActive {
-			get { return this[GameTag.COMBO_ACTIVE] == 1 ? true : false; }
+			get { return this[GameTag.COMBO_ACTIVE] == 1; }
 			set { this[GameTag.COMBO_ACTIVE] = value ? 1 : 0; }
 		}
 
