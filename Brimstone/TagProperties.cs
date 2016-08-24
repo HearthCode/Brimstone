@@ -2,10 +2,13 @@
 {
 	public partial class Entity
 	{
+		// Setting Zone directly moves the entity to the end of the specified zone
 		public Zone Zone {
 			get { return (Zone) this[GameTag.ZONE]; }
+			set { ZoneMove(value); }
 		}
 
+		// Setting ZonePosition directly performs a same-zone move
 		public int ZonePosition {
 			get { return this[GameTag.ZONE_POSITION]; }
 			set { ZoneMove(value); }
