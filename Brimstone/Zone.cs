@@ -191,8 +191,21 @@ namespace Brimstone
 
 		public IEntity MoveTo(IEntity Entity, int ZonePosition = -1, bool InPlace = false) {
 			Zone previous = Entity.Zone;
-			if (previous != Zone.INVALID)
-				Controller.Zones[previous].Remove(Entity, ClearZone: false);
+			if (previous != Zone.INVALID) {
+				// Same zone move
+				if (previous == Zone && Entity.Controller == Controller && ZonePosition > 0 && Entity.ZonePosition != ZonePosition) {
+					// We have to take a copy of asList here in case zone caching is disabled!
+					var entities = asList;
+					entities.Remove(Entity);
+					entities.Insert(ZonePosition - 1, Entity);
+					updateZonePositions();
+					return Entity;
+				}
+				else {
+					// Other zone move
+					Controller.Zones[previous].Remove(Entity, ClearZone: false);
+				}
+			}
 			Add(Entity, ZonePosition);
 			return Entity;
 		}
