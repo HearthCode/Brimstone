@@ -71,14 +71,14 @@ namespace Brimstone
 		protected void Init() {
 			// Make sure that _cachedEntities[0] has ZONE_POSITION = 1 etc.
 			_cachedEntities = Game.Entities
-				.Where(e => e.Controller == Controller && e[GameTag.ZONE] == (int)Zone && e[GameTag.ZONE_POSITION] > 0);
+				.Where(e => e.Controller == Controller && e.Zone == Zone && e.ZonePosition > 0);
 			_cachedEntitiesAsList = null;
 		}
 
 		private List<IEntity> asList {
 			get {
 				if (_cachedEntitiesAsList == null || !Settings.ZoneCaching)
-					_cachedEntitiesAsList = Entities.OrderBy(e => e[GameTag.ZONE_POSITION]).ToList();
+					_cachedEntitiesAsList = Entities.OrderBy(e => e.ZonePosition).ToList();
 				return _cachedEntitiesAsList;
 			}
 		}
@@ -190,7 +190,7 @@ namespace Brimstone
 		}
 
 		public IEntity MoveTo(IEntity Entity, int ZonePosition = -1, bool InPlace = false) {
-			Zone previous = (Zone)Entity[GameTag.ZONE];
+			Zone previous = Entity.Zone;
 			if (previous != Zone.INVALID)
 				Controller.Zones[previous].Remove(Entity, ClearZone: false);
 			Add(Entity, ZonePosition);
