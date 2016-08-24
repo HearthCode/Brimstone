@@ -37,7 +37,7 @@ namespace Brimstone
 				// TODO: Weapons
 				if (e != null)
 
-					Game.Add(e, (IEntity)Controller);
+					Game.Add(e, Controller);
 			}
 			// Force deck zone contents to update
 			Init();

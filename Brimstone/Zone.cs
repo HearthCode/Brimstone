@@ -147,10 +147,10 @@ namespace Brimstone
 			return asList.Skip(start).Take(count);
 		}
 
-		public IEntity Add(IEntity Entity, int ZonePosition = -1) {
+		public IEntity Add(IEntity Entity, int ZonePosition = -1, bool InPlace = false) {
 			// Update ownership
 			if (Entity.Game == null) {
-				Game.Add(Entity, (IEntity)Controller);
+				Game.Add(Entity, Controller);
 			}
 
 			if (ZonePosition == -1)
@@ -176,7 +176,7 @@ namespace Brimstone
 			return Entity;
 		}
 
-		public IEntity Remove(IEntity Entity, bool ClearZone = true) {
+		public IEntity Remove(IEntity Entity, bool ClearZone = true, bool InPlace = false) {
 			bool removed = asList.Remove(Entity);
 			if (removed) {
 				updateZonePositions();
@@ -189,7 +189,7 @@ namespace Brimstone
 			return null;
 		}
 
-		public IEntity MoveTo(IEntity Entity, int ZonePosition = -1) {
+		public IEntity MoveTo(IEntity Entity, int ZonePosition = -1, bool InPlace = false) {
 			Zone previous = (Zone)Entity[GameTag.ZONE];
 			if (previous != Zone.INVALID)
 				Controller.Zones[previous].Remove(Entity, ClearZone: false);

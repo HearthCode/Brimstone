@@ -18,7 +18,7 @@ namespace Brimstone
 		int Id { get; set; }
 		// Allow owner game and controller to be changed for state cloning
 		Game Game { get; set; }
-		IEntity Controller { get; set; }
+		IZoneOwner Controller { get; set; }
 		Card Card { get; }
 		Dictionary<GameTag, int> CopyTags();
 		int this[GameTag t] { get; set; }
@@ -142,8 +142,8 @@ namespace Brimstone
 
 		public virtual Game Game { get; set; }
 		// TODO: Re-do Controller code as normal tag property
-		private IEntity _controller;
-		public IEntity Controller {
+		private IZoneOwner _controller;
+		public IZoneOwner Controller {
 			get {
 				return _controller;
 			}
@@ -189,7 +189,7 @@ namespace Brimstone
 				if (_entity.Tags.ContainsKey(t) && _entity[t] == value)
 					return;
 				else if (t == GameTag.CONTROLLER) {
-					Controller = Game.Entities[value];
+					Controller = (IZoneOwner) Game.Entities[value];
 				}
 				else if (t == GameTag.ENTITY_ID) {
 					Changing();
@@ -376,7 +376,7 @@ namespace Brimstone
 			foreach (var entity in Entities)
 				entity.Value.Game = Game;
 			foreach (var entity in Entities)
-				entity.Value.Controller = Entities[es.Entities[entity.Key].Controller.Id];
+				entity.Value.Controller = (IZoneOwner) Entities[es.Entities[entity.Key].Controller.Id];
 
 			// Do this last so that changing Controller doesn't trigger EntityChanging
 			Game.Entities = this;

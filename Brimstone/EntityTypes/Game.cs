@@ -98,7 +98,7 @@ namespace Brimstone
 			GameId = ++SequenceNumber;
 		}
 
-		public IEntity Add(IEntity newEntity, IEntity controller) {
+		public IEntity Add(IEntity newEntity, IZoneOwner controller) {
 			newEntity.Controller = controller;
 			return Entities.Add(newEntity);
 		}
@@ -256,6 +256,7 @@ namespace Brimstone
 			return CloneState() as Game;
 		}
 
+		// TODO: Async cloning
 		public List<Game> GetClones(int qty) {
 			var clones = new List<Game>();
 
