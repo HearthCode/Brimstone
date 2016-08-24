@@ -111,6 +111,9 @@ namespace Brimstone
 			get {
 				return asList[zone_position - 1];
 			}
+			set {
+				MoveTo(value, zone_position);
+			}
 		}
 
 		// NOTE: For internal use only
