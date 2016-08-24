@@ -30,12 +30,14 @@ namespace Brimstone
 		public static Selector OpponentMinions { get { return Select(e => ((Player)e.Controller).Opponent.Board.Where(x => ((Character)x).Health > 0)); } }
 		public static Selector AllCharacters { get { return Union(AllMinions, FriendlyHero, OpponentHero); } }
 		public static ActionGraph MulliganChoice(ActionGraph Player = null) { return new CreateChoice { Args = { Player, MulliganSelector, (int)ChoiceType.MULLIGAN } }; }
-		public static ActionGraph Random(Selector Selector) { return new RandomChoice { Args = { Selector } }; }
+		public static ActionGraph Random(Selector Selector = null) { return new RandomChoice { Args = { Selector } }; }
 		public static ActionGraph RandomOpponentMinion { get { return Random(OpponentMinions); } }
 		public static ActionGraph RandomOpponentCharacter { get { return Random(OpponentCharacters); } }
-		public static ActionGraph RandomAmount(ActionGraph Min, ActionGraph Max) { return new RandomAmount { Args = { Min, Max } }; }
+		public static ActionGraph RandomAmount(ActionGraph Min = null, ActionGraph Max = null) { return new RandomAmount { Args = { Min, Max } }; }
 
 		public static ActionGraph MulliganSelector { get { return Select(e => ((Player)e).Hand.Slice(((Player)e).NumCardsDrawnThisTurn)); } }
+
+		public static ActionGraph Choose(ActionGraph Player = null) { return new Choose { Args = { Player } }; }
 
 		// TODO: Add selector set ops
 		public static Selector Union(params Selector[] s) {
