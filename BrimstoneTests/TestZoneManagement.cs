@@ -6,8 +6,7 @@ using Brimstone;
 namespace BrimstoneTests
 {
 	[TestFixture]
-	public class TestZoneManagement
-	{
+	public class TestZoneManagement {
 		[Test]
 		public void TestZoneAddRemove([Values(true, false)] bool zoneCaching) {
 			// Arrange
@@ -118,6 +117,35 @@ namespace BrimstoneTests
 					Assert.AreEqual(i, p1.Hand[i][GameTag.ZONE_POSITION]);
 				}
 			}
+		}
+
+		[Test]
+		public void TestSameZoneMove([Values(true, false)] bool zoneCaching) {
+			// Arrange
+			Settings.ZoneCaching = zoneCaching;
+
+			var game = new Game(HeroClass.Druid, HeroClass.Druid);
+			var p1 = game.Player1;
+
+			// Act
+			List<IEntity> items = new List<IEntity>(5);
+
+			// Add items to zones
+			for (int i = 0; i < 5; i++)
+				items.Add(p1.Board.Add(new Minion("River Crocolisk")));
+
+			// Move an item from the start to the middle
+			var oldBoardCount = p1.Board.Count;
+			var entity = p1.Board[1];
+
+			entity.ZoneMove(p1.Board, 3);
+
+			// Assert
+			Assert.AreEqual(oldBoardCount, p1.Board.Count);
+			for (int i = 1; i <= oldBoardCount; i++)
+				Assert.AreEqual(i, p1.Board[i][GameTag.ZONE_POSITION]);
+
+			Assert.AreEqual(3, entity.ZonePosition);
 		}
 
 		[Test]
