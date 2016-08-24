@@ -256,4 +256,43 @@ namespace Brimstone
 			return ActionResult.None;
 		}
 	}
+
+	public class Choose : QueueAction
+	{
+		public const int PLAYER = 0;
+
+		private void chooseMulligan(Player p) {
+			p.MulliganState = MulliganState.DEALING;
+
+			// TODO: Perform mulligan
+
+			p.MulliganState = MulliganState.WAITING;
+			p.MulliganState = MulliganState.DONE;
+
+			// TODO: Start main game if both players have completed mulligan
+		}
+
+		private void chooseGeneral(Player p) {
+			// TODO: General choices
+			throw new NotImplementedException();
+		}
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			var player = (Player)args[PLAYER];
+
+			if (player.Choice == null)
+				throw new InvalidChoiceException();
+
+			if (player.Choice.ChoiceType == ChoiceType.MULLIGAN)
+				chooseMulligan(player);
+			else if (player.Choice.ChoiceType == ChoiceType.GENERAL)
+				chooseGeneral(player);
+			else
+				throw new InvalidChoiceException();
+
+			var result = player.Choice.Choices;
+			player.Choice = null;
+			return result.ToList();
+		}
+	}
 }

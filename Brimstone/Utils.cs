@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Brimstone
 {
@@ -19,10 +20,39 @@ namespace Brimstone
 
 	public class Choice
 	{
-		public ChoiceType ChoiceType { get; set; }
-		public List<IEntity> Choices { get; set; }
+		public IZoneOwner Controller { get; }
+		public ChoiceType ChoiceType { get; }
+		public IEnumerable<IEntity> Choices { get; }
 
 		// TODO: Implement
+		public Choice(IZoneOwner Controller, IEnumerable<IEntity> Choices, ChoiceType ChoiceType = ChoiceType.GENERAL) {
+			this.Controller = Controller;
+			this.Choices = Choices;
+			this.ChoiceType = ChoiceType;
+		}
+
+		public void Select(IEntity Choice) {
+			if (ChoiceType != ChoiceType.GENERAL)
+				throw new InvalidChoiceException();
+
+			throw new NotImplementedException();
+		}
+
+		public void Keep(IEnumerable<IEntity> Choices) {
+			if (ChoiceType != ChoiceType.MULLIGAN)
+				throw new InvalidChoiceException();
+
+			if (!Choices.Except(this.Choices).Any())
+				throw new InvalidChoiceException();
+		}
+
+		public void Discard(List<IEntity> Choices) {
+			if (ChoiceType != ChoiceType.MULLIGAN)
+				throw new InvalidChoiceException();
+
+			if (!Choices.Except(this.Choices).Any())
+				throw new InvalidChoiceException();
+		}
 	}
 
 	public static class DebugLog {

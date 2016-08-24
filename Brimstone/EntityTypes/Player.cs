@@ -51,6 +51,11 @@ namespace Brimstone
 			}
 		}
 
+		public Choice StartMulligan() {
+			MulliganState = MulliganState.INPUT;
+			return new Choice(this, Game.Action(this, Actions.MulliganChoice(this)), ChoiceType.MULLIGAN);
+		}
+
 		public IPlayable Give(Card card) {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
 				throw new PendingChoiceException();
