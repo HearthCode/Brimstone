@@ -31,8 +31,8 @@ namespace BrimstoneTests
 
 			// Check zones, zone positions and references are correct
 			for (int i = 1; i <= 5; i++) {
-				Assert.AreEqual((int)Zone.PLAY, p1.Board[i][GameTag.ZONE]);
-				Assert.AreEqual(i, p1.Board[i][GameTag.ZONE_POSITION]);
+				Assert.AreEqual(Zone.PLAY, p1.Board[i].Zone);
+				Assert.AreEqual(i, p1.Board[i].ZonePosition);
 				Assert.AreSame(items[i - 1], p1.Board[i]);
 			}
 
@@ -46,13 +46,13 @@ namespace BrimstoneTests
 
 			// Check zone positions and references are correct
 			for (int i = 1; i <= 4; i++) {
-				Assert.AreEqual(i, p1.Board[i][GameTag.ZONE_POSITION]);
+				Assert.AreEqual(i, p1.Board[i].ZonePosition);
 				Assert.AreSame(items[i], p1.Board[i]);
 			}
 
 			// Check removed entity has correct zone data
-			Assert.AreEqual((int)Zone.INVALID, items[0][GameTag.ZONE]);
-			Assert.AreEqual(0, items[0][GameTag.ZONE_POSITION]);
+			Assert.AreEqual(Zone.INVALID, items[0].Zone);
+			Assert.AreEqual(0, items[0].ZonePosition);
 		}
 
 		[Test]
@@ -80,7 +80,7 @@ namespace BrimstoneTests
 				// Assert
 				Assert.AreEqual(oldCount + 1, p1.Board.Count);
 				for (int i = 0; i < oldCount + 1; i++)
-					Assert.AreEqual(i + 1, items[i][GameTag.ZONE_POSITION]);
+					Assert.AreEqual(i + 1, items[i].ZonePosition);
 			}
 		}
 
@@ -111,10 +111,10 @@ namespace BrimstoneTests
 				Assert.AreEqual(oldPlay - 1, p1.Board.Count);
 				Assert.AreEqual(oldHand + 1, p1.Hand.Count);
 				for (int i = 1; i <= oldPlay - 1; i++)
-					Assert.AreEqual(i, p1.Board[i][GameTag.ZONE_POSITION]);
+					Assert.AreEqual(i, p1.Board[i].ZonePosition);
 				for (int i = 1; i <= oldHand + 1; i++) {
-					Assert.AreEqual((int)Zone.HAND, p1.Hand[i][GameTag.ZONE]);
-					Assert.AreEqual(i, p1.Hand[i][GameTag.ZONE_POSITION]);
+					Assert.AreEqual(Zone.HAND, p1.Hand[i].Zone);
+					Assert.AreEqual(i, p1.Hand[i].ZonePosition);
 				}
 			}
 		}
@@ -143,17 +143,17 @@ namespace BrimstoneTests
 			// Assert
 			Assert.AreEqual(oldBoardCount, p1.Board.Count);
 			for (int i = 1; i <= oldBoardCount; i++)
-				Assert.AreEqual(i, p1.Board[i][GameTag.ZONE_POSITION]);
+				Assert.AreEqual(i, p1.Board[i].ZonePosition);
 
 			Assert.AreEqual(3, entity.ZonePosition);
 
-			// Move it back again
-			entity.ZoneMove(p1.Board, 1);
+			// Move it back again using the other mechanic
+			entity.ZonePosition = 1;
 
 			// Assert
 			Assert.AreEqual(oldBoardCount, p1.Board.Count);
 			for (int i = 1; i <= oldBoardCount; i++)
-				Assert.AreEqual(i, p1.Board[i][GameTag.ZONE_POSITION]);
+				Assert.AreEqual(i, p1.Board[i].ZonePosition);
 
 			Assert.AreEqual(1, entity.ZonePosition);
 		}
@@ -197,6 +197,58 @@ namespace BrimstoneTests
 		}
 
 		[Test]
+		public void TestZoneIndexWrite([Values(true, false)] bool zoneCaching) {
+			// Arrange
+			Settings.ZoneCaching = zoneCaching;
+
+			var game = new Game(HeroClass.Druid, HeroClass.Druid);
+			var p1 = game.Player1;
+
+			// Act
+			List<IEntity> items = new List<IEntity>(5);
+
+			// Add items to zones
+			int boardSize = 5;
+			int handSize = 3;
+
+			for (int i = 0; i < boardSize; i++)
+				items.Add(p1.Board.Add(new Minion("River Crocolisk")));
+			for (int i = 0; i < handSize; i++)
+				items.Add(p1.Hand.Add(new Minion("River Crocolisk")));
+
+			// Test same zone move
+			var entity = p1.Board[1];
+			p1.Board[3] = entity;
+
+			Assert.AreEqual(boardSize, p1.Board.Count);
+			for (int i = 1; i <= boardSize; i++)
+				Assert.AreEqual(i, p1.Board[i].ZonePosition);
+
+			Assert.AreEqual(3, entity.ZonePosition);
+
+			p1.Board[1] = entity;
+
+			Assert.AreEqual(boardSize, p1.Board.Count);
+			for (int i = 1; i <= boardSize; i++)
+				Assert.AreEqual(i, p1.Board[i].ZonePosition);
+
+			Assert.AreEqual(1, entity.ZonePosition);
+
+			// Test different zone move
+			// -1 = move to end of zone
+			p1.Hand[-1] = entity;
+
+			Assert.AreEqual(handSize + 1, p1.Hand.Count);
+			for (int i = 1; i <= handSize + 1; i++)
+				Assert.AreEqual(i, p1.Hand[i].ZonePosition);
+			Assert.AreEqual(boardSize - 1, p1.Board.Count);
+			for (int i = 1; i <= boardSize - 1; i++)
+				Assert.AreEqual(i, p1.Board[i].ZonePosition);
+
+			Assert.AreEqual(handSize + 1, entity.ZonePosition);
+		}
+
+		[Test]
 		public void TestZonePositionZero([Values(true, false)] bool zoneCaching) {
 			// Arrange
 			Settings.ZoneCaching = zoneCaching;
@@ -218,8 +270,8 @@ namespace BrimstoneTests
 			// Assert
 			// Position 0 items shouldn't be counted
 			Assert.AreEqual(0, p1.Graveyard.Count);
-			Assert.AreEqual((int)Zone.GRAVEYARD, item[GameTag.ZONE]);
-			Assert.AreEqual(0, item[GameTag.ZONE_POSITION]);
+			Assert.AreEqual(Zone.GRAVEYARD, item.Zone);
+			Assert.AreEqual(0, item.ZonePosition);
 		}
 
 		[Test]
@@ -241,27 +293,27 @@ namespace BrimstoneTests
 			e = p1.Deck.Slice(2).ToList();
 			Assert.AreEqual(2, e.Count);
 			for (int i = 0; i < e.Count; i++)
-				Assert.AreEqual(i + 1, e[i][GameTag.ZONE_POSITION]);
+				Assert.AreEqual(i + 1, e[i].ZonePosition);
 
 			e = p1.Deck.Slice(-2).ToList();
 			Assert.AreEqual(2, e.Count);
 			for (int i = 0; i < e.Count; i++)
-				Assert.AreEqual(i + 4, e[i][GameTag.ZONE_POSITION]);
+				Assert.AreEqual(i + 4, e[i].ZonePosition);
 
 			e = p1.Deck.Slice(-3, -1).ToList();
 			Assert.AreEqual(3, e.Count);
 			for (int i = 0; i < e.Count; i++)
-				Assert.AreEqual(i + 3, e[i][GameTag.ZONE_POSITION]);
+				Assert.AreEqual(i + 3, e[i].ZonePosition);
 
 			e = p1.Deck.Slice(2, 4).ToList();
 			Assert.AreEqual(3, e.Count);
 			for (int i = 0; i < e.Count; i++)
-				Assert.AreEqual(i + 2, e[i][GameTag.ZONE_POSITION]);
+				Assert.AreEqual(i + 2, e[i].ZonePosition);
 
 			e = p1.Deck.Slice(3, -2).ToList();
 			Assert.AreEqual(2, e.Count);
 			for (int i = 0; i < e.Count; i++)
-				Assert.AreEqual(i + 3, e[i][GameTag.ZONE_POSITION]);
+				Assert.AreEqual(i + 3, e[i].ZonePosition);
 		}
 
 		[Test]
@@ -298,7 +350,7 @@ namespace BrimstoneTests
 			Assert.AreSame(chromaggus, p1.Deck[6]);
 
 			for (int i = 1; i < 6; i++)
-				Assert.AreEqual(i, p1.Deck[i][GameTag.ZONE_POSITION]);
+				Assert.AreEqual(i, p1.Deck[i].ZonePosition);
 		}
 	}
 }
