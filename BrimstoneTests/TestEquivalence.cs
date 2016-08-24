@@ -105,7 +105,7 @@ namespace BrimstoneTests
 				if (i == 0)
 					firstId = id;
 			}
-			game.BeginTurn();
+			game.NextTurn();
 			var boomBot = game.CurrentPlayer.Give("Boom Bot").Play() as Minion;
 
 			// Act
@@ -231,7 +231,7 @@ namespace BrimstoneTests
 				if (i == 0)
 					firstId = id;
 			}
-			game.BeginTurn();
+			game.NextTurn();
 			boomBot = game.CurrentPlayer.Give("Boom Bot").Play() as Minion;
 			clones.Clear();
 

@@ -170,6 +170,8 @@ namespace Brimstone
 
 			if (!SkipMulligan)
 				StartMulligan();
+			else
+				Action(this, Actions.BeginTurn);
 		}
 
 		private void StartMulligan() {
@@ -179,7 +181,7 @@ namespace Brimstone
 				p.StartMulligan();
 		}
 
-		public void BeginTurn() {
+		public void NextTurn() {
 			if (Player1.Choice != null || Player2.Choice != null)
 				throw new PendingChoiceException();
 

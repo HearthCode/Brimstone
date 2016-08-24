@@ -51,7 +51,7 @@ namespace BrimstoneGameScript
 				fj.Play();
 			}
 
-			Game.BeginTurn();
+			Game.NextTurn();
 
 			for (int i = 0; i < MaxMinions - 2; i++) {
 				var fj = p2.Give("Flame Juggler");
@@ -62,7 +62,7 @@ namespace BrimstoneGameScript
 			p2.Give("Boom Bot").Play();
 			p2.Give("Boom Bot").Play();
 
-			Game.BeginTurn();
+			Game.NextTurn();
 
 			p1.Give("Boom Bot").Play();
 			Minion boombot = p1.Give("Boom Bot").Play() as Minion;

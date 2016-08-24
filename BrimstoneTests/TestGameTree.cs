@@ -142,7 +142,7 @@ namespace BrimstoneTests
 				game.CurrentPlayer.Give(FillMinion).Play();
 			for (int i = 0; i < NumBoomBots; i++)
 				game.CurrentPlayer.Give("Boom Bot").Play();
-			game.BeginTurn();
+			game.NextTurn();
 			for (int i = 0; i < MaxMinions - NumBoomBots; i++)
 				game.CurrentPlayer.Give(FillMinion).Play();
 			for (int i = 0; i < NumBoomBots; i++)
