@@ -50,6 +50,14 @@
 			}
 		}
 
+		public Player CurrentOpponent
+		{
+			get
+			{
+				return (Player1[GameTag.CURRENT_PLAYER] == 1 ? Player2 : Player2[GameTag.CURRENT_PLAYER] == 1 ? Player1 : null);
+			}
+		}
+
 		public Step Step {
 			get { return (Step)this[GameTag.STEP]; }
 			set { this[GameTag.STEP] = (int)value; }
