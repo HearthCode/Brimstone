@@ -32,11 +32,15 @@ namespace Brimstone
 		IPlayable Play();
 	}
 
-	public interface IMinion : IPlayable {
+	public interface ICanTarget : IEntity {
+		List<IEntity> ValidTargets { get; }
+	}
+
+	public interface IMinion : IPlayable, ICanTarget {
 		void Hit(int amount);
 	}
 
-	public interface ISpell : IPlayable {
+	public interface ISpell : IPlayable, ICanTarget {
 	}
 
 	public class BaseEntityData : ICloneable {

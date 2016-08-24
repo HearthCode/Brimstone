@@ -27,4 +27,13 @@ namespace Brimstone
 
 		public TreeSearchException(string message, Exception inner) : base(message, inner) { }
 	}
+
+	public class PlayRequirementNotImplementedException : BrimstoneException
+	{
+		public PlayRequirementNotImplementedException() { }
+
+		public PlayRequirementNotImplementedException(string message) : base(message) { }
+
+		public PlayRequirementNotImplementedException(string message, Exception inner) : base(message, inner) { }
+	}
 }

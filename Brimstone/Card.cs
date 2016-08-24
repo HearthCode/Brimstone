@@ -49,6 +49,12 @@ namespace Brimstone
 			}
 		}
 
+		public bool RequiresTargetIfAvailable {
+			get {
+				return Requirements.ContainsKey(PlayRequirements.REQ_TARGET_IF_AVAILABLE);
+			}
+		}
+
 		public int MaxAllowedInDeck {
 			get { return Rarity == Rarity.LEGENDARY ? 1 : 2; }
 		}
