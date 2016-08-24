@@ -1,5 +1,16 @@
 ﻿namespace Brimstone
 {
+	public partial class Entity
+	{
+		public Zone Zone {
+			get { return (Zone) this[GameTag.ZONE]; }
+		}
+
+		public int ZonePosition {
+			get { return this[GameTag.ZONE_POSITION]; }
+		}
+	}
+
 	public partial class Game : Entity, IZoneOwner
 	{
 		public int Turn {

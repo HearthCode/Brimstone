@@ -20,6 +20,8 @@ namespace Brimstone
 		Game Game { get; set; }
 		IZoneOwner Controller { get; set; }
 		Card Card { get; }
+		Zone Zone { get; }
+		int ZonePosition { get; }
 		Dictionary<GameTag, int> CopyTags();
 		int this[GameTag t] { get; set; }
 		string ShortDescription { get; }

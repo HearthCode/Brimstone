@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Brimstone
 {
-	public interface IZoneOwner
+	public interface IZoneOwner : IEntity
 	{
 		ZoneGroup Zones { get; }
 	}
