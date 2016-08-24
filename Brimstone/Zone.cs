@@ -113,6 +113,12 @@ namespace Brimstone
 			}
 		}
 
+		// Slice a zone
+		// If no arguments are supplied, return the entire zone
+		// If only one argument is supplied, return the first X elements (if X is positive) or last X elements (if X is negative)
+		// If two arguments are supplied, X to Y returns elements X to Y inclusive
+		// If two arguments are supplied, -X to -Y returns elemnts from Xth last to Yth last inclusive (eg. -4, -2 returns the 4th, 3rd and 2nd to last elements)
+		// If two arguments are supplied, X to -Y returns elements from Xth first to Yth last inclusive (eg. 2, -3 returns the 2nd first to 3rd last element)
 		public IEnumerable<IEntity> Slice(int? zpStart = null, int? zpEnd = null) {
 			int eCount = Count;
 			int start = 0, count = 0;
