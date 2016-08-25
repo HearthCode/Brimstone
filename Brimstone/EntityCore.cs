@@ -31,10 +31,13 @@ namespace Brimstone
 		int FuzzyHash { get; }
 
 		IEntity CloneState();
+
+		// TODO: Move this to ICanTarget when merged and add cloning code + cloning unit test
+		Character Target { get; set; }
 	}
 
 	public interface IPlayable : IEntity {
-		IPlayable Play();
+		IPlayable Play(Character target = null);
 	}
 
 	public interface ICanTarget : IEntity {
@@ -144,6 +147,7 @@ namespace Brimstone
 
 		public long ReferenceCount { get { return _referenceCount.Count; } }
 		public BaseEntityData BaseEntityData { get { return _entity; } }
+		public Character Target { get; set; }
 
 		public virtual Game Game { get; set; }
 		// TODO: Re-do Controller code as normal tag property

@@ -11,7 +11,7 @@ namespace Brimstone
 		public List<Trigger> Triggers = new List<Trigger>();
 	}
 
-	public partial class Actions {
+	public class Actions {
 		// Factory functions for DSL syntax
 		public static ActionGraph BeginTurn { get { return new BeginTurn(); } }
 		public static ActionGraph EndTurn { get { return new EndTurn(); } }
@@ -23,6 +23,7 @@ namespace Brimstone
 		// TODO: Write all common selectors
 		public static Selector Self { get { return Select(e => e); } }
 		public static Selector Controller { get { return Select(e => e.Controller); } }
+		public static Selector Target { get { return Select(e => e.Target); } }
 		public static Selector CurrentPlayer { get { return Select(e => e.Game.CurrentPlayer); } }
 		public static Selector FriendlyHero { get { return Select(e => ((Player)e.Controller).Hero); } }
 		public static Selector OpponentHero { get { return Select(e => ((Player)e.Controller).Opponent.Hero); } }

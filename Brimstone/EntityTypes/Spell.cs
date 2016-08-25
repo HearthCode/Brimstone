@@ -9,10 +9,12 @@ namespace Brimstone
 		public Spell(Spell cloneFrom) : base(cloneFrom) { }
 		public Spell(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
 
-		public IPlayable Play() {
+		public IPlayable Play(Character target = null) {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
 				throw new PendingChoiceException();
 
+			// TODO: Check targeting validity
+			Target = target;
 			return (IPlayable)(Entity)Game.Action(this, Actions.Play(this));
 		}
 
