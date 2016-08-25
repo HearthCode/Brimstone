@@ -92,15 +92,13 @@ namespace Brimstone
 
 		public List<IEntity> ValidTargets {
 			get {
-				var zone = (Zone)this[GameTag.ZONE]; // TODO: property
-
-				if (zone == Zone.HAND)
+				if (Zone.Type == Brimstone.Zone.HAND)
 					return getValidPlayTargets();
-				else if (zone == Zone.PLAY)
+				else if (Zone.Type == Brimstone.Zone.PLAY)
 					return getValidAttackTargets();
 				else {
 					// TODO: Should subclass BrimstoneException here
-					throw new Exception("Minion can't have targets while in zone " + zone);
+					throw new Exception("Minion can't have targets while in zone " + Zone.Type);
 				}
 			}
 		}
