@@ -134,7 +134,7 @@ namespace Brimstone
 			// Generate player heroes
 			// TODO: Add Start() parameters for non-default hero skins
 			foreach (var p in Players)
-				p.Hero = Add(new Hero(DefaultHero.For(p.HeroClass)), this) as Hero;
+				p.Hero = Add(new Hero(DefaultHero.For(p.HeroClass)), p) as Hero;
 
 			// TODO: Insert event call precisely here so our server can iterate all created entities
 
