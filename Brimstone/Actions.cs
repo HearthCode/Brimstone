@@ -368,6 +368,63 @@ namespace Brimstone
 		}
 	}
 
+	public class Attack : QueueAction
+	{
+		public const int ATTACKER = 0;
+		public const int DEFENDER = 1;
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			Character attacker = (Character)args[ATTACKER];
+			Character defender = (Character)args[DEFENDER];
+
+			DebugLog.WriteLine("{0} is attacking {1}", attacker.ShortDescription, defender.ShortDescription);
+
+			game.ProposedAttacker = attacker;
+			game.ProposedDefender = defender;
+			attacker.IsAttacking = true;
+
+			game.NextStep = Step.MAIN_ACTION;
+			game.Step = Step.MAIN_COMBAT;
+			// TODO: Increase NumOptionsPlayedThisTurn here
+
+			defender.IsDefending = true;
+
+			// TODO: Allow other things to change the proposed attacker/defender here
+			defender = game.ProposedDefender;
+
+			if (attacker.ShouldExitCombat) {
+				// TODO: Tag ordering unchecked for this case
+				game.ProposedAttacker = null;
+				game.ProposedDefender = null;
+				attacker.IsAttacking = false;
+				defender.IsDefending = false;
+				return ActionResult.None;
+			}
+
+			// Save defender's attack as it might change after being damaged (e.g. enrage)
+			int defAttack = defender.Attack;
+
+			// TODO: Review if it's ok to use game.Action here or add a PostAttack action
+			game.Action(attacker, Actions.Damage(defender, attacker.Attack));
+			if (defAttack > 0)
+				game.Action(defender, Actions.Damage(attacker, defAttack));
+
+			attacker.NumAttacksThisTurn += 1;
+			// TODO: Use EXTRA_ATTACKS_THIS_TURN?
+			attacker.IsExhausted = true;
+
+			game.ProposedAttacker = null;
+			game.ProposedDefender = null;
+			attacker.IsAttacking = false;
+			defender.IsDefending = false;
+
+			game.Step = Step.MAIN_ACTION;
+			game.NextStep = Step.MAIN_END;
+
+			return ActionResult.None;
+		}
+	}
+
 	public class Choose : QueueAction
 	{
 		public const int PLAYER = 0;
