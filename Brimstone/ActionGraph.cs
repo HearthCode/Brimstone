@@ -15,18 +15,9 @@ namespace Brimstone
 			Graph = new List<QueueAction>(g.Graph);
 		}
 
-		public ActionGraph(List<QueueAction> ql) {
-			Graph = ql;
-		}
-
 		// Convert single QueueAction to ActionGraph
 		public static implicit operator ActionGraph(QueueAction q) {
 			return new ActionGraph(q);
-		}
-
-		// Convert List<QueueAction> to ActionGraph
-		public static implicit operator ActionGraph(List<QueueAction> ql) {
-			return new ActionGraph(ql);
 		}
 
 		public ActionGraph Then(ActionGraph act) {
@@ -91,8 +82,9 @@ namespace Brimstone
 
 	public static class QueueActionListExtensions
 	{
-		public static ActionGraph Then(this List<QueueAction> ql, ActionGraph act) {
-			return ((ActionGraph) ql).Then(act);
+		public static List<QueueAction> Then(this List<QueueAction> ql, ActionGraph act) {
+			ql.AddRange(act.Unravel());
+			return ql;
 		}
 	}
 }
