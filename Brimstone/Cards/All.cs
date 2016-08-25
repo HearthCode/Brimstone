@@ -1,6 +1,6 @@
 ﻿namespace Brimstone
 {
-	public partial class BehaviourScripts : Actions
+	public class BehaviourScripts : Actions
 	{
 		// Flame Juggler
 		public static Behaviour AT_094 = new Behaviour {
@@ -27,6 +27,11 @@
 		// Arcane Missiles
 		public static Behaviour EX1_277 = new Behaviour {
 			Battlecry = Damage(RandomOpponentCharacter, 1) * 3
+		};
+
+		// Fireball
+		public static Behaviour CS2_029 = new Behaviour {
+			Battlecry = Damage(Target, 6)
 		};
 
 		// Armorsmith
