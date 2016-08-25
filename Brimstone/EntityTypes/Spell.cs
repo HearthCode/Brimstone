@@ -13,14 +13,7 @@ namespace Brimstone
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
 				throw new PendingChoiceException();
 
-			var played = (Entity)Game.Action(this, Actions.Play(this));
-
-			// TODO: This needs to go after the spell action completes, and before any triggers;
-			// it also needs to be part of an action
-			// Spells go to the graveyard after they are played
-			played.Zone = played.Controller.Graveyard;
-
-			return (IPlayable) played;
+			return (IPlayable)(Entity)Game.Action(this, Actions.Play(this));
 		}
 
 		private bool isValidTarget(Character targetable) {

@@ -248,7 +248,6 @@ namespace Brimstone
 	public class Play : QueueAction
 	{
 		// TODO: Deal with targeting
-		// TODO: Deal with spells moving to graveyard
 
 		public const int ENTITY = 0;
 
@@ -260,7 +259,14 @@ namespace Brimstone
 
 			DebugLog.WriteLine("{0} is playing {1}", player.FriendlyName, entity.ShortDescription);
 
-			game.Queue(entity, entity.Card.Behaviour.Battlecry);
+			if (entity is Minion)
+				game.Queue(entity, entity.Card.Behaviour.Battlecry);
+			else if (entity is Spell)
+				game.Queue(entity, entity.Card.Behaviour.Battlecry.Then((Action<IEntity>) (_ =>
+				{
+					// Spells go to the graveyard after they are played
+					entity.Zone = entity.Controller.Graveyard;
+				})));
 			return entity;
 		}
 	}
