@@ -18,6 +18,10 @@ namespace Brimstone
 			return result;
 		}
 
+		public ActionGraph Then(ActionGraph g) {
+			return ((ActionGraph) this).Then(g);
+		}
+
 		public override string ToString() {
 			return GetType().Name;
 		}
