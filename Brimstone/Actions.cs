@@ -147,6 +147,9 @@ namespace Brimstone
 			game.CurrentPlayer.NumCardsPlayedThisTurn = 0;
 			game.CurrentPlayer.NumMinionsPlayedThisTurn = 0;
 			game.CurrentPlayer.NumOptionsPlayedThisTurn = 0;
+
+			// TODO: Reset EXHAUSTED tags for current player here
+
 			game.CurrentPlayer.NumCardsDrawnThisTurn = 0;
 
 			// Ain't no rest for the triggered...
@@ -167,6 +170,7 @@ namespace Brimstone
 				game.CurrentOpponent.NumMinionsPlayerKilledThisTurn = 0;
 				game.CurrentPlayer.NumFriendlyMinionsThatAttackedThisTurn = 0;
 				game.NumMinionsKilledThisTurn = 0;
+				game.CurrentPlayer.HeroPowerActivationsThisTurn = 0;
 				game.NextStep = Step.MAIN_ACTION;
 				
 				game.Step = Step.MAIN_ACTION;
@@ -185,6 +189,9 @@ namespace Brimstone
 			game.Step = Step.MAIN_END;
 			game.NextStep = Step.MAIN_CLEANUP;
 			game.Step = Step.MAIN_CLEANUP;
+
+			// TODO: reset JUST_PLAYEDs for current player to zero here
+
 			game.NextStep = Step.MAIN_NEXT;
 			game.Step = Step.MAIN_NEXT;
 
