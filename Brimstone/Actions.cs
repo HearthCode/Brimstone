@@ -157,11 +157,22 @@ namespace Brimstone
 
 			game.Step = Step.MAIN_START_TRIGGERS;
 			game.NextStep = Step.MAIN_START;
+
+			// TODO: DEATHs block for eg. Doomsayer
+
 			game.Step = Step.MAIN_START;
-
-			game.Queue(game.CurrentPlayer, Actions.Draw(game.CurrentPlayer));
-
-			// TODO: After the card has been drawn, sedt the remaining counters and go to MAIN_ACTION step
+			game.Queue(game.CurrentPlayer, Actions.Draw(game.CurrentPlayer).Then((Action<IEntity>)(_ =>
+			{
+				game.CurrentPlayer.NumMinionsPlayerKilledThisTurn = 0;
+				game.CurrentOpponent.NumMinionsPlayerKilledThisTurn = 0;
+				game.CurrentPlayer.NumFriendlyMinionsThatAttackedThisTurn = 0;
+				game.NumMinionsKilledThisTurn = 0;
+				game.NextStep = Step.MAIN_ACTION;
+				
+				game.Step = Step.MAIN_ACTION;
+				game.NextStep = Step.MAIN_END;
+			}
+			)));
 
 			return ActionResult.None;
 		}
