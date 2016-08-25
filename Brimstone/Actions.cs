@@ -302,17 +302,29 @@ namespace Brimstone
 		public const int TARGETS = 0;
 
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
-			if (args[TARGETS].HasResult)
+			if (args[TARGETS].HasResult) {
+				bool gameEnd = false;
+
 				foreach (var e in args[TARGETS]) {
 					DebugLog.WriteLine("{0} dies", e.ShortDescription);
 
-					if (e is Minion)
-					{
-						e.Zone = e.Controller.Graveyard;
-						((Minion)e).Damage = 0;
+					e.Zone = e.Controller.Graveyard;
+
+					// Minion death
+					if (e is Minion) {
+						((Minion) e).Damage = 0;
 						game.Queue(e, e.Card.Behaviour.Deathrattle);
 					}
+
+					// Hero death
+					if (e is Hero) {
+						((Player) e.Controller).PlayState = PlayState.LOSING;
+						gameEnd = true;
+					}
 				}
+				if (gameEnd)
+					game.GameWon();
+			}
 			return ActionResult.None;
 		}
 	}

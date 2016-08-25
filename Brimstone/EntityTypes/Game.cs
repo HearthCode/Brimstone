@@ -188,6 +188,27 @@ namespace Brimstone
 			Action(this, Actions.EndTurn);
 		}
 
+		public void GameWon()
+		{
+			foreach (var p in Players) {
+				if (p.PlayState != PlayState.LOSING) continue;
+
+				p.PlayState = PlayState.LOST;
+				p.Opponent.PlayState = PlayState.WON;
+				End();
+			}
+		}
+
+		public void End() {
+			NextStep = Step.FINAL_WRAPUP;
+			Step = Step.FINAL_WRAPUP;
+			NextStep = Step.FINAL_GAMEOVER;
+			Step = Step.FINAL_GAMEOVER;
+			State = GameState.COMPLETE;
+
+			// TODO: Gold reward state
+		}
+
 		// Perform a fuzzy equivalence between two game states
 		public bool EquivalentTo(Game game) {
 			if (Settings.UseGameHashForEquality)
