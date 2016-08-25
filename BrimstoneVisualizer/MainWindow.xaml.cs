@@ -42,7 +42,7 @@ namespace BrimstoneVisualizer
 
 			if (App.Game == null)
 				MessageBox.Show("No game script loaded", "Error", MessageBoxButton.OK);
-			else {
+			else if (App.Game.State != GameState.COMPLETE) {
 				UpdateDisplay();
 				App.QueueRead.Set();
 			}
@@ -60,7 +60,7 @@ namespace BrimstoneVisualizer
 				i++;
 			};
 			App.Game.ActionQueue.OnActionStarting += waiter;
-			while (i < 5) {
+			while (i < 5 && App.Game.State != GameState.COMPLETE) {
 				App.QueueRead.Set();
 				System.Threading.Thread.Sleep(10);
 			}

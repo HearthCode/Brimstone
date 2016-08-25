@@ -24,10 +24,11 @@ namespace BrimstoneVisualizer
 
 			// Block every time we queue or perform action
 			Game.ActionQueue.OnQueued += (s, e) => {
-				QueueRead.WaitOne();
+					QueueRead.WaitOne();
 			};
 			Game.ActionQueue.OnAction += (s, e) => {
-				QueueRead.WaitOne();
+				if (Game.State != GameState.COMPLETE)
+					QueueRead.WaitOne();
 			};
 
 			Script.PlayGame(Game);
