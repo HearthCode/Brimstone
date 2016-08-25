@@ -15,6 +15,7 @@ namespace Brimstone
 		// Factory functions for DSL syntax
 		public static ActionGraph BeginTurn { get { return new BeginTurn(); } }
 		public static ActionGraph EndTurn { get { return new EndTurn(); } }
+		public static ActionGraph Concede(ActionGraph Player = null) { return new Concede { Args = { Player } }; }
 
 		public static ActionGraph Draw(ActionGraph Player = null) { return new Draw { Args = { Player } }; }
 		public static ActionGraph Give(ActionGraph Player = null, ActionGraph Card = null) { return new Give { Args = { Player, Card } }; }

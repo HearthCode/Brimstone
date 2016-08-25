@@ -209,6 +209,20 @@ namespace Brimstone
 		}
 	}
 
+	public class Concede : QueueAction
+	{
+		public const int PLAYER = 0;
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			Player player = (Player) args[PLAYER];
+			player.PlayState = PlayState.CONCEDED;
+			player.PlayState = PlayState.LOST;
+			player.Opponent.PlayState = PlayState.WON;
+			game.End();
+			return player.Opponent;
+		}
+	}
+
 	public class Give : QueueAction
 	{
 		public const int PLAYER = 0;

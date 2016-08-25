@@ -79,6 +79,10 @@ namespace Brimstone
 			Game.Action(this, Actions.Draw(this) * qty);
 		}
 
+		public void Concede() {
+			Game.Action(this, Actions.Concede(this));
+		}
+
 		public override object Clone() {
 			return new Player(this);
 		}
