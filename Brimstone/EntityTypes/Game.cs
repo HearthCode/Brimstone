@@ -47,6 +47,9 @@ namespace Brimstone
 			}
 		}
 
+		// TODO: Other common set selectors
+		public IEnumerable<IEntity> Characters => Player1.Board.Concat(Player2.Board).Concat(new List<IEntity> {Player1.Hero, Player2.Hero});
+
 		public ZoneEntities Setaside { get { return Zones[Brimstone.Zone.SETASIDE]; } }
 		public ZoneEntities Board { get { return Zones[Brimstone.Zone.PLAY]; } }
 		public ZoneEntities Graveyard { get { return null; } }

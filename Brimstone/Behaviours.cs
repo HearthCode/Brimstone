@@ -31,7 +31,7 @@ namespace Brimstone
 		public static Selector AllMinions { get { return Select(e => e.Game.Player1.Board.Concat(e.Game.Player2.Board).Where(x => ((Character)x).Health > 0)); } }
 		public static Selector OpponentCharacters { get { return Union(OpponentMinions, OpponentHero); } }
 		public static Selector OpponentMinions { get { return Select(e => ((Player)e.Controller).Opponent.Board.Where(x => ((Character)x).Health > 0)); } }
-		public static Selector AllCharacters { get { return Union(AllMinions, FriendlyHero, OpponentHero); } }
+		public static Selector AllCharacters { get { return Select(e => e.Game.Characters); } }
 		public static ActionGraph MulliganChoice(ActionGraph Player = null) { return new CreateChoice { Args = { Player, MulliganSelector, (int)ChoiceType.MULLIGAN } }; }
 		public static ActionGraph Random(Selector Selector = null) { return new RandomChoice { Args = { Selector } }; }
 		public static ActionGraph RandomOpponentMinion { get { return Random(OpponentMinions); } }
