@@ -41,6 +41,8 @@ namespace Brimstone
 	}
 
 	public interface ICanTarget : IEntity {
+		// TODO: Caching
+		// TODO: HasTarget
 		List<IEntity> ValidTargets { get; }
 	}
 

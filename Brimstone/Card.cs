@@ -52,15 +52,11 @@ namespace Brimstone
 		}
 
 		public bool RequiresTarget {
-			get {
-				return Requirements.ContainsKey(PlayRequirements.REQ_TARGET_TO_PLAY);
-			}
+			get { return Requirements.ContainsKey(PlayRequirements.REQ_TARGET_TO_PLAY); }
 		}
 
 		public bool RequiresTargetIfAvailable {
-			get {
-				return Requirements.ContainsKey(PlayRequirements.REQ_TARGET_IF_AVAILABLE);
-			}
+			get { return Requirements.ContainsKey(PlayRequirements.REQ_TARGET_IF_AVAILABLE); }
 		}
 
 		public int MaxAllowedInDeck {
@@ -68,9 +64,7 @@ namespace Brimstone
 		}
 
 		public string AbbrieviatedName {
-			get {
-				return new string(Name.Split(new[] { ' ' }).Select(word => word.First()).ToArray());
-			}
+			get { return new string(Name.Split(new[] { ' ' }).Select(word => word.First()).ToArray()); }
 		}
 
 		public static implicit operator Card(string name) {

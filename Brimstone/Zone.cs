@@ -9,6 +9,7 @@ namespace Brimstone
 	{
 		ZoneGroup Zones { get; }
 
+		// TODO: Lets make these generic types to avoid all the return value type casting
 		Deck Deck { get; set; }
 		ZoneEntities Hand { get; }
 		ZoneEntities Board { get; }
