@@ -30,7 +30,7 @@ namespace Test1
 			var game = new Game(HeroClass.Druid, HeroClass.Druid, PowerHistory: true);
 			game.Player1.Deck.Fill();
 			game.Player2.Deck.Fill();
-			game.Start(1);
+			game.Start(FirstPlayer: 1, SkipMulligan: true);
 
 			for (int i = 0; i < MaxMinions - NumBoomBots; i++)
 				game.CurrentPlayer.Give(FillMinion).Play();

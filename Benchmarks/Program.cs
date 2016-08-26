@@ -134,7 +134,7 @@ namespace Brimstone.Benchmark
 		public static Game NewEmptyGame() {
 			var game = new Game(HeroClass.Druid, HeroClass.Druid, PowerHistory: true);
 			Debug.Assert(game.Entities.Count == 6);
-			game.Start(1);
+			game.Start(FirstPlayer: 1, SkipMulligan: true);
 			return game;
 		}
 
@@ -146,7 +146,7 @@ namespace Brimstone.Benchmark
 			game.Player1.Deck.Fill();
 			game.Player2.Deck.Fill();
 			Debug.Assert(game.Entities.Count == 66);
-			game.Start(1);
+			game.Start(FirstPlayer: 1, SkipMulligan: true);
 			Console.SetOut(cOut);
 			return game;
 		}
@@ -162,7 +162,7 @@ namespace Brimstone.Benchmark
 				game.Player1.Deck.Fill();
 				game.Player2.Deck.Fill();
 			}
-			game.Start(1);
+			game.Start(FirstPlayer: 1, SkipMulligan: true);
 
 			for (int i = 0; i < MaxMinions - NumBoomBots; i++)
 				game.CurrentPlayer.Give(FillMinion).Play();
