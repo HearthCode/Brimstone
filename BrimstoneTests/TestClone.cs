@@ -15,7 +15,7 @@ namespace BrimstoneTests
 
 			// Create game with players
 			Game game = new Game(HeroClass.Druid, HeroClass.Druid, PowerHistory: true);
-			game.Start();
+			game.Start(SkipMulligan: true);
 
 			var p1 = game.CurrentPlayer;
 			var p2 = game.CurrentPlayer.Opponent;

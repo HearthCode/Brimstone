@@ -92,7 +92,7 @@ namespace BrimstoneTests
 			var game = new Game(HeroClass.Druid, HeroClass.Warrior, PowerHistory: true);
 			game.Player1.Deck.Fill();
 			game.Player2.Deck.Fill();
-			game.Start();
+			game.Start(SkipMulligan: true);
 
 			// We create a scenario with 7 Totem Golems on one side of the board
 			// and a single Boom Bot on the other side
@@ -223,7 +223,7 @@ namespace BrimstoneTests
 			game = new Game(HeroClass.Druid, HeroClass.Warrior, PowerHistory: true);
 			game.Player1.Deck.Fill();
 			game.Player2.Deck.Fill();
-			game.Start();
+			game.Start(SkipMulligan: true);
 
 			firstId = -1;
 			for (int i = 0; i < MaxMinions; i++) {
