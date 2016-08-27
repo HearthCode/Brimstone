@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Brimstone
 {
-	public class Card
+	public partial class Card
 	{
 		public int AssetId { get; set; }
 		public Guid Guid { get; set; }
@@ -21,47 +21,6 @@ namespace Brimstone
 				else
 					return 0;
 			}
-		}
-
-		// TODO: Move this stuff to TagProperties
-		public bool Collectible {
-			get { return this[GameTag.COLLECTIBLE] == 1; }
-		}
-
-		public CardClass Class {
-			get { return (CardClass)this[GameTag.CLASS]; }
-		}
-
-		public bool HasCombo {
-			get { return this[GameTag.COMBO] == 1; }
-		}
-
-		public Rarity Rarity {
-			get { return (Rarity)this[GameTag.RARITY]; }
-		}
-
-		public CardType Type {
-			get { return (CardType)this[GameTag.CARDTYPE]; }
-		}
-
-		public bool HasOverload {
-			get { return this[GameTag.OVERLOAD] == 1; }
-		}
-
-		public int Overload {
-			get { return this[GameTag.OVERLOAD_OWED]; }
-		}
-
-		public bool RequiresTarget {
-			get { return Requirements.ContainsKey(PlayRequirements.REQ_TARGET_TO_PLAY); }
-		}
-
-		public bool RequiresTargetIfAvailable {
-			get { return Requirements.ContainsKey(PlayRequirements.REQ_TARGET_IF_AVAILABLE); }
-		}
-
-		public int MaxAllowedInDeck {
-			get { return Rarity == Rarity.LEGENDARY ? 1 : 2; }
 		}
 
 		public string AbbrieviatedName {
