@@ -74,23 +74,23 @@
 			set { this[GameTag.NEXT_STEP] = (int)value; }
 		}
 
-		public Character ProposedAttacker {
+		public ICharacter ProposedAttacker {
 			get {
 				int id = this[GameTag.PROPOSED_ATTACKER];
-				return (id != 0 ? (Character)Game.Entities[id] : null);
+				return (id != 0 ? (ICharacter)Game.Entities[id] : null);
 			}
 			set {
-				this[GameTag.PROPOSED_ATTACKER] = (value != null ? value.Id : 0);;
+				this[GameTag.PROPOSED_ATTACKER] = value?.Id ?? 0;;
 			}
 		}
 
-		public Character ProposedDefender {
+		public ICharacter ProposedDefender {
 			get {
 				int id = this[GameTag.PROPOSED_DEFENDER];
-				return (id != 0 ? (Character)Game.Entities[id] : null);
+				return (id != 0 ? (ICharacter)Game.Entities[id] : null);
 			}
 			set {
-				this[GameTag.PROPOSED_DEFENDER] = (value != null ? value.Id : 0);
+				this[GameTag.PROPOSED_DEFENDER] = value?.Id ?? 0;
 			}
 		}
 
@@ -224,7 +224,24 @@
 		}
 	}
 
-	public abstract partial class Character : Entity
+	public partial interface ICharacter : ICanTarget
+	{
+		int Attack { get; set; }
+		bool CantBeTargetedByOpponents { get; set; }
+		int Damage { get; set; }
+		int Health { get; set; }
+		bool IsAttacking { get; set; }
+		bool IsDefending { get; set; }
+		bool IsExhausted { get; set; }
+		bool IsFrozen { get; set; }
+		int NumAttacksThisTurn { get; set; }
+		int PreDamage { get; set; }
+		Race Race { get; set; }
+		bool ShouldExitCombat { get; set; }
+		int StartingHealth { get; }
+	}
+
+	public abstract partial class Character<T> : Playable<T>, ICharacter where T : Entity
 	{
 		public int Attack {
 			get { return this[GameTag.ATK]; }
@@ -299,7 +316,7 @@
 		}
 	}
 
-	public partial class Minion : Character, IMinion
+	public partial class Minion : Character<Minion>
 	{
 		public bool CantBeTargetedByAbilities {
 			get { return this[GameTag.CANT_BE_TARGETED_BY_ABILITIES] == 1; }

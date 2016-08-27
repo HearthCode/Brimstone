@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -60,10 +61,12 @@
     <Compile Include="Cards\All.cs" />
     <Compile Include="Deck.cs" />
     <Compile Include="EntityCore.cs" />
+    <Compile Include="EntityTypes\CanTarget.cs" />
     <Compile Include="EntityTypes\Character.cs" />
     <Compile Include="EntityTypes\Game.cs" />
     <Compile Include="EntityTypes\Hero.cs" />
     <Compile Include="EntityTypes\Minion.cs" />
+    <Compile Include="EntityTypes\Playable.cs" />
     <Compile Include="EntityTypes\Player.cs" />
     <Compile Include="EntityTypes\Spell.cs" />
     <Compile Include="Enums.cs" />

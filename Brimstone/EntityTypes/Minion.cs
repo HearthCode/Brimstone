@@ -4,20 +4,10 @@ using System.Linq;
 
 namespace Brimstone
 {
-	public partial class Minion : Character, IMinion
+	public partial class Minion : Character<Minion>
 	{
 		public Minion(Minion cloneFrom) : base(cloneFrom) { }
 		public Minion(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
-
-		// TODO: Merge Player, Spell and Weapon implementation
-		public IPlayable Play(Character target = null) {
-			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
-				throw new PendingChoiceException();
-
-			// TODO: Check targeting validity
-			Target = target;
-			return (IPlayable) (Entity) Game.Action(this, Actions.Play(this));
-		}
 
 		public override object Clone() {
 			return new Minion(this);
@@ -52,18 +42,19 @@ namespace Brimstone
 			return false;
 		}
 
-		private bool isValidPlayTarget(Character targetable) {
+		private bool isValidPlayTarget(ICharacter targetable) {
 			return this.MeetsGenericTargetingRequirements(targetable);
 		}
 
-		private List<IEntity> getValidPlayTargets() {
+		private List<ICharacter> getValidPlayTargets() {
 			if (!mustLookForTargets())
-				return new List<IEntity>();
+				return new List<ICharacter>();
 
 			var controller = (Player)Controller;
 
 			var board = controller.Board.Concat(controller.Opponent.Board);
-			var targets = board.Where(x => isValidPlayTarget((Character)x)).ToList();
+			// TODO: Remove select after zones are made generic
+			var targets = board.Where(x => isValidPlayTarget((ICharacter)x)).Select(x => (ICharacter)x).ToList();
 
 			var hero = controller.Hero;
 			if (isValidPlayTarget(hero))
@@ -76,21 +67,23 @@ namespace Brimstone
 			return targets;
 		}
 
-		private List<IEntity> getValidAttackTargets() {
+		private List<ICharacter> getValidAttackTargets() {
 			var controller = (Player)Controller;
 
 			if (controller.Opponent.Board.Any(x => ((Minion)x).HasTaunt && !((Minion)x).HasStealth)) {
 				// Must attack non-stealthed taunts
-				return controller.Opponent.Board.Where(x => ((Minion)x).HasTaunt && !((Minion)x).HasStealth).ToList();
+				// TODO: Remove select after zones are made generic
+				return controller.Opponent.Board.Where(x => ((Minion)x).HasTaunt && !((Minion)x).HasStealth).Select(x => (ICharacter)x).ToList();
 			} else {
 				// Can attack all opponent characters
-				var targets = controller.Opponent.Board.Where(x => !((Minion)x).HasStealth).ToList();
+				// TODO: Remove select after zones are made generic
+				var targets = controller.Opponent.Board.Where(x => !((Minion)x).HasStealth).Select(x => (ICharacter)x).ToList();
 				targets.Add(controller.Opponent.Hero);
 				return targets;
 			}
 		}
 
-		public List<IEntity> ValidTargets {
+		public override List<ICharacter> ValidTargets {
 			get {
 				if (Zone.Type == Brimstone.Zone.HAND)
 					return getValidPlayTargets();

@@ -65,7 +65,7 @@ namespace BrimstoneGameScript
 			Game.NextTurn();
 
 			p1.Give("Boom Bot").Play();
-			Minion boombot = p1.Give("Boom Bot").Play() as Minion;
+			var boombot = p1.Give("Boom Bot").Play() as Minion;
 
 			boombot.Hit(1);
 

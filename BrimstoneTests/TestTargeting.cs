@@ -243,7 +243,7 @@ namespace BrimstoneTests
 
 			validTargets.Add(p2.Give("Sludge Belcher").Play());
 
-			var stealthTaunt = (Minion)p2.Give("Deathlord").Play();
+			var stealthTaunt = p2.Give("Deathlord").Play() as Minion;
 			stealthTaunt.HasStealth = true;
 
 			// Assert

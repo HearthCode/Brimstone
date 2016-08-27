@@ -53,25 +53,29 @@ namespace Brimstone
 
 		public int RemainingMana => (BaseMana + TemporaryMana) - (UsedMana + Overload);
 
+		// TODO: Allow UserData for ActionQueue
 		public Choice StartMulligan() {
 			MulliganState = MulliganState.INPUT;
 			return new Choice(this, Game.Action(this, Actions.MulliganChoice(this)), ChoiceType.MULLIGAN);
 		}
 
+		// TODO: Allow UserData for ActionQueue
 		public IPlayable Give(Card card) {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
 				throw new PendingChoiceException();
 
-			return (IPlayable)(Entity)Game.Action(Game, Actions.Give(this, card));
+			return (IPlayable)(Entity) Game.Action(Game, Actions.Give(this, card));
 		}
 
-		public IPlayable Draw() {
+		// TODO: Allow UserData for ActionQueue
+		public T Draw<T>() where T : Entity {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
 				throw new PendingChoiceException();
 
-			return (IPlayable)(Entity)Game.Action(Game, Actions.Draw(this));
+			return (T) Game.Action(Game, Actions.Draw(this));
 		}
 
+		// TODO: Allow UserData for ActionQueue
 		public void Draw(ActionGraph qty) {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
 				throw new PendingChoiceException();
@@ -79,6 +83,7 @@ namespace Brimstone
 			Game.Action(this, Actions.Draw(this) * qty);
 		}
 
+		// TODO: Allow UserData for ActionQueue
 		public void Concede() {
 			Game.Action(this, Actions.Concede(this));
 		}

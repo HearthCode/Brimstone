@@ -106,7 +106,7 @@ namespace BrimstoneTests
 					firstId = id;
 			}
 			game.NextTurn();
-			var boomBot = game.CurrentPlayer.Give("Boom Bot").Play() as Minion;
+			var boomBot = game.CurrentPlayer.Give("Boom Bot").Play() as ICharacter;
 
 			// Act
 

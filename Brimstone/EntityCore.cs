@@ -5,13 +5,6 @@ using System.Threading;
 
 namespace Brimstone
 {
-	// TODO: The base hierarchy needs to be refactored
-	// Entity base class, with:
-	// ICharacter implemented by IMinion, IHero
-	// ICanTarget implemented by IMinion, IHero, ISpell, IHeroPower
-	// IPlayable implemented by IMinion, ISpell, IWeapon
-	// ???
-
 	// TODO: Handle unknown entities
 
 	public interface IEntity : IEnumerable<KeyValuePair<GameTag, int>>, ICloneable {
@@ -31,26 +24,6 @@ namespace Brimstone
 		int FuzzyHash { get; }
 
 		IEntity CloneState();
-
-		// TODO: Move this to ICanTarget when merged and add cloning code + cloning unit test
-		Character Target { get; set; }
-	}
-
-	public interface IPlayable : IEntity {
-		IPlayable Play(Character target = null);
-	}
-
-	public interface ICanTarget : IEntity {
-		// TODO: Caching
-		// TODO: HasTarget
-		List<IEntity> ValidTargets { get; }
-	}
-
-	public interface IMinion : IPlayable, ICanTarget {
-		void Hit(int amount);
-	}
-
-	public interface ISpell : IPlayable, ICanTarget {
 	}
 
 	public class BaseEntityData : ICloneable {
@@ -149,8 +122,6 @@ namespace Brimstone
 
 		public long ReferenceCount { get { return _referenceCount.Count; } }
 		public BaseEntityData BaseEntityData { get { return _entity; } }
-		public Character Target { get; set; }
-
 		public virtual Game Game { get; set; }
 		// TODO: Re-do Controller code as normal tag property
 		private IZoneOwner _controller;

@@ -299,7 +299,7 @@ namespace Brimstone
 
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			if (args[TARGETS].HasResult)
-				foreach (Character e in args[TARGETS]) {
+				foreach (ICharacter e in args[TARGETS]) {
 					DebugLog.WriteLine("{0} is getting hit for {1} points of damage", e.ShortDescription, args[DAMAGE]);
 
 					e.Damage += args[DAMAGE];
@@ -374,8 +374,8 @@ namespace Brimstone
 		public const int DEFENDER = 1;
 
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
-			Character attacker = (Character)args[ATTACKER];
-			Character defender = (Character)args[DEFENDER];
+			var attacker = (ICharacter)(Entity)args[ATTACKER];
+			var defender = (ICharacter)(Entity)args[DEFENDER];
 
 			DebugLog.WriteLine("{0} is attacking {1}", attacker.ShortDescription, defender.ShortDescription);
 
@@ -405,9 +405,9 @@ namespace Brimstone
 			int defAttack = defender.Attack;
 
 			// TODO: Review if it's ok to use game.Action here or add a PostAttack action
-			game.Action(attacker, Actions.Damage(defender, attacker.Attack));
+			game.Action(attacker, Actions.Damage((Entity)defender, attacker.Attack));
 			if (defAttack > 0)
-				game.Action(defender, Actions.Damage(attacker, defAttack));
+				game.Action(defender, Actions.Damage((Entity)attacker, defAttack));
 
 			attacker.NumAttacksThisTurn += 1;
 			// TODO: Use EXTRA_ATTACKS_THIS_TURN?

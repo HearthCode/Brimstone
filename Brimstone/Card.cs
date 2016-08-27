@@ -23,6 +23,7 @@ namespace Brimstone
 			}
 		}
 
+		// TODO: Move this stuff to TagProperties
 		public bool Collectible {
 			get { return this[GameTag.COLLECTIBLE] == 1; }
 		}
