@@ -60,6 +60,7 @@
     <Compile Include="CardData.cs" />
     <Compile Include="Cards\All.cs" />
     <Compile Include="Deck.cs" />
+    <Compile Include="EntityController.cs" />
     <Compile Include="EntityCore.cs" />
     <Compile Include="EntityTypes\CanTarget.cs" />
     <Compile Include="EntityTypes\Character.cs" />
