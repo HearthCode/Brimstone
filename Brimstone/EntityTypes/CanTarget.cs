@@ -103,5 +103,22 @@ namespace Brimstone
 			}
 			return true;
 		}
+
+		protected List<ICharacter> GetValidAttackTargets() {
+			var controller = (Player)Controller;
+
+			if (controller.Opponent.Board.Any(x => ((Minion)x).HasTaunt && !((Minion)x).HasStealth)) {
+				// Must attack non-stealthed taunts
+				// TODO: Remove select after zones are made generic
+				return controller.Opponent.Board.Where(x => ((Minion)x).HasTaunt && !((Minion)x).HasStealth).Select(x => (ICharacter)x).ToList();
+			}
+			else {
+				// Can attack all opponent characters
+				// TODO: Remove select after zones are made generic
+				var targets = controller.Opponent.Board.Where(x => !((Minion)x).HasStealth).Select(x => (ICharacter)x).ToList();
+				targets.Add(controller.Opponent.Hero);
+				return targets;
+			}
+		}
 	}
 }

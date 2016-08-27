@@ -10,7 +10,7 @@ namespace Brimstone
 		public Minion(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
 
 		// Checks if it is currently possible to play this minion with a target. Does not check if a suitable target is available
-		private bool mustLookForTargets() {
+		private bool NeedsTargetList() {
 			if (Card.RequiresTarget)
 				return true;
 
@@ -38,53 +38,33 @@ namespace Brimstone
 			return false;
 		}
 
-		private bool isValidPlayTarget(ICharacter targetable) {
-			return MeetsGenericTargetingRequirements(targetable);
-		}
-
-		private List<ICharacter> getValidPlayTargets() {
-			if (!mustLookForTargets())
+		private List<ICharacter> GetValidBattlecryTargets() {
+			if (!NeedsTargetList())
 				return new List<ICharacter>();
 
 			var controller = (Player)Controller;
 
 			var board = controller.Board.Concat(controller.Opponent.Board);
 			// TODO: Remove select after zones are made generic
-			var targets = board.Where(x => isValidPlayTarget((ICharacter)x)).Select(x => (ICharacter)x).ToList();
+			var targets = board.Where(x => MeetsGenericTargetingRequirements((ICharacter)x)).Select(x => (ICharacter)x).ToList();
 
 			var hero = controller.Hero;
-			if (isValidPlayTarget(hero))
+			if (MeetsGenericTargetingRequirements(hero))
 				targets.Add(hero);
 
 			var opponentHero = controller.Opponent.Hero;
-			if (isValidPlayTarget(opponentHero))
+			if (MeetsGenericTargetingRequirements(opponentHero))
 				targets.Add(opponentHero);
 
 			return targets;
 		}
 
-		private List<ICharacter> getValidAttackTargets() {
-			var controller = (Player)Controller;
-
-			if (controller.Opponent.Board.Any(x => ((Minion)x).HasTaunt && !((Minion)x).HasStealth)) {
-				// Must attack non-stealthed taunts
-				// TODO: Remove select after zones are made generic
-				return controller.Opponent.Board.Where(x => ((Minion)x).HasTaunt && !((Minion)x).HasStealth).Select(x => (ICharacter)x).ToList();
-			} else {
-				// Can attack all opponent characters
-				// TODO: Remove select after zones are made generic
-				var targets = controller.Opponent.Board.Where(x => !((Minion)x).HasStealth).Select(x => (ICharacter)x).ToList();
-				targets.Add(controller.Opponent.Hero);
-				return targets;
-			}
-		}
-
 		public override List<ICharacter> ValidTargets {
 			get {
-				if (Zone.Type == Brimstone.Zone.HAND)
-					return getValidPlayTargets();
-				else if (Zone.Type == Brimstone.Zone.PLAY)
-					return getValidAttackTargets();
+				if (Zone == Controller.Hand)
+					return GetValidBattlecryTargets();
+				else if (Zone == Controller.Board)
+					return GetValidAttackTargets();
 				else {
 					// TODO: Should subclass BrimstoneException here
 					throw new Exception("Minion can't have targets while in zone " + Zone.Type);
