@@ -9,10 +9,6 @@ namespace Brimstone
 		public Minion(Minion cloneFrom) : base(cloneFrom) { }
 		public Minion(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
 
-		public override object Clone() {
-			return new Minion(this);
-		}
-
 		// Checks if it is currently possible to play this minion with a target. Does not check if a suitable target is available
 		private bool mustLookForTargets() {
 			if (Card.RequiresTarget)
@@ -43,7 +39,7 @@ namespace Brimstone
 		}
 
 		private bool isValidPlayTarget(ICharacter targetable) {
-			return this.MeetsGenericTargetingRequirements(targetable);
+			return MeetsGenericTargetingRequirements(targetable);
 		}
 
 		private List<ICharacter> getValidPlayTargets() {
@@ -94,6 +90,10 @@ namespace Brimstone
 					throw new Exception("Minion can't have targets while in zone " + Zone.Type);
 				}
 			}
+		}
+
+		public override object Clone() {
+			return new Minion(this);
 		}
 	}
 }

@@ -10,17 +10,18 @@ namespace BrimstoneTests
 	public class TestTargeting
 	{
 		[Test]
-		public void TestSpellTargeting([Values(1, 2)] int playerToAct) {
+		public void TestSpellTargeting([Values(1, 2)] int playerToStart, [Values(1, 2)] int playerToAct) {
 			// Arrange
 			var game = new Game(HeroClass.Priest, HeroClass.Priest);
-			game.Start(SkipMulligan: true);
+			game.Start(FirstPlayer: playerToStart, SkipMulligan: true);
 
 			var p1 = game.CurrentPlayer;
 			var p2 = game.CurrentPlayer.Opponent;
+
 			var pAct = game.Players[playerToAct - 1];
 
 			// Add a spell and some targets
-			var spell = pAct.Give("Fireball") as ICanTarget;
+			var spell = pAct.Give("Fireball") as Spell;
 
 			var in1 = p1.Give("Goldshire Footman").Play();
 			var in2 = p1.Give("Goldshire Footman").Play();
@@ -49,14 +50,20 @@ namespace BrimstoneTests
 			CollectionAssert.Contains(targets, in3);
 
 			// Our Stanglethorn Tiger must be a valid target
-			CollectionAssert.Contains(targets, in4);
+			if (pAct == p1)
+				CollectionAssert.Contains(targets, in4);
+			else
+				CollectionAssert.DoesNotContain(targets, in4);
 
 			// No Faerie Dragon must be a valid target
 			CollectionAssert.DoesNotContain(targets, out1);
 			CollectionAssert.DoesNotContain(targets, out2);
 
 			// Opponent Stranglethorn Tiger must not be a valid target
-			CollectionAssert.DoesNotContain(targets, out3);
+			if (pAct == p1)
+				CollectionAssert.DoesNotContain(targets, out3);
+			else
+				CollectionAssert.Contains(targets, out3);
 
 			// No other entities must be in the valid targets list
 			Assert.AreEqual(targets.Count, 6);

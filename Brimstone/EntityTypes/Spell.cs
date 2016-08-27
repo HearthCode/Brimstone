@@ -14,7 +14,7 @@ namespace Brimstone
 			if (minion != null && minion.CantBeTargetedByAbilities)
 				return false;
 
-			return this.MeetsGenericTargetingRequirements(targetable);
+			return MeetsGenericTargetingRequirements(targetable);
 		}
 
 		public override List<ICharacter> ValidTargets {
@@ -44,8 +44,5 @@ namespace Brimstone
 		public override object Clone() {
 			return new Spell(this);
 		}
-
-		public ICharacter Target { get; set; }
-
 	}
 }

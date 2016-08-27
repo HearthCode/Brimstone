@@ -87,7 +87,6 @@
     <Compile Include="Utils.cs" />
     <Compile Include="Variant.cs" />
     <Compile Include="Zone.cs" />
-    <Compile Include="Targeting.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
