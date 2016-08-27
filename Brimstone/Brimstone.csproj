@@ -71,7 +71,6 @@
     <Compile Include="EntityTypes\Player.cs" />
     <Compile Include="EntityTypes\Spell.cs" />
     <Compile Include="Enums.cs" />
-    <Compile Include="EntityGroup.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="GameNode.cs" />
     <Compile Include="GameTree.cs" />
