@@ -1,4 +1,6 @@
-﻿namespace Brimstone
+﻿using System;
+
+namespace Brimstone
 {
 	public partial class Card
 	{
@@ -49,6 +51,7 @@
 
 	public partial interface IEntity
 	{
+		Player Controller { get; set; }
 		int Cost { get; set; }
 	}
 
@@ -70,6 +73,13 @@
 		public int NumTurnsInPlay {
 			get { return this[GameTag.NUM_TURNS_IN_PLAY]; }
 			set { this[GameTag.NUM_TURNS_IN_PLAY] = value; }
+		}
+
+		// TODO: Finish this off
+		public Player Controller
+		{
+			get { return ZoneController as Player; }
+			set { throw new NotImplementedException(); }
 		}
 
 		public int Cost {
