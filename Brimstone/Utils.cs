@@ -35,10 +35,10 @@ namespace Brimstone
 
 		public void Pick(IEntity Choice) {
 			if (ChoiceType != ChoiceType.GENERAL)
-				throw new InvalidChoiceException();
+				throw new ChoiceException("Attempting to select a card with Pick for a mulligan or unknown choice card");
 
 			if (!Choices.Contains(Choice))
-				throw new InvalidChoiceException();
+				throw new ChoiceException("Attempting to select an unavailable card with Pick");
 
 			Keeping = new List<IEntity>() {Choice};
 			Controller.Game.Action(Controller, Actions.Choose((Player)Controller));
@@ -48,10 +48,10 @@ namespace Brimstone
 		public void Keep(IEnumerable<IEntity> Choices)
 		{
 			if (ChoiceType != ChoiceType.MULLIGAN)
-				throw new InvalidChoiceException();
+				throw new ChoiceException("Attempting to make a non-mulligan selection with Keep");
 
 			if (Choices.Except(this.Choices).Any())
-				throw new InvalidChoiceException();
+				throw new ChoiceException("Attempting to keep unavailable cards in mulligan selection");
 
 			Keeping = new List<IEntity>(Choices);
 			Controller.Game.Action(Controller, Actions.Choose((Player) Controller));
@@ -59,10 +59,10 @@ namespace Brimstone
 
 		public void Discard(IEnumerable<IEntity> Choices) {
 			if (ChoiceType != ChoiceType.MULLIGAN)
-				throw new InvalidChoiceException();
+				throw new ChoiceException("Attempting to make a non-mulligan selection with Discard");
 
 			if (Choices.Except(this.Choices).Any())
-				throw new InvalidChoiceException();
+				throw new ChoiceException("Attempting to discard unavailable cards in mulligan selection");
 
 			Keeping = new List<IEntity>(this.Choices.Except(Choices));
 			Controller.Game.Action(Controller, Actions.Choose((Player) Controller));

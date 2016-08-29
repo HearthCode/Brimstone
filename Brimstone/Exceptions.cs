@@ -9,23 +9,13 @@ namespace Brimstone
 		public BrimstoneException(string message, Exception inner) : base(message, inner) { }
 	}
 
-	// We can't continue until a player has made a choice (ie. mulligan, discover)
-	public class PendingChoiceException : BrimstoneException
+	public class ChoiceException : BrimstoneException
 	{
-		public PendingChoiceException() { }
+		public ChoiceException() { }
 
-		public PendingChoiceException(string message) : base(message) { }
+		public ChoiceException(string message) : base(message) { }
 
-		public PendingChoiceException(string message, Exception inner) : base(message, inner) { }
-	}
-
-	public class InvalidChoiceException : BrimstoneException
-	{
-		public InvalidChoiceException() { }
-
-		public InvalidChoiceException(string message) : base(message) { }
-
-		public InvalidChoiceException(string message, Exception inner) : base(message, inner) { }
+		public ChoiceException(string message, Exception inner) : base(message, inner) { }
 	}
 
 	public class TreeSearchException : BrimstoneException
@@ -37,21 +27,39 @@ namespace Brimstone
 		public TreeSearchException(string message, Exception inner) : base(message, inner) { }
 	}
 
-	public class ZoneMoveException : BrimstoneException
+	public class ZoneException : BrimstoneException
 	{
-		public ZoneMoveException() { }
+		public ZoneException() { }
 
-		public ZoneMoveException(string message) : base(message) { }
+		public ZoneException(string message) : base(message) { }
 
-		public ZoneMoveException(string message, Exception inner) : base(message, inner) { }
+		public ZoneException(string message, Exception inner) : base(message, inner) { }
 	}
 
-	public class PlayRequirementNotImplementedException : BrimstoneException
+	public class PlayRequirementException : BrimstoneException
 	{
-		public PlayRequirementNotImplementedException() { }
+		public PlayRequirementException() { }
 
-		public PlayRequirementNotImplementedException(string message) : base(message) { }
+		public PlayRequirementException(string message) : base(message) { }
 
-		public PlayRequirementNotImplementedException(string message, Exception inner) : base(message, inner) { }
+		public PlayRequirementException(string message, Exception inner) : base(message, inner) { }
+	}
+
+	public class TargetingException : BrimstoneException
+	{
+		public TargetingException() { }
+
+		public TargetingException(string message) : base(message) { }
+
+		public TargetingException(string message, Exception inner) : base(message, inner) { }
+	}
+
+	public class SelectorException : BrimstoneException
+	{
+		public SelectorException() { }
+
+		public SelectorException(string message) : base(message) { }
+
+		public SelectorException(string message, Exception inner) : base(message, inner) { }
 	}
 }

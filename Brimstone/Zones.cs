@@ -54,8 +54,7 @@ namespace Brimstone
 							newZone = new Zone<IEntity>(Game, Controller, z);
 							break;
 						default:
-							// TODO: Change to a ZoneTypeInvalidException later
-							throw new NotImplementedException("No such zone type when creating zone: " + z);
+							throw new ZoneException("No such zone type when creating zone: " + z);
 					}
 					_zones[(int)z] = newZone;
 				}

@@ -60,21 +60,21 @@ namespace Brimstone
 
 		public IPlayable Give(Card card) {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
-				throw new PendingChoiceException();
+				throw new ChoiceException();
 
 			return (IPlayable)(Entity) Game.Action(Game, Actions.Give(this, card));
 		}
 
 		public T Draw<T>() where T : Entity {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
-				throw new PendingChoiceException();
+				throw new ChoiceException();
 
 			return (T) Game.Action(Game, Actions.Draw(this));
 		}
 
 		public void Draw(ActionGraph qty) {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
-				throw new PendingChoiceException();
+				throw new ChoiceException();
 
 			Game.Action(this, Actions.Draw(this) * qty);
 		}

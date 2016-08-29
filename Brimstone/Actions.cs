@@ -449,14 +449,14 @@ namespace Brimstone
 			var player = (Player)args[PLAYER];
 
 			if (player.Choice == null)
-				throw new InvalidChoiceException();
+				throw new ChoiceException(source + " attempted to make a choice when no choice was available");
 
 			if (player.Choice.ChoiceType == ChoiceType.MULLIGAN)
 				chooseMulligan(player);
 			else if (player.Choice.ChoiceType == ChoiceType.GENERAL)
 				chooseGeneral(player);
 			else
-				throw new InvalidChoiceException();
+				throw new ChoiceException("Unknown choice type: " + player.Choice.ChoiceType);
 
 			var result = player.Choice.Choices;
 			player.Choice = null;

@@ -45,13 +45,13 @@ namespace Brimstone
 		// TODO: Add selector set ops
 		public static Selector Union(params Selector[] s) {
 			if (s.Length < 2)
-				throw new ArgumentException();
+				throw new SelectorException("Selector union requires at least 2 arguments");
 
 			if (s.Length > 2)
 				s[1] = Union(s.Skip(1).ToArray());
 
 			if (s[0].SelectionSource != s[1].SelectionSource)
-				throw new ArgumentException();
+				throw new SelectorException("All selectors in a union must use the same selection source");
 
 			var sel = new Selector {
 				SelectionSource = s[0].SelectionSource,

@@ -189,7 +189,7 @@ namespace Brimstone
 
 		public void NextTurn() {
 			if (Player1.Choice != null || Player2.Choice != null)
-				throw new PendingChoiceException();
+				throw new ChoiceException();
 
 			Action(this, Actions.EndTurn);
 		}

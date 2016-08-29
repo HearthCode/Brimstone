@@ -98,7 +98,7 @@ namespace Brimstone
 						break;
 
 					default:
-						throw new PlayRequirementNotImplementedException("Card requirement not implemented: " + req);
+						throw new PlayRequirementException("Card requirement not implemented: " + req);
 				}
 			}
 			return true;

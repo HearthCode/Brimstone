@@ -65,8 +65,7 @@ namespace Brimstone
 				else if (Zone == Controller.Board)
 					return GetValidAttackTargets();
 				else {
-					// TODO: Should subclass BrimstoneException here
-					throw new Exception("Minion can't have targets while in zone " + Zone.Type);
+					throw new TargetingException("Minion can't have targets while in zone " + Zone.Type);
 				}
 			}
 		}

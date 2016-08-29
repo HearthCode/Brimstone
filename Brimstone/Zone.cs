@@ -284,7 +284,7 @@ namespace Brimstone
 	{
 		public void ZoneMove(Zone Zone, int ZonePosition = -1) {
 			if (Controller == null)
-				throw new ZoneMoveException();
+				throw new ZoneException("Attempted a zone move for an entity with no controller");
 
 			Controller.Zones[Zone].MoveTo(this, ZonePosition);
 		}
@@ -299,7 +299,7 @@ namespace Brimstone
 
 		public void ZoneSwap(IEntity entity) {
 			if (Controller == null)
-				throw new ZoneMoveException();
+				throw new ZoneException("Attempted a zone swap for an entity with no controller");
 
 			Zone.Swap(this, entity);
 		}

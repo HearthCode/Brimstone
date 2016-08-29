@@ -24,7 +24,7 @@ namespace Brimstone
 		// Return T when calling Play on concrete class
 		public T Play(ICharacter target = null) {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
-				throw new PendingChoiceException();
+				throw new ChoiceException();
 
 			// TODO: Check card is in player's hand
 
