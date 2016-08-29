@@ -10,6 +10,8 @@ namespace Brimstone
 		public Hero(Hero cloneFrom) : base(cloneFrom) { }
 		public Hero(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
 
+		public override bool IsPlayable => false;
+
 		public override List<ICharacter> ValidTargets => GetValidAttackTargets();
 
 		public override object Clone() {

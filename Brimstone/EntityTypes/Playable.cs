@@ -4,6 +4,7 @@ namespace Brimstone
 {
 	public partial interface IPlayable : ICanTarget
 	{
+		bool IsPlayable { get; }
 		IPlayable Play(ICharacter target = null);
 	}
 
@@ -16,6 +17,17 @@ namespace Brimstone
 		{
 			Zone = player.Hand;
 			return (T) (IEntity) this;
+		}
+
+		public virtual bool IsPlayable
+		{
+			get
+			{
+				if (Zone != Controller.Hand)
+					return false;
+
+				return true;
+			}
 		}
 
 		// Return IPlayable when calling Play from interface
