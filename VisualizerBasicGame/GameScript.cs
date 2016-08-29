@@ -42,8 +42,8 @@ namespace BrimstoneGameScript
 			var p2 = Game.Player2;
 
 			// Do mulligan
-			p1.Choice.Keep(p1.Choice.Choices.Where(x => x[GameTag.COST] <= 2));
-			p2.Choice.Keep(p2.Choice.Choices.Where(x => x[GameTag.COST] <= 4));
+			p1.Choice.Keep(x => x.Cost <= 2);
+			p2.Choice.Keep(x => x.Cost <= 4);
 
 			// Fill the board with Flame Jugglers
 			for (int i = 0; i < MaxMinions - 2; i++) {

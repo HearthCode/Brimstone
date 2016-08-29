@@ -44,7 +44,10 @@ namespace Brimstone
 			Controller.Game.Action(Controller, Actions.Choose((Player)Controller));
 		}
 
-		// TODO: Allow passing of lambda to Keep and Discard
+		public void Keep(Func<IEntity, bool> Chooser) {
+			Keep(Choices.Where(Chooser));
+		}
+
 		public void Keep(IEnumerable<IEntity> Choices)
 		{
 			if (ChoiceType != ChoiceType.MULLIGAN)
@@ -55,6 +58,10 @@ namespace Brimstone
 
 			Keeping = new List<IEntity>(Choices);
 			Controller.Game.Action(Controller, Actions.Choose((Player) Controller));
+		}
+
+		public void Discard(Func<IEntity, bool> Chooser) {
+			Discard(Choices.Where(Chooser));
 		}
 
 		public void Discard(IEnumerable<IEntity> Choices) {
