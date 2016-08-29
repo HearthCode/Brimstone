@@ -286,7 +286,8 @@ namespace Brimstone
 			
 			DebugLog.WriteLine("{0} is playing {1}", player.FriendlyName, entity.ShortDescription);
 
-			game.Queue(entity, entity.Card.Behaviour.Battlecry.Then((Action<IEntity>) (_ =>
+			game.Queue(source, entity.Card.Behaviour.Battlecry);
+			game.Queue(source, new Action<IEntity>(_ =>
 			{
 				player.IsComboActive = true;
 				player.NumOptionsPlayedThisTurn++;
@@ -294,7 +295,7 @@ namespace Brimstone
 				// Spells go to the graveyard after they are played
 				if (entity is Spell)
 					entity.Zone = entity.Controller.Graveyard;
-			})));
+			}));
 			return (Entity) entity;
 		}
 	}
@@ -386,6 +387,7 @@ namespace Brimstone
 
 			DebugLog.WriteLine("{0} is attacking {1}", attacker.ShortDescription, defender.ShortDescription);
 
+			//source.Controller.Num
 			game.ProposedAttacker = attacker;
 			game.ProposedDefender = defender;
 			attacker.IsAttacking = true;
