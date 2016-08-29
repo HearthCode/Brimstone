@@ -267,21 +267,35 @@ namespace Brimstone
 
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			Player player = (Player)source.Controller;
-			Entity entity = args[ENTITY];
+			IPlayable entity = (IPlayable) (Entity) args[ENTITY];
+
+			// TODO: Update ResourcesUsed
+			// TODO: Update NumResourcesSpentThisGame
+
+			player.NumCardsPlayedThisTurn++;
+			if (entity is Minion)
+				player.NumMinionsPlayedThisTurn++;
 
 			entity.Zone = player.Board;
 
+			if (entity is Minion && !((Minion) entity).HasCharge)
+				((Minion) entity).IsExhausted = true;
+
+			entity.JustPlayed = true;
+			player.LastCardPlayed = entity;
+			
 			DebugLog.WriteLine("{0} is playing {1}", player.FriendlyName, entity.ShortDescription);
 
-			if (entity is Minion)
-				game.Queue(entity, entity.Card.Behaviour.Battlecry);
-			else if (entity is Spell)
-				game.Queue(entity, entity.Card.Behaviour.Battlecry.Then((Action<IEntity>) (_ =>
-				{
-					// Spells go to the graveyard after they are played
+			game.Queue(entity, entity.Card.Behaviour.Battlecry.Then((Action<IEntity>) (_ =>
+			{
+				player.IsComboActive = true;
+				player.NumOptionsPlayedThisTurn++;
+
+				// Spells go to the graveyard after they are played
+				if (entity is Spell)
 					entity.Zone = entity.Controller.Graveyard;
-				})));
-			return entity;
+			})));
+			return (Entity) entity;
 		}
 	}
 
