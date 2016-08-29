@@ -148,7 +148,8 @@ namespace Brimstone
 			game.CurrentPlayer.NumMinionsPlayedThisTurn = 0;
 			game.CurrentPlayer.NumOptionsPlayedThisTurn = 0;
 
-			// TODO: Reset EXHAUSTED tags for current player here
+			foreach (Minion e in game.CurrentPlayer.Board)
+				e.IsExhausted = false;
 
 			game.CurrentPlayer.NumCardsDrawnThisTurn = 0;
 
@@ -418,7 +419,6 @@ namespace Brimstone
 
 			defender.LastAffectedBy = attacker;
 
-			// TODO: Review if it's ok to use game.Action here or add a PostAttack action
 			game.Queue(attacker, Actions.Damage((Entity)defender, attacker.Attack));
 			if (defAttack > 0)
 				game.Queue(defender, Actions.Damage((Entity)attacker, defAttack));
