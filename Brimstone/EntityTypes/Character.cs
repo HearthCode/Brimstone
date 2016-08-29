@@ -13,7 +13,6 @@ namespace Brimstone
 		protected Character(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
 		protected Character(Character<T> cloneFrom) : base(cloneFrom) { }
 
-		// TODO: Allow UserData for ActionQueue
 		public void Hit(int amount) {
 			Game.Action(this, Actions.Damage(this, amount));
 		}

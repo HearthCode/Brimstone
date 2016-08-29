@@ -48,7 +48,6 @@ namespace Brimstone
 		public List<QueueActionEventArgs> History;
 		public bool Paused { get; set; }
 
-		// TODO: Remove - this should be transient
 		public object UserData { get; set; }
 
 		public event EventHandler<QueueActionEventArgs> OnQueueing;

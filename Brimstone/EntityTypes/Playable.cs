@@ -18,8 +18,6 @@ namespace Brimstone
 			return (T) (IEntity) this;
 		}
 
-		// TODO: Allow UserData for ActionQueue
-
 		// Return IPlayable when calling Play from interface
 		IPlayable IPlayable.Play(ICharacter target) { return (IPlayable) Play(target); }
 
