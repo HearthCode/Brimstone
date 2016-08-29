@@ -284,6 +284,16 @@
 			get { return this[GameTag.OVERLOAD_THIS_GAME]; }
 			set { this[GameTag.OVERLOAD_THIS_GAME] = value; }
 		}
+
+		public IPlayable LastCardPlayed {
+			get {
+				int id = this[GameTag.LAST_CARD_PLAYED];
+				return (id != 0 ? (IPlayable)Game.Entities[id] : null);
+			}
+			set {
+				this[GameTag.PROPOSED_ATTACKER] = value?.Id ?? 0;;
+			}
+		}
 	}
 
 	public partial interface IPlayable : ICanTarget
