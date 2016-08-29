@@ -53,6 +53,8 @@ namespace Brimstone
 
 		public int RemainingMana => (BaseMana + TemporaryMana) - (UsedMana + Overload);
 
+		public bool SufficientMana(IEntity e) => RemainingMana >= e.Cost;
+
 		// All the entities that we can potentially play or attack with when it's our turn
 		public IEnumerable<IEntity> LiveEntities => Hand.Concat(Board).Concat(new List<IEntity> {this, /* HeroPower */});
 
