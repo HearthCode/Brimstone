@@ -398,6 +398,10 @@
 			set { this[GameTag.CANT_BE_TARGETED_BY_ABILITIES ] = value ? 1 : 0; }
 		}
 
+		public bool HasCharge {
+			get { return this[GameTag.CHARGE] == 1; }
+		}
+
 		public bool HasDeathrattle {
 			get { return this[GameTag.DEATHRATTLE] == 1; }
 		}
