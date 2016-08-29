@@ -267,7 +267,7 @@
 		}
 	}
 
-	public partial interface ICharacter : ICanTarget
+	public partial interface ICharacter : IPlayable
 	{
 		int Attack { get; set; }
 		bool CantBeTargetedByOpponents { get; set; }

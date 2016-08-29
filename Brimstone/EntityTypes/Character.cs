@@ -2,7 +2,7 @@
 
 namespace Brimstone
 {
-	public partial interface ICharacter : ICanTarget
+	public partial interface ICharacter : IPlayable
 	{
 		void Hit(int amount);
 		void CheckForDeath();
