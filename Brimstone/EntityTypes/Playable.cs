@@ -12,6 +12,8 @@ namespace Brimstone
 		protected Playable(Playable<T> cloneFrom) : base(cloneFrom) { }
 		protected Playable(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
 
+		// TODO: Add GiveTo helper
+
 		// TODO: Allow UserData for ActionQueue
 
 		// Return IPlayable when calling Play from interface
@@ -21,6 +23,8 @@ namespace Brimstone
 		public T Play(ICharacter target = null) {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
 				throw new PendingChoiceException();
+
+			// TODO: Check card is in player's hand
 
 			// TODO: Check targeting validity
 			Target = target;
