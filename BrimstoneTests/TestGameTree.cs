@@ -122,7 +122,7 @@ namespace BrimstoneTests
 							break;
 
 						case TestAction.ArcaneMissiles:
-							((Spell)game.CurrentPlayer.Hand.First(t => t.Card.Name == "Arcane Missiles")).Play();
+							game.CurrentPlayer.Hand.First(t => t.Card.Name == "Arcane Missiles").Play();
 							break;
 					}
 				}

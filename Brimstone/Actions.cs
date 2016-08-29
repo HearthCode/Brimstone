@@ -233,15 +233,7 @@ namespace Brimstone
 			Card card = args[CARD];
 
 			DebugLog.WriteLine("Giving {0} to {1}", card.Name, player.FriendlyName);
-
-			// TODO: IPlayable factory method
-			if (card.Type == CardType.MINION)
-				return new Minion(card) {Zone = player.Hand};
-			if (card.Type == CardType.SPELL)
-				return new Spell(card) {Zone = player.Hand};
-			// TODO: Weapons
-
-			return ActionResult.None;
+			return (Entity) Entity.FromCard(card, StartingZone: player.Hand) ?? ActionResult.None;
 		}
 	}
 

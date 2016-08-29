@@ -244,6 +244,30 @@ namespace Brimstone
 			return allTags;
 		}
 
+		public static IEntity FromCard(Card Card, Dictionary<GameTag, int> Tags = null, IZone StartingZone = null)
+		{
+			IEntity e = null;
+			switch (Card.Type)
+			{
+				case CardType.MINION:
+					if (StartingZone == null)
+						e = new Minion(Card, Tags);
+					else
+						e = new Minion(Card, Tags) {Zone = StartingZone};
+					break;
+
+				case CardType.SPELL:
+					if (StartingZone == null)
+						e = new Spell(Card, Tags);
+					else
+						e = new Minion(Card, Tags) {Zone = StartingZone};
+					break;
+				
+				// TODO: Weapons etc.
+			}
+			return e;
+		}
+
 		public IEnumerator<KeyValuePair<GameTag, int>> GetEnumerator() {
 			// Hopefully we're only iterating through tags in test code
 			// so it doesn't matter that we are making a deep clone of the dictionary

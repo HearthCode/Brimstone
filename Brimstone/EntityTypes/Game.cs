@@ -105,8 +105,11 @@ namespace Brimstone
 		}
 
 		public IEntity Add(IEntity newEntity, IZoneController controller) {
-			newEntity.Controller = controller;
-			return Entities.Add(newEntity);
+			if (newEntity != null) {
+				newEntity.Controller = controller;
+				return Entities.Add(newEntity);
+			}
+			return null;
 		}
 
 		public ActionResult Action(IEntity source, ActionGraph g) {

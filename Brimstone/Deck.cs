@@ -21,23 +21,11 @@ namespace Brimstone
 			int nextPos = Count + 1;
 
 			foreach (var card in cards) {
-				IEntity e = null;
-
 				var tags = new Dictionary<GameTag, int> {
 					{ GameTag.ZONE, (int)Zone.DECK },
 					{ GameTag.ZONE_POSITION, nextPos++ }
 				};
-
-				if (card.Type == CardType.MINION) {
-					e = new Minion(card, tags);
-				}
-				else if (card.Type == CardType.SPELL) {
-					e = new Spell(card, tags);
-				}
-				// TODO: Weapons
-				if (e != null)
-
-					Game.Add(e, Controller);
+				Game.Add(Entity.FromCard(card, tags), Controller);
 			}
 			// Force deck zone contents to update
 			Init();
