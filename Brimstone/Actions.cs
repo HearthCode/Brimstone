@@ -387,7 +387,7 @@ namespace Brimstone
 
 			DebugLog.WriteLine("{0} is attacking {1}", attacker.ShortDescription, defender.ShortDescription);
 
-			//source.Controller.Num
+			source.Controller.NumFriendlyMinionsThatAttackedThisTurn++;
 			game.ProposedAttacker = attacker;
 			game.ProposedDefender = defender;
 			attacker.IsAttacking = true;
@@ -398,7 +398,10 @@ namespace Brimstone
 
 			defender.IsDefending = true;
 
+			defender.PreDamage = attacker.Attack;
+
 			// TODO: Allow other things to change the proposed attacker/defender here
+			defender.PreDamage = 0;
 			defender = game.ProposedDefender;
 
 			if (attacker.ShouldExitCombat) {
@@ -413,12 +416,14 @@ namespace Brimstone
 			// Save defender's attack as it might change after being damaged (e.g. enrage)
 			int defAttack = defender.Attack;
 
+			defender.LastAffectedBy = attacker;
+
 			// TODO: Review if it's ok to use game.Action here or add a PostAttack action
 			game.Action(attacker, Actions.Damage((Entity)defender, attacker.Attack));
 			if (defAttack > 0)
 				game.Action(defender, Actions.Damage((Entity)attacker, defAttack));
 
-			attacker.NumAttacksThisTurn += 1;
+			attacker.NumAttacksThisTurn++;
 			// TODO: Use EXTRA_ATTACKS_THIS_TURN?
 			attacker.IsExhausted = true;
 
