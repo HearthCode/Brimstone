@@ -385,7 +385,7 @@ namespace Brimstone
 
 			game.NextStep = Step.MAIN_ACTION;
 			game.Step = Step.MAIN_COMBAT;
-			// TODO: Increase NumOptionsPlayedThisTurn here
+			game.NumOptionsPlayedThisTurn++;
 
 			defender.IsDefending = true;
 
