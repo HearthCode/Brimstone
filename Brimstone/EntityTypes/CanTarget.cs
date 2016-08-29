@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Brimstone
 {
-	public partial interface ICanTarget : IEntity
+	public interface ICanTarget : IEntity
 	{	
 		// TODO: Caching
 		// TODO: HasTarget
@@ -11,9 +11,11 @@ namespace Brimstone
 
 		// TODO: Add cloning code + cloning unit test
 		ICharacter Target { get; set; }
+
+		ICanTarget Attack(ICharacter Target = null);
 	}
 
-	public abstract partial class CanTarget : Entity, ICanTarget
+	public abstract class CanTarget : Entity, ICanTarget
 	{
 		public ICharacter Target { get; set; }
 
@@ -115,6 +117,15 @@ namespace Brimstone
 				targets.Add(Controller.Opponent.Hero);
 				return targets;
 			}
+		}
+
+		public ICanTarget Attack(ICharacter target = null) {
+			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
+				throw new ChoiceException();
+
+			// TODO: Check targeting validity
+			Target = target;
+			return (ICanTarget) (Entity) Game.Action(this, Actions.Attack(this, (Entity) target));
 		}
 	}
 }
