@@ -12,7 +12,7 @@ namespace Brimstone
 		// Allow owner game and controller to be changed for state cloning
 		Game Game { get; set; }
 		BaseEntityData BaseEntityData { get; }
-		IZoneController Controller { get; set; }
+		IZoneController ZoneController { get; set; }
 		Card Card { get; }
 		IZone Zone { get; set; }
 		int ZonePosition { get; set; }
@@ -124,18 +124,18 @@ namespace Brimstone
 		public BaseEntityData BaseEntityData { get { return _entity; } }
 		public virtual Game Game { get; set; }
 		// TODO: Re-do Controller code as normal tag property
-		private IZoneController _controller;
-		public IZoneController Controller {
+		private IZoneController _zoneController;
+		public IZoneController ZoneController {
 			get {
-				return _controller;
+				return _zoneController;
 			}
 			set {
-				if (_controller == value)
+				if (_zoneController == value)
 					return;
 				if (Game != null)
 					if (Game.Entities != null)
 						Changing(false);
-				_controller = value;
+				_zoneController = value;
 				if (Game != null)
 					if (Game.Entities != null)
 						Game.Entities.EntityChanged(Id, GameTag.CONTROLLER, value.Id);
@@ -163,7 +163,7 @@ namespace Brimstone
 				if (t == GameTag.ENTITY_ID)
 					return _entity.Id;
 				if (t == GameTag.CONTROLLER)
-					return Controller.Id;
+					return ZoneController.Id;
 				return _entity[t];
 			}
 			set {
@@ -174,7 +174,7 @@ namespace Brimstone
 					return;
 
 				else if (t == GameTag.CONTROLLER) {
-					Controller = (IZoneController) Game.Entities[value];
+					ZoneController = (IZoneController) Game.Entities[value];
 				}
 				else if (t == GameTag.ENTITY_ID) {
 					Changing();
@@ -237,8 +237,8 @@ namespace Brimstone
 				allTags[tag.Key] = tag.Value;
 
 			// Specially handled tags
-			if (Controller != null)
-				allTags[GameTag.CONTROLLER] = Controller.Id;
+			if (ZoneController != null)
+				allTags[GameTag.CONTROLLER] = ZoneController.Id;
 			allTags[GameTag.ENTITY_ID] = _entity.Id;
 			return allTags;
 		}
@@ -293,7 +293,7 @@ namespace Brimstone
 				if (_fuzzyHash != 0 && Settings.EntityHashCaching)
 					return _fuzzyHash;
 				uint prime = 16777219;
-				bool inHand = Zone == Controller.Hand;
+				bool inHand = Zone == ZoneController.Hand;
 				uint hash = 2166136261;
 				// The card's asset ID uniquely identifies the set of immutable starting tags for the card
 				hash = (hash * prime) ^ (uint)(_entity.Card.AssetId >> 8);
@@ -306,7 +306,7 @@ namespace Brimstone
 						hash = (hash * prime) ^ (uint)(kv.Value & 0xff);
 					}
 				hash = (hash * prime) ^ (uint)GameTag.CONTROLLER;
-				hash = (hash * prime) ^ (uint)Controller.Id;
+				hash = (hash * prime) ^ (uint)ZoneController.Id;
 				_fuzzyHash = (int)hash;
 				return _fuzzyHash;
 			}
@@ -315,8 +315,8 @@ namespace Brimstone
 		public override string ToString() {
 			string s = Card.Name + " - ";
 			s += new Tag(GameTag.ENTITY_ID, _entity.Id) + ", ";
-			if (Controller != null)
-				s += new Tag(GameTag.CONTROLLER, Controller.Id) + ", ";
+			if (ZoneController != null)
+				s += new Tag(GameTag.CONTROLLER, ZoneController.Id) + ", ";
 			foreach (var tag in _entity.Tags) {
 				s += new Tag(tag.Key, tag.Value) + ", ";
 			}

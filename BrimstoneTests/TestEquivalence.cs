@@ -32,7 +32,7 @@ namespace BrimstoneTests
 			var wisp3 = game1.Player1.Give("Wisp");
 
 			Assert.AreNotEqual(wisp1.Id, wisp3.Id);
-			Assert.AreEqual(wisp1.Controller.Id, wisp3.Controller.Id);
+			Assert.AreEqual(wisp1.ZoneController.Id, wisp3.ZoneController.Id);
 			Assert.AreNotEqual(wisp1[GameTag.ZONE_POSITION], wisp3[GameTag.ZONE_POSITION]);
 			Assert.AreNotEqual(wisp1, wisp3);
 			Assert.AreNotEqual(wisp2, wisp3);
@@ -41,10 +41,10 @@ namespace BrimstoneTests
 			Assert.AreEqual(wisp2.FuzzyHash, wisp3.FuzzyHash);
 
 			// Different wisp, same entity ID, different controller, same game, same hand position
-			wisp2.Controller = game1.Player2;
+			wisp2.ZoneController = game1.Player2;
 
 			Assert.AreEqual(wisp1.Id, wisp2.Id);
-			Assert.AreNotEqual(wisp1.Controller.Id, wisp2.Controller.Id);
+			Assert.AreNotEqual(wisp1.ZoneController.Id, wisp2.ZoneController.Id);
 			Assert.AreEqual(wisp1[GameTag.ZONE_POSITION], wisp2[GameTag.ZONE_POSITION]);
 
 			Assert.AreNotEqual(wisp1, wisp2);
@@ -55,7 +55,7 @@ namespace BrimstoneTests
 			var wisp4 = game1.Player1.Give("Wisp");
 			var wisp5 = wisp4.CloneState();
 			wisp5.Game = game1;
-			wisp5.Controller = wisp4.Controller;
+			wisp5.ZoneController = wisp4.ZoneController;
 
 			Assert.AreEqual(wisp4, wisp5);
 			Assert.AreEqual(wisp4.FuzzyHash, wisp5.FuzzyHash);

@@ -106,7 +106,7 @@ namespace Brimstone
 
 		public IEntity Add(IEntity newEntity, IZoneController controller) {
 			if (newEntity != null) {
-				newEntity.Controller = controller;
+				newEntity.ZoneController = controller;
 				return Entities.Add(newEntity);
 			}
 			return null;

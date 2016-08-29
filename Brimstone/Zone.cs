@@ -49,7 +49,7 @@ namespace Brimstone
 		protected void Init() {
 			// Make sure that _cachedEntities[0] has ZONE_POSITION = 1 etc.
 			_cachedEntities = Game.Entities
-				.Where(e => e.Controller == Controller && e.Zone == this && e.ZonePosition > 0).Select(e => (T) e);
+				.Where(e => e.ZoneController == Controller && e.Zone == this && e.ZonePosition > 0).Select(e => (T) e);
 			_cachedEntitiesAsList = null;
 		}
 
@@ -222,7 +222,7 @@ namespace Brimstone
 			var previous = Entity.Zone;
 			if (previous != null && previous.Type != Zone.INVALID) {
 				// Same zone move
-				if (previous == this && Entity.Controller == Controller && ZonePosition > 0 && Entity.ZonePosition != ZonePosition) {
+				if (previous == this && Entity.ZoneController == Controller && ZonePosition > 0 && Entity.ZonePosition != ZonePosition) {
 					if (Entity is T)
 					{
 						// We have to take a copy of asList here in case zone caching is disabled!
@@ -258,10 +258,10 @@ namespace Brimstone
 			Old[GameTag.ZONE_POSITION] = p;
 
 			// Swap references
-			Old.Controller.Zones[Old.Zone.Type].SetDirty();
-			New.Controller.Zones[Old.Zone.Type].SetDirty();
-			Old.Controller.Zones[New.Zone.Type].SetDirty();
-			New.Controller.Zones[New.Zone.Type].SetDirty();
+			Old.ZoneController.Zones[Old.Zone.Type].SetDirty();
+			New.ZoneController.Zones[Old.Zone.Type].SetDirty();
+			Old.ZoneController.Zones[New.Zone.Type].SetDirty();
+			New.ZoneController.Zones[New.Zone.Type].SetDirty();
 		}
 
 		public IEnumerator<T> GetEnumerator() {
@@ -283,10 +283,10 @@ namespace Brimstone
 	public partial class Entity : IEntity
 	{
 		public void ZoneMove(Zone Zone, int ZonePosition = -1) {
-			if (Controller == null)
+			if (ZoneController == null)
 				throw new ZoneException("Attempted a zone move for an entity with no controller");
 
-			Controller.Zones[Zone].MoveTo(this, ZonePosition);
+			ZoneController.Zones[Zone].MoveTo(this, ZonePosition);
 		}
 
 		public void ZoneMove(IZone Zone, int ZonePosition = -1) {
@@ -298,7 +298,7 @@ namespace Brimstone
 		}
 
 		public void ZoneSwap(IEntity entity) {
-			if (Controller == null)
+			if (ZoneController == null)
 				throw new ZoneException("Attempted a zone swap for an entity with no controller");
 
 			Zone.Swap(this, entity);

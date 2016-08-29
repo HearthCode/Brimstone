@@ -33,7 +33,7 @@ namespace Brimstone
 		public EntityController(Game game)
 		{
 			Game = game;
-			Game.Controller = game;
+			Game.ZoneController = game;
 
 			// Fuzzy hashing
 			Changed = false;
@@ -55,7 +55,7 @@ namespace Brimstone
 			foreach (var entity in Entities)
 				entity.Value.Game = Game;
 			foreach (var entity in Entities)
-				entity.Value.Controller = (IZoneController) Entities[es.Entities[entity.Key].Controller.Id];
+				entity.Value.ZoneController = (IZoneController) Entities[es.Entities[entity.Key].ZoneController.Id];
 
 			// Do this last so that changing Controller doesn't trigger EntityChanging
 			Game.Entities = this;
@@ -129,7 +129,7 @@ namespace Brimstone
 						if (entity.Zone.Type != Zone.PLAY || entity.ZonePosition == 0)
 							_gameHash += entity.FuzzyHash;
 						else
-							_gameHash += (entity.Controller.Id*8 + entity.ZonePosition)*entity.FuzzyHash;
+							_gameHash += (entity.ZoneController.Id*8 + entity.ZonePosition)*entity.FuzzyHash;
 					_changed = false;
 				}
 				return _gameHash;

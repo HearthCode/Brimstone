@@ -56,7 +56,7 @@
 	{
 		// Setting Zone directly moves the entity to the end of the specified zone
 		public IZone Zone {
-			get { return Controller?.Zones[(Zone)this[GameTag.ZONE]]; }
+			get { return ZoneController?.Zones[(Zone)this[GameTag.ZONE]]; }
 			set { ZoneMove(value); }
 		}
 

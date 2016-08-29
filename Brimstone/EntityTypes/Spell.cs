@@ -23,7 +23,7 @@ namespace Brimstone
 				if (!Card.RequiresTargetIfAvailable && !Card.RequiresTarget)
 					return new List<ICharacter>();
 
-				var controller = (Player)Controller;
+				var controller = (Player)ZoneController;
 
 				var board = controller.Board.Concat(controller.Opponent.Board);
 				var targets = board.Where(isValidTarget).ToList<ICharacter>();

@@ -19,7 +19,7 @@ namespace Brimstone
 				return true;
 
 			// Targeted play, if combo is active (e.g. SI:7)
-			var controller = (Player)Controller;
+			var controller = (Player)ZoneController;
 			if (Card.HasCombo && Card.Requirements.ContainsKey(PlayRequirements.REQ_TARGET_FOR_COMBO))
 				return controller.IsComboActive;
 
@@ -42,7 +42,7 @@ namespace Brimstone
 			if (!NeedsTargetList())
 				return new List<ICharacter>();
 
-			var controller = (Player)Controller;
+			var controller = (Player)ZoneController;
 
 			var board = controller.Board.Concat(controller.Opponent.Board);
 			var targets = board.Where(MeetsGenericTargetingRequirements).ToList<ICharacter>();
@@ -60,9 +60,9 @@ namespace Brimstone
 
 		public override List<ICharacter> ValidTargets {
 			get {
-				if (Zone == Controller.Hand)
+				if (Zone == ZoneController.Hand)
 					return GetValidBattlecryTargets();
-				else if (Zone == Controller.Board)
+				else if (Zone == ZoneController.Board)
 					return GetValidAttackTargets();
 				else {
 					throw new TargetingException("Minion can't have targets while in zone " + Zone.Type);
