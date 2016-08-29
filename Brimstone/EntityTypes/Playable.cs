@@ -2,12 +2,12 @@
 
 namespace Brimstone
 {
-	public interface IPlayable : ICanTarget
+	public partial interface IPlayable : ICanTarget
 	{
 		IPlayable Play(ICharacter target = null);
 	}
 
-	public abstract class Playable<T> : CanTarget, IPlayable where T : Entity
+	public abstract partial class Playable<T> : CanTarget, IPlayable where T : Entity
 	{
 		protected Playable(Playable<T> cloneFrom) : base(cloneFrom) { }
 		protected Playable(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }

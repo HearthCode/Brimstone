@@ -286,6 +286,19 @@
 		}
 	}
 
+	public partial interface IPlayable : ICanTarget
+	{
+		bool JustPlayed { get; set; }
+	}
+
+	public abstract partial class Playable<T> : CanTarget, IPlayable where T : Entity
+	{
+		public bool JustPlayed {
+			get { return this[GameTag.JUST_PLAYED] == 1; }
+			set { this[GameTag.JUST_PLAYED] = value ? 1 : 0; }
+		}
+	}
+
 	public partial interface ICharacter : IPlayable
 	{
 		int Attack { get; set; }
