@@ -419,21 +419,24 @@ namespace Brimstone
 			defender.LastAffectedBy = attacker;
 
 			// TODO: Review if it's ok to use game.Action here or add a PostAttack action
-			game.Action(attacker, Actions.Damage((Entity)defender, attacker.Attack));
+			game.Queue(attacker, Actions.Damage((Entity)defender, attacker.Attack));
 			if (defAttack > 0)
-				game.Action(defender, Actions.Damage((Entity)attacker, defAttack));
+				game.Queue(defender, Actions.Damage((Entity)attacker, defAttack));
 
-			attacker.NumAttacksThisTurn++;
-			// TODO: Use EXTRA_ATTACKS_THIS_TURN?
-			attacker.IsExhausted = true;
+			game.Queue(source, new Action<IEntity>(_ =>
+			{
+				attacker.NumAttacksThisTurn++;
+				// TODO: Use EXTRA_ATTACKS_THIS_TURN?
+				attacker.IsExhausted = true;
 
-			game.ProposedAttacker = null;
-			game.ProposedDefender = null;
-			attacker.IsAttacking = false;
-			defender.IsDefending = false;
+				game.ProposedAttacker = null;
+				game.ProposedDefender = null;
+				attacker.IsAttacking = false;
+				defender.IsDefending = false;
 
-			game.Step = Step.MAIN_ACTION;
-			game.NextStep = Step.MAIN_END;
+				game.Step = Step.MAIN_ACTION;
+				game.NextStep = Step.MAIN_END;
+			}));
 
 			return ActionResult.None;
 		}
