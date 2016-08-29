@@ -53,13 +53,15 @@ namespace Brimstone
 	{
 		Player Controller { get; set; }
 		int Cost { get; set; }
+		IEntity LastAffectedBy { get; set; }
 	}
 
 	public partial class Entity
 	{
 		// Setting Zone directly moves the entity to the end of the specified zone
-		public IZone Zone {
-			get { return ZoneController?.Zones[(Zone)this[GameTag.ZONE]]; }
+		public IZone Zone
+		{
+			get { return ZoneController?.Zones[(Zone) this[GameTag.ZONE]]; }
 			set { ZoneMove(value); }
 		}
 
@@ -76,8 +78,7 @@ namespace Brimstone
 		}
 
 		// TODO: Finish this off
-		public Player Controller
-		{
+		public Player Controller {
 			get { return ZoneController as Player; }
 			set { ZoneController = value; }
 		}
@@ -85,6 +86,16 @@ namespace Brimstone
 		public int Cost {
 			get { return this[GameTag.COST]; }
 			set { this[GameTag.COST] = value; }
+		}
+
+		public IEntity LastAffectedBy {
+			get {
+				int id = this[GameTag.LAST_AFFECTED_BY];
+				return (id != 0 ? Game.Entities[id] : null);
+			}
+			set {
+				this[GameTag.LAST_AFFECTED_BY] = value?.Id ?? 0;
+			}
 		}
 	}
 
