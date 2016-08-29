@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Brimstone
 {
-	public interface ICanTarget : IEntity
+	public partial interface ICanTarget : IEntity
 	{	
 		// TODO: Caching
 		// TODO: HasTarget
@@ -13,7 +13,7 @@ namespace Brimstone
 		ICharacter Target { get; set; }
 	}
 
-	public abstract class CanTarget : Entity, ICanTarget
+	public abstract partial class CanTarget : Entity, ICanTarget
 	{
 		public ICharacter Target { get; set; }
 

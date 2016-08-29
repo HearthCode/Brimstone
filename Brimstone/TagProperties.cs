@@ -22,6 +22,10 @@
 			get { return (CardType)this[GameTag.CARDTYPE]; }
 		}
 
+		public int Cost {
+			get { return this[GameTag.COST]; }
+		}
+
 		public bool HasOverload {
 			get { return this[GameTag.OVERLOAD] == 1; }
 		}
@@ -43,6 +47,11 @@
 		}
 	}
 
+	public partial interface IEntity
+	{
+		int Cost { get; set; }
+	}
+
 	public partial class Entity
 	{
 		// Setting Zone directly moves the entity to the end of the specified zone
@@ -61,6 +70,11 @@
 		public int NumTurnsInPlay {
 			get { return this[GameTag.NUM_TURNS_IN_PLAY]; }
 			set { this[GameTag.NUM_TURNS_IN_PLAY] = value; }
+		}
+
+		public int Cost {
+			get { return this[GameTag.COST]; }
+			set { this[GameTag.COST] = value; }
 		}
 	}
 

@@ -7,7 +7,7 @@ namespace Brimstone
 {
 	// TODO: Handle unknown entities
 
-	public interface IEntity : IEnumerable<KeyValuePair<GameTag, int>>, ICloneable {
+	public partial interface IEntity : IEnumerable<KeyValuePair<GameTag, int>>, ICloneable {
 		int Id { get; set; }
 		// Allow owner game and controller to be changed for state cloning
 		Game Game { get; set; }
