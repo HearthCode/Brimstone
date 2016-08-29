@@ -258,10 +258,10 @@ namespace Brimstone
 				case "S":
 					s += "Player 1 (health " + Player1.Hero.Health + "): ";
 					foreach (var e in Player1.Board)
-						s += "[" + e.ZonePosition + ":" + e.Card.AbbrieviatedName + "](" + ((ICharacter)e).Damage + ") ";
+						s += "[" + e.ZonePosition + ":" + e.Card.AbbrieviatedName + "](" + e.Damage + ") ";
 					s += "\r\nPlayer 2 (health " + Player2.Hero.Health + "): ";
 					foreach (var e in Player2.Board)
-						s += "[" + e.ZonePosition + ":" + e.Card.AbbrieviatedName + "](" + ((ICharacter)e).Damage + ") ";
+						s += "[" + e.ZonePosition + ":" + e.Card.AbbrieviatedName + "](" + e.Damage + ") ";
 					s += "\r\n";
 					foreach (var pa in PowerHistory.Skip(PowerHistory.Count() - 20))
 						s += pa + "\r\n";
@@ -270,10 +270,10 @@ namespace Brimstone
 				case "s":
 					s += "Player 1 (health " + Player1.Hero.Health + "): ";
 					foreach (var e in Player1.Board)
-						s += "[" + e.ZonePosition + ":" + e.Card.AbbrieviatedName + "](" + ((ICharacter)e).Damage + ") ";
+						s += "[" + e.ZonePosition + ":" + e.Card.AbbrieviatedName + "](" + e.Damage + ") ";
 					s += "\r\nPlayer 2 (health " + Player2.Hero.Health + "): ";
 					foreach (var e in Player2.Board)
-						s += "[" + e.ZonePosition + ":" + e.Card.AbbrieviatedName + "](" + ((ICharacter)e).Damage + ") ";
+						s += "[" + e.ZonePosition + ":" + e.Card.AbbrieviatedName + "](" + e.Damage + ") ";
 					s += "\r\n";
 					return s;
 				default:

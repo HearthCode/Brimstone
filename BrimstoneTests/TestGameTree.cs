@@ -35,7 +35,7 @@ namespace BrimstoneTests
 			// Check that each game state's probability is correct
 
 			// 12/48
-			var opponentRCDead = uniqueGames.Where(x => x.Key.Player1.Board.Where(y => y.Card.Name == "River Crocolisk").Count() == 1).First().Value;
+			var opponentRCDead = uniqueGames.First(x => x.Key.Player1.Board.Count(y => y.Card.Name == "River Crocolisk") == 1).Value;
 			Assert.AreEqual(1.0 / 4.0, opponentRCDead, 0.0000001);
 
 			// 12/48
@@ -49,20 +49,20 @@ namespace BrimstoneTests
 				Assert.AreEqual(1.0 / 48.0, p, 0.0000001);
 
 			// 4/48
-			var bothBoomBotsRCDead = uniqueGames.Where(x => x.Key.Player1.Board.Concat(x.Key.Player2.Board).Where(y => y.Card.Name == "Boom Bot").Count() == 0
-														&& x.Key.Player2.Board.Where(y => y.Card.Name == "River Crocolisk").Count() == 1).First().Value;
+			var bothBoomBotsRCDead = uniqueGames.First(x => x.Key.Player1.Board.Concat(x.Key.Player2.Board).Count(y => y.Card.Name == "Boom Bot") == 0
+														&& x.Key.Player2.Board.Count(y => y.Card.Name == "River Crocolisk") == 1).Value;
 			Assert.AreEqual(4.0 / 48.0, bothBoomBotsRCDead, 0.0000001);
 
 			// 12/48
-			var opponentRCDamaged = uniqueGames.Where(x => x.Key.Player1.Board.Where(y => y.Card.Name == "River Crocolisk").Count() == 2
-													&& x.Key.Player1.Board.Where(y => y.Card.Name == "Boom Bot").Count() == 1
+			var opponentRCDamaged = uniqueGames.Where(x => x.Key.Player1.Board.Count(y => y.Card.Name == "River Crocolisk") == 2
+													&& x.Key.Player1.Board.Count(y => y.Card.Name == "Boom Bot") == 1
 													&& x.Key.Player1.Hero.Health == 30).Select(x => x.Value).ToList();
 			foreach (var p in opponentRCDamaged)
 				Assert.AreEqual(3.0 / 48.0, p, 0.0000001);
 
 			// 4/48
-			var friendlyRCDamaged = uniqueGames.Where(x => x.Key.Player2.Board.Where(y => y.Card.Name == "River Crocolisk").Count() == 2
-													&& x.Key.Player1.Board.Where(y => y.Card.Name == "Boom Bot").Count() == 0)
+			var friendlyRCDamaged = uniqueGames.Where(x => x.Key.Player2.Board.Count(y => y.Card.Name == "River Crocolisk") == 2
+													&& x.Key.Player1.Board.All(y => y.Card.Name != "Boom Bot"))
 													.Select(x => x.Value).ToList();
 			foreach (var p in friendlyRCDamaged)
 				Assert.AreEqual(1.0 / 48.0, p, 0.0000001);
@@ -118,7 +118,7 @@ namespace BrimstoneTests
 					// This is the action that shall be taken to build the tree
 					switch (testAction) {
 						case TestAction.BoomBot:
-							((Minion)game.CurrentPlayer.Board.First(t => t.Card.Name == "Boom Bot")).Hit(1);
+							game.CurrentPlayer.Board.First(t => t.Card.Name == "Boom Bot").Hit(1);
 							break;
 
 						case TestAction.ArcaneMissiles:
@@ -200,7 +200,7 @@ namespace BrimstoneTests
 			}
 
 			// Do a random action on the first game in depth 1 and add all possible outcomes as children
-			Minion FirstBoomBot = depth1Games[0].CurrentPlayer.Board.Where(x => x.Card.Name == "Boom Bot").First() as Minion;
+			Minion FirstBoomBot = depth1Games[0].CurrentPlayer.Board.First(x => x.Card.Name == "Boom Bot");
 			var boomBotResults = RandomOutcomeSearch.Find(depth1Games[0], () => FirstBoomBot.Hit(1));
 
 			var depth2Nodes = depth1Nodes[0].AddChildren(boomBotResults).ToList();

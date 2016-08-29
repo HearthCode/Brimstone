@@ -54,7 +54,7 @@ namespace Test1
 				SearchMode: new NaiveActionWalker(),
 				Action: () => {
 					if (BoomBotTest) {
-						var BoomBot = game.CurrentPlayer.Board.First(t => t.Card.Id == "GVG_110t") as Minion;
+						var BoomBot = game.CurrentPlayer.Board.First(t => t.Card.Id == "GVG_110t");
 						BoomBot.Hit(1);
 					}
 

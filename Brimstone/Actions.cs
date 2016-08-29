@@ -234,6 +234,7 @@ namespace Brimstone
 
 			DebugLog.WriteLine("Giving {0} to {1}", card.Name, player.FriendlyName);
 
+			// TODO: IPlayable factory method
 			if (card.Type == CardType.MINION)
 				return new Minion(card) {Zone = player.Hand};
 			if (card.Type == CardType.SPELL)
@@ -252,13 +253,13 @@ namespace Brimstone
 			Player player = (Player)args[PLAYER];
 
 			if (!player.Deck.IsEmpty) {
-				Entity entity = (Entity)player.Deck[1];
+				var entity = player.Deck[1];
 
 				DebugLog.WriteLine("{0} draws {1}", player.FriendlyName, entity.ShortDescription);
 
 				entity.Zone = player.Hand;
 				player.NumCardsDrawnThisTurn++;
-				return entity;
+				return (Entity) entity;
 			}
 
 			DebugLog.WriteLine("{0} tries to draw but their deck is empty", player.FriendlyName);
@@ -351,7 +352,7 @@ namespace Brimstone
 
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			var choice = new Choice(
-				Controller: (IZoneController)(Entity)args[PLAYER],
+				Controller: (Player)args[PLAYER],
 				ChoiceType: (ChoiceType)(int)args[CHOICE_TYPE],
 				Choices: args[ENTITIES]
 			);

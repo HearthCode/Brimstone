@@ -11,6 +11,7 @@ namespace Brimstone
 		int Id { get; set; }
 		// Allow owner game and controller to be changed for state cloning
 		Game Game { get; set; }
+		BaseEntityData BaseEntityData { get; }
 		IZoneController Controller { get; set; }
 		Card Card { get; }
 		IZone Zone { get; set; }
@@ -23,6 +24,7 @@ namespace Brimstone
 		string ShortDescription { get; }
 		int FuzzyHash { get; }
 
+		// TODO: Do explicit instantiations
 		IEntity CloneState();
 	}
 

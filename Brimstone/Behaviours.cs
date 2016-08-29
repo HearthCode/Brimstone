@@ -28,9 +28,9 @@ namespace Brimstone
 		public static Selector CurrentPlayer { get { return Select(e => e.Game.CurrentPlayer); } }
 		public static Selector FriendlyHero { get { return Select(e => ((Player)e.Controller).Hero); } }
 		public static Selector OpponentHero { get { return Select(e => ((Player)e.Controller).Opponent.Hero); } }
-		public static Selector AllMinions { get { return Select(e => e.Game.Player1.Board.Concat(e.Game.Player2.Board).Where(x => ((ICharacter)x).Health > 0)); } }
+		public static Selector AllMinions { get { return Select(e => e.Game.Player1.Board.Concat(e.Game.Player2.Board).Where(x => x.Health > 0)); } }
 		public static Selector OpponentCharacters { get { return Union(OpponentMinions, OpponentHero); } }
-		public static Selector OpponentMinions { get { return Select(e => ((Player)e.Controller).Opponent.Board.Where(x => ((ICharacter)x).Health > 0)); } }
+		public static Selector OpponentMinions { get { return Select(e => ((Player)e.Controller).Opponent.Board.Where(x => x.Health > 0)); } }
 		public static Selector AllCharacters { get { return Select(e => e.Game.Characters); } }
 		public static ActionGraph MulliganChoice(ActionGraph Player = null) { return new CreateChoice { Args = { Player, MulliganSelector, (int)ChoiceType.MULLIGAN } }; }
 		public static ActionGraph Random(Selector Selector = null) { return new RandomChoice { Args = { Selector } }; }

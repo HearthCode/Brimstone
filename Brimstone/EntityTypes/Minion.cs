@@ -45,7 +45,7 @@ namespace Brimstone
 			var controller = (Player)Controller;
 
 			var board = controller.Board.Concat(controller.Opponent.Board);
-			var targets = board.Where(x => MeetsGenericTargetingRequirements((ICharacter)x)).ToList<ICharacter>();
+			var targets = board.Where(MeetsGenericTargetingRequirements).ToList<ICharacter>();
 
 			var hero = controller.Hero;
 			if (MeetsGenericTargetingRequirements(hero))

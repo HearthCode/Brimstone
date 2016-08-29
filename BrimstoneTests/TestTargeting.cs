@@ -21,7 +21,7 @@ namespace BrimstoneTests
 			var pAct = game.Players[playerToAct - 1];
 
 			// Add a spell and some targets
-			var spell = pAct.Give("Fireball") as Spell;
+			var spell = new Spell("Fireball").GiveTo(pAct);
 
 			var in1 = p1.Give("Goldshire Footman").Play();
 			var in2 = p1.Give("Goldshire Footman").Play();
@@ -79,7 +79,7 @@ namespace BrimstoneTests
 			var p2 = game.CurrentPlayer.Opponent;
 
 			// Add Houndmaster to hands and add some targets
-			var houndmaster = p1.Give("Houndmaster") as ICanTarget;
+			var houndmaster = new Minion("Houndmaster").GiveTo(p1);
 
 			var in1 = p1.Give("Bloodfen Raptor").Play();
 			var in2 = p1.Give("Bloodfen Raptor").Play();
@@ -122,7 +122,7 @@ namespace BrimstoneTests
 			var p2 = game.CurrentPlayer.Opponent;
 
 			// Add Gormok to hand and add some targets
-			var gormok = p1.Give("Gormok the Impaler") as ICanTarget;
+			var gormok = new Minion("Gormok the Impaler").GiveTo(p1);
 
 			for (int i = 0; i < 4; i++)
 				p1.Give("Wisp").Play();
@@ -154,7 +154,7 @@ namespace BrimstoneTests
 			var p2 = game.CurrentPlayer.Opponent;
 
 			// Add Blackwing to hand and add some targets
-			var blackwing = p1.Give("Blackwing Corruptor") as ICanTarget;
+			var blackwing = new Minion("Blackwing Corruptor").GiveTo(p1);
 
 			for (int i = 0; i < 4; i++)
 				p1.Give("Wisp").Play();
@@ -192,7 +192,7 @@ namespace BrimstoneTests
 			// Add friendly minions
 			for (int i = 0; i < 3; i++)
 				p1.Give("Wisp").Play();
-			var attacker = p1.Give("Worgen Infiltrator").Play() as ICanTarget;
+			var attacker = new Minion("Worgen Infiltrator").GiveTo(p1).Play();
 			p1.Give("Worgen Infiltrator").Play();
 
 			// Add enemy minions
@@ -218,7 +218,7 @@ namespace BrimstoneTests
 			var p2 = game.CurrentPlayer.Opponent;
 
 			// Add friendly minions
-			var attacker = p1.Give("Raging Worgen").Play() as ICanTarget;
+			var attacker = new Minion("Raging Worgen").GiveTo(p1).Play();
 
 			// Assert
 
@@ -238,7 +238,7 @@ namespace BrimstoneTests
 			// Add friendly minions
 			for (int i = 0; i < 3; i++)
 				p1.Give("Wisp").Play();
-			var attacker = p1.Give("Worgen Infiltrator").Play() as ICanTarget;
+			var attacker = new Minion("Worgen Infiltrator").GiveTo(p1).Play();
 
 			// Add enemy minions, including two taunts and one stealthy taunt
 			var validTargets = new List<IEntity>();
@@ -250,7 +250,7 @@ namespace BrimstoneTests
 
 			validTargets.Add(p2.Give("Sludge Belcher").Play());
 
-			var stealthTaunt = p2.Give("Deathlord").Play() as Minion;
+			var stealthTaunt = new Minion("Deathlord").GiveTo(p2).Play();
 			stealthTaunt.HasStealth = true;
 
 			// Assert

@@ -73,7 +73,7 @@ namespace Brimstone.Benchmark
 
 		public void Test_BoomBotPreDeathrattle(Game g, int it) {
 			// Capture after Boom Bot has died but before Deathrattle executes
-			var BoomBot = g.Player1.Board.First(t => t.Card.Name == "Boom Bot") as Minion;
+			var BoomBot = g.Player1.Board.First(t => t.Card.Name == "Boom Bot");
 			g.ActionQueue.OnAction += (o, e) => {
 				ActionQueue queue = o as ActionQueue;
 				if (e.Action is Death && e.Source == BoomBot) {
@@ -87,7 +87,7 @@ namespace Brimstone.Benchmark
 		}
 
 		private void _boomBotUniqueStates(Game g, int it, ITreeActionWalker search) {
-			var BoomBot = g.CurrentPlayer.Board.First(t => t.Card.Name == "Boom Bot") as Minion;
+			var BoomBot = g.CurrentPlayer.Board.First(t => t.Card.Name == "Boom Bot");
 			var tree = RandomOutcomeSearch.Build(
 				Game: g,
 				SearchMode: search,

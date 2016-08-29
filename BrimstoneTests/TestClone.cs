@@ -115,11 +115,11 @@ namespace BrimstoneTests
 			if (copyOnWrite)
 				// All proxies must point to original entities
 				foreach (Entity e in game.Entities)
-					Assert.AreSame(e.BaseEntityData, ((Entity)clone.Entities[e.Id]).BaseEntityData);
+					Assert.AreSame(e.BaseEntityData, clone.Entities[e.Id].BaseEntityData);
 			else
 				// All proxies must point to new entities
 				foreach (Entity e in game.Entities)
-					Assert.AreNotSame(e.BaseEntityData, ((Entity)clone.Entities[e.Id]).BaseEntityData);
+					Assert.AreNotSame(e.BaseEntityData, clone.Entities[e.Id].BaseEntityData);
 
 			if (copyOnWrite) {
 				// All reference counts must be 2

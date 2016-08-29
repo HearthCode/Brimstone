@@ -107,13 +107,13 @@ namespace Brimstone
 		protected List<ICharacter> GetValidAttackTargets() {
 			var controller = (Player)Controller;
 
-			if (controller.Opponent.Board.Any(x => ((Minion)x).HasTaunt && !((Minion)x).HasStealth)) {
+			if (controller.Opponent.Board.Any(x => x.HasTaunt && !x.HasStealth)) {
 				// Must attack non-stealthed taunts
-				return controller.Opponent.Board.Where(x => ((Minion)x).HasTaunt && !((Minion)x).HasStealth).ToList<ICharacter>();
+				return controller.Opponent.Board.Where(x => x.HasTaunt && !x.HasStealth).ToList<ICharacter>();
 			}
 			else {
 				// Can attack all opponent characters
-				var targets = controller.Opponent.Board.Where(x => !((Minion)x).HasStealth).ToList<ICharacter>();
+				var targets = controller.Opponent.Board.Where(x => !x.HasStealth).ToList<ICharacter>();
 				targets.Add(controller.Opponent.Hero);
 				return targets;
 			}
