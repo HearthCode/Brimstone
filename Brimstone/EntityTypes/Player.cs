@@ -5,16 +5,16 @@ using System.Linq;
 
 namespace Brimstone
 {
-	public partial class Player : Entity, IZoneOwner {
+	public partial class Player : Entity, IZoneController {
 		public string FriendlyName { get; }
 
 		public Deck Deck { get { return (Deck)Zones[Brimstone.Zone.DECK]; } set { Zones[Brimstone.Zone.DECK] = value; } }
-		public ZoneEntities Hand { get { return Zones[Brimstone.Zone.HAND]; } }
-		public ZoneEntities Board { get { return Zones[Brimstone.Zone.PLAY]; } }
-		public ZoneEntities Graveyard { get { return Zones[Brimstone.Zone.GRAVEYARD]; } }
-		public ZoneEntities Secrets { get { return Zones[Brimstone.Zone.SECRET]; } }
-		public ZoneEntities Setaside { get { return null; } }
-		public ZoneGroup Zones { get; private set; }
+		public Zone<IPlayable> Hand { get { return (Zone<IPlayable>) Zones[Brimstone.Zone.HAND]; } }
+		public Zone<Minion> Board { get { return (Zone<Minion>) Zones[Brimstone.Zone.PLAY]; } }
+		public Zone<ICharacter> Graveyard { get { return (Zone<ICharacter>) Zones[Brimstone.Zone.GRAVEYARD]; } }
+		public Zone<Spell> Secrets { get { return (Zone<Spell>) Zones[Brimstone.Zone.SECRET]; } }
+		public Zone<IPlayable> Setaside { get { return null; } }
+		public Zones Zones { get; private set; }
 		public HeroClass HeroClass { get; }
 
 		public Choice Choice { get; set; }
@@ -47,7 +47,7 @@ namespace Brimstone
 				base.Game = value;
 
 				// Create zones
-				Zones = new ZoneGroup(Game, this);
+				Zones = new Zones(Game, this);
 			}
 		}
 

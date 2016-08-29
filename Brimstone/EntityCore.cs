@@ -11,12 +11,12 @@ namespace Brimstone
 		int Id { get; set; }
 		// Allow owner game and controller to be changed for state cloning
 		Game Game { get; set; }
-		IZoneOwner Controller { get; set; }
+		IZoneController Controller { get; set; }
 		Card Card { get; }
-		ZoneEntities Zone { get; set; }
+		IZone Zone { get; set; }
 		int ZonePosition { get; set; }
 		void ZoneMove(Zone Zone, int ZonePosition = -1);
-		void ZoneMove(ZoneEntities Zone, int ZonePosition = -1);
+		void ZoneMove(IZone Zone, int ZonePosition = -1);
 		void ZoneSwap(IEntity New);
 		Dictionary<GameTag, int> CopyTags();
 		int this[GameTag t] { get; set; }
@@ -124,8 +124,8 @@ namespace Brimstone
 		public BaseEntityData BaseEntityData { get { return _entity; } }
 		public virtual Game Game { get; set; }
 		// TODO: Re-do Controller code as normal tag property
-		private IZoneOwner _controller;
-		public IZoneOwner Controller {
+		private IZoneController _controller;
+		public IZoneController Controller {
 			get {
 				return _controller;
 			}
@@ -174,7 +174,7 @@ namespace Brimstone
 					return;
 
 				else if (t == GameTag.CONTROLLER) {
-					Controller = (IZoneOwner) Game.Entities[value];
+					Controller = (IZoneController) Game.Entities[value];
 				}
 				else if (t == GameTag.ENTITY_ID) {
 					Changing();

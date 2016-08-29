@@ -3,13 +3,13 @@ using System.Linq;
 
 namespace Brimstone
 {
-	public class Deck : ZoneEntities
+	public class Deck : Zone<IPlayable>
 	{
 		public const int MaxCards = 30;
 
 		public HeroClass HeroClass { get; }
 
-		public Deck(Game game, HeroClass hero, IZoneOwner controller) : base(game, controller, Zone.DECK) {
+		public Deck(Game game, HeroClass hero, IZoneController controller) : base(game, controller, Zone.DECK) {
 			HeroClass = hero;
 		}
 

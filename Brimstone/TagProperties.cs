@@ -46,7 +46,7 @@
 	public partial class Entity
 	{
 		// Setting Zone directly moves the entity to the end of the specified zone
-		public ZoneEntities Zone {
+		public IZone Zone {
 			get { return Controller?.Zones[(Zone)this[GameTag.ZONE]]; }
 			set { ZoneMove(value); }
 		}
@@ -64,7 +64,7 @@
 		}
 	}
 
-	public partial class Game : Entity, IZoneOwner
+	public partial class Game : Entity, IZoneController
 	{
 		public int Turn {
 			get { return this[GameTag.TURN]; }
@@ -143,7 +143,7 @@
 		}
 	}
 
-	public partial class Player : Entity, IZoneOwner
+	public partial class Player : Entity, IZoneController
 	{
 		public Hero Hero {
 			get {

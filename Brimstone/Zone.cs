@@ -5,62 +5,32 @@ using System.Linq;
 
 namespace Brimstone
 {
-	public interface IZoneOwner : IEntity
+	public interface IZone
 	{
-		ZoneGroup Zones { get; }
-
-		// TODO: Lets make these generic types to avoid all the return value type casting
-		Deck Deck { get; set; }
-		ZoneEntities Hand { get; }
-		ZoneEntities Board { get; }
-		ZoneEntities Graveyard { get; }
-		ZoneEntities Secrets { get; }
-		ZoneEntities Setaside { get; }
+		Game Game { get; }
+		Zone Type { get; }
+		IZoneController Controller { get; }
+		int Count { get; }
+		bool IsEmpty { get; }
+		IEntity this[int ZonePosition] { get; set; }
+		IEnumerable<IEntity> Slice(int? Start, int? End);
+		IEntity Add(IEntity Entity, int ZonePosition);
+		IEntity Remove(IEntity Entity, bool ClearZone);
+		IEntity MoveTo(IEntity Entity, int ZonePosition);
+		void Swap(IEntity Old, IEntity New);
+		void SetDirty();
 	}
 
-	public class ZoneGroup : IEnumerable<ZoneEntities>
-	{
-		public Game Game { get; }
-		public IZoneOwner Owner { get; }
-
-		private ZoneEntities[] _zones = new ZoneEntities[(int)Zone._COUNT];
-
-		public ZoneGroup(Game game, IZoneOwner controller) {
-			Game = game;
-			Owner = controller;
-		}
-
-		public ZoneEntities this[Zone z] {
-			get {
-				if (_zones[(int)z] == null)
-					_zones[(int)z] = new ZoneEntities(Game, Owner, z);
-				return _zones[(int)z];
-			}
-			// For decks
-			set {
-				_zones[(int)z] = value;
-			}
-		}
-
-		public IEnumerator<ZoneEntities> GetEnumerator() {
-			return ((IEnumerable<ZoneEntities>)_zones).GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator() {
-			return ((IEnumerable<ZoneEntities>)_zones).GetEnumerator();
-		}
-	}
-
-	public class ZoneEntities : IEnumerable<IEntity>
+	public class Zone<T> : IZone, IEnumerable<T> where T : IEntity
 	{
 		public Game Game { get; }
 		public Zone Type { get; }
-		public IZoneOwner Controller { get; }
+		public IZoneController Controller { get; }
 
-		private IEnumerable<IEntity> _cachedEntities;
-		private List<IEntity> _cachedEntitiesAsList;
+		private IEnumerable<T> _cachedEntities;
+		private List<T> _cachedEntitiesAsList;
 
-		private IEnumerable<IEntity> Entities {
+		private IEnumerable<T> Entities {
 			get {
 				if (!Settings.ZoneCaching) {
 					Init();
@@ -79,11 +49,11 @@ namespace Brimstone
 		protected void Init() {
 			// Make sure that _cachedEntities[0] has ZONE_POSITION = 1 etc.
 			_cachedEntities = Game.Entities
-				.Where(e => e.Controller == Controller && e.Zone == this && e.ZonePosition > 0);
+				.Where(e => e.Controller == Controller && e.Zone == this && e.ZonePosition > 0).Select(e => (T) e);
 			_cachedEntitiesAsList = null;
 		}
 
-		private List<IEntity> asList {
+		private List<T> asList {
 			get {
 				if (_cachedEntitiesAsList == null || !Settings.ZoneCaching)
 					_cachedEntitiesAsList = Entities.OrderBy(e => e.ZonePosition).ToList();
@@ -97,7 +67,7 @@ namespace Brimstone
 				ze[GameTag.ZONE_POSITION] = p++;
 		}
 
-		public ZoneEntities(Game game, IZoneOwner controller, Zone zone) {
+		public Zone(Game game, IZoneController controller, Zone zone) {
 			Game = game;
 			Type = zone;
 			Controller = controller;
@@ -115,7 +85,7 @@ namespace Brimstone
 			}
 		}
 
-		public IEntity this[int zone_position] {
+		public T this[int zone_position] {
 			get {
 				return asList[zone_position - 1];
 			}
@@ -130,13 +100,42 @@ namespace Brimstone
 			_cachedEntitiesAsList = null;
 		}
 
+		// Explicit interface
+		IEntity IZone.this[int ZonePosition] {
+			get { return this[ZonePosition]; }
+			set { this[ZonePosition] = (T)value; }
+		}
+
+		IEnumerable<IEntity> IZone.Slice(int? Start, int? End) {
+			return (IEnumerable<IEntity>)Slice(Start, End);
+		}
+
+		IEntity IZone.Add(IEntity Entity, int ZonePosition = -1) {
+			Add(Entity, ZonePosition);
+			return Entity;
+		}
+
+		IEntity IZone.Remove(IEntity Entity, bool ClearZone = true) {
+			Remove(Entity, ClearZone);
+			return Entity;
+		}
+
+		IEntity IZone.MoveTo(IEntity Entity, int ZonePosition = -1) {
+			MoveTo(Entity, ZonePosition);
+			return Entity;
+		}
+
+		void IZone.Swap(IEntity Old, IEntity New) {
+			Swap((T)Old, (T)New);
+		}
+
 		// Slice a zone
 		// If no arguments are supplied, return the entire zone
 		// If only one argument is supplied, return the first X elements (if X is positive) or last X elements (if X is negative)
 		// If two arguments are supplied, X to Y returns elements X to Y inclusive
 		// If two arguments are supplied, -X to -Y returns elemnts from Xth last to Yth last inclusive (eg. -4, -2 returns the 4th, 3rd and 2nd to last elements)
 		// If two arguments are supplied, X to -Y returns elements from Xth first to Yth last inclusive (eg. 2, -3 returns the 2nd first to 3rd last element)
-		public IEnumerable<IEntity> Slice(int? zpStart = null, int? zpEnd = null) {
+		public IEnumerable<T> Slice(int? zpStart = null, int? zpEnd = null) {
 			int eCount = Count;
 			int start = 0, count = 0;
 
@@ -164,11 +163,14 @@ namespace Brimstone
 			return asList.Skip(start).Take(count);
 		}
 
-		public IEntity Add(IEntity Entity, int ZonePosition = -1) {
+		public T Add(IEntity Entity, int ZonePosition = -1) {
 			// Update ownership
 			if (Entity.Game == null) {
 				Game.Add(Entity, Controller);
 			}
+
+			if (Type == Zone.INVALID)
+				return (T)Entity;
 
 			if (ZonePosition == -1)
 				if (Entity is Minion)
@@ -181,7 +183,8 @@ namespace Brimstone
 			if (Type == Zone.SETASIDE || Type == Zone.GRAVEYARD || (Type == Zone.PLAY && Controller is Game))
 				ZonePosition = 0;
 			if (ZonePosition != 0) {
-				asList.Insert(ZonePosition - 1, Entity);
+				if (Entity is T)
+					asList.Insert(ZonePosition - 1, (T)Entity);
 			}
 			else
 				Entity[GameTag.ZONE_POSITION] = 0;
@@ -190,47 +193,61 @@ namespace Brimstone
 			if (ZonePosition != 0)
 				updateZonePositions();
 
-			return Entity;
+			if (Entity is T)
+				return (T) Entity;
+			return default(T);
 		}
 
-		public IEntity Remove(IEntity Entity, bool ClearZone = true) {
-			bool removed = asList.Remove(Entity);
-			if (removed) {
-				updateZonePositions();
-				if (ClearZone) {
-					Entity[GameTag.ZONE_POSITION] = 0;
-					Entity[GameTag.ZONE] = (int)Zone.INVALID;
-				}
-				return Entity;
+		public T Remove(IEntity Entity, bool ClearZone = true) {
+			if (Entity.Zone.Type != Zone.INVALID)
+			{
+				bool removed = (Entity is T ? asList.Remove((T) Entity) : true);
+				if (removed)
+				{
+					if (Entity is T)
+						updateZonePositions();
+					if (ClearZone)
+					{
+						Entity[GameTag.ZONE_POSITION] = 0;
+						Entity[GameTag.ZONE] = (int) Zone.INVALID;
+					}
+				} else
+					return default(T);
 			}
-			return null;
+			return (Entity is T ? (T) Entity : default(T));
 		}
 
-		public IEntity MoveTo(IEntity Entity, int ZonePosition = -1)
+		public T MoveTo(IEntity Entity, int ZonePosition = -1)
 		{
 			var previous = Entity.Zone;
 			if (previous != null && previous.Type != Zone.INVALID) {
 				// Same zone move
 				if (previous == this && Entity.Controller == Controller && ZonePosition > 0 && Entity.ZonePosition != ZonePosition) {
-					// We have to take a copy of asList here in case zone caching is disabled!
-					var entities = asList;
-					entities.Remove(Entity);
-					entities.Insert(ZonePosition - 1, Entity);
-					updateZonePositions();
-					return Entity;
+					if (Entity is T)
+					{
+						// We have to take a copy of asList here in case zone caching is disabled!
+						var entities = asList;
+						entities.Remove((T)Entity);
+						entities.Insert(ZonePosition - 1, (T)Entity);
+						updateZonePositions();
+						return (T)Entity;
+					}
 				}
 				else {
 					// Other zone move
 					previous.Remove(Entity, ClearZone: false);
 				}
 			}
-			Add(Entity, ZonePosition);
-			return Entity;
+			if (Type != Zone.INVALID)
+				Add(Entity, ZonePosition);
+			if (Entity is T)
+				return (T)Entity;
+			return default(T);
 		}
 
 		// Perform an in-replacement of one entity with another, without re-calculating zone positions
 		// NOTE: The item in New will be moved first
-		public void Swap(IEntity Old, IEntity New) {
+		public void Swap(T Old, T New) {
 			var z = New.Zone.Type;
 			int p = New.ZonePosition;
 
@@ -247,7 +264,7 @@ namespace Brimstone
 			New.Controller.Zones[New.Zone.Type].SetDirty();
 		}
 
-		public IEnumerator<IEntity> GetEnumerator() {
+		public IEnumerator<T> GetEnumerator() {
 			return Entities.GetEnumerator();
 		}
 
@@ -272,7 +289,7 @@ namespace Brimstone
 			Controller.Zones[Zone].MoveTo(this, ZonePosition);
 		}
 
-		public void ZoneMove(ZoneEntities Zone, int ZonePosition = -1) {
+		public void ZoneMove(IZone Zone, int ZonePosition = -1) {
 			Zone.MoveTo(this, ZonePosition);
 		}
 

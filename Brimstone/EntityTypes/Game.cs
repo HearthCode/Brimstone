@@ -21,7 +21,7 @@ namespace Brimstone
 		}
 	}
 
-	public partial class Game : Entity, IZoneOwner, IFormattable
+	public partial class Game : Entity, IZoneController, IFormattable
 	{
 		// Game settings
 		public int MaxMinionsOnBoard { get; private set; } = 7;
@@ -50,14 +50,14 @@ namespace Brimstone
 		// TODO: Other common set selectors
 		public IEnumerable<IEntity> Characters => Player1.Board.Concat(Player2.Board).Concat(new List<IEntity> {Player1.Hero, Player2.Hero});
 
-		public ZoneEntities Setaside { get { return Zones[Brimstone.Zone.SETASIDE]; } }
-		public ZoneEntities Board { get { return Zones[Brimstone.Zone.PLAY]; } }
-		public ZoneEntities Graveyard { get { return null; } }
-		public ZoneEntities Hand { get { return null; } }
-		public ZoneEntities Secrets { get { return null; } }
+		public Zone<IPlayable> Setaside { get { return (Zone<IPlayable>) Zones[Brimstone.Zone.SETASIDE]; } }
+		public Zone<Minion> Board { get { return (Zone<Minion>) Zones[Brimstone.Zone.PLAY]; } }
+		public Zone<ICharacter> Graveyard { get { return null; } }
+		public Zone<IPlayable> Hand { get { return null; } }
+		public Zone<Spell> Secrets { get { return null; } }
 		public Deck Deck { get { return null; } set { throw new NotImplementedException(); } }
 
-		public ZoneGroup Zones { get; }
+		public Zones Zones { get; }
 
 		public PowerHistory PowerHistory;
 		public ActionQueue ActionQueue;
@@ -70,7 +70,7 @@ namespace Brimstone
 		// Required by IEntity
 		public Game(Game cloneFrom) : base(cloneFrom) {
 			// Generate zones owned by game
-			Zones = new ZoneGroup(this, this);
+			Zones = new Zones(this, this);
 			// Update tree
 			GameId = ++SequenceNumber;
 			Depth = cloneFrom.Depth + 1;
@@ -91,7 +91,7 @@ namespace Brimstone
 			Entities = new EntityController(this);
 
 			// Generate zones owned by game
-			Zones = new ZoneGroup(this, this);
+			Zones = new Zones(this, this);
 
 			// Generate players and empty decks
 			Player1 = new Player(Hero1, (Player1Name.Length > 0) ? Player1Name : "Player 1", 1) {Zone = Board};
@@ -104,7 +104,7 @@ namespace Brimstone
 			GameId = ++SequenceNumber;
 		}
 
-		public IEntity Add(IEntity newEntity, IZoneOwner controller) {
+		public IEntity Add(IEntity newEntity, IZoneController controller) {
 			newEntity.Controller = controller;
 			return Entities.Add(newEntity);
 		}

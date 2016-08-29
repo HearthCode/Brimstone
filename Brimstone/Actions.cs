@@ -351,7 +351,7 @@ namespace Brimstone
 
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			var choice = new Choice(
-				Controller: (IZoneOwner)(Entity)args[PLAYER],
+				Controller: (IZoneController)(Entity)args[PLAYER],
 				ChoiceType: (ChoiceType)(int)args[CHOICE_TYPE],
 				Choices: args[ENTITIES]
 			);

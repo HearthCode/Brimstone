@@ -17,7 +17,7 @@ namespace BrimstoneTests
 			var p2 = game.Player2;
 
 			// Act
-			List<IEntity> items = new List<IEntity>(5);
+			List<Minion> items = new List<Minion>(5);
 
 			Assert.IsTrue(p1.Board.IsEmpty);
 
@@ -288,7 +288,7 @@ namespace BrimstoneTests
 				p1.Deck.Add("Wisp");
 
 			// Assert
-			List<IEntity> e;
+			List<IPlayable> e;
 
 			e = p1.Deck.Slice(2).ToList();
 			Assert.AreEqual(2, e.Count);

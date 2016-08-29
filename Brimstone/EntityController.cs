@@ -55,7 +55,7 @@ namespace Brimstone
 			foreach (var entity in Entities)
 				entity.Value.Game = Game;
 			foreach (var entity in Entities)
-				entity.Value.Controller = (IZoneOwner) Entities[es.Entities[entity.Key].Controller.Id];
+				entity.Value.Controller = (IZoneController) Entities[es.Entities[entity.Key].Controller.Id];
 
 			// Do this last so that changing Controller doesn't trigger EntityChanging
 			Game.Entities = this;
