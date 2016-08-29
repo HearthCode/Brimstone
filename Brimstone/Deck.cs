@@ -9,7 +9,7 @@ namespace Brimstone
 
 		public HeroClass HeroClass { get; }
 
-		public Deck(Game game, HeroClass hero, IZoneController controller) : base(game, controller, Zone.DECK) {
+		public Deck(Game game, HeroClass hero, Player controller) : base(game, controller, Zone.DECK) {
 			HeroClass = hero;
 		}
 

@@ -62,7 +62,7 @@ namespace Brimstone
 					else if (source is Player)
 						return Lambda(source).ToList();
 					else
-						return Lambda(source.ZoneController).ToList();
+						return Lambda(source.Controller).ToList();
 				case SelectionSource.ActionSource:
 					return Lambda(source).ToList();
 				default:
@@ -266,7 +266,7 @@ namespace Brimstone
 		public const int ENTITY = 0;
 
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
-			Player player = (Player)source.ZoneController;
+			Player player = source.Controller;
 			IPlayable entity = (IPlayable) (Entity) args[ENTITY];
 
 			// TODO: Update ResourcesUsed
@@ -294,7 +294,7 @@ namespace Brimstone
 
 				// Spells go to the graveyard after they are played
 				if (entity is Spell)
-					entity.Zone = entity.ZoneController.Graveyard;
+					entity.Zone = entity.Controller.Graveyard;
 			}));
 			return (Entity) entity;
 		}
@@ -330,7 +330,7 @@ namespace Brimstone
 				foreach (var e in args[TARGETS]) {
 					DebugLog.WriteLine("{0} dies", e.ShortDescription);
 
-					e.Zone = e.ZoneController.Graveyard;
+					e.Zone = e.Controller.Graveyard;
 
 					// Minion death
 					if (e is Minion) {
@@ -340,7 +340,7 @@ namespace Brimstone
 
 					// Hero death
 					if (e is Hero) {
-						((Player) e.ZoneController).PlayState = PlayState.LOSING;
+						e.Controller.PlayState = PlayState.LOSING;
 						gameEnd = true;
 					}
 				}

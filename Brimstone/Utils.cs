@@ -20,14 +20,14 @@ namespace Brimstone
 
 	public class Choice
 	{
-		public IZoneController Controller { get; }
+		public Player Controller { get; }
 		public ChoiceType ChoiceType { get; }
 		public List<IEntity> Choices { get; }
 		public List<IEntity> Keeping { get; private set; } = null;
 
 		public List<IEntity> Discarding => (Keeping != null)? Choices.Except(Keeping).ToList() : null;
 
-		public Choice(IZoneController Controller, List<IEntity> Choices, ChoiceType ChoiceType = ChoiceType.GENERAL) {
+		public Choice(Player Controller, List<IEntity> Choices, ChoiceType ChoiceType = ChoiceType.GENERAL) {
 			this.Controller = Controller;
 			this.Choices = Choices;
 			this.ChoiceType = ChoiceType;

@@ -28,10 +28,10 @@ namespace Brimstone
 			Minion minion = target as Minion;
 
 			// Can't target your opponent's stealth minions
-			if (minion != null && minion.HasStealth && minion.ZoneController != ZoneController)
+			if (minion != null && minion.HasStealth && minion.Controller != ZoneController)
 				return false;
 
-			if (target.CantBeTargetedByOpponents && target.ZoneController != ZoneController)
+			if (target.CantBeTargetedByOpponents && target.Controller != ZoneController)
 				return false;
 
 			foreach (var item in Card.Requirements) {
@@ -44,11 +44,11 @@ namespace Brimstone
 							return false;
 						break;
 					case PlayRequirements.REQ_FRIENDLY_TARGET:
-						if (target.ZoneController != ZoneController)
+						if (target.Controller != Controller)
 							return false;
 						break;
 					case PlayRequirements.REQ_ENEMY_TARGET:
-						if (target.ZoneController == ZoneController)
+						if (target.Controller == Controller)
 							return false;
 						break;
 					case PlayRequirements.REQ_DAMAGED_TARGET:
@@ -105,16 +105,14 @@ namespace Brimstone
 		}
 
 		protected List<ICharacter> GetValidAttackTargets() {
-			var controller = (Player)ZoneController;
-
-			if (controller.Opponent.Board.Any(x => x.HasTaunt && !x.HasStealth)) {
+			if (Controller.Opponent.Board.Any(x => x.HasTaunt && !x.HasStealth)) {
 				// Must attack non-stealthed taunts
-				return controller.Opponent.Board.Where(x => x.HasTaunt && !x.HasStealth).ToList<ICharacter>();
+				return Controller.Opponent.Board.Where(x => x.HasTaunt && !x.HasStealth).ToList<ICharacter>();
 			}
 			else {
 				// Can attack all opponent characters
-				var targets = controller.Opponent.Board.Where(x => !x.HasStealth).ToList<ICharacter>();
-				targets.Add(controller.Opponent.Hero);
+				var targets = Controller.Opponent.Board.Where(x => !x.HasStealth).ToList<ICharacter>();
+				targets.Add(Controller.Opponent.Hero);
 				return targets;
 			}
 		}

@@ -79,7 +79,7 @@ namespace Brimstone
 		public Player Controller
 		{
 			get { return ZoneController as Player; }
-			set { throw new NotImplementedException(); }
+			set { ZoneController = value; }
 		}
 
 		public int Cost {
