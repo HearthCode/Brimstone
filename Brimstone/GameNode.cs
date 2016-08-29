@@ -42,12 +42,12 @@ namespace Brimstone
 		}
 
 		public GameNode Branch() {
-			var clone = Game.GetClone();
+			var clone = Game.CloneState();
 			return new GameNode(clone, this, Children != null);
 		}
 
 		public IEnumerable<GameNode> Branch(int Quantity) {
-			var clones = Game.GetClones(Quantity);
+			var clones = Game.CloneStates(Quantity);
 			var nodes = clones.Select(c => new GameNode(c, this, Children != null));
 			return nodes;
 		}
@@ -80,12 +80,12 @@ namespace Brimstone
 		}
 
 		public WeightedGameNode Branch(double Weight = 1.0) {
-			var clone = Game.GetClone();
+			var clone = Game.CloneState();
 			return new WeightedGameNode(clone, this, Weight, Children != null);
 		}
 
 		public IEnumerable<WeightedGameNode> Branch(int Quantity, double Weight = 1.0) {
-			var clones = Game.GetClones(Quantity);
+			var clones = Game.CloneStates(Quantity);
 			var nodes = clones.Select(c => new WeightedGameNode(c, this, Weight, Children != null));
 			return nodes;
 		}
@@ -112,12 +112,12 @@ namespace Brimstone
 		}
 
 		public new ProbabilisticGameNode Branch(double Weight = 1.0) {
-			var clone = Game.GetClone();
+			var clone = Game.CloneState();
 			return new ProbabilisticGameNode(clone, this, Weight, Children != null);
 		}
 
 		public new IEnumerable<ProbabilisticGameNode> Branch(int Quantity, double Weight = 1.0) {
-			var clones = Game.GetClones(Quantity);
+			var clones = Game.CloneStates(Quantity);
 			var nodes = clones.Select(c => new ProbabilisticGameNode(c, this, Weight, Children != null));
 			return nodes;
 		}

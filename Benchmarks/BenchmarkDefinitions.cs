@@ -46,27 +46,27 @@ namespace Brimstone.Benchmark
 		public void Test_RawClone(Game g, int it) {
 			Settings.ParallelClone = false;
 			for (int i = 0; i < it; i++)
-				g.GetClone();
+				g.CloneState();
 		}
 		public void Test_RawClone_MT(Game g, int it) {
 			Settings.ParallelClone = false;
-			Parallel.For(0, it, i => g.GetClone());
+			Parallel.For(0, it, i => g.CloneState());
 		}
 
 		public void Test_StoredClone(Game g, int it) {
 			Settings.ParallelClone = false;
-			g.GetClones(it);
+			g.CloneStates(it);
 		}
 
 		public void Test_StoredClone_MT(Game g, int it) {
 			Settings.ParallelClone = true;
-			g.GetClones(it);
+			g.CloneStates(it);
 		}
 
 		public void Test_BoomBotPreHit(Game g, int it) {
 			var BoomBotId = g.Player1.Board.First(t => t.Card.Name == "Boom Bot").Id;
 			for (int i = 0; i < it; i++) {
-				Game cloned = (Game)g.CloneState();
+				Game cloned = g.CloneState();
 				((Minion)cloned.Entities[BoomBotId]).Hit(1);
 			}
 		}
@@ -78,7 +78,7 @@ namespace Brimstone.Benchmark
 				ActionQueue queue = o as ActionQueue;
 				if (e.Action is Death && e.Source == BoomBot) {
 					for (int i = 0; i < it; i++) {
-						Game cloned = (Game)g.CloneState();
+						Game cloned = g.CloneState();
 						cloned.ActionQueue.ProcessAll();
 					}
 				}

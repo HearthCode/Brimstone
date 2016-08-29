@@ -23,8 +23,6 @@ namespace Brimstone
 		int this[GameTag t] { get; set; }
 		string ShortDescription { get; }
 		int FuzzyHash { get; }
-
-		// TODO: Do explicit instantiations
 		IEntity CloneState();
 	}
 
@@ -210,7 +208,8 @@ namespace Brimstone
 			return new Entity(this);
 		}
 
-		public virtual IEntity CloneState() {
+		IEntity IEntity.CloneState()
+		{
 			return Clone() as IEntity;
 		}
 

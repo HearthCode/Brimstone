@@ -39,7 +39,7 @@ namespace BrimstoneTests
 			// Act
 
 			// Clone with copy-on-write
-			Game clone = (Game)game.CloneState();
+			var clone = game.CloneState();
 
 			// Assert
 
@@ -207,7 +207,7 @@ namespace BrimstoneTests
 			game.Player1.Deck.Fill();
 			game.Player2.Deck.Fill();
 
-			var clones = game.GetClones(1000);
+			var clones = game.CloneStates(1000);
 			foreach (Entity e in game.Entities)
 				Assert.AreEqual(1001, e.ReferenceCount);
 
@@ -217,7 +217,7 @@ namespace BrimstoneTests
 			game.Player2.Deck.Fill();
 			game.Start(1);
 
-			clones = game.GetClones(1000);
+			clones = game.CloneStates(1000);
 			foreach (Entity e in game.Entities)
 				Assert.AreEqual(1001, e.ReferenceCount);
 		}

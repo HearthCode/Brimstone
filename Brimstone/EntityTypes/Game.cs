@@ -284,25 +284,21 @@ namespace Brimstone
 			}
 		}
 
-		public Game GetClone() {
-			return CloneState() as Game;
-		}
-
 		// TODO: Async cloning
-		public List<Game> GetClones(int qty) {
+		public List<Game> CloneStates(int qty) {
 			var clones = new List<Game>();
 
 			// Sequential cloning
 			if (!Settings.ParallelClone) {
 				for (int i = 0; i < qty; i++)
-					clones.Add(GetClone());
+					clones.Add(CloneState());
 				return clones;
 			}
 
 			// Parallel cloning
 			Parallel.For(0, qty,
 				() => new List<Game>(),
-				(i, state, localSet) => { localSet.Add(GetClone()); return localSet; },
+				(i, state, localSet) => { localSet.Add(CloneState()); return localSet; },
 				(localSet) => { lock (clones) clones.AddRange(localSet); }
 			);
 			return clones;
@@ -310,7 +306,7 @@ namespace Brimstone
 
 		// WARNING: The Game must not be changing during this,
 		// ie. it is not thread-safe unless the game is inactive
-		public override IEntity CloneState() {
+		public Game CloneState() {
 			var entities = new EntityController(Entities);
 			Game game = entities.FindGame();
 			// Set references to the new player proxies (no additional cloning)
