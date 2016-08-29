@@ -13,6 +13,11 @@ namespace Brimstone
 		protected Playable(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
 
 		// TODO: Add GiveTo helper
+		public T GiveTo(Player player)
+		{
+			Zone = player.Hand;
+			return (T) (IEntity) this;
+		}
 
 		// TODO: Allow UserData for ActionQueue
 
