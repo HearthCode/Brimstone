@@ -8,7 +8,6 @@ namespace Brimstone
 	{
 		Zones Zones { get; }
 
-		// TODO: Lets make these generic types to avoid all the return value type casting
 		Deck Deck { get; set; }
 		Zone<IPlayable> Hand { get; }
 		Zone<Minion> Board { get; }

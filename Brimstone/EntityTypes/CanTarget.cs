@@ -109,13 +109,11 @@ namespace Brimstone
 
 			if (controller.Opponent.Board.Any(x => ((Minion)x).HasTaunt && !((Minion)x).HasStealth)) {
 				// Must attack non-stealthed taunts
-				// TODO: Remove select after zones are made generic
-				return controller.Opponent.Board.Where(x => ((Minion)x).HasTaunt && !((Minion)x).HasStealth).Select(x => (ICharacter)x).ToList();
+				return controller.Opponent.Board.Where(x => ((Minion)x).HasTaunt && !((Minion)x).HasStealth).ToList<ICharacter>();
 			}
 			else {
 				// Can attack all opponent characters
-				// TODO: Remove select after zones are made generic
-				var targets = controller.Opponent.Board.Where(x => !((Minion)x).HasStealth).Select(x => (ICharacter)x).ToList();
+				var targets = controller.Opponent.Board.Where(x => !((Minion)x).HasStealth).ToList<ICharacter>();
 				targets.Add(controller.Opponent.Hero);
 				return targets;
 			}

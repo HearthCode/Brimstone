@@ -45,8 +45,7 @@ namespace Brimstone
 			var controller = (Player)Controller;
 
 			var board = controller.Board.Concat(controller.Opponent.Board);
-			// TODO: Remove select after zones are made generic
-			var targets = board.Where(x => MeetsGenericTargetingRequirements((ICharacter)x)).Select(x => (ICharacter)x).ToList();
+			var targets = board.Where(x => MeetsGenericTargetingRequirements((ICharacter)x)).ToList<ICharacter>();
 
 			var hero = controller.Hero;
 			if (MeetsGenericTargetingRequirements(hero))
