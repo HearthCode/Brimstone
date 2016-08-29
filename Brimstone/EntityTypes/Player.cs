@@ -53,6 +53,9 @@ namespace Brimstone
 
 		public int RemainingMana => (BaseMana + TemporaryMana) - (UsedMana + Overload);
 
+		// All the entities that we can potentially play or attack with when it's our turn
+		public IEnumerable<IEntity> LiveEntities => Hand.Concat(Board).Concat(new List<IEntity> {this, /* HeroPower */});
+
 		public Choice StartMulligan() {
 			MulliganState = MulliganState.INPUT;
 			return new Choice(this, Game.Action(this, Actions.MulliganChoice(this)), ChoiceType.MULLIGAN);
