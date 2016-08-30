@@ -420,8 +420,13 @@ namespace Brimstone
 			defender.LastAffectedBy = attacker;
 
 			game.Queue(attacker, Actions.Damage((Entity)defender, attacker.AttackDamage));
+
+			// TODO: Attacker Predamage
+
 			if (defAttack > 0)
 				game.Queue(defender, Actions.Damage((Entity)attacker, defAttack));
+
+			// TODO: Attacker LastAffectedBy
 
 			game.Queue(source, new Action<IEntity>(_ =>
 			{
@@ -434,6 +439,7 @@ namespace Brimstone
 				attacker.IsAttacking = false;
 				defender.IsDefending = false;
 
+				// TODO: Move this to after death processing etc.
 				game.Step = Step.MAIN_ACTION;
 				game.NextStep = Step.MAIN_END;
 			}));
