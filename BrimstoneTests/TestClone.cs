@@ -196,7 +196,7 @@ namespace BrimstoneTests
 			// TODO: Check Queue events are copied
 			// TODO: Check that choices are cloned
 			// TODO: Check that Environment is cloned
-			// TODO: Check that ActionBlocks are cloned
+			// TODO: Check that queue QueueStack and BlockStack are cloned
 		}
 
 		[Test]

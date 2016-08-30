@@ -43,6 +43,8 @@ namespace Brimstone
 	public class ActionQueue : ICloneable
 	{
 		public Game Game { get; private set; }
+		public Stack<Deque<QueueActionEventArgs>> QueueStack = new Stack<Deque<QueueActionEventArgs>>();
+		public Stack<BlockStart> BlockStack = new Stack<BlockStart>();
 		public Deque<QueueActionEventArgs> Queue = new Deque<QueueActionEventArgs>();
 		public Stack<ActionResult> ResultStack = new Stack<ActionResult>();
 		public List<QueueActionEventArgs> History;
@@ -68,6 +70,8 @@ namespace Brimstone
 		}
 
 		public ActionQueue(ActionQueue cloneFrom) {
+			// TODO: Clone queue stack
+			// TODO: Clone block stack
 			foreach (var item in cloneFrom.Queue)
 				Queue.AddBack((QueueActionEventArgs)item.Clone());
 			var stack = new List<ActionResult>(cloneFrom.ResultStack);
@@ -244,6 +248,13 @@ namespace Brimstone
 		public async Task<bool> ProcessOneAsync(object UserData = null) {
 			if (Paused)
 				return false;
+
+			// Unwind completed action blocks
+			while (Queue.Count == 0 && QueueStack.Count > 0) {
+				Queue = QueueStack.Pop();
+				// TODO: Change this to an OnBlockResolved event that Game subscribes to
+				Game.PowerHistory?.Add(new BlockEnd(BlockStack.Pop().Type));
+			}
 
 			if (Queue.Count == 0)
 				return false;

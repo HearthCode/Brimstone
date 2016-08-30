@@ -39,6 +39,25 @@ namespace Brimstone
 		}
 	}
 
+	public class QueueBlock : QueueAction
+	{
+		public BlockStart Block { get; set; }
+		public List<QueueAction> Actions { get; set; }
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
+		{
+			game.PowerHistory?.Add(Block);
+
+			// TODO: Move into ActionQueue
+			game.ActionQueue.QueueStack.Push(game.ActionQueue.Queue);
+			game.ActionQueue.BlockStack.Push(Block);
+			game.ActionQueue.Queue = new Deque<QueueActionEventArgs>();
+			foreach (var a in Actions)
+				game.Queue(source, a);
+			return ActionResult.None;
+		}
+	}
+
 	public enum SelectionSource
 	{
 		Game,
@@ -359,12 +378,14 @@ namespace Brimstone
 		public const int CHOICE_TYPE = 2;
 
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			var player = (Player) args[PLAYER];
+
 			var choice = new Choice(
-				Controller: (Player)args[PLAYER],
+				Controller: player,
 				ChoiceType: (ChoiceType)(int)args[CHOICE_TYPE],
 				Choices: args[ENTITIES]
 			);
-			((Player)args[PLAYER]).Choice = choice;
+			player.Choice = choice;
 
 			// The mulligan is the only situation where:
 			// 1. We are waiting for both players' input at the same time
@@ -372,6 +393,8 @@ namespace Brimstone
 			// In all other cases, we must pause the queue until the user responds with a choice
 			if (choice.ChoiceType != ChoiceType.MULLIGAN)
 				game.ActionQueue.Paused = true;
+			else
+				player.MulliganState = MulliganState.INPUT;
 
 			return ActionResult.None;
 		}

@@ -112,8 +112,26 @@ namespace Brimstone
 
 		public void EntityChanged(int id, GameTag tag, int value)
 		{
-			if (Game.PowerHistory != null)
-				Game.PowerHistory.Add(new TagChange(id, tag, value));
+			Game.PowerHistory?.Add(new TagChange(id, tag, value));
+
+			var entity = Entities[id];
+
+			// Tag change triggers
+			switch (tag)
+			{
+				case GameTag.STATE:
+					if (value == (int) GameState.RUNNING)
+						Game.ActiveTriggers.Fire(TriggerType.GameStart, entity);
+					break;
+
+				case GameTag.STEP:
+					switch ((Step) value) {
+						case Step.BEGIN_MULLIGAN:
+							Game.ActiveTriggers.Fire(TriggerType.BeginMulligan, entity);
+							break;
+					}
+					break;
+			}
 		}
 
 		public int FuzzyGameHash
