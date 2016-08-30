@@ -71,4 +71,13 @@ namespace Brimstone
 
 		public ActionBlockException(string message, Exception inner) : base(message, inner) { }
 	}
+
+	public class TriggerException : BrimstoneException
+	{
+		public TriggerException() { }
+
+		public TriggerException(string message) : base(message) { }
+
+		public TriggerException(string message, Exception inner) : base(message, inner) { }
+	}
 }
