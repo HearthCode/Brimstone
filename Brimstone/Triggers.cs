@@ -28,14 +28,26 @@ namespace Brimstone
 		DrawCard,
 		AddToHand,
 		PreDamage,
-		Damage,
+		Damage, // 0
 		Heal,
 		Silence,
 		Discard,
 		GainArmor,
 		RevealSecret,
 		EquipWeapon,
-		PhaseMainNext
+		WeaponAttack, // 3
+
+		GameStart, // -1
+		BeginMulligan, // -1
+		DealMulligan, // 6
+		MulliganWaiting, // 7
+		PhaseMainReady, // 1
+		PhaseMainStartTriggers, // 8
+		PhaseMainStart, // 0
+		PhaseMainAction, // 2
+		PhaseMainEnd, // 4
+		PhaseMainCleanup, // 5
+		PhaseMainNext, // -1
 	}
 
 	public class Trigger
