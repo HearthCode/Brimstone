@@ -134,7 +134,6 @@ namespace Brimstone
 			ActionQueue.EnqueueDeferred(a);
 		}
 
-		// TODO: Clone this and add to unit tests
 		private Stack<BlockStart> ActionBlocks = new Stack<BlockStart>();
 
 		public BlockStart BlockStart(BlockType Type, IEntity Source, IEntity Target = null, int Index = -1) {

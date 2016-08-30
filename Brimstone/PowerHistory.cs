@@ -24,6 +24,7 @@ namespace Brimstone
 		}
 	}
 
+	// TODO: Implement IEquatable<T> on BlockStart and BlockEnd
 	public class BlockStart : PowerAction
 	{
 		public BlockType Type { get; }
