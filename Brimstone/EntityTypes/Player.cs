@@ -58,6 +58,25 @@ namespace Brimstone
 		// All the entities that we can potentially play or attack with when it's our turn
 		public IEnumerable<IEntity> LiveEntities => Hand.Concat(Board).Concat(new List<IEntity> {this, /* HeroPower */});
 
+		public IEnumerable<Option> Options
+		{
+			get
+			{
+				foreach (var e in Hand)
+					if (e.IsPlayable)
+						yield return new Option {Source = e, Targets = e.ValidTargets};
+
+				foreach (var e in Board)
+					if (e.CanAttack)
+						yield return new Option {Source = e, Targets = e.ValidTargets};
+
+				if (Hero.CanAttack)
+					yield return new Option {Source = Hero, Targets = Hero.ValidTargets};
+
+				// TODO: Hero power
+			}
+		}
+
 		public Choice StartMulligan() {
 			MulliganState = MulliganState.INPUT;
 			return new Choice(this, Game.Action(this, Actions.MulliganChoice(this)), ChoiceType.MULLIGAN);

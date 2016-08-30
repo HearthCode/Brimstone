@@ -2,7 +2,7 @@
 
 namespace Brimstone
 {
-	class Option
+	public class Option
 	{
 		public IEntity Source;
 		public IEnumerable<Option> SubOptions;
