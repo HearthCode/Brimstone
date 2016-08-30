@@ -4,6 +4,8 @@ namespace Brimstone
 {
 	public partial interface ICharacter : IPlayable
 	{
+		bool CanAttack { get; }
+
 		ICanTarget Attack(ICharacter Target = null);
 
 		void Hit(int amount);
@@ -15,6 +17,8 @@ namespace Brimstone
 	{
 		protected Character(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
 		protected Character(Character<T> cloneFrom) : base(cloneFrom) { }
+
+		public bool CanAttack => !IsExhausted && ValidTargets.Count > 0;
 
 		public ICanTarget Attack(ICharacter target = null) {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
