@@ -312,7 +312,7 @@ namespace Brimstone
 				return (id != 0 ? (IPlayable)Game.Entities[id] : null);
 			}
 			set {
-				this[GameTag.PROPOSED_ATTACKER] = value?.Id ?? 0;;
+				this[GameTag.LAST_CARD_PLAYED] = value?.Id ?? 0;;
 			}
 		}
 	}
