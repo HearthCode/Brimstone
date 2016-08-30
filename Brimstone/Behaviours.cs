@@ -91,7 +91,10 @@ namespace Brimstone
 		public static ActionGraph Death(ActionGraph Targets = null) { return new Death { Args = { Targets } }; }
 
 		// Event helpers
-		public static Trigger When(ActionGraph trigger, ActionGraph action) { return Trigger.When(trigger, action); }
-		public static Trigger After(ActionGraph trigger, ActionGraph action) { return Trigger.After(trigger, action); }
+		public static Trigger At(TriggerType TriggerType, Selector Condition, ActionGraph Action) { return Trigger.At(TriggerType, Action, Condition); }
+		public static Trigger At(TriggerType TriggerType, ActionGraph Action) { return Trigger.At(TriggerType, Action); }
+
+		// TODO: Add the rest
+		public static Trigger OnDamage(Selector Condition, ActionGraph Action) { return Trigger.At(TriggerType.Damage, Action, Condition); }
 	}
 }

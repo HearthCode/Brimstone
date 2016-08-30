@@ -1,39 +1,61 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Brimstone
 {
-	public enum TriggerEpoch
+	public enum TriggerType
 	{
-		When,
-		After
+		BeginTurn,
+		EndTurn,
+		PlaySpell,
+		AfterPlaySpell,
+		Spellbender,
+		PlayWeapon,
+		PreSummon,
+		Summon,
+		PlayMinion,
+		AfterPlayCard,
+		AfterSummon,
+		ProposedAttack,
+		Attack,
+		AfterAttack,
+		Inspire,
+		Death,
+		DrawCard,
+		AddToHand,
+		PreDamage,
+		Damage,
+		Heal,
+		Silence,
+		Discard,
+		GainArmor,
+		RevealSecret,
+		EquipWeapon,
+		PhaseMainNext
 	}
 
 	public class Trigger
 	{
-		public Type TriggerActionType { get; }
-		public List<QueueAction> Args { get; } = new List<QueueAction>();
+		public Selector Condition { get; }
 		public List<QueueAction> Action { get; }= new List<QueueAction>();
-		public TriggerEpoch Epoch { get; }
+		public TriggerType Type { get; }
 
-		public Trigger(ActionGraph triggerSource, ActionGraph action, TriggerEpoch when) {
-			var actionList = triggerSource.Unravel();
-			TriggerActionType = actionList[actionList.Count - 1].GetType();
-			actionList.RemoveAt(actionList.Count - 1);
-			Args = actionList;
+		public Trigger(TriggerType type, ActionGraph action, Selector condition = null) {
+			DebugLog.WriteLine("Creating trigger " + type + " using " + action.Graph[0].GetType().Name);
+			Condition = condition;
 			Action = action.Unravel();
-			Epoch = when;
+			Type = type;
 		}
 
 		public Trigger(Trigger t) {
 			// Only a shallow copy is necessary because Args and Action don't change and are lazily evaluated
-			TriggerActionType = t.TriggerActionType;
-			Args = t.Args;
+			Condition = t.Condition;
 			Action = t.Action;
-			Epoch = t.Epoch;
+			Type = t.Type;
 		}
 
 		public AttachedTrigger CreateAttachedTrigger(IEntity entity) {
@@ -42,12 +64,10 @@ namespace Brimstone
 			return new AttachedTrigger(this, entity);
 		}
 
-		public static Trigger When(ActionGraph trigger, ActionGraph g) {
-			return new Trigger(trigger, g, TriggerEpoch.When);
-		}
+		// TODO: Detach triggers
 
-		public static Trigger After(ActionGraph trigger, ActionGraph g) {
-			return new Trigger(trigger, g, TriggerEpoch.After);
+		public static Trigger At(TriggerType type, ActionGraph g, Selector condition = null) {
+			return new Trigger(type, g, condition);
 		}
 	}
 
@@ -56,6 +76,7 @@ namespace Brimstone
 		public int EntityId { get; }
 
 		public AttachedTrigger(Trigger t, IEntity e) : base(t) {
+			DebugLog.WriteLine("Attaching trigger " + t.Type + " to entity " + e.ShortDescription);
 			EntityId = e.Id;
 		}
 
@@ -67,16 +88,16 @@ namespace Brimstone
 	public class TriggerManager : ICloneable
 	{
 		public Game Game { get; set; }
-		public Dictionary<Type, List<AttachedTrigger>> Triggers { get; }
+		public Dictionary<TriggerType, List<AttachedTrigger>> Triggers { get; }
 
 		public TriggerManager(Game game) {
 			Game = game;
-			Triggers = new Dictionary<Type, List<AttachedTrigger>>();
+			Triggers = new Dictionary<TriggerType, List<AttachedTrigger>>();
 		}
 
 		public TriggerManager(TriggerManager tm) {
 			Game = tm.Game;
-			Triggers = new Dictionary<Type, List<AttachedTrigger>>(tm.Triggers);
+			Triggers = new Dictionary<TriggerType, List<AttachedTrigger>>(tm.Triggers);
 		}
 
 		public void Add(IEntity entity) {
@@ -87,58 +108,46 @@ namespace Brimstone
 		}
 
 		public void Add(AttachedTrigger t) {
-			if (Triggers.ContainsKey(t.TriggerActionType))
-				Triggers[t.TriggerActionType].Add(t);
+			if (Triggers.ContainsKey(t.Type))
+				Triggers[t.Type].Add(t);
 			else
-				Triggers.Add(t.TriggerActionType, new List<AttachedTrigger> { t });
+				Triggers.Add(t.Type, new List<AttachedTrigger> { t });
 		}
 
-		public void Fire(TriggerEpoch epoch, QueueAction action, IEntity source, List<ActionResult> args) {
-			// TODO: This is all really slow, improve performance
-
-			Type me = action.GetType();
-			if (!Triggers.ContainsKey(me))
+		public void Fire(TriggerType type, IEntity source) {
+			if (!Triggers.ContainsKey(type))
 				return;
 
-			foreach (var trigger in Triggers[me])
-				if (trigger.Epoch == epoch) {
-					// Get arguments that must match for the trigger to fire
-					var matchArgs = new List<ActionResult>();
-					foreach (var a in trigger.Args)
-						matchArgs.Add(a.Run(Game, Game.Entities[trigger.EntityId], null));
-					//var matchArgs = game.ActionQueue.EnqueueMultiResult(game.Entities[trigger.EntityId], trigger.Args);
+			DebugLog.WriteLine("Checking triggers for " + type + " initiated by " + source.ShortDescription);
 
-					bool match = true;
-					for (int i = 0; i < matchArgs.Count; i++) {
-						// Always match unspecified arguments
-						if (matchArgs[i].IsBlank)
-							continue;
-						// Match if value type equality is met
-						else if (matchArgs[i] == args[i])
-							continue;
-						// Check if it's a list of entities
-						List<IEntity> matchEntities = matchArgs[i];
-						if (matchEntities == null) {
-							// If it's not then equality failed and there is no match
-							match = false;
+			foreach (var trigger in Triggers[type]) {
+				var owningEntity = Game.Entities[trigger.EntityId];
+
+				// Get condition entities
+				IEnumerable<IEntity> conditionEntities = trigger.Condition?.Lambda(owningEntity);
+
+				// No condition? Conditions met
+				bool conditionMet = conditionEntities == null;
+
+				// Check for entity match
+				if (!conditionMet) {
+					switch (trigger.Type) {
+						case TriggerType.Damage:
+							conditionMet = conditionEntities.Contains(Game.Environment.LastDamaged);
 							break;
-						}
-						// One if the items in the trigger list must be in the actual entity list to match
-						match = matchArgs[i].Intersect((List<IEntity>)args[i]).Any();
-						if (!match)
-							break;
+						default:
+							throw new TriggerException("Trigger type " + trigger.Type + " not implemented");
 					}
-					if (match)
-						Game.Queue(Game.Entities[trigger.EntityId], trigger.Action);
 				}
+
+				// Run trigger if condition met
+				if (conditionMet)
+					Game.TriggerBlock(owningEntity, trigger.Action);
+			}
 		}
 
-		public void When(ActionGraph trigger, ActionGraph g) {
-			Add(new Trigger(trigger, g, TriggerEpoch.When).CreateAttachedTrigger(Game));
-		}
-
-		public void After(ActionGraph trigger, ActionGraph g) {
-			Add(new Trigger(trigger, g, TriggerEpoch.After).CreateAttachedTrigger(Game));
+		public void At(TriggerType type, ActionGraph g, Selector condition = null) {
+			Add(new Trigger(type, g, condition).CreateAttachedTrigger(Game));
 		}
 
 		public object Clone() {

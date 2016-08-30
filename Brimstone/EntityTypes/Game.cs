@@ -28,6 +28,7 @@ namespace Brimstone
 
 		public EntityController Entities;
 		public TriggerManager ActiveTriggers;
+		public Environment Environment;
 
 		public Player[] Players { get; private set; } = new Player[2];
 		public Player Player1 {
@@ -89,6 +90,7 @@ namespace Brimstone
 			ActionQueue = new ActionQueue(this);
 			ActiveTriggers = new TriggerManager(this);
 			Entities = new EntityController(this);
+			Environment = new Environment(this);
 
 			// Generate zones owned by game
 			Zones = new Zones(this, this);
@@ -138,7 +140,7 @@ namespace Brimstone
 		public BlockStart BlockStart(BlockType Type, IEntity Source, IEntity Target = null, int Index = -1) {
 			var block = new BlockStart(Type, Source, Target, Index);
 			ActionBlocks.Push(block);
-			PowerHistory.Add(block);
+			PowerHistory?.Add(block);
 			return block;
 		}
 
@@ -148,17 +150,30 @@ namespace Brimstone
 			var block = ActionBlocks.Pop();
 			if (Block.Type != block.Type || Block.EntityId != block.EntityId)
 				throw new ActionBlockException("Mismatched action blocks");
-			PowerHistory.Add(new BlockEnd(block.Type));
+			PowerHistory?.Add(new BlockEnd(block.Type));
 
 			if (ActionBlocks.Count == 0) {
-				// TODO: Death processing
+				// TODO: Store list of mortally wounded characters to avoid iteration
+				foreach (var e in Characters)
+					e.CheckForDeath();
 			}
 		}
 
-		public void TriggerBlock(IEntity Source, Action Action, IEntity Target = null, int Index = -1) {
-			var block = BlockStart(BlockType.TRIGGER, Source, Target, Index);
-			Action();
-			BlockEnd(block);
+		public void TriggerBlock(IEntity Source, ActionGraph Actions, int Index = -1) {
+			TriggerBlock(Source, Actions.Unravel(), Index);
+		}
+
+		public void TriggerBlock(IEntity Source, List<QueueAction> Actions, int Index = -1) {
+			DebugLog.WriteLine("Queueing trigger for " + Source.ShortDescription);
+
+			BlockStart block = null;
+			Queue(Source, (Action<IEntity>)(_ => {
+				block = Game.BlockStart(BlockType.TRIGGER, Source, Index: Index);
+			}));
+			Game.Queue(Source,
+				Actions.Then((Action<IEntity>)(_ => {
+					Game.BlockEnd(block);
+				})));
 		}
 
 		public void Start(int FirstPlayer = 0, bool SkipMulligan = false) {
@@ -178,8 +193,8 @@ namespace Brimstone
 			foreach (var p in Players)
 				p.PlayState = PlayState.PLAYING;
 
-			TriggerBlock(this, () =>
-			{
+			//TriggerBlock(this, (Action<IEntity>) (_ =>
+			//{
 				// Pick a random starting player
 				if (FirstPlayer == 0)
 					this.FirstPlayer = Players[RNG.Between(0, 1)];
@@ -203,7 +218,7 @@ namespace Brimstone
 
 				if (!SkipMulligan)
 					NextStep = Step.BEGIN_MULLIGAN;
-			});
+			//}));
 
 			// TODO: POWERED_UP settings and stuff go here
 
@@ -216,6 +231,8 @@ namespace Brimstone
 		private void StartMulligan() {
 			// TODO: Put the output into choices
 			Step = Step.BEGIN_MULLIGAN;
+
+			//BlockStart(BlockType.TRIGGER, this);
 			foreach (var p in Players)
 				p.StartMulligan();
 		}
@@ -357,6 +374,10 @@ namespace Brimstone
 			// Clone triggers
 			game.ActiveTriggers = ((TriggerManager)ActiveTriggers.Clone());
 			game.ActiveTriggers.Game = game;
+			// Clone environment
+			game.Environment = (Environment) Environment.Clone();
+			// Clone ActionBlocks
+			game.ActionBlocks = new Stack<BlockStart>(ActionBlocks);
 			// Link PowerHistory
 			if (PowerHistory != null) {
 				game.PowerHistory = new PowerHistory(game, this);

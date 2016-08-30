@@ -312,7 +312,8 @@ namespace Brimstone
 					DebugLog.WriteLine("{0} is getting hit for {1} points of damage", e.ShortDescription, args[DAMAGE]);
 
 					e.Damage += args[DAMAGE];
-					e.CheckForDeath();
+					game.Environment.LastDamaged = e;
+					game.ActiveTriggers.Fire(TriggerType.Damage, e);
 
 					// TODO: What if one of our targets gets killed?
 				}

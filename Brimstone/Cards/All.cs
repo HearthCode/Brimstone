@@ -20,7 +20,7 @@
 		// Acolyte of Pain
 		public static Behaviour EX1_007 = new Behaviour {
 			Triggers = {
-				When(Damage(Self), Draw(Controller))
+				OnDamage(Self, Draw(Controller))
 			}
 		};
 

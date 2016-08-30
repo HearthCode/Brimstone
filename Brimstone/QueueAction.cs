@@ -11,11 +11,7 @@ namespace Brimstone
 
 		// TODO: Find a way to get rid of source altogether (we only need it for Play and Select at the moment)
 		public ActionResult Execute(Game game, IEntity source, List<ActionResult> args) {
-			// TODO: The triggers are probably in the wrong place
-			game.ActiveTriggers.Fire(TriggerEpoch.When, this, source, args);
-			var result = Run(game, source, args);
-			game.ActiveTriggers.Fire(TriggerEpoch.After, this, source, args);
-			return result;
+			return Run(game, source, args);
 		}
 
 		public ActionGraph Then(ActionGraph g) {
