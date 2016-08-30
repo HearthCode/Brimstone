@@ -132,6 +132,29 @@ namespace Brimstone
 			ActionQueue.EnqueueDeferred(a);
 		}
 
+		// TODO: Clone this and add to unit tests
+		private Stack<BlockStart> ActionBlocks = new Stack<BlockStart>();
+
+		public BlockStart BlockStart(BlockType Type, IEntity Source, IEntity Target = null, int Index = -1) {
+			var block = new BlockStart(Type, Source, Target, Index);
+			ActionBlocks.Push(block);
+			PowerHistory.Add(block);
+			return block;
+		}
+
+		public void BlockEnd(BlockStart Block) {
+			if (ActionBlocks.Count == 0)
+				throw new ActionBlockException("Tried to end block when already at top level");
+			var block = ActionBlocks.Pop();
+			if (Block.Type != block.Type || Block.EntityId != block.EntityId)
+				throw new ActionBlockException("Mismatched action blocks");
+			PowerHistory.Add(new BlockEnd(block.Type));
+
+			if (ActionBlocks.Count == 0) {
+				// TODO: Death processing
+			}
+		}
+
 		public void Start(int FirstPlayer = 0, bool SkipMulligan = false) {
 			// Shuffle player decks
 			foreach (var p in Players)

@@ -62,4 +62,13 @@ namespace Brimstone
 
 		public SelectorException(string message, Exception inner) : base(message, inner) { }
 	}
+
+	public class ActionBlockException : BrimstoneException
+	{
+		public ActionBlockException() { }
+
+		public ActionBlockException(string message) : base(message) { }
+
+		public ActionBlockException(string message, Exception inner) : base(message, inner) { }
+	}
 }
