@@ -30,15 +30,15 @@ namespace Brimstone
 		public int Target { get; }
 		public int Index { get; }
 
-		public BlockStart(BlockType type, int source, int target, int index = -1) : base(source) {
+		public BlockStart(BlockType type, int source, int target = 0, int index = -1) : base(source) {
 			Type = type;
 			Target = target;
 			Index = index;
 		}
 
-		public BlockStart(BlockType type, IEntity source, IEntity target, int index = -1) : base(source) {
+		public BlockStart(BlockType type, IEntity source, IEntity target = null, int index = -1) : base(source) {
 			Type = type;
-			Target = target.Id;
+			Target = target?.Id ?? 0;
 			Index = index;
 		}
 
@@ -289,6 +289,7 @@ namespace Brimstone
 			var collapsedDelta = new HashSet<TagChange>(new CompareEntityAndTagName());
 			foreach (var entry in delta.Reverse<PowerAction>()) {
 				// TODO: All the other PowerAction types
+				// Ignore BlockStart and BlockEnd
 				if (entry is CreateEntity) {
 					foreach (var tag in ((CreateEntity)entry).Tags)
 						collapsedDelta.Add(new TagChange(entry.EntityId, tag.Key, tag.Value));
