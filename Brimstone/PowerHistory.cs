@@ -51,7 +51,13 @@ namespace Brimstone
 	{
 		public BlockType Type { get; }
 
-		public BlockEnd(BlockType type) : base(-1) { }
+		public BlockEnd(BlockType type) : base(-1) {
+			Type = type;
+		}
+
+		public override string ToString() {
+			return "[End] " + Type;
+		}
 	}
 
 	public class TagChange : PowerAction, IEquatable<TagChange>
