@@ -23,8 +23,22 @@ namespace Brimstone
 		{
 			get
 			{
+				if (Controller != Game.CurrentPlayer)
+					return false;
+
 				if (Zone != Controller.Hand)
 					return false;
+
+				if (Controller.Choice != null)
+					return false;
+
+				if (!Controller.SufficientResources(this))
+					return false;
+
+				if (Card.RequiresTarget && ValidTargets.Count == 0)
+					return false;
+
+				// TODO: Alot more criteria
 
 				return true;
 			}
