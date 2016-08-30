@@ -155,6 +155,12 @@ namespace Brimstone
 			}
 		}
 
+		public void TriggerBlock(IEntity Source, Action Action, IEntity Target = null, int Index = -1) {
+			var block = BlockStart(BlockType.TRIGGER, Source, Target, Index);
+			Action();
+			BlockEnd(block);
+		}
+
 		public void Start(int FirstPlayer = 0, bool SkipMulligan = false) {
 			// Shuffle player decks
 			foreach (var p in Players)
@@ -172,28 +178,32 @@ namespace Brimstone
 			foreach (var p in Players)
 				p.PlayState = PlayState.PLAYING;
 
-			// Pick a random starting player
-			if (FirstPlayer == 0)
-				this.FirstPlayer = Players[RNG.Between(0, 1)];
-			else
-				this.FirstPlayer = Players[FirstPlayer - 1];
-			CurrentPlayer = this.FirstPlayer;
+			TriggerBlock(this, () =>
+			{
+				// Pick a random starting player
+				if (FirstPlayer == 0)
+					this.FirstPlayer = Players[RNG.Between(0, 1)];
+				else
+					this.FirstPlayer = Players[FirstPlayer - 1];
+				CurrentPlayer = this.FirstPlayer;
 
-			// Set turn counter
-			Game.Turn = 1;
+				// Set turn counter
+				Game.Turn = 1;
 
-			// Draw cards
-			foreach (var p in Players) {
-				p.Draw((this.FirstPlayer == p ? 3 : 4));
-				p.NumTurnsLeft = 1;
+				// Draw cards
+				foreach (var p in Players)
+				{
+					p.Draw((this.FirstPlayer == p ? 3 : 4));
+					p.NumTurnsLeft = 1;
 
-				// Give 2nd player the coin
-				if (p != this.FirstPlayer)
-					p.Give("The Coin");
-			}
+					// Give 2nd player the coin
+					if (p != this.FirstPlayer)
+						p.Give("The Coin");
+				}
 
-			if (!SkipMulligan)
-				NextStep = Step.BEGIN_MULLIGAN;
+				if (!SkipMulligan)
+					NextStep = Step.BEGIN_MULLIGAN;
+			});
 
 			// TODO: POWERED_UP settings and stuff go here
 
