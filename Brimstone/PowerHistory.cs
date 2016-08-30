@@ -9,7 +9,7 @@ namespace Brimstone
 
 	public abstract class PowerAction
 	{
-		public int EntityId { get; set; }
+		public int EntityId { get; protected set; }
 
 		public PowerAction(int eId) {
 			EntityId = eId;
@@ -22,6 +22,36 @@ namespace Brimstone
 		public override string ToString() {
 			return "Entity: " + EntityId;
 		}
+	}
+
+	public class BlockStart : PowerAction
+	{
+		public BlockType Type { get; }
+		public int Target { get; }
+		public int Index { get; }
+
+		public BlockStart(BlockType type, int source, int target, int index = -1) : base(source) {
+			Type = type;
+			Target = target;
+			Index = index;
+		}
+
+		public BlockStart(BlockType type, IEntity source, IEntity target, int index = -1) : base(source) {
+			Type = type;
+			Target = target.Id;
+			Index = index;
+		}
+
+		public override string ToString() {
+			return "[Start] " + Type + ": Source = " + EntityId + ", Target = " + Target + ", Index = " + Index;
+		}
+	}
+
+	public class BlockEnd : PowerAction
+	{
+		public BlockType Type { get; }
+
+		public BlockEnd(BlockType type) : base(-1) { }
 	}
 
 	public class TagChange : PowerAction, IEquatable<TagChange>
