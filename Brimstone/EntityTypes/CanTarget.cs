@@ -11,8 +11,6 @@ namespace Brimstone
 
 		// TODO: Add cloning code + cloning unit test
 		ICharacter Target { get; set; }
-
-		ICanTarget Attack(ICharacter Target = null);
 	}
 
 	public abstract class CanTarget : Entity, ICanTarget
@@ -70,7 +68,7 @@ namespace Brimstone
 							return false;
 						break;
 					case PlayRequirements.REQ_TARGET_MIN_ATTACK:
-						if (target.Attack < param)
+						if (target.AttackDamage < param)
 							return false;
 						break;
 					case PlayRequirements.REQ_MUST_TARGET_TAUNTER:
@@ -117,15 +115,6 @@ namespace Brimstone
 				targets.Add(Controller.Opponent.Hero);
 				return targets;
 			}
-		}
-
-		public ICanTarget Attack(ICharacter target = null) {
-			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
-				throw new ChoiceException();
-
-			// TODO: Check targeting validity
-			Target = target;
-			return (ICanTarget) (Entity) Game.Action(this, Actions.Attack(this, (Entity) target));
 		}
 	}
 }
