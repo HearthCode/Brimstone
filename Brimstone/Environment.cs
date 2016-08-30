@@ -17,7 +17,10 @@ namespace Brimstone
 		private int _lastDamaged;
 		public ICharacter LastDamaged {
 			get { return (ICharacter) Game.Entities[_lastDamaged]; }
-			set { _lastDamaged = value.Id; }
+			set {
+				_lastDamaged = value.Id;
+				Game.ActiveTriggers.Fire(TriggerType.Damage, value);
+			}
 		}
 
 		public object Clone() {

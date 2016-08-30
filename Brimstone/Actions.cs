@@ -313,7 +313,6 @@ namespace Brimstone
 
 					e.Damage += args[DAMAGE];
 					game.Environment.LastDamaged = e;
-					game.ActiveTriggers.Fire(TriggerType.Damage, e);
 
 					// TODO: What if one of our targets gets killed?
 				}
