@@ -18,7 +18,7 @@ namespace Brimstone
 		protected Character(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
 		protected Character(Character<T> cloneFrom) : base(cloneFrom) { }
 
-		public bool CanAttack => !IsExhausted && ValidTargets.Count > 0;
+		public bool CanAttack => !IsExhausted && AttackDamage > 0 && ValidTargets.Count > 0;
 
 		public ICanTarget Attack(ICharacter target = null) {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
