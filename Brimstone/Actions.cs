@@ -399,7 +399,7 @@ namespace Brimstone
 
 			defender.IsDefending = true;
 
-			defender.PreDamage = attacker.Attack;
+			defender.PreDamage = attacker.AttackDamage;
 
 			// TODO: Allow other things to change the proposed attacker/defender here
 			defender.PreDamage = 0;
@@ -415,11 +415,11 @@ namespace Brimstone
 			}
 
 			// Save defender's attack as it might change after being damaged (e.g. enrage)
-			int defAttack = defender.Attack;
+			int defAttack = defender.AttackDamage;
 
 			defender.LastAffectedBy = attacker;
 
-			game.Queue(attacker, Actions.Damage((Entity)defender, attacker.Attack));
+			game.Queue(attacker, Actions.Damage((Entity)defender, attacker.AttackDamage));
 			if (defAttack > 0)
 				game.Queue(defender, Actions.Damage((Entity)attacker, defAttack));
 

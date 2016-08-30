@@ -332,7 +332,7 @@ namespace Brimstone
 
 	public partial interface ICharacter : IPlayable
 	{
-		int Attack { get; set; }
+		int AttackDamage { get; set; }
 		bool CantBeTargetedByOpponents { get; set; }
 		int Damage { get; set; }
 		int Health { get; set; }
@@ -349,7 +349,7 @@ namespace Brimstone
 
 	public abstract partial class Character<T> : Playable<T>, ICharacter where T : Entity
 	{
-		public int Attack {
+		public int AttackDamage {
 			get { return this[GameTag.ATK]; }
 			set { this[GameTag.ATK] = value; }
 		}
