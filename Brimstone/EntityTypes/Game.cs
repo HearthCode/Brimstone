@@ -187,17 +187,17 @@ namespace Brimstone
 					NextStep = Step.MAIN_READY;
 			}));
 
-			Game.ActiveTriggers.At(TriggerType.BeginMulligan, (Action<IEntity>) (_ =>
+			ActiveTriggers.At(TriggerType.BeginMulligan, (Action<IEntity>) (_ =>
 			{
-				Game.Queue(Player1, Actions.MulliganChoice(Player1));
-				Game.Queue(Player2, Actions.MulliganChoice(Player2));
+				foreach (var p in Players)
+					p.StartMulligan();
 			}));
-			Game.ActiveTriggers.At(TriggerType.PhaseMainReady, Actions.BeginTurn);
+			ActiveTriggers.At(TriggerType.PhaseMainReady, Actions.BeginTurn);
 
 			// Set game state
 			Game.State = GameState.RUNNING;
 			foreach (var p in Players)
-				p.PlayState = PlayState.PLAYING;
+				p.Start();
 
 			Process();
 			// TODO: POWERED_UP settings and stuff go here
@@ -207,15 +207,11 @@ namespace Brimstone
 		{
 			while (ActionQueue.Queue.Count > 0 && !ActionQueue.Paused) {
 				ActionQueue.ProcessAll();
-				if (Game.NextStep != Game.Step)
+				if (Game.NextStep != Game.Step) {
+					DebugLog.WriteLine("Advancing game step to " + Game.NextStep);
 					Game.Step = Game.NextStep;
+				}
 			}
-		}
-
-		private void StartMulligan() {
-			// TODO: Put the output into choices
-			foreach (var p in Players)
-				p.StartMulligan();
 		}
 
 		public void NextTurn() {

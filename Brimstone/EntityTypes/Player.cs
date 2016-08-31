@@ -77,12 +77,29 @@ namespace Brimstone
 			}
 		}
 
-		// NOTE: Not normally used
-		public Choice StartMulligan() {
-			Game.Action(this, Actions.MulliganChoice(this));
-			return Choice;
+		public void Start() {
+			Game.ActiveTriggers.At(TriggerType.DealMulligan, (Action<IEntity>) (_ => {
+				// Perform mulligan
+				foreach (var e in Choice.Discarding)
+					e.ZoneSwap(Deck[RNG.Between(1, Deck.Count)]);
+				Choice = null;
+
+				MulliganState = MulliganState.WAITING;
+			}), this, Actions.Self);
+
+			Game.ActiveTriggers.At(TriggerType.MulliganWaiting, (Action<IEntity>) (_ => {
+				MulliganState = MulliganState.DONE;
+
+				// Start main game if both players have completed mulligan
+				if (Opponent.MulliganState == MulliganState.DONE)
+					Game.NextStep = Step.MAIN_READY;
+			}), this, Actions.Self);
 		}
 
+		public void StartMulligan() {
+			Game.Action(this, Actions.MulliganChoice(this));
+		}
+			
 		public IPlayable Give(Card card) {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
 				throw new ChoiceException();

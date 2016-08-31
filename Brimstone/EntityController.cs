@@ -131,6 +131,18 @@ namespace Brimstone
 							break;
 					}
 					break;
+
+				case GameTag.MULLIGAN_STATE:
+					switch ((MulliganState) value)
+					{
+						case MulliganState.DEALING:
+							Game.ActiveTriggers.Fire(TriggerType.DealMulligan, entity);
+							break;
+						case MulliganState.WAITING:
+							Game.ActiveTriggers.Fire(TriggerType.MulliganWaiting, entity);
+							break;
+					}
+					break;
 			}
 		}
 

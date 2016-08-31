@@ -473,47 +473,24 @@ namespace Brimstone
 
 	public class Choose : QueueAction
 	{
-		public const int PLAYER = 0;
-
-		private void chooseMulligan(Player p) {
-			p.MulliganState = MulliganState.DEALING;
-
-			// Perform mulligan
-			foreach (var e in p.Choice.Discarding)
-				e.ZoneSwap(p.Deck[RNG.Between(1, p.Deck.Count)]);
-
-			p.MulliganState = MulliganState.WAITING;
-			p.MulliganState = MulliganState.DONE;
-
-			// Start main game if both players have completed mulligan
-			if (p.Opponent.MulliganState == MulliganState.DONE)
-			{
-				p.Game.NextStep = Step.MAIN_READY;
-				p.Game.Queue(p.Game, Actions.BeginTurn);
-			}
-		}
-
-		private void chooseGeneral(Player p) {
-			// TODO: General choices
-			throw new NotImplementedException();
-		}
-
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
-			var player = (Player)args[PLAYER];
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
+		{
+			var player = (Player) source;
+			var choices = player.Choice.Choices;
 
 			if (player.Choice == null)
 				throw new ChoiceException(source + " attempted to make a choice when no choice was available");
 
 			if (player.Choice.ChoiceType == ChoiceType.MULLIGAN)
-				chooseMulligan(player);
-			else if (player.Choice.ChoiceType == ChoiceType.GENERAL)
-				chooseGeneral(player);
+				player.MulliganState = MulliganState.DEALING;
+			else if (player.Choice.ChoiceType == ChoiceType.GENERAL) {
+				player.Choice = null;
+				throw new NotImplementedException();
+			}
 			else
 				throw new ChoiceException("Unknown choice type: " + player.Choice.ChoiceType);
 
-			var result = player.Choice.Choices;
-			player.Choice = null;
-			return result.ToList();
+			return choices;
 		}
 	}
 }

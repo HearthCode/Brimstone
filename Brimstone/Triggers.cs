@@ -147,6 +147,10 @@ namespace Brimstone
 						case TriggerType.Damage:
 							conditionMet = conditionEntities.Contains(Game.Environment.LastDamaged);
 							break;
+						case TriggerType.DealMulligan:
+						case TriggerType.MulliganWaiting:
+							conditionMet = conditionEntities.Contains(source);
+							break;
 						default:
 							throw new TriggerException("Trigger type " + trigger.Type + " not implemented");
 					}
@@ -158,8 +162,8 @@ namespace Brimstone
 			}
 		}
 
-		public void At(TriggerType type, ActionGraph g, Selector condition = null) {
-			Add(new Trigger(type, g, condition).CreateAttachedTrigger(Game));
+		public void At(TriggerType Type, ActionGraph Actions, IEntity Owner = null, Selector Condition = null) {
+			Add(new Trigger(Type, Actions, Condition).CreateAttachedTrigger(Owner ?? Game));
 		}
 
 		public object Clone() {
