@@ -345,6 +345,10 @@ namespace Brimstone
 				if (action.Cancel)
 					return false;
 			}
+
+			if (Queue.Count == 0 && QueueStack.Count == 0)
+				Game.OnQueueEmpty();
+
 			return true;
 		}
 

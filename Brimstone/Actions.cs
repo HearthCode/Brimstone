@@ -39,6 +39,7 @@ namespace Brimstone
 		}
 	}
 
+	// TODO: Get rid of these. Implement a OnBlockEmpty callback and stack
 	public class GameBlockStart : QueueAction
 	{
 		public BlockStart Block { get; set; }
@@ -60,12 +61,6 @@ namespace Brimstone
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			game.PowerHistory?.Add(new BlockEnd(Block.Type));
 			game.ActionQueue.EndBlock();
-
-			// TODO: Remove this once everything is wrapped in blocks
-			if (game.ActionQueue.Count == 0 && game.ActionQueue.QueueStack.Count == 0)
-				foreach (var e in game.Characters)
-					e?.CheckForDeath();
-
 			return ActionResult.None;
 		}
 	}

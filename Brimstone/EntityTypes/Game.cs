@@ -166,7 +166,7 @@ namespace Brimstone
 				CurrentPlayer = this.FirstPlayer;
 
 				// Set turn counter
-				Game.Turn = 1;
+				Turn = 1;
 
 				// Draw cards
 				foreach (var p in Players)
@@ -195,22 +195,24 @@ namespace Brimstone
 			ActiveTriggers.At(TriggerType.PhaseMainReady, Actions.BeginTurn);
 
 			// Set game state
-			Game.State = GameState.RUNNING;
+			State = GameState.RUNNING;
 			foreach (var p in Players)
 				p.Start();
 
-			Process();
+			ActionQueue.ProcessAll();
 			// TODO: POWERED_UP settings and stuff go here
 		}
 
-		public void Process()
+		public void OnQueueEmpty()
 		{
-			while (ActionQueue.Queue.Count > 0 && !ActionQueue.Paused) {
-				ActionQueue.ProcessAll();
-				if (Game.NextStep != Game.Step) {
-					DebugLog.WriteLine("Advancing game step to " + Game.NextStep);
-					Game.Step = Game.NextStep;
-				}
+			// Death checking phase
+			foreach (var e in Characters)
+				e?.CheckForDeath();
+
+			// Advance game step if necessary (probably setting off new triggers)
+			if (NextStep != Step) {
+				DebugLog.WriteLine("Advancing game step to " + NextStep);
+				Step = NextStep;
 			}
 		}
 
