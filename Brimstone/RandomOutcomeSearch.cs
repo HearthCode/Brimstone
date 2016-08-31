@@ -215,7 +215,7 @@ namespace Brimstone
 		public override void Visitor(ProbabilisticGameNode cloned, GameTree<GameNode> tree, QueueActionEventArgs e) {
 			// If the action queue is empty, we have reached a leaf node game state
 			// TODO: Optimize to use TLS and avoid spinlocks
-			if (cloned.Game.ActionQueue.Queue.Count == 0) {
+			if (cloned.Game.ActionQueue.IsEmpty) {
 				tree.LeafNodeCount++;
 				lock (leafNodeGames) {
 					leafNodeGames.Add(cloned);
@@ -298,7 +298,7 @@ namespace Brimstone
 		public override void Visitor(ProbabilisticGameNode cloned, GameTree<GameNode> tree, QueueActionEventArgs e) {
 			// If the action queue is empty, we have reached a leaf node game state
 			// so compare it for equality with other final game states
-			if (cloned.Game.ActionQueue.Queue.Count == 0)
+			if (cloned.Game.ActionQueue.IsEmpty)
 				if (!cloned.Game.EquivalentTo(e.Game)) {
 					tree.LeafNodeCount++;
 					// This will cause the game to be discarded if its fuzzy hash matches any other final game state
@@ -358,7 +358,7 @@ namespace Brimstone
 			if (e.Game.Entities.Changed) {
 				// If the action queue is empty, we have reached a leaf node game state
 				// so compare it for equality with other final game states
-				if (e.Game.ActionQueue.Queue.Count == 0) {
+				if (e.Game.ActionQueue.IsEmpty) {
 					t.LeafNodeCount++;
 					// This will cause the game to be discarded if its fuzzy hash matches any other final game state
 					if (!tlsUniqueGames.Value.ContainsKey(e.Game)) {

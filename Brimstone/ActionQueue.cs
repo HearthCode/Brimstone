@@ -61,6 +61,8 @@ namespace Brimstone
 
 		public int Count { get { return Queue.Count; } }
 
+		public bool IsEmpty { get { return Queue.Count == 0 && QueueStack.Count == 0; } }
+
 		public ActionQueue(Game game, object userData = null) {
 			Game = game;
 			Paused = false;
@@ -285,7 +287,7 @@ namespace Brimstone
 				;
 			// Return whatever is left on the stack
 			var stack = new List<ActionResult>(ResultStack);
-			if (Paused || Queue.Count != 0)
+			if (Paused || !IsEmpty)
 				return stack;
 			ResultStack.Clear();
 			stack.Reverse();
@@ -345,16 +347,11 @@ namespace Brimstone
 			if (result.HasResult)
 				ResultStack.Push(result);
 
-			if (OnAction != null) {
-				OnAction(this, action);
-				if (action.Cancel)
-					return false;
-			}
-
-			if (Queue.Count == 0 && QueueStack.Count == 0)
+			if (IsEmpty)
 				Game.OnQueueEmpty();
 
-			return true;
+			OnAction?.Invoke(this, action);
+			return !action.Cancel;
 		}
 
 		public void ReplaceAction<QAT>(Func<ActionQueue, QueueActionEventArgs, Task> evt) {
