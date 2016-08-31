@@ -39,7 +39,7 @@ namespace Brimstone
 		}
 	}
 
-	public class QueueBlock : QueueAction
+	public class GameActionBlock : QueueAction
 	{
 		public BlockStart Block { get; set; }
 		public List<QueueAction> Actions { get; set; }

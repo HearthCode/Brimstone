@@ -140,7 +140,7 @@ namespace Brimstone
 
 		public void TriggerBlock(IEntity Source, List<QueueAction> Actions, int Index = -1) {
 			DebugLog.WriteLine("Queueing trigger for " + Source.ShortDescription);
-			Queue(Source, new QueueBlock {Block = new BlockStart(BlockType.TRIGGER, Source, null, Index), Actions = Actions });
+			Queue(Source, new GameActionBlock {Block = new BlockStart(BlockType.TRIGGER, Source, null, Index), Actions = Actions });
 		}
 
 		public void Start(int FirstPlayer = 0, bool SkipMulligan = false) {
