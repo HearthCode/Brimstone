@@ -7,6 +7,7 @@ namespace Brimstone
 {
 	public class QueueActionEventArgs : EventArgs, ICloneable
 	{
+		// TODO: Make this value-type cloneable (it might be already for not yet run actions)
 		public Game Game { get; set; }
 		public IEntity Source { get; set; }
 		public QueueAction Action { get; set; }
@@ -69,8 +70,12 @@ namespace Brimstone
 		}
 
 		public ActionQueue(ActionQueue cloneFrom) {
-			// TODO: Clone queue stack
-			// TODO: Clone block stack
+			foreach (var queue in cloneFrom.QueueStack.Reverse()) {
+				var cq = new Deque<QueueActionEventArgs>();
+				foreach (var item in queue)
+					cq.AddBack((QueueActionEventArgs) item.Clone());
+				QueueStack.Push(cq);
+			}
 			foreach (var item in cloneFrom.Queue)
 				Queue.AddBack((QueueActionEventArgs)item.Clone());
 			var stack = new List<ActionResult>(cloneFrom.ResultStack);
