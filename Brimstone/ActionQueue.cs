@@ -113,12 +113,46 @@ namespace Brimstone
 			}
 		}
 
+		public void StartBlock(IEntity source, List<QueueAction> ql) {
+			if (Queue.Count > 0) {
+				QueueStack.Push(Queue);
+				Queue = new Deque<QueueActionEventArgs>();
+			}
+			EnqueueDeferred(source, ql);
+		}
+
+		public void StartBlock(IEntity source, QueueAction a) {
+			if (Queue.Count > 0) {
+				QueueStack.Push(Queue);
+				Queue = new Deque<QueueActionEventArgs>();
+			}
+			EnqueueDeferred(source, a);
+		}
+
+		public void StartBlock(IEntity source, ActionGraph g) {
+			if (Queue.Count > 0) {
+				QueueStack.Push(Queue);
+				Queue = new Deque<QueueActionEventArgs>();
+			}
+			EnqueueDeferred(source, g);
+		}
+
+		public bool EndBlock() {
+			if (QueueStack.Count == 0)
+				return false;
+			var remainingItems = Queue;
+			Queue = QueueStack.Pop();
+			Queue.AddFrontRange(remainingItems);
+			return true;
+		}
+
 		// Gets a QueueAction that can put into the queue
 		private QueueActionEventArgs initializeAction(IEntity source, QueueAction qa) {
 			return new QueueActionEventArgs(Game, source, qa);
 		}
 
 		// TODO: Insertion from multiple threads (eg. two players mulliganing simultaneously) is not thread-safe
+		// TODO: Possible bug - should the list be reversed first?
 		public void InsertDeferred(IEntity source, List<QueueAction> qa) {
 			if (qa != null) {
 				foreach (var a in qa) {
@@ -138,40 +172,49 @@ namespace Brimstone
 			Queue.AddFront(initializeAction(source, a));
 		}
 
-		public List<ActionResult> EnqueueMultiResult(IEntity source, List<QueueAction> qa) {
-			EnqueueDeferred(source, qa);
-			return ProcessThisDepth();
+		public List<ActionResult> RunMultiResult(IEntity source, List<QueueAction> qa) {
+			StartBlock(source, qa);
+			var result = ProcessBlock();
+			EndBlock();
+			return result;
 		}
 
-		public List<ActionResult> EnqueueMultiResult(IEntity source, ActionGraph g) {
-			EnqueueDeferred(source, g);
-			return ProcessThisDepth();
+		public List<ActionResult> RunMultiResult(IEntity source, ActionGraph g) {
+			StartBlock(source, g);
+			var result = ProcessBlock();
+			EndBlock();
+			return result;
 		}
 
-		public List<ActionResult> EnqueueMultiResult(IEntity source, QueueAction a) {
-			EnqueueDeferred(source, a);
-			return ProcessThisDepth();
+		public List<ActionResult> RunMultiResult(IEntity source, QueueAction a) {
+			StartBlock(source, a);
+			var result = ProcessBlock();
+			EndBlock();
+			return result;
 		}
 
-		public ActionResult Enqueue(IEntity source, List<QueueAction> qa) {
-			EnqueueDeferred(source, qa);
-			var result = ProcessThisDepth();
+		public ActionResult Run(IEntity source, List<QueueAction> qa) {
+			StartBlock(source, qa);
+			var result = ProcessBlock();
+			EndBlock();
 			if (result.Count > 0)
 				return result[0];
 			return ActionResult.None;
 		}
 
-		public ActionResult Enqueue(IEntity source, ActionGraph g) {
-			EnqueueDeferred(source, g);
-			var result = ProcessThisDepth();
+		public ActionResult Run(IEntity source, ActionGraph g) {
+			StartBlock(source, g);
+			var result = ProcessBlock();
+			EndBlock();
 			if (result.Count > 0)
 				return result[0];
 			return ActionResult.None;
 		}
 
-		public ActionResult Enqueue(IEntity source, QueueAction a) {
-			EnqueueDeferred(source, a);
-			var result = ProcessThisDepth();
+		public ActionResult Run(IEntity source, QueueAction a) {
+			StartBlock(source, a);
+			var result = ProcessBlock();
+			EndBlock();
 			if (result.Count > 0)
 				return result[0];
 			return ActionResult.None;
@@ -225,7 +268,7 @@ namespace Brimstone
 				ResultStack.Push(a);
 		}
 
-		public List<ActionResult> ProcessThisDepth(object UserData = null) {
+		public List<ActionResult> ProcessBlock(object UserData = null) {
 			return ProcessAll(UserData, QueueStack.Count);
 		}
 
@@ -253,12 +296,8 @@ namespace Brimstone
 			if (Paused)
 				return false;
 
-			// Unwind completed action blocks, but never go to a higher depth than MaxUnwindDepth
-			while (Queue.Count == 0 && QueueStack.Count > MaxUnwindDepth) {
-				Queue = QueueStack.Pop();
-				// TODO: Change this to an OnBlockResolved event that Game subscribes to
-				Game.PowerHistory?.Add(new BlockEnd(BlockStack.Pop().Type));
-			}
+			while (Queue.Count == 0 && QueueStack.Count > MaxUnwindDepth)
+				EndBlock();
 
 			if (Queue.Count == 0)
 				return false;
@@ -303,7 +342,7 @@ namespace Brimstone
 				ResultStack.Push(result);
 
 			// TODO: Remove this once everything is wrapped in blocks
-			if (Queue.Count == 0)
+			if (Queue.Count == 0 && QueueStack.Count == 0)
 				foreach (var e in Game.Characters)
 					e?.CheckForDeath();
 
@@ -331,8 +370,15 @@ namespace Brimstone
 
 		public override string ToString() {
 			string s = string.Empty;
+			s += "Current block:\n";
 			foreach (var a in Queue)
 				s += a + "\n";
+
+			foreach (var b in QueueStack) {
+				s += "\nStacked:\n";
+				foreach (var a in b)
+					s += a + "\n";
+			}
 			return s;
 		}
 
