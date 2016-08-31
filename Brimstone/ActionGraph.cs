@@ -44,6 +44,12 @@ namespace Brimstone
 		public static implicit operator ActionGraph(Action<IEntity> x) {
 			return new Func { F = x };
 		}
+		public static implicit operator ActionGraph(List<IEntity> e) {
+			return new Selector {
+				SelectionSource = SelectionSource.ActionSource,
+				Lambda = x => e
+			};
+		}
 
 		// Unravel graph implicitly
 		public static implicit operator List<QueueAction>(ActionGraph g) {
