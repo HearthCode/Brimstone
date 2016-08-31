@@ -44,7 +44,6 @@ namespace Brimstone
 	{
 		public Game Game { get; private set; }
 		public Stack<Deque<QueueActionEventArgs>> QueueStack = new Stack<Deque<QueueActionEventArgs>>();
-		public Stack<BlockStart> BlockStack = new Stack<BlockStart>();
 		public Deque<QueueActionEventArgs> Queue = new Deque<QueueActionEventArgs>();
 		public Stack<ActionResult> ResultStack = new Stack<ActionResult>();
 		public List<QueueActionEventArgs> History;
@@ -340,11 +339,6 @@ namespace Brimstone
 			var result = action.Action.Execute(action.Game, action.Source, action.Args);
 			if (result.HasResult)
 				ResultStack.Push(result);
-
-			// TODO: Remove this once everything is wrapped in blocks
-			if (Queue.Count == 0 && QueueStack.Count == 0)
-				foreach (var e in Game.Characters)
-					e?.CheckForDeath();
 
 			if (OnAction != null) {
 				OnAction(this, action);

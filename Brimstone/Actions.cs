@@ -39,7 +39,7 @@ namespace Brimstone
 		}
 	}
 
-	public class GameActionBlock : QueueAction
+	public class GameBlockStart : QueueAction
 	{
 		public BlockStart Block { get; set; }
 		public List<QueueAction> Actions { get; set; }
@@ -47,13 +47,25 @@ namespace Brimstone
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
 		{
 			game.PowerHistory?.Add(Block);
+			game.ActionQueue.StartBlock(source, Actions);
+			game.ActionQueue.EnqueueDeferred(source, new GameBlockEnd {Block = Block});
+			return ActionResult.None;
+		}
+	}
 
-			// TODO: Move into ActionQueue
-			game.ActionQueue.QueueStack.Push(game.ActionQueue.Queue);
-			game.ActionQueue.BlockStack.Push(Block);
-			game.ActionQueue.Queue = new Deque<QueueActionEventArgs>();
-			foreach (var a in Actions)
-				game.Queue(source, a);
+	public class GameBlockEnd : QueueAction
+	{
+		public BlockStart Block { get; set; }
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			game.PowerHistory?.Add(new BlockEnd(Block.Type));
+			game.ActionQueue.EndBlock();
+
+			// TODO: Remove this once everything is wrapped in blocks
+			if (game.ActionQueue.Count == 0 && game.ActionQueue.QueueStack.Count == 0)
+				foreach (var e in game.Characters)
+					e?.CheckForDeath();
+
 			return ActionResult.None;
 		}
 	}

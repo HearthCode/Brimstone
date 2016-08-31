@@ -115,7 +115,7 @@ namespace Brimstone
 		}
 
 		public ActionResult Action(IEntity source, ActionGraph g) {
-			return ActionQueue.Enqueue(source, g);
+			return ActionQueue.Run(source, g);
 		}
 
 		public void Queue(IEntity source, ActionGraph g) {
@@ -140,7 +140,7 @@ namespace Brimstone
 
 		public void TriggerBlock(IEntity Source, List<QueueAction> Actions, int Index = -1) {
 			DebugLog.WriteLine("Queueing trigger for " + Source.ShortDescription);
-			Queue(Source, new GameActionBlock {Block = new BlockStart(BlockType.TRIGGER, Source, null, Index), Actions = Actions });
+			Queue(Source, new GameBlockStart {Block = new BlockStart(BlockType.TRIGGER, Source, null, Index), Actions = Actions });
 		}
 
 		public void Start(int FirstPlayer = 0, bool SkipMulligan = false) {
