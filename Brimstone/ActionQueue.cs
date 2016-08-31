@@ -140,22 +140,22 @@ namespace Brimstone
 
 		public List<ActionResult> EnqueueMultiResult(IEntity source, List<QueueAction> qa) {
 			EnqueueDeferred(source, qa);
-			return ProcessThis();
+			return ProcessThisDepth();
 		}
 
 		public List<ActionResult> EnqueueMultiResult(IEntity source, ActionGraph g) {
 			EnqueueDeferred(source, g);
-			return ProcessThis();
+			return ProcessThisDepth();
 		}
 
 		public List<ActionResult> EnqueueMultiResult(IEntity source, QueueAction a) {
 			EnqueueDeferred(source, a);
-			return ProcessThis();
+			return ProcessThisDepth();
 		}
 
 		public ActionResult Enqueue(IEntity source, List<QueueAction> qa) {
 			EnqueueDeferred(source, qa);
-			var result = ProcessThis();
+			var result = ProcessThisDepth();
 			if (result.Count > 0)
 				return result[0];
 			return ActionResult.None;
@@ -163,7 +163,7 @@ namespace Brimstone
 
 		public ActionResult Enqueue(IEntity source, ActionGraph g) {
 			EnqueueDeferred(source, g);
-			var result = ProcessThis();
+			var result = ProcessThisDepth();
 			if (result.Count > 0)
 				return result[0];
 			return ActionResult.None;
@@ -171,7 +171,7 @@ namespace Brimstone
 
 		public ActionResult Enqueue(IEntity source, QueueAction a) {
 			EnqueueDeferred(source, a);
-			var result = ProcessThis();
+			var result = ProcessThisDepth();
 			if (result.Count > 0)
 				return result[0];
 			return ActionResult.None;
@@ -225,7 +225,7 @@ namespace Brimstone
 				ResultStack.Push(a);
 		}
 
-		public List<ActionResult> ProcessThis(object UserData = null) {
+		public List<ActionResult> ProcessThisDepth(object UserData = null) {
 			return ProcessAll(UserData, QueueStack.Count);
 		}
 
