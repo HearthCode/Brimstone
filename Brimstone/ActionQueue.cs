@@ -140,22 +140,22 @@ namespace Brimstone
 
 		public List<ActionResult> EnqueueMultiResult(IEntity source, List<QueueAction> qa) {
 			EnqueueDeferred(source, qa);
-			return ProcessAll();
+			return ProcessThis();
 		}
 
 		public List<ActionResult> EnqueueMultiResult(IEntity source, ActionGraph g) {
 			EnqueueDeferred(source, g);
-			return ProcessAll();
+			return ProcessThis();
 		}
 
 		public List<ActionResult> EnqueueMultiResult(IEntity source, QueueAction a) {
 			EnqueueDeferred(source, a);
-			return ProcessAll();
+			return ProcessThis();
 		}
 
 		public ActionResult Enqueue(IEntity source, List<QueueAction> qa) {
 			EnqueueDeferred(source, qa);
-			var result = ProcessAll();
+			var result = ProcessThis();
 			if (result.Count > 0)
 				return result[0];
 			return ActionResult.None;
@@ -163,7 +163,7 @@ namespace Brimstone
 
 		public ActionResult Enqueue(IEntity source, ActionGraph g) {
 			EnqueueDeferred(source, g);
-			var result = ProcessAll();
+			var result = ProcessThis();
 			if (result.Count > 0)
 				return result[0];
 			return ActionResult.None;
@@ -171,7 +171,7 @@ namespace Brimstone
 
 		public ActionResult Enqueue(IEntity source, QueueAction a) {
 			EnqueueDeferred(source, a);
-			var result = ProcessAll();
+			var result = ProcessThis();
 			if (result.Count > 0)
 				return result[0];
 			return ActionResult.None;
@@ -225,12 +225,16 @@ namespace Brimstone
 				ResultStack.Push(a);
 		}
 
-		public List<ActionResult> ProcessAll(object UserData = null) {
-			return ProcessAllAsync(UserData).Result;
+		public List<ActionResult> ProcessThis(object UserData = null) {
+			return ProcessAll(UserData, QueueStack.Count);
 		}
 
-		public async Task<List<ActionResult>> ProcessAllAsync(object UserData = null) {
-			while (await ProcessOneAsync(UserData))
+		public List<ActionResult> ProcessAll(object UserData = null, int MaxUnwindDepth = 0) {
+			return ProcessAllAsync(UserData, MaxUnwindDepth).Result;
+		}
+
+		public async Task<List<ActionResult>> ProcessAllAsync(object UserData = null, int MaxUnwindDepth = 0) {
+			while (await ProcessOneAsync(UserData, MaxUnwindDepth))
 				;
 			// Return whatever is left on the stack
 			var stack = new List<ActionResult>(ResultStack);
@@ -241,16 +245,16 @@ namespace Brimstone
 			return stack;
 		}
 
-		public bool ProcessOne(object UserData = null) {
-			return ProcessOneAsync(UserData).Result;
+		public bool ProcessOne(object UserData = null, int MaxUnwindDepth = 0) {
+			return ProcessOneAsync(UserData, MaxUnwindDepth).Result;
 		}
 
-		public async Task<bool> ProcessOneAsync(object UserData = null) {
+		public async Task<bool> ProcessOneAsync(object UserData = null, int MaxUnwindDepth = 0) {
 			if (Paused)
 				return false;
 
-			// Unwind completed action blocks
-			while (Queue.Count == 0 && QueueStack.Count > 0) {
+			// Unwind completed action blocks, but never go to a higher depth than MaxUnwindDepth
+			while (Queue.Count == 0 && QueueStack.Count > MaxUnwindDepth) {
 				Queue = QueueStack.Pop();
 				// TODO: Change this to an OnBlockResolved event that Game subscribes to
 				Game.PowerHistory?.Add(new BlockEnd(BlockStack.Pop().Type));
