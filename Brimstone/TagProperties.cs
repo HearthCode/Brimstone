@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Brimstone
 {
@@ -59,8 +59,7 @@ namespace Brimstone
 	public partial class Entity
 	{
 		// Setting Zone directly moves the entity to the end of the specified zone
-		public IZone Zone
-		{
+		public IZone Zone {
 			get { return ZoneController?.Zones[(Zone) this[GameTag.ZONE]]; }
 			set { ZoneMove(value); }
 		}
@@ -336,10 +335,13 @@ namespace Brimstone
 		bool CantBeTargetedByOpponents { get; set; }
 		int Damage { get; set; }
 		int Health { get; set; }
+		bool ToBeDestroyed { get; set; }
+		bool MortallyWounded { get; }
 		bool IsAttacking { get; set; }
 		bool IsDefending { get; set; }
 		bool IsExhausted { get; set; }
 		bool IsFrozen { get; set; }
+		bool HasTaunt { get; set; }
 		int NumAttacksThisTurn { get; set; }
 		int PreDamage { get; set; }
 		Race Race { get; set; }
@@ -375,6 +377,15 @@ namespace Brimstone
 			}
 		}
 
+		public bool ToBeDestroyed {
+			get { return this[GameTag.TO_BE_DESTROYED] == 1; }
+			set { this[GameTag.TO_BE_DESTROYED] = value ? 1 : 0; }
+		}
+
+		public bool MortallyWounded {
+			get { return Health <= 0 || ToBeDestroyed; }
+		}
+
 		public bool IsAttacking {
 			get { return this[GameTag.ATTACKING] == 1; }
 			set { this[GameTag.ATTACKING] = value ? 1 : 0; }
@@ -393,6 +404,11 @@ namespace Brimstone
 		public bool IsFrozen {
 			get { return this[GameTag.FROZEN] == 1; }
 			set { this[GameTag.FROZEN] = value ? 1 : 0; }
+		}
+
+		public bool HasTaunt {
+			get { return this[GameTag.TAUNT] == 1; }
+			set { this[GameTag.TAUNT] = value ? 1 : 0; }
 		}
 
 		public int NumAttacksThisTurn {
@@ -440,11 +456,6 @@ namespace Brimstone
 		public bool HasStealth {
 			get { return this[GameTag.STEALTH] == 1; }
 			set { this[GameTag.STEALTH] = value ? 1 : 0; }
-		}
-
-		public bool HasTaunt {
-			get { return this[GameTag.TAUNT] == 1; }
-			set { this[GameTag.TAUNT] = value ? 1 : 0; }
 		}
 	}
 }
