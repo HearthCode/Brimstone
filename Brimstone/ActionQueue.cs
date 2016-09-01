@@ -48,6 +48,7 @@ namespace Brimstone
 		public Deque<QueueActionEventArgs> Queue = new Deque<QueueActionEventArgs>();
 		public Stack<ActionResult> ResultStack = new Stack<ActionResult>();
 		public List<QueueActionEventArgs> History;
+
 		public bool Paused { get; set; }
 
 		public object UserData { get; set; }
@@ -57,11 +58,10 @@ namespace Brimstone
 		public event EventHandler<QueueActionEventArgs> OnActionStarting;
 		public event EventHandler<QueueActionEventArgs> OnAction;
 
-		private Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>> ReplacedActions;
+		private readonly Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>> ReplacedActions;
 
-		public int Count { get { return Queue.Count; } }
-
-		public bool IsEmpty { get { return Queue.Count == 0 && QueueStack.Count == 0; } }
+		public int Count => Queue.Count;
+		public bool IsEmpty => Queue.Count == 0 && QueueStack.Count == 0;
 
 		public ActionQueue(Game game, object userData = null) {
 			Game = game;
@@ -119,28 +119,24 @@ namespace Brimstone
 			}
 		}
 
-		public void StartBlock(IEntity source, List<QueueAction> ql) {
+		public void StartBlock(IEntity source, List<QueueAction> qa, Action emptyCallback = null) {
+			if (qa == null)
+				return;
 			if (Queue.Count > 0) {
 				QueueStack.Push(Queue);
 				Queue = new Deque<QueueActionEventArgs>();
 			}
-			EnqueueDeferred(source, ql);
+			EnqueueDeferred(source, qa);
 		}
 
-		public void StartBlock(IEntity source, QueueAction a) {
-			if (Queue.Count > 0) {
-				QueueStack.Push(Queue);
-				Queue = new Deque<QueueActionEventArgs>();
-			}
-			EnqueueDeferred(source, a);
+		public void StartBlock(IEntity source, QueueAction a, Action emptyCallback = null) {
+			if (a != null)
+				StartBlock(source, new List<QueueAction> { a }, emptyCallback);
 		}
 
-		public void StartBlock(IEntity source, ActionGraph g) {
-			if (Queue.Count > 0) {
-				QueueStack.Push(Queue);
-				Queue = new Deque<QueueActionEventArgs>();
-			}
-			EnqueueDeferred(source, g);
+		public void StartBlock(IEntity source, ActionGraph g, Action emptyCallback = null) {
+			if (g != null)
+				StartBlock(source, g.Unravel(), emptyCallback);
 		}
 
 		public bool EndBlock() {
@@ -160,25 +156,25 @@ namespace Brimstone
 		// TODO: Insertion from multiple threads (eg. two players mulliganing simultaneously) is not thread-safe
 		// TODO: Possible bug - should the list be reversed first?
 		public void InsertDeferred(IEntity source, List<QueueAction> qa) {
-			if (qa != null) {
-				foreach (var a in qa) {
+			if (qa != null)
+				foreach (var a in qa)
+					// No event triggers when inserting at front of queue
 					Queue.AddFront(initializeAction(source, a));
-				}
-			}
 		}
 
 		public void InsertDeferred(IEntity source, ActionGraph g) {
-			InsertDeferred(source, g.Unravel());
+			if (g != null)
+				InsertDeferred(source, g.Unravel());
 		}
 
 		public void InsertDeferred(IEntity source, QueueAction a) {
-			if (a == null)
-				return;
-			// No event triggers when inserting at front of queue
-			Queue.AddFront(initializeAction(source, a));
+			if (a != null)
+				Queue.AddFront(initializeAction(source, a));
 		}
 
 		public List<ActionResult> RunMultiResult(IEntity source, List<QueueAction> qa) {
+			if (qa == null)
+				return new List<ActionResult>();
 			StartBlock(source, qa);
 			var result = ProcessBlock();
 			EndBlock();
@@ -186,20 +182,16 @@ namespace Brimstone
 		}
 
 		public List<ActionResult> RunMultiResult(IEntity source, ActionGraph g) {
-			StartBlock(source, g);
-			var result = ProcessBlock();
-			EndBlock();
-			return result;
+			return g != null ? RunMultiResult(source, g.Unravel()) : new List<ActionResult>();
 		}
 
 		public List<ActionResult> RunMultiResult(IEntity source, QueueAction a) {
-			StartBlock(source, a);
-			var result = ProcessBlock();
-			EndBlock();
-			return result;
+			return a != null ? RunMultiResult(source, new List<QueueAction> {a}) : new List<ActionResult>();
 		}
 
 		public ActionResult Run(IEntity source, List<QueueAction> qa) {
+			if (qa == null)
+				return ActionResult.None;
 			StartBlock(source, qa);
 			var result = ProcessBlock();
 			EndBlock();
@@ -209,21 +201,11 @@ namespace Brimstone
 		}
 
 		public ActionResult Run(IEntity source, ActionGraph g) {
-			StartBlock(source, g);
-			var result = ProcessBlock();
-			EndBlock();
-			if (result.Count > 0)
-				return result[0];
-			return ActionResult.None;
+			return g != null ? Run(source, g.Unravel()) : ActionResult.None;
 		}
 
 		public ActionResult Run(IEntity source, QueueAction a) {
-			StartBlock(source, a);
-			var result = ProcessBlock();
-			EndBlock();
-			if (result.Count > 0)
-				return result[0];
-			return ActionResult.None;
+			return a != null ? Run(source, new List<QueueAction> {a}) : ActionResult.None;
 		}
 
 		public void EnqueueDeferred(IEntity source, List<QueueAction> qa) {
@@ -235,8 +217,7 @@ namespace Brimstone
 		public void EnqueueDeferred(IEntity source, ActionGraph g) {
 			// Don't queue unimplemented cards
 			if (g != null)
-				// Unravel the graph into a list of actions
-				g.Queue(source, this);
+				EnqueueDeferred(source, g.Unravel());
 		}
 
 		public void EnqueueDeferred(IEntity source, QueueAction a) {
@@ -253,25 +234,13 @@ namespace Brimstone
 			else
 				Queue.AddBack(e);
 
-			if (OnQueued != null)
-				OnQueued(this, e);
+			OnQueued?.Invoke(this, e);
 		}
 
 		public void EnqueueDeferred(Action a) {
 			Paused = true;
 			a();
 			Paused = false;
-		}
-
-		public void ReplaceArg(ActionResult newArg) {
-			ReplaceArgs(new List<ActionResult> { newArg });
-		}
-
-		public void ReplaceArgs(List<ActionResult> newArgs) {
-			for (int i = 0; i < newArgs.Count; i++)
-				ResultStack.Pop();
-			foreach (var a in newArgs)
-				ResultStack.Push(a);
 		}
 
 		public List<ActionResult> ProcessBlock(object UserData = null) {
@@ -313,8 +282,6 @@ namespace Brimstone
 			action.Game = Game;
 			if (action.Source.Game.GameId != Game.GameId)
 				action.Source = Game.Entities[action.Source.Id];
-
-			// TODO: Fix stack modifying on OnActionStarting
 
 			// TODO: Make it work when not all of the arguments are supplied, for flexible syntax
 
