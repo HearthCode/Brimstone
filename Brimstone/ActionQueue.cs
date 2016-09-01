@@ -61,7 +61,9 @@ namespace Brimstone
 		private readonly Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>> ReplacedActions;
 
 		public int Count => Queue.Count;
+		public bool IsBlockEmpty => Queue.Count == 0;
 		public bool IsEmpty => Queue.Count == 0 && QueueStack.Count == 0;
+		public int Depth => QueueStack.Count;
 
 		public ActionQueue(Game game, object userData = null) {
 			Game = game;
@@ -122,7 +124,7 @@ namespace Brimstone
 		public void StartBlock(IEntity source, List<QueueAction> qa, Action emptyCallback = null) {
 			if (qa == null)
 				return;
-			if (Queue.Count > 0) {
+			if (!IsBlockEmpty) {
 				QueueStack.Push(Queue);
 				Queue = new Deque<QueueActionEventArgs>();
 			}
@@ -140,7 +142,7 @@ namespace Brimstone
 		}
 
 		public bool EndBlock() {
-			if (QueueStack.Count == 0)
+			if (Depth == 0)
 				return false;
 			var remainingItems = Queue;
 			Queue = QueueStack.Pop();
@@ -244,7 +246,7 @@ namespace Brimstone
 		}
 
 		public List<ActionResult> ProcessBlock(object UserData = null) {
-			return ProcessAll(UserData, QueueStack.Count);
+			return ProcessAll(UserData, Depth);
 		}
 
 		public List<ActionResult> ProcessAll(object UserData = null, int MaxUnwindDepth = 0) {
@@ -271,10 +273,10 @@ namespace Brimstone
 			if (Paused)
 				return false;
 
-			while (Queue.Count == 0 && QueueStack.Count > MaxUnwindDepth)
+			while (IsBlockEmpty && Depth > MaxUnwindDepth)
 				EndBlock();
 
-			if (Queue.Count == 0)
+			if (IsBlockEmpty)
 				return false;
 
 			// Get next action and make sure it's up to date if cloned from another game
@@ -316,6 +318,9 @@ namespace Brimstone
 
 			if (IsEmpty)
 				Game.OnQueueEmpty();
+
+			if (IsBlockEmpty)
+				Game.OnBlockEmpty();
 
 			OnAction?.Invoke(this, action);
 			return !action.Cancel;

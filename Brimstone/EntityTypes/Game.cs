@@ -203,6 +203,10 @@ namespace Brimstone
 			// TODO: POWERED_UP settings and stuff go here
 		}
 
+		public void OnBlockEmpty() {
+			DebugLog.WriteLine("Action block emptied");
+		}
+
 		public void OnQueueEmpty()
 		{
 			// Death checking phase
