@@ -78,7 +78,7 @@ namespace Brimstone
 		}
 
 		public void Start() {
-			Game.ActiveTriggers.At(TriggerType.DealMulligan, (Action<IEntity>) (_ => {
+			Game.ActiveTriggers.At<IEntity, IEntity>(TriggerType.DealMulligan, (Action<IEntity>) (_ => {
 				// Perform mulligan
 				foreach (var e in Choice.Discarding)
 					e.ZoneSwap(Deck[RNG.Between(1, Deck.Count)]);
@@ -87,7 +87,7 @@ namespace Brimstone
 				MulliganState = MulliganState.WAITING;
 			}), this, Actions.Self);
 
-			Game.ActiveTriggers.At(TriggerType.MulliganWaiting, (Action<IEntity>) (_ => {
+			Game.ActiveTriggers.At<IEntity, IEntity>(TriggerType.MulliganWaiting, (Action<IEntity>) (_ => {
 				MulliganState = MulliganState.DONE;
 
 				// Start main game if both players have completed mulligan

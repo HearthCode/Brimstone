@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Brimstone
 {
@@ -50,49 +47,65 @@ namespace Brimstone
 		PhaseMainNext, // -1
 	}
 
-	public class Trigger
+	public interface ITrigger {
+		ICondition Condition { get; }
+		List<QueueAction> Action { get; }
+		TriggerType Type { get; }
+		IAttachedTrigger CreateAttachedTrigger(IEntity entity);
+	}
+
+	public class Trigger<T, U> : ITrigger where T : IEntity where U : IEntity
 	{
-		public Selector Condition { get; }
+		ICondition ITrigger.Condition => Condition;
+		public Condition<T, U> Condition { get; }
 		public List<QueueAction> Action { get; }= new List<QueueAction>();
 		public TriggerType Type { get; }
 
-		public Trigger(TriggerType type, ActionGraph action, Selector condition = null) {
+		public Trigger(TriggerType type, ActionGraph action, Condition<T, U> condition = null) {
 			DebugLog.WriteLine("Creating trigger " + type + " using " + action.Graph[0].GetType().Name);
 			Condition = condition;
 			Action = action.Unravel();
 			Type = type;
 		}
 
-		public Trigger(Trigger t) {
+		public Trigger(Trigger<T, U> t) {
 			// Only a shallow copy is necessary because Args and Action don't change and are lazily evaluated
 			Condition = t.Condition;
 			Action = t.Action;
 			Type = t.Type;
 		}
 
-		public AttachedTrigger CreateAttachedTrigger(IEntity entity) {
+		IAttachedTrigger ITrigger.CreateAttachedTrigger(IEntity entity) {
+			return CreateAttachedTrigger(entity);
+		}
+
+		public AttachedTrigger<T, U> CreateAttachedTrigger(IEntity entity) {
 			// The base Triggers property on Card.Behaviour has no linked entity
 			// Link by creating a copy of the trigger and setting EntityId
-			return new AttachedTrigger(this, entity);
+			return new AttachedTrigger<T, U>(this, entity);
 		}
 
 		// TODO: Detach triggers
 
-		public static Trigger At(TriggerType type, ActionGraph g, Selector condition = null) {
-			return new Trigger(type, g, condition);
+		public static Trigger<T, U> At(TriggerType type, ActionGraph g, Condition<T, U> condition = null) {
+			return new Trigger<T, U>(type, g, condition);
 		}
 	}
 
-	public class AttachedTrigger : Trigger
+	public interface IAttachedTrigger : ITrigger {
+		int EntityId { get; }
+	}
+
+	public class AttachedTrigger<T, U> : Trigger<T, U>, IAttachedTrigger where T : IEntity where U : IEntity
 	{
 		public int EntityId { get; }
 
-		public AttachedTrigger(Trigger t, IEntity e) : base(t) {
+		public AttachedTrigger(Trigger<T, U> t, IEntity e) : base(t) {
 			DebugLog.WriteLine("Attaching trigger " + t.Type + " to entity " + e.ShortDescription);
 			EntityId = e.Id;
 		}
 
-		public AttachedTrigger(AttachedTrigger t) : base(t) {
+		public AttachedTrigger(AttachedTrigger<T, U> t) : base(t) {
 			EntityId = t.EntityId;
 		}
 	}
@@ -100,16 +113,16 @@ namespace Brimstone
 	public class TriggerManager : ICloneable
 	{
 		public Game Game { get; set; }
-		public Dictionary<TriggerType, List<AttachedTrigger>> Triggers { get; }
+		public Dictionary<TriggerType, List<IAttachedTrigger>> Triggers { get; }
 
 		public TriggerManager(Game game) {
 			Game = game;
-			Triggers = new Dictionary<TriggerType, List<AttachedTrigger>>();
+			Triggers = new Dictionary<TriggerType, List<IAttachedTrigger>>();
 		}
 
 		public TriggerManager(TriggerManager tm) {
 			Game = tm.Game;
-			Triggers = new Dictionary<TriggerType, List<AttachedTrigger>>(tm.Triggers);
+			Triggers = new Dictionary<TriggerType, List<IAttachedTrigger>>(tm.Triggers);
 		}
 
 		public void Add(IEntity entity) {
@@ -119,14 +132,14 @@ namespace Brimstone
 						Add(t.CreateAttachedTrigger(entity));
 		}
 
-		public void Add(AttachedTrigger t) {
+		public void Add(IAttachedTrigger t) {
 			if (Triggers.ContainsKey(t.Type))
 				Triggers[t.Type].Add(t);
 			else
-				Triggers.Add(t.Type, new List<AttachedTrigger> { t });
+				Triggers.Add(t.Type, new List<IAttachedTrigger> { t });
 		}
 
-		public void Fire(TriggerType type, IEntity source) {
+		public void Queue(TriggerType type, IEntity source) {
 			if (!Triggers.ContainsKey(type))
 				return;
 
@@ -135,35 +148,15 @@ namespace Brimstone
 			foreach (var trigger in Triggers[type]) {
 				var owningEntity = Game.Entities[trigger.EntityId];
 
-				// Get condition entities
-				IEnumerable<IEntity> conditionEntities = trigger.Condition?.Lambda(owningEntity);
-
-				// No condition? Conditions met
-				bool conditionMet = conditionEntities == null;
-
-				// Check for entity match
-				if (!conditionMet) {
-					switch (trigger.Type) {
-						case TriggerType.Damage:
-							conditionMet = conditionEntities.Contains(Game.Environment.LastDamaged);
-							break;
-						case TriggerType.DealMulligan:
-						case TriggerType.MulliganWaiting:
-							conditionMet = conditionEntities.Contains(source);
-							break;
-						default:
-							throw new TriggerException("Trigger type " + trigger.Type + " not implemented");
-					}
-				}
-
-				// Run trigger if condition met
-				if (conditionMet)
+				// Test trigger condition
+				if (trigger.Condition?.Eval(owningEntity, source) ?? true)
 					Game.TriggerBlock(owningEntity, trigger.Action);
 			}
 		}
 
-		public void At(TriggerType Type, ActionGraph Actions, IEntity Owner = null, Selector Condition = null) {
-			Add(new Trigger(Type, Actions, Condition).CreateAttachedTrigger(Owner ?? Game));
+		public void At<T, U>(TriggerType Type, ActionGraph Actions, IEntity Owner = null, Condition<T, U> Condition = null)
+			where T : IEntity where U : IEntity {
+			Add(new Trigger<T, U>(Type, Actions, Condition).CreateAttachedTrigger(Owner ?? Game));
 		}
 
 		public object Clone() {

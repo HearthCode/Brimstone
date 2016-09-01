@@ -8,7 +8,7 @@ namespace Brimstone
 		// Defaulting to null for unimplemented cards or actions
 		public ActionGraph Battlecry;
 		public ActionGraph Deathrattle;
-		public List<Trigger> Triggers = new List<Trigger>();
+		public List<ITrigger> Triggers = new List<ITrigger>();
 	}
 
 	public class Actions {
@@ -21,6 +21,8 @@ namespace Brimstone
 		public static ActionGraph Give(ActionGraph Player = null, ActionGraph Card = null) { return new Give { Args = { Player, Card } }; }
 		public static ActionGraph Play(ActionGraph Entity = null) { return new Play { Args = { Entity } }; }
 		public static ActionGraph Attack(ActionGraph Attacker = null, ActionGraph Defender = null) { return new Attack { Args = { Attacker, Defender } }; }
+		public static ActionGraph Damage(ActionGraph Targets = null, ActionGraph Amount = null) { return new Damage { Args = { Targets, Amount } }; }
+		public static ActionGraph Death(ActionGraph Targets = null) { return new Death { Args = { Targets } }; }
 
 		// TODO: Write all common selectors
 		public static Selector Self { get { return Select(e => e); } }
@@ -73,28 +75,28 @@ namespace Brimstone
 				Lambda = selector
 			};
 		}
-		/*
-		public static Selector Select(Func<Player, IEnumerable<IEntity>> selector) {
-			return new Selector {
-				SelectionSource = SelectionSource.Player,
-				Lambda = e => selector((Player)e)
-			};
-		}
-		public static Selector Select(Func<Game, IEnumerable<IEntity>> selector) {
-			return new Selector {
-				SelectionSource = SelectionSource.Game,
-				Lambda = e => selector((Game)e)
-			};
-		}
-		*/
-		public static ActionGraph Damage(ActionGraph Targets = null, ActionGraph Amount = null) { return new Damage { Args = { Targets, Amount } }; }
-		public static ActionGraph Death(ActionGraph Targets = null) { return new Death { Args = { Targets } }; }
 
-		// Event helpers
-		public static Trigger At(TriggerType TriggerType, Selector Condition, ActionGraph Action) { return Trigger.At(TriggerType, Action, Condition); }
-		public static Trigger At(TriggerType TriggerType, ActionGraph Action) { return Trigger.At(TriggerType, Action); }
+		// Generic triggers (use to create triggers for events not specified in Triggers section below)
+		public static Trigger<T, U> At<T, U>(TriggerType TriggerType, Condition<T, U> Condition, ActionGraph Action)
+			where T : IEntity where U : IEntity {
+			return Trigger<T, U>.At(TriggerType, Action, Condition);
+		}
 
-		// TODO: Add the rest
-		public static Trigger OnDamage(Selector Condition, ActionGraph Action) { return Trigger.At(TriggerType.Damage, Action, Condition); }
+		public static Trigger<T, U> At<T, U>(TriggerType TriggerType, ActionGraph Action)
+			where T : IEntity where U : IEntity {
+			return Trigger<T, U>.At(TriggerType, Action);
+		}
+
+		// Triggers
+		public static Trigger<ICharacter, ICharacter> OnDamage(Condition<ICharacter, ICharacter> Condition, ActionGraph Action) {
+			return Trigger<ICharacter, ICharacter>.At(TriggerType.Damage, Action, Condition);
+		}
+		public static Trigger<IEntity, Spell> AfterPlaySpell(Condition<IEntity, Spell> Condition, ActionGraph Action) {
+			return Trigger<IEntity, Spell>.At(TriggerType.Damage, Action, Condition);
+		}
+
+		// Trigger conditions
+		public static Condition<ICharacter, ICharacter> IsSelf = new Condition<ICharacter, ICharacter>((me, other) => me == other);
+		public static Condition<IEntity, Spell> IsFriendlySpell = new Condition<IEntity, Spell>((me, spell) => me.Controller == spell.Controller);
 	}
 }

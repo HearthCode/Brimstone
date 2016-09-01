@@ -156,7 +156,7 @@ namespace Brimstone
 			// TODO: Insert event call precisely here so our server can iterate all created entities
 
 			// Attach all game triggers
-			ActiveTriggers.At(TriggerType.GameStart, (Action<IEntity>)(_ =>
+			ActiveTriggers.At<IEntity, IEntity>(TriggerType.GameStart, (Action<IEntity>)(_ =>
 			{;
 				// Pick a random starting player
 				if (FirstPlayer == 0)
@@ -187,12 +187,12 @@ namespace Brimstone
 					NextStep = Step.MAIN_READY;
 			}));
 
-			ActiveTriggers.At(TriggerType.BeginMulligan, (Action<IEntity>) (_ =>
+			ActiveTriggers.At<IEntity, IEntity>(TriggerType.BeginMulligan, (Action<IEntity>) (_ =>
 			{
 				foreach (var p in Players)
 					p.StartMulligan();
 			}));
-			ActiveTriggers.At(TriggerType.PhaseMainReady, Actions.BeginTurn);
+			ActiveTriggers.At<IEntity, IEntity>(TriggerType.PhaseMainReady, Actions.BeginTurn);
 
 			// Set game state
 			State = GameState.RUNNING;
