@@ -97,6 +97,7 @@ namespace Brimstone
 		}
 
 		public void StartMulligan() {
+			// TODO: Get this working with Game.Queue as well
 			Game.Action(this, Actions.MulliganChoice(this));
 		}
 			

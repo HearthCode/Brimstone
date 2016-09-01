@@ -206,6 +206,7 @@ namespace Brimstone
 		public void OnQueueEmpty()
 		{
 			// Death checking phase
+			// TODO: Only do this if game state has changed
 			foreach (var e in Characters)
 				e?.CheckForDeath();
 
