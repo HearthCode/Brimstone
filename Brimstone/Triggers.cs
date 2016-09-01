@@ -1,9 +1,12 @@
-﻿using System;
+﻿#define _TRIGGER_DEBUG
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Brimstone
 {
+	// TODO: We need a list of which TriggerTypes are top-level only (ie. MulliganWaiting)
+	// TODO: We need to supply the trigger indexes to Game.ActionBlock
 	public enum TriggerType
 	{
 		BeginTurn,
@@ -62,7 +65,9 @@ namespace Brimstone
 		public TriggerType Type { get; }
 
 		public Trigger(TriggerType type, ActionGraph action, Condition<T, U> condition = null) {
+#if _TRIGGER_DEBUG
 			DebugLog.WriteLine("Creating trigger " + type + " using " + action.Graph[0].GetType().Name);
+#endif
 			Condition = condition;
 			Action = action.Unravel();
 			Type = type;
@@ -101,7 +106,9 @@ namespace Brimstone
 		public int EntityId { get; }
 
 		public AttachedTrigger(Trigger<T, U> t, IEntity e) : base(t) {
+#if _TRIGGER_DEBUG
 			DebugLog.WriteLine("Attaching trigger " + t.Type + " to entity " + e.ShortDescription);
+#endif
 			EntityId = e.Id;
 		}
 
@@ -142,15 +149,15 @@ namespace Brimstone
 		public void Queue(TriggerType type, IEntity source) {
 			if (!Triggers.ContainsKey(type))
 				return;
-
+#if _TRIGGER_DEBUG
 			DebugLog.WriteLine("Checking triggers for " + type + " initiated by " + source.ShortDescription);
-
+#endif
 			foreach (var trigger in Triggers[type]) {
 				var owningEntity = Game.Entities[trigger.EntityId];
 
 				// Test trigger condition
 				if (trigger.Condition?.Eval(owningEntity, source) ?? true)
-					Game.TriggerBlock(owningEntity, trigger.Action);
+					Game.ActionBlock(BlockType.TRIGGER, owningEntity, trigger.Action);
 			}
 		}
 

@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define _GAME_DEBUG
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -134,13 +136,41 @@ namespace Brimstone
 			ActionQueue.EnqueueDeferred(a);
 		}
 
-		public void TriggerBlock(IEntity Source, ActionGraph Actions, int Index = -1) {
-			TriggerBlock(Source, Actions.Unravel(), Index);
+		public void ActionBlock(BlockType Type, IEntity Source, ActionGraph Actions, IEntity Target = null, int Index = -1) {
+			ActionBlock(Type, Source, Actions.Unravel(), Target, Index);
 		}
 
-		public void TriggerBlock(IEntity Source, List<QueueAction> Actions, int Index = -1) {
-			DebugLog.WriteLine("Queueing trigger for " + Source.ShortDescription);
-			Queue(Source, new GameBlockStart {Block = new BlockStart(BlockType.TRIGGER, Source, null, Index), Actions = Actions });
+		public void ActionBlock(BlockType Type, IEntity Source, List<QueueAction> Actions, IEntity Target = null, int Index = -1) {
+#if _GAME_DEBUG
+			DebugLog.WriteLine("Queueing " + Type + " for " + Source.ShortDescription + " => " + (Target?.ShortDescription ?? "no target"));
+#endif
+			var block = new BlockStart(Type, Source, Target, Index);
+			Queue(Source, new GameBlock(block, Actions));
+		}
+
+		public void OnBlockEmpty(BlockStart Block) {
+#if _GAME_DEBUG
+			DebugLog.WriteLine("Action block " + Block.Type + " for " + Entities[Block.Source].ShortDescription + " resolved");
+#endif
+			PowerHistory?.Add(new BlockEnd(Block.Type));
+		}
+
+		public void OnQueueEmpty() {
+#if _GAME_DEBUG
+			DebugLog.WriteLine("Action queue resolved");
+#endif
+			// Death checking phase
+			// TODO: Only do this if game state has changed
+			foreach (var e in Characters)
+				e?.CheckForDeath();
+
+			// Advance game step if necessary (probably setting off new triggers)
+			var nextStep = NextStep;
+			var step = Step;
+			if (nextStep != step) {
+				DebugLog.WriteLine("Advancing game step from " + step + " to " + nextStep);
+				Step = nextStep;
+			}
 		}
 
 		public void Start(int FirstPlayer = 0, bool SkipMulligan = false) {
@@ -156,6 +186,7 @@ namespace Brimstone
 			// TODO: Insert event call precisely here so our server can iterate all created entities
 
 			// Attach all game triggers
+			// TODO: Clean these up into named functions
 			ActiveTriggers.At<IEntity, IEntity>(TriggerType.GameStart, (Action<IEntity>)(_ =>
 			{;
 				// Pick a random starting player
@@ -201,24 +232,6 @@ namespace Brimstone
 
 			ActionQueue.ProcessAll();
 			// TODO: POWERED_UP settings and stuff go here
-		}
-
-		public void OnBlockEmpty() {
-			DebugLog.WriteLine("Action block emptied");
-		}
-
-		public void OnQueueEmpty()
-		{
-			// Death checking phase
-			// TODO: Only do this if game state has changed
-			foreach (var e in Characters)
-				e?.CheckForDeath();
-
-			// Advance game step if necessary (probably setting off new triggers)
-			if (NextStep != Step) {
-				DebugLog.WriteLine("Advancing game step to " + NextStep);
-				Step = NextStep;
-			}
 		}
 
 		public void NextTurn() {
@@ -364,6 +377,9 @@ namespace Brimstone
 			if (PowerHistory != null) {
 				game.PowerHistory = new PowerHistory(game, this);
 			}
+#if _GAME_DEBUG
+			DebugLog.WriteLine("Cloned game " + GameId + " => " + game.GameId);
+#endif
 			return game;
 		}
 

@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define _ACTIONS_DEBUG
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -36,32 +38,6 @@ namespace Brimstone
 
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			return (Entity)game.Entities[EntityId];
-		}
-	}
-
-	// TODO: Get rid of these. Implement a OnBlockEmpty callback and stack
-	public class GameBlockStart : QueueAction
-	{
-		public BlockStart Block { get; set; }
-		public List<QueueAction> Actions { get; set; }
-
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
-		{
-			game.PowerHistory?.Add(Block);
-			game.ActionQueue.StartBlock(source, Actions);
-			game.ActionQueue.EnqueueDeferred(source, new GameBlockEnd {Block = Block});
-			return ActionResult.None;
-		}
-	}
-
-	public class GameBlockEnd : QueueAction
-	{
-		public BlockStart Block { get; set; }
-
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
-			game.PowerHistory?.Add(new BlockEnd(Block.Type));
-			game.ActionQueue.EndBlock();
-			return ActionResult.None;
 		}
 	}
 
@@ -103,6 +79,23 @@ namespace Brimstone
 
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			F(source);
+			return ActionResult.None;
+		}
+	}
+
+	public class GameBlock : QueueAction
+	{
+		public BlockStart Block { get; set; }
+		public List<QueueAction> Actions { get; set; }
+
+		public GameBlock(BlockStart Block, List<QueueAction> Actions) {
+			this.Block = Block;
+			this.Actions = Actions;
+		}
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			game.PowerHistory?.Add(Block);
+			game.ActionQueue.StartBlock(source, Actions, Block);
 			return ActionResult.None;
 		}
 	}
@@ -256,8 +249,9 @@ namespace Brimstone
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			Player player = (Player)args[PLAYER];
 			Card card = args[CARD];
-
-			DebugLog.WriteLine("Giving {0} to {1}", card.Name, player.FriendlyName);
+#if _ACTIONS_DEBUG
+			DebugLog.WriteLine("Game {0}: Giving {1} to {2}", game.GameId, card.Name, player.FriendlyName);
+#endif
 			return (Entity) Entity.FromCard(card, StartingZone: player.Hand) ?? ActionResult.None;
 		}
 	}
@@ -271,15 +265,16 @@ namespace Brimstone
 
 			if (!player.Deck.IsEmpty) {
 				var entity = player.Deck[1];
-
-				DebugLog.WriteLine("{0} draws {1}", player.FriendlyName, entity.ShortDescription);
-
+#if _ACTIONS_DEBUG
+				DebugLog.WriteLine("Game {0}: {1} draws {2}", game.GameId, player.FriendlyName, entity.ShortDescription);
+#endif
 				entity.Zone = player.Hand;
 				player.NumCardsDrawnThisTurn++;
 				return (Entity) entity;
 			}
-
-			DebugLog.WriteLine("{0} tries to draw but their deck is empty", player.FriendlyName);
+#if _ACTIONS_DEBUG
+			DebugLog.WriteLine("Game {0}: {1} tries to draw but their deck is empty", game.GameId, player.FriendlyName);
+#endif
 			return ActionResult.None;
 		}
 	}
@@ -301,6 +296,7 @@ namespace Brimstone
 			if (entity is Minion)
 				player.NumMinionsPlayedThisTurn++;
 
+			// TODO: Stop spells from getting a zone position
 			entity.Zone = player.Board;
 
 			if (entity is Minion && !((Minion) entity).HasCharge)
@@ -308,9 +304,9 @@ namespace Brimstone
 
 			entity.JustPlayed = true;
 			player.LastCardPlayed = entity;
-			
-			DebugLog.WriteLine("{0} is playing {1}", player.FriendlyName, entity.ShortDescription);
-
+#if _ACTIONS_DEBUG
+			DebugLog.WriteLine("Game {0}: {1} is playing {2}", game.GameId, player.FriendlyName, entity.ShortDescription);
+#endif
 			game.Queue(source, entity.Card.Behaviour.Battlecry);
 			game.Queue(source, new Action<IEntity>(_ =>
 			{
@@ -333,8 +329,9 @@ namespace Brimstone
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			if (args[TARGETS].HasResult)
 				foreach (ICharacter e in args[TARGETS]) {
-					DebugLog.WriteLine("{0} is getting hit for {1} points of damage", e.ShortDescription, args[DAMAGE]);
-
+#if _ACTIONS_DEBUG
+					DebugLog.WriteLine("Game {0}: {1} is getting hit for {2} points of damage", game.GameId, e.ShortDescription, args[DAMAGE]);
+#endif
 					game.Environment.LastDamaged = e;
 					e.Damage += args[DAMAGE];
 
@@ -353,8 +350,9 @@ namespace Brimstone
 				bool gameEnd = false;
 
 				foreach (var e in args[TARGETS]) {
-					DebugLog.WriteLine("{0} dies", e.ShortDescription);
-
+#if _ACTIONS_DEBUG
+					DebugLog.WriteLine("Game {0}: {1} dies", game.GameId, e.ShortDescription);
+#endif
 					e.Zone = e.Controller.Graveyard;
 
 					// Minion death
@@ -414,8 +412,9 @@ namespace Brimstone
 			var attacker = (ICharacter)(Entity)args[ATTACKER];
 			var defender = (ICharacter)(Entity)args[DEFENDER];
 
-			DebugLog.WriteLine("{0} is attacking {1}", attacker.ShortDescription, defender.ShortDescription);
-
+#if _ACTIONS_DEBUG
+			DebugLog.WriteLine("Game {0}: {1} is attacking {2}", game.GameId, attacker.ShortDescription, defender.ShortDescription);
+#endif
 			source.Controller.NumFriendlyMinionsThatAttackedThisTurn++;
 			game.ProposedAttacker = attacker;
 			game.ProposedDefender = defender;

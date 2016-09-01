@@ -110,6 +110,7 @@ namespace Brimstone
 				_changed = true;
 		}
 
+		// TODO: Change this to a delegate event
 		public void EntityChanged(int id, GameTag tag, int value)
 		{
 			Game.PowerHistory?.Add(new TagChange(id, tag, value));

@@ -76,6 +76,7 @@ namespace Brimstone
 		}
 	}
 
+	// TODO: Replace this with log4net
 	public static class DebugLog {
 		public static void WriteLine(string s, params object[] p) {
 #if DEBUG

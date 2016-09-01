@@ -78,6 +78,7 @@ namespace Brimstone
 		}
 
 		public void Start() {
+			// TODO: Clean these up into named functions
 			Game.ActiveTriggers.At<IEntity, IEntity>(TriggerType.DealMulligan, (Action<IEntity>) (_ => {
 				// Perform mulligan
 				foreach (var e in Choice.Discarding)
@@ -97,8 +98,7 @@ namespace Brimstone
 		}
 
 		public void StartMulligan() {
-			// TODO: Get this working with Game.Queue as well
-			Game.Action(this, Actions.MulliganChoice(this));
+			Game.Queue(this, Actions.MulliganChoice(this));
 		}
 			
 		public IPlayable Give(Card card) {

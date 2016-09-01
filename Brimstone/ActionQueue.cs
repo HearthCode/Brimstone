@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define _QUEUE_DEBUG
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -59,6 +61,7 @@ namespace Brimstone
 		public event EventHandler<QueueActionEventArgs> OnAction;
 
 		private readonly Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>> ReplacedActions;
+		private readonly Stack<BlockStart> BlockStack = new Stack<BlockStart>();
 
 		public int Count => Queue.Count;
 		public bool IsBlockEmpty => Queue.Count == 0;
@@ -74,6 +77,8 @@ namespace Brimstone
 		}
 
 		public ActionQueue(ActionQueue cloneFrom) {
+			// BlockStart is immutable and uses only value types so we can just shallow clone
+			BlockStack = new Stack<BlockStart>(cloneFrom.BlockStack.Reverse());
 			foreach (var queue in cloneFrom.QueueStack.Reverse()) {
 				var cq = new Deque<QueueActionEventArgs>();
 				foreach (var item in queue)
@@ -121,33 +126,45 @@ namespace Brimstone
 			}
 		}
 
-		public void StartBlock(IEntity source, List<QueueAction> qa, Action emptyCallback = null) {
+		public void StartBlock(IEntity source, List<QueueAction> qa, BlockStart gameBlock = null) {
 			if (qa == null)
 				return;
-			if (!IsBlockEmpty) {
-				QueueStack.Push(Queue);
-				Queue = new Deque<QueueActionEventArgs>();
-			}
+#if _QUEUE_DEBUG
+			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Spawning new queue at depth " + (Depth + 1) + " for " + source.ShortDescription + " with actions: " +
+			                   string.Join(" ", qa.Select(a => a.ToString())) + " for action block: " + (gameBlock?.ToString() ?? "none"));
+#endif
+			QueueStack.Push(Queue);
+			BlockStack.Push(gameBlock);
+			Queue = new Deque<QueueActionEventArgs>();
 			EnqueueDeferred(source, qa);
 		}
 
-		public void StartBlock(IEntity source, QueueAction a, Action emptyCallback = null) {
+		public void StartBlock(IEntity source, QueueAction a, BlockStart gameBlock = null) {
 			if (a != null)
-				StartBlock(source, new List<QueueAction> { a }, emptyCallback);
+				StartBlock(source, new List<QueueAction> { a }, gameBlock);
 		}
 
-		public void StartBlock(IEntity source, ActionGraph g, Action emptyCallback = null) {
+		public void StartBlock(IEntity source, ActionGraph g, BlockStart gameBlock = null) {
 			if (g != null)
-				StartBlock(source, g.Unravel(), emptyCallback);
+				StartBlock(source, g.Unravel(), gameBlock);
 		}
 
 		public bool EndBlock() {
-			if (Depth == 0)
-				return false;
-			var remainingItems = Queue;
-			Queue = QueueStack.Pop();
-			Queue.AddFrontRange(remainingItems);
-			return true;
+			if (Depth > 0) {
+#if _QUEUE_DEBUG
+				DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Destroying queue at depth " + Depth);
+#endif
+				var gameBlock = BlockStack.Pop();
+				if (gameBlock != null)
+					Game.OnBlockEmpty(gameBlock);
+				var remainingItems = Queue;
+				Queue = QueueStack.Pop();
+				Queue.AddFrontRange(remainingItems);
+			}
+			// When the queue is empty, notify the game - it may refill it with new actions
+			if (IsEmpty)
+				Game.OnQueueEmpty();
+			return !IsEmpty;
 		}
 
 		// Gets a QueueAction that can put into the queue
@@ -178,9 +195,7 @@ namespace Brimstone
 			if (qa == null)
 				return new List<ActionResult>();
 			StartBlock(source, qa);
-			var result = ProcessBlock();
-			EndBlock();
-			return result;
+			return ProcessBlock();
 		}
 
 		public List<ActionResult> RunMultiResult(IEntity source, ActionGraph g) {
@@ -196,10 +211,7 @@ namespace Brimstone
 				return ActionResult.None;
 			StartBlock(source, qa);
 			var result = ProcessBlock();
-			EndBlock();
-			if (result.Count > 0)
-				return result[0];
-			return ActionResult.None;
+			return result.Count > 0 ? result[0] : ActionResult.None;
 		}
 
 		public ActionResult Run(IEntity source, ActionGraph g) {
@@ -225,7 +237,9 @@ namespace Brimstone
 		public void EnqueueDeferred(IEntity source, QueueAction a) {
 			if (a == null)
 				return;
-
+#if _QUEUE_DEBUG
+			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Queueing action " + a + " for " + source.ShortDescription + " at depth " + Depth);
+#endif
 			var e = initializeAction(source, a);
 			if (OnQueueing != null) {
 				OnQueueing(this, e);
@@ -246,7 +260,16 @@ namespace Brimstone
 		}
 
 		public List<ActionResult> ProcessBlock(object UserData = null) {
-			return ProcessAll(UserData, Depth);
+#if _QUEUE_DEBUG
+			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): start processing current block");
+			var depth = Depth;
+#endif
+			var result = ProcessAll(UserData, Depth);
+#if _QUEUE_DEBUG
+			System.Diagnostics.Debug.Assert(depth == Depth + 1);
+			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): end processing current block");
+#endif
+			return result;
 		}
 
 		public List<ActionResult> ProcessAll(object UserData = null, int MaxUnwindDepth = 0) {
@@ -273,9 +296,11 @@ namespace Brimstone
 			if (Paused)
 				return false;
 
-			while (IsBlockEmpty && Depth > MaxUnwindDepth)
-				EndBlock();
+			// Unwind queue when blocks are empty
+			while (IsBlockEmpty && Depth > MaxUnwindDepth && EndBlock())
+				;
 
+			// Exit if we have unwound the entire queue or reached the unwind limit
 			if (IsBlockEmpty)
 				return false;
 
@@ -312,17 +337,19 @@ namespace Brimstone
 			History.Add(action);
 
 			// Run action and push results onto stack
+#if _QUEUE_DEBUG
+			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Running action " + action + " for " + action.Source.ShortDescription + " at depth " + Depth);
+#endif
 			var result = action.Action.Execute(action.Game, action.Source, action.Args);
 			if (result.HasResult)
 				ResultStack.Push(result);
 
-			if (IsEmpty)
-				Game.OnQueueEmpty();
-
-			if (IsBlockEmpty)
-				Game.OnBlockEmpty();
+			// The >= allows the current block to unwind for ProcessBlock()
+			while (IsBlockEmpty && Depth >= MaxUnwindDepth && EndBlock())
+				;
 
 			OnAction?.Invoke(this, action);
+
 			return !action.Cancel;
 		}
 
