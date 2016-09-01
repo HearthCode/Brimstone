@@ -17,10 +17,17 @@
 			Battlecry = Damage(AllMinions, 1)
 		};
 
+		// Wild Pyromancer
+		public static Behaviour NEW1_020 = new Behaviour {
+			Triggers = {
+				AfterPlaySpell(IsFriendlySpell, Damage(AllMinions, 1))
+			}
+		};
+
 		// Acolyte of Pain
 		public static Behaviour EX1_007 = new Behaviour {
 			Triggers = {
-				OnDamage(Self, Draw(Controller))
+				OnDamage(IsSelf, Draw(Controller))
 			}
 		};
 
