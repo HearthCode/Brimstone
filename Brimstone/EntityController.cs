@@ -121,13 +121,16 @@ namespace Brimstone
 			{
 				case GameTag.STATE:
 					if (value == (int) GameState.RUNNING)
-						Game.ActiveTriggers.Fire(TriggerType.GameStart, entity);
+						Game.ActiveTriggers.Queue(TriggerType.GameStart, entity);
 					break;
 
 				case GameTag.STEP:
 					switch ((Step) value) {
 						case Step.BEGIN_MULLIGAN:
-							Game.ActiveTriggers.Fire(TriggerType.BeginMulligan, entity);
+							Game.ActiveTriggers.Queue(TriggerType.BeginMulligan, entity);
+							break;
+						case Step.MAIN_READY:
+							Game.ActiveTriggers.Queue(TriggerType.PhaseMainReady, entity);
 							break;
 					}
 					break;
@@ -136,12 +139,16 @@ namespace Brimstone
 					switch ((MulliganState) value)
 					{
 						case MulliganState.DEALING:
-							Game.ActiveTriggers.Fire(TriggerType.DealMulligan, entity);
+							Game.ActiveTriggers.Queue(TriggerType.DealMulligan, entity);
 							break;
 						case MulliganState.WAITING:
-							Game.ActiveTriggers.Fire(TriggerType.MulliganWaiting, entity);
+							Game.ActiveTriggers.Queue(TriggerType.MulliganWaiting, entity);
 							break;
 					}
+					break;
+
+				case GameTag.DAMAGE:
+					Game.ActiveTriggers.Queue(TriggerType.Damage, entity);
 					break;
 			}
 		}
