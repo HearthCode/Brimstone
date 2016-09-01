@@ -1,4 +1,4 @@
-﻿#define _TRIGGER_DEBUG
+#define _TRIGGER_DEBUG
 
 using System;
 using System.Collections.Generic;
@@ -11,14 +11,11 @@ namespace Brimstone
 	{
 		BeginTurn,
 		EndTurn,
-		PlaySpell,
-		AfterPlaySpell,
+		Play,
+		AfterPlay,
 		Spellbender,
-		PlayWeapon,
 		PreSummon,
 		Summon,
-		PlayMinion,
-		AfterPlayCard,
 		AfterSummon,
 		ProposedAttack,
 		Attack,
@@ -32,7 +29,7 @@ namespace Brimstone
 		Heal,
 		Silence,
 		Discard,
-		GainArmor,
+		GainArmour,
 		RevealSecret,
 		EquipWeapon,
 		WeaponAttack, // 3
