@@ -147,8 +147,6 @@ namespace Brimstone
 	{
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
 		{
-			game.Step = Step.MAIN_READY;
-
 			// Update the number of turns everything has been in play
 			game.CurrentPlayer.Hero.NumTurnsInPlay++;
 			// TODO: game.CurrentPlayer.HeroPower.NumTurnsInPlay++;
