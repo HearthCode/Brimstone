@@ -1,4 +1,4 @@
-﻿#define _ACTIONS_DEBUG
+#define _ACTIONS_DEBUG
 
 using System;
 using System.Collections.Generic;
@@ -329,13 +329,157 @@ namespace Brimstone
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			if (args[TARGETS].HasResult)
 				foreach (ICharacter e in args[TARGETS]) {
-#if _ACTIONS_DEBUG
-					DebugLog.WriteLine("Game {0}: {1} is getting hit for {2} points of damage", game.GameId, e.ShortDescription, args[DAMAGE]);
-#endif
-					game.Environment.LastDamaged = e;
-					e.Damage += args[DAMAGE];
+					DebugLog.WriteLine("{0} is getting hit for {1} points of damage", e.ShortDescription, args[DAMAGE]);
 
-					// TODO: What if one of our targets gets killed?
+					e.Damage += args[DAMAGE];
+					game.Environment.LastDamaged = e;
+
+					// TODO: Handle Predamage, on-damage triggers and more, full specification here https://hearthstone.gamepedia.com/Advanced_rulebook#Damage_and_Healing
+				}
+			return ActionResult.None;
+		}
+	}
+
+	public class Heal : QueueAction
+	{
+		public const int TARGETS = 0;
+		public const int AMOUNT = 1;
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			if (args[TARGETS].HasResult)
+				foreach (ICharacter e in args[TARGETS]) {
+					DebugLog.WriteLine("{0} is getting healed for {1} points", e.ShortDescription, args[AMOUNT]);
+
+					e.Damage -= args[AMOUNT];
+
+					// TODO: Handle on-healing triggers and more, full specification here https://hearthstone.gamepedia.com/Advanced_rulebook#Damage_and_Healing
+					// TODO: Handle Prehealing. Currently nothing cares about it, but it does exist in the log.
+					// TODO: In Hearthstone tags can't be set to a negative value (clamps to 0 instead), so I should be able to write it like this and not worry about reaching negative Damage.
+				}
+			return ActionResult.None;
+		}
+	}
+
+	public class Silence : QueueAction
+	{
+		public const int TARGETS = 0;
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			throw new NotImplementedException(); // TODO: implement https://hearthstone.gamepedia.com/Advanced_rulebook#Silence + https://hearthstone.gamepedia.com/Silence
+		}
+	}
+
+	public class Bounce : QueueAction
+	{
+		public const int TARGETS = 0;
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			throw new NotImplementedException(); // TODO: implement https://hearthstone.gamepedia.com/Advanced_rulebook#Zones + https://hearthstone.gamepedia.com/Return_to_hand
+		}
+	}
+
+	public class Destroy : QueueAction
+	{
+		public const int TARGETS = 0;
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			throw new NotImplementedException(); // TODO: implement https://hearthstone.gamepedia.com/Advanced_rulebook#Destroy_effects_in_all_zones
+		}
+	}
+
+	public class GainMana : QueueAction
+	{
+		public const int CONTROLLER = 0;
+		public const int AMOUNT = 1;
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			throw new NotImplementedException(); // TODO: implement https://hearthstone.gamepedia.com/Advanced_rulebook#Mana_Crystals_and_mana_costs
+		}
+	}
+
+	public class Summon : QueueAction
+	{
+		public const int CONTROLLER = 0;
+		public const int ENTITY = 1;
+		public const int AMOUNT = 2;
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			throw new NotImplementedException(); // TODO: implement https://hearthstone.gamepedia.com/Advanced_rulebook#Playing.2Fsummoning_a_minion
+
+			// Notes on summon position:
+			// 1) Friendly summon, unknown amount, battlecry/trigger: All to the right of the summoning minion (N'Zoth, Kel'Thuzad, Herald Volazj)
+			// 2) Friendly summon, known amount, battlecry/trigger: Alternate right/left/right/left... of the summoner (Onyxia/Dr. Boom)
+			// 3) Opponent summon: All to the far right (Leeroy Jenkins, Hungry Dragon)
+			// 4) Deathrattle, unknown amount: All to the far right (Moat Lurker, Thaddius)
+			// 5) Deathrattle, known amount: the position the minion died in (Haunted Creeper, Soul of the Forest, Ancestral Spirit) see https://hearthstone.gamepedia.com/Advanced_rulebook#Where_do_Minions_summoned_by_Deathrattles_spawn.3F
+			// 6) Other: All to the far right (Reincarnate, Resurrect)
+			// For edge cases where the played minion died or returned to hand before its summoning Battlecry resolves, see https://www.youtube.com/watch?v=nuzvKVL2Vlg
+		}
+	}
+
+	public class InPlaceSwap : QueueAction
+	{
+		public const int MINION1 = 0;
+		public const int MINION2 = 1;
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			throw new NotImplementedException(); // TODO: implement https://www.youtube.com/watch?v=YhJlDd7NxNg + log in description
+		}
+	}
+
+	public class GiveTaunt : QueueAction
+	{
+		public const int TARGETS = 0;
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			if (args[TARGETS].HasResult)
+				foreach (ICharacter e in args[TARGETS]) {
+					DebugLog.WriteLine("{0} is given Taunt", e.ShortDescription);
+
+					e.HasTaunt = true;
+				}
+			return ActionResult.None;
+		}
+	}
+
+	public class GainArmour : QueueAction
+	{
+		public const int TARGETS = 0;
+		public const int AMOUNT = 1;
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			if (args[TARGETS].HasResult)
+				foreach (Hero e in args[TARGETS]) {
+					DebugLog.WriteLine("{0} gains {1} Armor", e.ShortDescription, args[AMOUNT]);
+					e.GainArmour(args[AMOUNT]);
+				}
+			return ActionResult.None;
+		}
+	}
+
+	public class EquipWeapon : QueueAction
+	{
+		public const int CONTROLLER = 0;
+		public const int ENTITY = 1;
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			throw new NotImplementedException(); // TODO: implement (equipping over a weapon destroys it and removes it from play).
+
+			// Possibly this could just be a special case of Summon, by the way. That's how Fireplace does it at least.
+		}
+	}
+
+	public class Discard : QueueAction
+	{
+		public const int TARGETS = 0;
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			if (args[TARGETS].HasResult)
+				foreach (IEntity e in args[TARGETS]) {
+					DebugLog.WriteLine("{0} is discarded", e.ShortDescription);
+					game.Environment.LastCardDiscarded = e;
+					e.Zone = e.Controller.Graveyard;
+					//TODO: Detach Enchantments, run on discard triggers, etc
 				}
 			return ActionResult.None;
 		}
