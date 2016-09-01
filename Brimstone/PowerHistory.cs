@@ -28,6 +28,7 @@ namespace Brimstone
 	public class BlockStart : PowerAction
 	{
 		public BlockType Type { get; }
+		public int Source { get { return EntityId; } }
 		public int Target { get; }
 		public int Index { get; }
 
