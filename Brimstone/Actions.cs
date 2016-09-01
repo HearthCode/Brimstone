@@ -337,8 +337,8 @@ namespace Brimstone
 				foreach (ICharacter e in args[TARGETS]) {
 					DebugLog.WriteLine("{0} is getting hit for {1} points of damage", e.ShortDescription, args[DAMAGE]);
 
-					e.Damage += args[DAMAGE];
 					game.Environment.LastDamaged = e;
+					e.Damage += args[DAMAGE];
 
 					// TODO: What if one of our targets gets killed?
 				}
