@@ -13,7 +13,6 @@ namespace Brimstone
 		// TODO: Combining selectors, Enchantment-refreshing Auras (CS2_222o)
 
 		// Frostwolf Warlord
-		// public static Behaviour CS2_226 = new Behaviour {
 		// Battlecry =
 		// TODO: Counting selectors, Enchantments (CS2_266e)
 
@@ -411,7 +410,7 @@ namespace Brimstone
 
 		// Arathi Weaponsmith
 		public static Behaviour EX1_398 = new Behaviour {
-			Battlecry = EquipWeapon(Controller, "Battle Axe")
+			Battlecry = Summon(Controller, "Battle Axe", 1)
 		};
 
 		//Explosive Sheep
