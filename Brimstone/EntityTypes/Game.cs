@@ -93,8 +93,7 @@ namespace Brimstone
 
 		public Game(HeroClass Hero1, HeroClass Hero2, string Player1Name = "", string Player2Name = "", bool PowerHistory = false)
 					: base(Cards.FromId("Game"), new Dictionary<GameTag, int> {
-						{ GameTag.ZONE, (int) Brimstone.Zone.PLAY },
-						{ GameTag.STATE, (int) GameState.LOADING }
+						{ GameTag.ZONE, (int) Brimstone.Zone.PLAY }
 					}) {
 			// Start Power log
 			if (PowerHistory) {
