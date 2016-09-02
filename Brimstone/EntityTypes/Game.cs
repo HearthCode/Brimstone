@@ -297,6 +297,11 @@ namespace Brimstone
 			// TODO: Gold reward state
 		}
 
+		public void EntityCreated(IEntity e) {
+			PowerHistory?.Add(new CreateEntity(e));
+			ActiveTriggers.Add(e);
+		}
+
 		public void EntityChanging(int id, int previousHash) {
 			if (Settings.GameHashCaching)
 				_changed = true;
@@ -304,7 +309,7 @@ namespace Brimstone
 
 		// TODO: Change this to a delegate event
 		public void EntityChanged(int id, GameTag tag, int value) {
-			Game.PowerHistory?.Add(new TagChange(id, tag, value));
+			PowerHistory?.Add(new TagChange(id, tag, value));
 
 			var entity = Entities[id];
 

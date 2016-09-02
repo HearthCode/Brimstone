@@ -58,10 +58,7 @@ namespace Brimstone
 			entity.Game = Game;
 			entity.Id = NextEntityId++;
 			Entities[entity.Id] = entity;
-			Game.EntityChanging(entity.Id, 0);
-			if (Game.PowerHistory != null)
-				Game.PowerHistory.Add(new CreateEntity(entity));
-			Game.ActiveTriggers.Add(entity);
+			Game.EntityCreated(entity);
 			return entity;
 		}
 
