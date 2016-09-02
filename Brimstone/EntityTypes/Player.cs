@@ -32,8 +32,7 @@ namespace Brimstone
 				{ GameTag.MAXRESOURCES, 10 },
 				{ GameTag.PLAYER_ID, playerId },
 				{ GameTag.TEAM_ID, (teamId != 0? teamId : playerId) },
-				{ GameTag.STARTHANDSIZE, 4 },
-				{ GameTag.ZONE, (int) Brimstone.Zone.PLAY }
+				{ GameTag.STARTHANDSIZE, 4 }
 			}) {
 			HeroClass = hero;
 			FriendlyName = name;
@@ -79,22 +78,30 @@ namespace Brimstone
 
 		public void Start() {
 			// TODO: Clean these up into named functions
-			Game.ActiveTriggers.At<IEntity, IEntity>(TriggerType.DealMulligan, (Action<IEntity>) (_ => {
+			Game.ActiveTriggers.At(TriggerType.DealMulligan, (Action<IEntity>) (_ => {
 				// Perform mulligan
 				foreach (var e in Choice.Discarding)
 					e.ZoneSwap(Deck[RNG.Between(1, Deck.Count)]);
 				Choice = null;
 
 				MulliganState = MulliganState.WAITING;
-			}), this, Actions.Self);
+			}), this, Actions.IsSelf);
 
-			Game.ActiveTriggers.At<IEntity, IEntity>(TriggerType.MulliganWaiting, (Action<IEntity>) (_ => {
+			Game.ActiveTriggers.At(TriggerType.MulliganWaiting, (Action<IEntity>) (_ => {
 				MulliganState = MulliganState.DONE;
 
 				// Start main game if both players have completed mulligan
 				if (Opponent.MulliganState == MulliganState.DONE)
 					Game.NextStep = Step.MAIN_READY;
-			}), this, Actions.Self);
+			}), this, Actions.IsSelf);
+
+			Game.ActiveTriggers.At(TriggerType.PhaseMainStart, Actions.BeginTurnForPlayer, this, Actions.IsControllersTurn);
+
+			Game.ActiveTriggers.At(TriggerType.PhaseMainAction, (Action<IEntity>) (_ => {
+				// TODO: At this point the player should be offered options to play
+
+				Game.NextStep = Step.MAIN_END;
+			}), this, Actions.IsControllersTurn);
 		}
 
 		public void StartMulligan() {

@@ -167,13 +167,22 @@ namespace Brimstone
 				e?.CheckForDeath();
 
 			// Advance game step if necessary (probably setting off new triggers)
-			/*var nextStep = NextStep;
+			var nextStep = NextStep;
 			var step = Step;
 			if (nextStep != step) {
+				// TODO: Game step should not advance if player has options available
 				DebugLog.WriteLine("Advancing game step from " + step + " to " + nextStep);
 				Step = nextStep;
-			}*/ // TODO: This code has a bug, it advances MAIN_ACTION to MAIN_END before the user hits End Turn button
+			}
+
+			if (nextStep == Step.MAIN_START_TRIGGERS) {
+				// TODO: Do something exciting with turn start triggers for the current player here
+				NextStep = Step.MAIN_START;
+				Step = Step.MAIN_START;
+				// TODO: DEATHs block for eg. Doomsayer
+			}
 		}
+
 
 		public void Start(int FirstPlayer = 0, bool SkipMulligan = false) {
 			// Shuffle player decks

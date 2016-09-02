@@ -136,10 +136,10 @@ namespace Brimstone
 		}
 	}
 
+	// Runs when STEP = MAIN_READY
 	public class BeginTurn : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
-		{
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			// Update the number of turns everything has been in play
 			game.CurrentPlayer.Hero.NumTurnsInPlay++;
 			// TODO: game.CurrentPlayer.HeroPower.NumTurnsInPlay++;
@@ -175,27 +175,23 @@ namespace Brimstone
 
 			game.CurrentPlayer.NumFriendlyMinionsThatDiedThisTurn = 0;
 			game.CurrentOpponent.NumFriendlyMinionsThatDiedThisTurn = 0;
+			return ActionResult.None;
+		}
+	}
 
-			game.Step = Step.MAIN_START_TRIGGERS;
-			game.NextStep = Step.MAIN_START;
-
-			// TODO: DEATHs block for eg. Doomsayer
-
-			game.Step = Step.MAIN_START;
-			game.Queue(game.CurrentPlayer, Actions.Draw(game.CurrentPlayer).Then((Action<IEntity>)(_ =>
-			{
+	// Runs when STEP = MAIN_START
+	public class BeginTurnForPlayer : QueueAction
+	{
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			// Draw a card then reset all relevant flags
+			game.Queue(game.CurrentPlayer, Actions.Draw(game.CurrentPlayer).Then((Action<IEntity>)(_ => {
 				game.CurrentPlayer.NumMinionsPlayerKilledThisTurn = 0;
 				game.CurrentOpponent.NumMinionsPlayerKilledThisTurn = 0;
 				game.CurrentPlayer.NumFriendlyMinionsThatAttackedThisTurn = 0;
 				game.NumMinionsKilledThisTurn = 0;
 				game.CurrentPlayer.HeroPowerActivationsThisTurn = 0;
 				game.NextStep = Step.MAIN_ACTION;
-				
-				game.Step = Step.MAIN_ACTION;
-				game.NextStep = Step.MAIN_END;
-			}
-			)));
-
+			})));
 			return ActionResult.None;
 		}
 	}
