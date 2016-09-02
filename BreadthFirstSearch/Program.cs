@@ -29,7 +29,7 @@ namespace Test1
 				game.CurrentPlayer.Give(FillMinion).Play();
 			for (int i = 0; i < NumBoomBots; i++)
 				game.CurrentPlayer.Give("Boom Bot").Play();
-			game.NextTurn();
+			game.EndTurn();
 			for (int i = 0; i < MaxMinions - NumBoomBots; i++)
 				game.CurrentPlayer.Give(FillMinion).Play();
 			for (int i = 0; i < NumBoomBots; i++)

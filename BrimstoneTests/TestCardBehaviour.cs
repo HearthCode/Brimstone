@@ -161,13 +161,13 @@ namespace BrimstoneTests
 			var d1 = p1.Give("Demolisher").Play();
 
 			Assert.AreEqual(0, p2.Hero.Damage + c1.Damage);
-			game.NextTurn();
+			game.EndTurn();
 			Assert.AreEqual(0, p2.Hero.Damage + c1.Damage);
-			game.NextTurn();
+			game.EndTurn();
 			Assert.AreEqual(2, p2.Hero.Damage + c1.Damage);
-			game.NextTurn();
+			game.EndTurn();
 			Assert.AreEqual(2, p2.Hero.Damage + c1.Damage);
-			game.NextTurn();
+			game.EndTurn();
 			Assert.AreEqual(4, p2.Hero.Damage + c1.Damage);
 		}
 
@@ -219,35 +219,35 @@ namespace BrimstoneTests
 			Assert.AreEqual(0, c2.Damage);
 			Assert.AreEqual(0, b1.Damage);
 
-			game.NextTurn();
+			game.EndTurn();
 			Assert.AreEqual(2, p1.Hero.Damage);
 			Assert.AreEqual(2, p2.Hero.Damage);
 			Assert.AreEqual(2, c1.Damage);
 			Assert.AreEqual(2, c2.Damage);
 			Assert.AreEqual(2, b1.Damage);
 
-			game.NextTurn();
+			game.EndTurn();
 			Assert.AreEqual(2, p1.Hero.Damage);
 			Assert.AreEqual(2, p2.Hero.Damage);
 			Assert.AreEqual(2, c1.Damage);
 			Assert.AreEqual(2, c2.Damage);
 			Assert.AreEqual(2, b1.Damage);
 
-			game.NextTurn();
+			game.EndTurn();
 			Assert.AreEqual(4, p1.Hero.Damage);
 			Assert.AreEqual(4, p2.Hero.Damage);
 			Assert.AreEqual(4, c1.Damage);
 			Assert.AreEqual(4, c2.Damage);
 			Assert.AreEqual(4, b1.Damage);
 
-			game.NextTurn();
+			game.EndTurn();
 			Assert.AreEqual(4, p1.Hero.Damage);
 			Assert.AreEqual(4, p2.Hero.Damage);
 			Assert.AreEqual(4, c1.Damage);
 			Assert.AreEqual(4, c2.Damage);
 			Assert.AreEqual(4, b1.Damage);
 
-			game.NextTurn();
+			game.EndTurn();
 			Assert.AreEqual(6, p1.Hero.Damage);
 			Assert.AreEqual(6, p2.Hero.Damage);
 			Assert.That(c1.Zone == c1.Controller.Graveyard);

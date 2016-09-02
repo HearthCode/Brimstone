@@ -258,7 +258,7 @@ namespace Brimstone
 			// TODO: POWERED_UP settings and stuff go here
 		}
 
-		public void NextTurn() {
+		public void EndTurn() {
 			if (Player1.Choice != null || Player2.Choice != null)
 				throw new ChoiceException();
 
