@@ -142,6 +142,7 @@ namespace Brimstone
 		}
 
 		// Triggers
+		// TODO: BeginTurn and EndTurn shouldn't match against Game, but against CurrentPlayer.
 		public static Trigger<IEntity, Game> OnBeginTurn(Condition<IEntity, Game> Condition, ActionGraph Action) {
 			return Trigger<IEntity, Game>.At(TriggerType.PhaseMainStartTriggers, Action, Condition);
 		}
