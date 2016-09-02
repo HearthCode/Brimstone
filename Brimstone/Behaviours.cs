@@ -128,7 +128,6 @@ namespace Brimstone
 		public static ActionGraph Destroy(ActionGraph Targets = null) { return new Destroy { Args = { Targets } }; }
 		public static ActionGraph GainMana(ActionGraph Player = null, ActionGraph Amount = null) { return new GainMana { Args = { Player, Amount } }; }
 		public static ActionGraph Summon(ActionGraph Player = null, ActionGraph Entity = null, ActionGraph Amount = null) { return new Summon { Args = { Player, Entity, Amount } }; }
-		public static ActionGraph EquipWeapon(ActionGraph Controller = null, ActionGraph Entity = null) { return new EquipWeapon { Args = { Controller, Entity } }; }
 		public static ActionGraph Discard(ActionGraph Targets = null) { return new Discard { Args = { Targets } }; }
 
 		// Generic triggers (use to create triggers for events not specified in Triggers section below)
