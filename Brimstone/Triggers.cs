@@ -114,7 +114,19 @@ namespace Brimstone
 
 	public class TriggerManager : ICloneable
 	{
-		public Game Game { get; set; }
+		private Game _game;
+		public Game Game
+		{
+			get { return _game; }
+			set
+			{
+				if (_game != null && _game != value)
+					_game.OnEntityChanged -= OnEntityChanged;
+				_game = value;
+				_game.OnEntityChanged += OnEntityChanged;
+			}
+		}
+
 		public Dictionary<TriggerType, List<IAttachedTrigger>> Triggers { get; }
 
 		public TriggerManager(Game game) {
@@ -139,6 +151,67 @@ namespace Brimstone
 				Triggers[t.Type].Add(t);
 			else
 				Triggers.Add(t.Type, new List<IAttachedTrigger> { t });
+		}
+
+		private void OnEntityChanged(Game game, IEntity entity, GameTag tag, int oldValue, int newValue) {
+			// Tag change triggers
+			switch (tag) {
+				case GameTag.STATE:
+					if (newValue == (int)GameState.RUNNING)
+						Queue(TriggerType.GameStart, entity);
+					break;
+
+				case GameTag.STEP:
+					switch ((Step)newValue) {
+						case Step.BEGIN_MULLIGAN:
+							Queue(TriggerType.BeginMulligan, entity);
+							break;
+						case Step.MAIN_NEXT:
+							Queue(TriggerType.PhaseMainNext, entity);
+							break;
+						case Step.MAIN_READY:
+							Queue(TriggerType.PhaseMainReady, entity);
+							break;
+						case Step.MAIN_START_TRIGGERS:
+							Queue(TriggerType.PhaseMainStartTriggers, entity);
+							break;
+						case Step.MAIN_START:
+							Queue(TriggerType.PhaseMainStart, entity);
+							break;
+						case Step.MAIN_ACTION:
+							Queue(TriggerType.PhaseMainAction, entity);
+							break;
+						case Step.MAIN_END:
+							Queue(TriggerType.PhaseMainEnd, entity);
+							break;
+						case Step.MAIN_CLEANUP:
+							Queue(TriggerType.PhaseMainCleanup, entity);
+							break;
+					}
+					break;
+
+				case GameTag.MULLIGAN_STATE:
+					switch ((MulliganState)newValue) {
+						case MulliganState.DEALING:
+							Queue(TriggerType.DealMulligan, entity);
+							break;
+						case MulliganState.WAITING:
+							Queue(TriggerType.MulliganWaiting, entity);
+							break;
+					}
+					break;
+
+				case GameTag.JUST_PLAYED:
+					if (newValue == 1)
+						Queue(TriggerType.Play, entity);
+					break;
+
+				case GameTag.DAMAGE:
+					if (newValue != 0) { // TODO: Replace with checking if the value increased
+						Queue(TriggerType.Damage, entity);
+					}
+					break;
+			}
 		}
 
 		public void Queue(TriggerType type, IEntity source) {

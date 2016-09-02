@@ -316,68 +316,8 @@ namespace Brimstone
 			OnEntityChanging?.Invoke(this, entity, tag, oldValue, newValue);
 		}
 
-		// TODO: Change this to a delegate event
 		public void EntityChanged(IEntity entity, GameTag tag, int oldValue, int newValue) {
 			OnEntityChanged?.Invoke(this, entity, tag, oldValue, newValue);
-
-			// Tag change triggers
-			switch (tag) {
-				case GameTag.STATE:
-					if (newValue == (int)GameState.RUNNING)
-						Game.ActiveTriggers.Queue(TriggerType.GameStart, entity);
-					break;
-
-				case GameTag.STEP:
-					switch ((Step)newValue) {
-						case Step.BEGIN_MULLIGAN:
-							Game.ActiveTriggers.Queue(TriggerType.BeginMulligan, entity);
-							break;
-						case Step.MAIN_NEXT:
-							Game.ActiveTriggers.Queue(TriggerType.PhaseMainNext, entity);
-							break;
-						case Step.MAIN_READY:
-							Game.ActiveTriggers.Queue(TriggerType.PhaseMainReady, entity);
-							break;
-						case Step.MAIN_START_TRIGGERS:
-							Game.ActiveTriggers.Queue(TriggerType.PhaseMainStartTriggers, entity);
-							break;
-						case Step.MAIN_START:
-							Game.ActiveTriggers.Queue(TriggerType.PhaseMainStart, entity);
-							break;
-						case Step.MAIN_ACTION:
-							Game.ActiveTriggers.Queue(TriggerType.PhaseMainAction, entity);
-							break;
-						case Step.MAIN_END:
-							Game.ActiveTriggers.Queue(TriggerType.PhaseMainEnd, entity);
-							break;
-						case Step.MAIN_CLEANUP:
-							Game.ActiveTriggers.Queue(TriggerType.PhaseMainCleanup, entity);
-							break;
-					}
-					break;
-
-				case GameTag.MULLIGAN_STATE:
-					switch ((MulliganState)newValue) {
-						case MulliganState.DEALING:
-							Game.ActiveTriggers.Queue(TriggerType.DealMulligan, entity);
-							break;
-						case MulliganState.WAITING:
-							Game.ActiveTriggers.Queue(TriggerType.MulliganWaiting, entity);
-							break;
-					}
-					break;
-
-				case GameTag.JUST_PLAYED:
-					if (newValue == 1)
-						Game.ActiveTriggers.Queue(TriggerType.Play, entity);
-					break;
-
-				case GameTag.DAMAGE:
-					if (newValue != 0) { // TODO: Replace with checking if the value increased
-						Game.ActiveTriggers.Queue(TriggerType.Damage, entity);
-					}
-					break;
-			}
 		}
 
 		private int _gameHash = 0;
