@@ -222,6 +222,8 @@ namespace Brimstone
 
 			// Set game state
 			State = GameState.RUNNING;
+			foreach (var p in Players)
+				p.PlayState = PlayState.PLAYING;
 
 			ActionQueue.ProcessAll();
 			// TODO: POWERED_UP settings and stuff go here
