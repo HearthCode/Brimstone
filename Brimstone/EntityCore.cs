@@ -136,9 +136,8 @@ namespace Brimstone
 					if (Game.Entities != null)
 						Changing(false);
 				_zoneController = value;
-				if (Game != null)
-					if (Game.Entities != null)
-						Game.Entities.EntityChanged(Id, GameTag.CONTROLLER, value.Id);
+				if (Game != null && Game.Entities != null)
+					Game.EntityChanged(Id, GameTag.CONTROLLER, value.Id);
 			}
 		}
 
@@ -185,7 +184,7 @@ namespace Brimstone
 					_entity[t] = value;
 				}
 				if (Game != null && t != GameTag.CONTROLLER)
-					Game.Entities.EntityChanged(Id, t, value);
+					Game.EntityChanged(Id, t, value);
 			}
 		}
 
@@ -216,7 +215,7 @@ namespace Brimstone
 
 		private void Changing(bool cow = true) {
 			// TODO: Replace with a C# event
-			Game.Entities.EntityChanging(Id, _fuzzyHash);
+			Game.EntityChanging(Id, _fuzzyHash);
 			_fuzzyHash = 0;
 			if (cow) CopyOnWrite();
 		}

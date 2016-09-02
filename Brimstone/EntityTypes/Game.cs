@@ -14,12 +14,12 @@ namespace Brimstone
 			if (ReferenceEquals(x, y))
 				return true;
 			if (Settings.UseGameHashForEquality)
-				return x.Entities.FuzzyGameHash == y.Entities.FuzzyGameHash;
+				return x.FuzzyGameHash == y.FuzzyGameHash;
 			return x.PowerHistory.EquivalentTo(y.PowerHistory);
 		}
 
 		public int GetHashCode(Game obj) {
-			return obj.Entities.FuzzyGameHash;
+			return obj.FuzzyGameHash;
 		}
 	}
 
@@ -77,6 +77,9 @@ namespace Brimstone
 			// Update tree
 			GameId = ++SequenceNumber;
 			Depth = cloneFrom.Depth + 1;
+			// Fuzzy hashing
+			_gameHash = cloneFrom._gameHash;
+			Changed = cloneFrom.Changed;
 		}
 
 		public Game(HeroClass Hero1, HeroClass Hero2, string Player1Name = "", string Player2Name = "", bool PowerHistory = false)
@@ -108,6 +111,9 @@ namespace Brimstone
 
 			// No parent or children
 			GameId = ++SequenceNumber;
+
+			// Fuzzy hashing
+			Changed = false;
 		}
 
 		public IEntity Add(IEntity newEntity, IZoneController controller) {
@@ -291,10 +297,110 @@ namespace Brimstone
 			// TODO: Gold reward state
 		}
 
+		public void EntityChanging(int id, int previousHash) {
+			if (Settings.GameHashCaching)
+				_changed = true;
+		}
+
+		// TODO: Change this to a delegate event
+		public void EntityChanged(int id, GameTag tag, int value) {
+			Game.PowerHistory?.Add(new TagChange(id, tag, value));
+
+			var entity = Entities[id];
+
+			// Tag change triggers
+			switch (tag) {
+				case GameTag.STATE:
+					if (value == (int)GameState.RUNNING)
+						Game.ActiveTriggers.Queue(TriggerType.GameStart, entity);
+					break;
+
+				case GameTag.STEP:
+					switch ((Step)value) {
+						case Step.BEGIN_MULLIGAN:
+							Game.ActiveTriggers.Queue(TriggerType.BeginMulligan, entity);
+							break;
+						case Step.MAIN_NEXT:
+							Game.ActiveTriggers.Queue(TriggerType.PhaseMainNext, entity);
+							break;
+						case Step.MAIN_READY:
+							Game.ActiveTriggers.Queue(TriggerType.PhaseMainReady, entity);
+							break;
+						case Step.MAIN_START_TRIGGERS:
+							Game.ActiveTriggers.Queue(TriggerType.PhaseMainStartTriggers, entity);
+							break;
+						case Step.MAIN_START:
+							Game.ActiveTriggers.Queue(TriggerType.PhaseMainStart, entity);
+							break;
+						case Step.MAIN_ACTION:
+							Game.ActiveTriggers.Queue(TriggerType.PhaseMainAction, entity);
+							break;
+						case Step.MAIN_END:
+							Game.ActiveTriggers.Queue(TriggerType.PhaseMainEnd, entity);
+							break;
+						case Step.MAIN_CLEANUP:
+							Game.ActiveTriggers.Queue(TriggerType.PhaseMainCleanup, entity);
+							break;
+					}
+					break;
+
+				case GameTag.MULLIGAN_STATE:
+					switch ((MulliganState)value) {
+						case MulliganState.DEALING:
+							Game.ActiveTriggers.Queue(TriggerType.DealMulligan, entity);
+							break;
+						case MulliganState.WAITING:
+							Game.ActiveTriggers.Queue(TriggerType.MulliganWaiting, entity);
+							break;
+					}
+					break;
+
+				case GameTag.DAMAGE:
+					if (value != 0) { // TODO: Replace with checking if the value increased
+						Game.ActiveTriggers.Queue(TriggerType.Damage, entity);
+					}
+					break;
+			}
+		}
+
+		private int _gameHash = 0;
+		private bool _changed = false;
+
+		public bool Changed {
+			get { return _changed; }
+			set {
+				int dummy;
+				if (!value)
+					dummy = FuzzyGameHash;
+				else
+					_changed = true;
+			}
+		}
+
+		// Calculate a fuzzy hash for the whole game state
+		// WARNING: The hash algorithm MUST be designed in such a way that the order
+		// in which the entities are hashed doesn't matter
+		public int FuzzyGameHash {
+			get {
+				// TODO: Take order-of-play semantics into account
+				if (!Settings.GameHashCaching || _changed) {
+					_gameHash = 0;
+					// Hash board states (play zones) for both players in order, hash rest of game entities in any order
+					foreach (var entity in Entities)
+						if (entity.Zone.Type != Brimstone.Zone.PLAY || entity.ZonePosition == 0)
+							_gameHash += entity.FuzzyHash;
+						else
+							_gameHash += (entity.ZoneController.Id * 8 + entity.ZonePosition) * entity.FuzzyHash;
+					_changed = false;
+				}
+				return _gameHash;
+			}
+		}
+
 		// Perform a fuzzy equivalence between two game states
 		public bool EquivalentTo(Game game) {
 			if (Settings.UseGameHashForEquality)
-				return Entities.FuzzyGameHash == game.Entities.FuzzyGameHash;
+				return FuzzyGameHash == game.FuzzyGameHash;
 			return PowerHistory.EquivalentTo(game.PowerHistory);
 		}
 
@@ -312,7 +418,7 @@ namespace Brimstone
 					return formatter.Format(format, this, formatProvider);
 			}
 
-			string s = string.Format("Game hash: {0:x8}", Entities.FuzzyGameHash) + "\r\n";
+			string s = string.Format("Game hash: {0:x8}", FuzzyGameHash) + "\r\n";
 
 			switch (format) {
 				case "G":

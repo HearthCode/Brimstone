@@ -27,7 +27,7 @@ namespace Brimstone
 		}
 
 		public override string ToString() {
-			string s = string.Format("Game {0:x8}: {1} ({2}) -> {3}", Game.Entities.FuzzyGameHash, Source.Card.Name, Source.Id, Action);
+			string s = string.Format("Game {0:x8}: {1} ({2}) -> {3}", Game.FuzzyGameHash, Source.Card.Name, Source.Id, Action);
 			if (Args != null && Args.Count > 0) {
 				s += "(";
 				foreach (var a in Args)

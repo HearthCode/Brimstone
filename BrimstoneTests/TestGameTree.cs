@@ -195,8 +195,8 @@ namespace BrimstoneTests
 			// Check every game is different
 			var childHashes = new List<int>();
 			foreach (var g in depth1Games) {
-				Assert.False(childHashes.Contains(g.Entities.FuzzyGameHash));
-				childHashes.Add(g.Entities.FuzzyGameHash);
+				Assert.False(childHashes.Contains(g.FuzzyGameHash));
+				childHashes.Add(g.FuzzyGameHash);
 			}
 
 			// Do a random action on the first game in depth 1 and add all possible outcomes as children
