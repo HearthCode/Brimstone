@@ -33,18 +33,9 @@ namespace Brimstone
 		// Selectors for heroes
 		public static Selector FriendlyHero { get { return Select(e => e.Controller.Hero); } }
 		public static Selector OpponentHero { get { return Select(e => e.Controller.Opponent.Hero); } }
-		public static Selector FriendlyHealthyHero { get { return Select(e => new List<Hero> { e.Controller.Hero }.Where(x => !x.MortallyWounded)); } }
-		public static Selector OpponentHealthyHero { get { return Select(e => new List<Hero> { e.Controller.Opponent.Hero }.Where(x => !x.MortallyWounded)); } }
 		// Selectors for weapons
-		public static Selector FriendlyWeapon { get { throw new NotImplementedException(); } } // TODO: implement
-		public static Selector OpponentWeapon { get { throw new NotImplementedException(); } } // TODO: implement
-																							   // Selectors for minions and characters - healthy
-		public static Selector AllHealthyMinions { get { return Select(e => e.Game.Player1.Board.Concat(e.Game.Player2.Board).Where(x => !x.MortallyWounded)); } }
-		public static Selector FriendlyHealthyMinions { get { return Select(e => e.Controller.Board.Where(x => !x.MortallyWounded)); } }
-		public static Selector OpponentHealthyMinions { get { return Select(e => e.Controller.Opponent.Board.Where(x => !x.MortallyWounded)); } }
-		public static Selector AllHealthyCharacters { get { return Select(e => e.Game.Characters.Where(x => !x.MortallyWounded)); } }
-		public static Selector FriendlyHealthyCharacters { get { return Union(FriendlyHealthyMinions, FriendlyHealthyHero); } }
-		public static Selector OpponentHealthyCharacters { get { return Union(OpponentHealthyMinions, OpponentHealthyHero); } }
+		//public static Selector FriendlyWeapon { get { throw new NotImplementedException(); } } // TODO: implement
+		//public static Selector OpponentWeapon { get { throw new NotImplementedException(); } } // TODO: implement
 		// Selectors for minions and characters - all
 		public static Selector AllMinions { get { return Select(e => e.Game.Player1.Board.Concat(e.Game.Player2.Board)); } }
 		public static Selector FriendlyMinions { get { return Select(e => e.Controller.Board); } }
@@ -56,18 +47,22 @@ namespace Brimstone
 		public static Selector OpponentMinionsInDeck { get { return Select(e => e.Controller.Opponent.Deck.Where(x => x.Card.Type == CardType.MINION)); } }
 		public static Selector FriendlyMinionsInHand { get { return Select(e => e.Controller.Hand.Where(x => x.Card.Type == CardType.MINION)); } }
 		public static Selector AdjacentMinions { get { return Select(e => e.Controller.Board.Where(x => x.ZonePosition == e.ZonePosition + 1 || x.ZonePosition == e.ZonePosition - 1)); } }
+
+		// Selectors for minions/heroes/characters - healthy
+		public static Selector FriendlyHealthyHero { get { return Select(e => new List<Hero> { e.Controller.Hero }.Where(x => !x.MortallyWounded)); } }
+		public static Selector OpponentHealthyHero { get { return Select(e => new List<Hero> { e.Controller.Opponent.Hero }.Where(x => !x.MortallyWounded)); } }
+		public static Selector AllHealthyMinions { get { return Select(e => e.Game.Player1.Board.Concat(e.Game.Player2.Board).Where(x => !x.MortallyWounded)); } }
+		public static Selector FriendlyHealthyMinions { get { return Select(e => e.Controller.Board.Where(x => !x.MortallyWounded)); } }
+		public static Selector OpponentHealthyMinions { get { return Select(e => e.Controller.Opponent.Board.Where(x => !x.MortallyWounded)); } }
+		public static Selector AllHealthyCharacters { get { return Select(e => e.Game.Characters.Where(x => !x.MortallyWounded)); } }
+		public static Selector FriendlyHealthyCharacters { get { return Union(FriendlyHealthyMinions, FriendlyHealthyHero); } }
+		public static Selector OpponentHealthyCharacters { get { return Union(OpponentHealthyMinions, OpponentHealthyHero); } }
+
 		// Selectors for cards being played
 		//public static Selector FriendlySpell { get { return Select(e => e.Game.Environment.LastCardPlayed.Controller == e.Controller && e.Game.Environment.LastCardPlayed.Card.Type == CardType.SPELL)} }
 		// TODO: more selectors, more actiongraphs
 		// Actiongraphs
 		public static ActionGraph Random(Selector Selector = null) { return new RandomChoice { Args = { Selector } }; }
-		// Random minion/character - healthy
-		public static ActionGraph RandomHealthyMinion { get { return Random(AllHealthyMinions); } }
-		public static ActionGraph RandomFriendlyHealthyMinion { get { return Random(FriendlyHealthyMinions); } }
-		public static ActionGraph RandomOpponentHealthyMinion { get { return Random(OpponentHealthyMinions); } }
-		public static ActionGraph RandomHealthyCharacter { get { return Random(AllHealthyCharacters); } }
-		public static ActionGraph RandomFriendlyHealthyCharacter { get { return Random(FriendlyHealthyCharacters); } }
-		public static ActionGraph RandomOpponentHealthyCharacter { get { return Random(OpponentHealthyCharacters); } }
 		// Random minion/character - all
 		public static ActionGraph RandomMinion { get { return Random(AllMinions); } }
 		public static ActionGraph RandomFriendlyMinion { get { return Random(FriendlyMinions); } }
@@ -78,6 +73,14 @@ namespace Brimstone
 		public static ActionGraph RandomFriendlyMinionInDeck { get { return Random(FriendlyMinionsInDeck); } }
 		public static ActionGraph RandomOpponentMinionInDeck { get { return Random(OpponentMinionsInDeck); } }
 		public static ActionGraph RandomFriendlyMinionInHand { get { return Random(FriendlyMinionsInHand); } }
+
+		// Random minion/character - healthy
+		public static ActionGraph RandomHealthyMinion { get { return Random(AllHealthyMinions); } }
+		public static ActionGraph RandomFriendlyHealthyMinion { get { return Random(FriendlyHealthyMinions); } }
+		public static ActionGraph RandomOpponentHealthyMinion { get { return Random(OpponentHealthyMinions); } }
+		public static ActionGraph RandomHealthyCharacter { get { return Random(AllHealthyCharacters); } }
+		public static ActionGraph RandomFriendlyHealthyCharacter { get { return Random(FriendlyHealthyCharacters); } }
+		public static ActionGraph RandomOpponentHealthyCharacter { get { return Random(OpponentHealthyCharacters); } }
 		// Actiongraphs continue
 		public static ActionGraph MulliganChoice(ActionGraph Player = null) { return new CreateChoice { Args = { Player, MulliganSelector, (int)ChoiceType.MULLIGAN } }; }
 		public static ActionGraph RandomAmount(ActionGraph Min = null, ActionGraph Max = null) { return new RandomAmount { Args = { Min, Max } }; }
@@ -123,11 +126,8 @@ namespace Brimstone
 		public static ActionGraph Silence(ActionGraph Targets = null) { return new Silence { Args = { Targets } }; }
 		public static ActionGraph Bounce(ActionGraph Targets = null) { return new Bounce { Args = { Targets } }; }
 		public static ActionGraph Destroy(ActionGraph Targets = null) { return new Destroy { Args = { Targets } }; }
-		public static ActionGraph GainMana(ActionGraph Controller = null, ActionGraph Amount = null) { return new GainMana { Args = { Controller, Amount } }; }
-		public static ActionGraph Summon(ActionGraph Controller = null, ActionGraph Entity = null, ActionGraph Amount = null) { return new Summon { Args = { Controller, Entity, Amount } }; }
-		public static ActionGraph InPlaceSwap(ActionGraph Minion1 = null, ActionGraph Minion2 = null) { return new InPlaceSwap { Args = { Minion1, Minion2 } }; }
-		public static ActionGraph GiveTaunt(ActionGraph Targets = null) { return new GiveTaunt { Args = { Targets } }; }
-		public static ActionGraph GainArmour(ActionGraph Targets = null, ActionGraph Amount = null) { return new GainArmour { Args = { Targets, Amount } }; }
+		public static ActionGraph GainMana(ActionGraph Player = null, ActionGraph Amount = null) { return new GainMana { Args = { Player, Amount } }; }
+		public static ActionGraph Summon(ActionGraph Player = null, ActionGraph Entity = null, ActionGraph Amount = null) { return new Summon { Args = { Player, Entity, Amount } }; }
 		public static ActionGraph EquipWeapon(ActionGraph Controller = null, ActionGraph Entity = null) { return new EquipWeapon { Args = { Controller, Entity } }; }
 		public static ActionGraph Discard(ActionGraph Targets = null) { return new Discard { Args = { Targets } }; }
 
@@ -143,11 +143,11 @@ namespace Brimstone
 		}
 
 		// Triggers
-		public static Trigger<IEntity, IEntity> OnBeginTurn(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.BeginTurn, Action, Condition);
+		public static Trigger<IEntity, Game> OnBeginTurn(Condition<IEntity, Game> Condition, ActionGraph Action) {
+			return Trigger<IEntity, Game>.At(TriggerType.PhaseMainStartTriggers, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnEndTurn(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.EndTurn, Action, Condition);
+		public static Trigger<IEntity, Game> OnEndTurn(Condition<IEntity, Game> Condition, ActionGraph Action) {
+			return Trigger<IEntity, Game>.At(TriggerType.PhaseMainEnd, Action, Condition);
 		}
 		public static Trigger<IEntity, IEntity> OnPlay(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
 			return Trigger<IEntity, IEntity>.At(TriggerType.Play, Action, Condition);
@@ -215,12 +215,14 @@ namespace Brimstone
 		public static Trigger<IEntity, IEntity> OnWeaponAttack(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
 			return Trigger<IEntity, IEntity>.At(TriggerType.WeaponAttack, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnPhaseMainNext(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.PhaseMainNext, Action, Condition);
+		public static Trigger<IEntity, Game> OnMainNext(Condition<IEntity, Game> Condition, ActionGraph Action) {
+			return Trigger<IEntity, Game>.At(TriggerType.PhaseMainNext, Action, Condition);
 		}
 
 		// Trigger conditions
 		public static Condition<IEntity, IEntity> IsSelf = new Condition<IEntity, IEntity>((me, other) => me == other);
-		public static Condition<IEntity, IEntity> IsFriendlySpell = new Condition<IEntity, IEntity>((me, spell) => me.Controller == spell.Controller);
+		public static Condition<IEntity, IEntity> IsFriendlySpell = new Condition<IEntity, IEntity>((me, spell) => me.Controller == spell.Controller && spell.Card.Type == CardType.SPELL);
+		public static Condition<IEntity, Game> IsControllersTurn = new Condition<IEntity, Game>((me, game) => me.Controller == game.CurrentPlayer);
+		public static Condition<IEntity, Game> IsOpponentsTurn = new Condition<IEntity, Game>((me, game) => me.Controller == game.CurrentOpponent);
 	}
 }
