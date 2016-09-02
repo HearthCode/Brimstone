@@ -98,8 +98,10 @@ namespace Brimstone
 			Zones = new Zones(this, this);
 
 			// Generate players and empty decks
-			Player1 = new Player(Hero1, (Player1Name.Length > 0) ? Player1Name : "Player 1", 1) {Zone = Board};
-			Player2 = new Player(Hero2, (Player2Name.Length > 0) ? Player2Name : "Player 2", 2) {Zone = Board};
+			Player1 = new Player(Hero1, (Player1Name.Length > 0) ? Player1Name : "Player 1", 1);
+			Player2 = new Player(Hero2, (Player2Name.Length > 0) ? Player2Name : "Player 2", 2);
+			Add(Player1, Player1);
+			Add(Player2, Player2);
 			for (int i = 0; i < 2; i++) {
 				Players[i].Deck = new Deck(this, Players[i].HeroClass, Players[i]);
 			}
@@ -177,6 +179,10 @@ namespace Brimstone
 			// Shuffle player decks
 			foreach (var p in Players)
 				p.Deck.Shuffle();
+
+			// Add players to board
+			foreach (var p in Players)
+				p.Zone = p.Board;
 
 			// Generate player heroes
 			// TODO: Add Start() parameters for non-default hero skins
