@@ -17,9 +17,5 @@ namespace Brimstone
 		public override object Clone() {
 			return new Hero(this);
 		}
-
-		public void GainArmour(int amount) {
-			this[GameTag.ARMOR] += amount;
-		}
 	}
 }
