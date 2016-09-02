@@ -114,7 +114,7 @@ namespace Brimstone
 		}
 
 		public void StartMulligan() {
-			Game.Queue(this, Actions.MulliganChoice(this));
+			Game.Action(this, Actions.MulliganChoice(this));
 		}
 			
 		public IPlayable Give(Card card) {
