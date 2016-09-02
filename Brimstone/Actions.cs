@@ -310,7 +310,7 @@ namespace Brimstone
 #if _ACTIONS_DEBUG
 			DebugLog.WriteLine("Game {0}: {1} is playing {2}", game.GameId, player.FriendlyName, entity.ShortDescription);
 #endif
-			game.ActiveTriggers.Queue(TriggerType.Play, entity);
+			game.ActiveTriggers.Queue(TriggerType.Play, entity); // TODO: Attach this to a tag change
 
 			// TODO: Deaths
 
@@ -325,7 +325,7 @@ namespace Brimstone
 					entity.Zone = entity.Controller.Graveyard;
 			}));
 
-			game.ActiveTriggers.Queue(TriggerType.AfterPlay, entity);
+			game.ActiveTriggers.Queue(TriggerType.AfterPlay, entity); // TODO: Attach this to a tag change
 
 			// TODO: Deaths, other triggers, etc
 
@@ -476,10 +476,7 @@ namespace Brimstone
 					// Minion death
 					if (e is Minion) {
 						var minion = ((Minion)e);
-						minion.IgnoreDamage = true;
 						minion.Damage = 0;
-						minion.IgnoreDamage = false;
-						// TODO: fully implement IGNORE_DAMAGE/IGNORE_DAMAGE_OFF behaviour https://gist.github.com/Patashu/a6b43f765d9ae3605c91 https://gist.github.com/Patashu/de7befdffb329ba12903 https://gist.github.com/Patashu/5eb066f3a2b16c2554bc
 						game.Queue(e, e.Card.Behaviour.Deathrattle);
 					}
 
