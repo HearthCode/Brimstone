@@ -370,6 +370,11 @@ namespace Brimstone
 					}
 					break;
 
+				case GameTag.JUST_PLAYED:
+					if (newValue == 1)
+						Game.ActiveTriggers.Queue(TriggerType.Play, entity);
+					break;
+
 				case GameTag.DAMAGE:
 					if (newValue != 0) { // TODO: Replace with checking if the value increased
 						Game.ActiveTriggers.Queue(TriggerType.Damage, entity);

@@ -301,8 +301,6 @@ namespace Brimstone
 #if _ACTIONS_DEBUG
 			DebugLog.WriteLine("Game {0}: {1} is playing {2}", game.GameId, player.FriendlyName, entity.ShortDescription);
 #endif
-			game.ActiveTriggers.Queue(TriggerType.Play, entity); // TODO: Attach this to a tag change
-
 			// TODO: Deaths
 
 			game.Queue(source, entity.Card.Behaviour.Battlecry);
