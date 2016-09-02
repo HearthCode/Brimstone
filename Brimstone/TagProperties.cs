@@ -334,6 +334,7 @@ namespace Brimstone
 		int AttackDamage { get; set; }
 		bool CantBeTargetedByOpponents { get; set; }
 		int Damage { get; set; }
+		bool IgnoreDamage { get; set; }
 		int Health { get; set; }
 		bool ToBeDestroyed { get; set; }
 		bool MortallyWounded { get; }
@@ -364,6 +365,11 @@ namespace Brimstone
 		public int Damage {
 			get { return this[GameTag.DAMAGE]; }
 			set { this[GameTag.DAMAGE] = value; }
+		}
+
+		public bool IgnoreDamage {
+			get { return this[GameTag.IGNORE_DAMAGE] == 1; }
+			set { this[GameTag.IGNORE_DAMAGE] = value ? 1 : 0; }
 		}
 
 		public int Health {
