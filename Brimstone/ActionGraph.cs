@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Brimstone
@@ -36,6 +36,9 @@ namespace Brimstone
 			return new FixedNumber { Num = x };
 		}
 		public static implicit operator ActionGraph(Card x) {
+			return new FixedCard { Card = x };
+		}
+		public static implicit operator ActionGraph(string x) {
 			return new FixedCard { Card = x };
 		}
 		public static implicit operator ActionGraph(Entity x) {
