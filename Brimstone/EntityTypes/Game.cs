@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using System.Threading.Tasks;
 
 namespace Brimstone
@@ -64,6 +65,14 @@ namespace Brimstone
 
 		public PowerHistory PowerHistory;
 		public ActionQueue ActionQueue;
+
+		// Game events (used for triggers and packet transmission)
+		public delegate void EntityCreateEventDelegate(Game Game, IEntity Entity);
+		public delegate void EntityChangeEventDelegate(Game Game, IEntity Entity, GameTag Tag, int OldValue, int NewValue);
+
+		public event EntityCreateEventDelegate OnEntityCreated;
+		public event EntityChangeEventDelegate OnEntityChanging;
+		public event EntityChangeEventDelegate OnEntityChanged;
 
 		// Game clones n-tree traversal
 		private static int SequenceNumber { get; set; }
@@ -297,19 +306,22 @@ namespace Brimstone
 			// TODO: Gold reward state
 		}
 
-		public void EntityCreated(IEntity e) {
-			PowerHistory?.Add(new CreateEntity(e));
-			ActiveTriggers.Add(e);
+		public void EntityCreated(IEntity entity) {
+			PowerHistory?.Add(new CreateEntity(entity));
+			OnEntityCreated?.Invoke(this, entity);
+			ActiveTriggers.Add(entity);
 		}
 
-		public void EntityChanging(IEntity e, GameTag tag, int oldValue, int newValue, int previousHash) {
+		public void EntityChanging(IEntity entity, GameTag tag, int oldValue, int newValue, int previousHash) {
 			if (Settings.GameHashCaching)
 				_changed = true;
+			OnEntityChanging?.Invoke(this, entity, tag, oldValue, newValue);
 		}
 
 		// TODO: Change this to a delegate event
 		public void EntityChanged(IEntity entity, GameTag tag, int oldValue, int newValue) {
 			PowerHistory?.Add(new TagChange(entity, tag, newValue));
+			OnEntityChanged?.Invoke(this, entity, tag, oldValue, newValue);
 
 			// Tag change triggers
 			switch (tag) {
