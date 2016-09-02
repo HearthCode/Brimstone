@@ -246,6 +246,9 @@ namespace Brimstone
 				OrderedHash = 17;
 				UnorderedHash = 0;
 			}
+			// Subscribe to game events
+			Game.OnEntityCreated += (g, e) => Add(new CreateEntity(e));
+			Game.OnEntityChanged += (g, e, t, o, n) => Add(new TagChange(e, t, n));
 		}
 
 		public void Add(PowerAction a) {

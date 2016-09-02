@@ -203,7 +203,6 @@ namespace Brimstone
 				// TODO: Do something exciting with turn start triggers for the current player here
 				NextStep = Step.MAIN_START;
 				Step = Step.MAIN_START;
-				// TODO: DEATHs block for eg. Doomsayer
 			}
 		}
 
@@ -307,7 +306,6 @@ namespace Brimstone
 		}
 
 		public void EntityCreated(IEntity entity) {
-			PowerHistory?.Add(new CreateEntity(entity));
 			OnEntityCreated?.Invoke(this, entity);
 			ActiveTriggers.Add(entity);
 		}
@@ -320,7 +318,6 @@ namespace Brimstone
 
 		// TODO: Change this to a delegate event
 		public void EntityChanged(IEntity entity, GameTag tag, int oldValue, int newValue) {
-			PowerHistory?.Add(new TagChange(entity, tag, newValue));
 			OnEntityChanged?.Invoke(this, entity, tag, oldValue, newValue);
 
 			// Tag change triggers
