@@ -16,6 +16,7 @@ namespace Brimstone
 		public static ActionGraph BeginTurn { get { return new BeginTurn(); } }
 		public static ActionGraph BeginTurnForPlayer { get { return new BeginTurnForPlayer(); } }
 		public static ActionGraph EndTurn { get { return new EndTurn(); } }
+		public static ActionGraph EndTurnForPlayer { get { return new EndTurnForPlayer(); } }
 		public static ActionGraph Concede(ActionGraph Player = null) { return new Concede { Args = { Player } }; }
 
 		public static ActionGraph Draw(ActionGraph Player = null) { return new Draw { Args = { Player } }; }

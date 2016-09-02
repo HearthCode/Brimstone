@@ -196,22 +196,20 @@ namespace Brimstone
 		}
 	}
 
+	// Runs when STEP = MAIN_END
+	public class EndTurnForPlayer : QueueAction
+	{
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			game.NextStep = Step.MAIN_CLEANUP;
+			return ActionResult.None;
+		}
+	}
+
+	// Runs when STEP = MAIN_NEXT
 	public class EndTurn : QueueAction
 	{
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
 		{
-			game.Step = Step.MAIN_END;
-			
-			// TODO: DEATHs block for e.g. Baron Geddon
-
-			game.NextStep = Step.MAIN_CLEANUP;
-			game.Step = Step.MAIN_CLEANUP;
-
-			// TODO: reset JUST_PLAYEDs for current player to zero here
-
-			game.NextStep = Step.MAIN_NEXT;
-			game.Step = Step.MAIN_NEXT;
-
 			// This is probably going to be used to give players extra turns later
 			game.CurrentPlayer.NumTurnsLeft = 0;
 			game.CurrentOpponent.NumTurnsLeft = 1;
@@ -220,8 +218,6 @@ namespace Brimstone
 			game.Turn++;
 
 			game.NextStep = Step.MAIN_READY;
-			game.Queue(game, Actions.BeginTurn);
-
 			return ActionResult.None;
 		}
 	}

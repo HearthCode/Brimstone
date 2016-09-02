@@ -100,8 +100,15 @@ namespace Brimstone
 
 			Game.ActiveTriggers.At(TriggerType.PhaseMainAction, (Action<IEntity>) (_ => {
 				// At this point the player is offered options to play via the Options property
-				// The game step will not advance until there are no options remaining
+				// The game step will not advance until the player chooses to end turn
 				Game.NextStep = Step.MAIN_END;
+			}), this, Actions.IsControllersTurn);
+
+			Game.ActiveTriggers.At(TriggerType.PhaseMainEnd, Actions.EndTurnForPlayer, this, Actions.IsControllersTurn);
+
+			Game.ActiveTriggers.At(TriggerType.PhaseMainCleanup, (Action<IEntity>) (_ => {
+				// TODO: reset JUST_PLAYEDs for current player to zero here
+				Game.NextStep = Step.MAIN_NEXT;
 			}), this, Actions.IsControllersTurn);
 		}
 

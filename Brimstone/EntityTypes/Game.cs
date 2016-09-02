@@ -170,8 +170,8 @@ namespace Brimstone
 			var nextStep = NextStep;
 			var step = Step;
 			if (nextStep != step) {
-				// Only advance to end turn when current player has no options remaining
-				if (nextStep != Step.MAIN_END || !CurrentPlayer.Options.Any())
+				// Only advance to end turn when current player chooses to
+				if (nextStep != Step.MAIN_END)
 				{
 #if _GAME_DEBUG
 					DebugLog.WriteLine("Advancing game step from " + step + " to " + nextStep);
@@ -249,6 +249,8 @@ namespace Brimstone
 			}));
 			ActiveTriggers.At<IEntity, IEntity>(TriggerType.PhaseMainReady, Actions.BeginTurn);
 
+			ActiveTriggers.At<IEntity, IEntity>(TriggerType.PhaseMainNext, Actions.EndTurn);
+
 			// Set game state
 			State = GameState.RUNNING;
 			foreach (var p in Players)
@@ -261,8 +263,11 @@ namespace Brimstone
 		public void EndTurn() {
 			if (Player1.Choice != null || Player2.Choice != null)
 				throw new ChoiceException();
-
-			Action(this, Actions.EndTurn);
+#if _GAME_DEBUG
+			DebugLog.WriteLine("Advancing game step from " + Step + " to " + NextStep);
+#endif
+			Step = Step.MAIN_END;
+			ActionQueue.ProcessAll();
 		}
 
 		public void GameWon()
