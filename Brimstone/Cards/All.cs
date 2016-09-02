@@ -29,13 +29,13 @@ namespace Brimstone
 
 		// Mad Bomber
 		public static Behaviour EX1_082 = new Behaviour {
-			Battlecry = Damage(RandomHealthyCharacter, 1) * 3
+			Battlecry = Damage(RandomHealthyCharacter, 1) * 3 // TODO: Should be RandomHealthyCharacter - Self
 		};
 
 		// Demolisher
 		public static Behaviour EX1_102 = new Behaviour {
 			Triggers = {
-				OnBeginTurn(Controller, Damage(RandomOpponentHealthyCharacter, 2))
+				OnBeginTurn(IsControllersTurn, Damage(RandomOpponentHealthyCharacter, 2))
 			}
 		};
 
@@ -74,7 +74,7 @@ namespace Brimstone
 
 		// Silver Hand Knight
 		public static Behaviour CS2_151 = new Behaviour {
-			Battlecry = Summon(Controller, "CS2_152")
+			Battlecry = Summon(Controller, "Squire")
 		};
 
 		// Elven Archer
@@ -122,13 +122,19 @@ namespace Brimstone
 
 		// Dragonling Mechanic
 		public static Behaviour EX1_025 = new Behaviour {
-			Battlecry = Summon(Controller, "EX1_025t")
+			Battlecry = Summon(Controller, "Mechanical Dragonling")
 		};
 
 		// Leper Gnome
-		public static Behaviour EX1_046 = new Behaviour {
+		public static Behaviour EX1_029 = new Behaviour {
 			Deathrattle = Damage(OpponentHero, 2)
 		};
+
+		// Dark Iron Dwarf
+		/*public static Behaviour EX1_046 = new Behaviour {
+			Battlecry =
+		};*/
+		// TODO: Enchantments (EX1_046e)
 
 		// Spellbreaker
 		public static Behaviour EX1_048 = new Behaviour {
@@ -146,9 +152,10 @@ namespace Brimstone
 		};
 
 		// Acidic Swamp Ooze
-		public static Behaviour EX1_066 = new Behaviour {
+		/*public static Behaviour EX1_066 = new Behaviour {
 			Battlecry = Destroy(OpponentWeapon)
-		};
+		};*/
+		// TODO: Weapon selectors
 
 		// Loot Hoarder
 		public static Behaviour EX1_096 = new Behaviour {
@@ -169,12 +176,12 @@ namespace Brimstone
 
 		// Murloc Tidehunter
 		public static Behaviour EX1_506 = new Behaviour {
-			Battlecry = Summon(Controller, "EX1_506a")
+			Battlecry = Summon(Controller, "Murloc Scout")
 		};
 
 		// Harvest Golem
 		public static Behaviour EX1_556 = new Behaviour {
-			Deathrattle = Summon(Controller, "skele21")
+			Deathrattle = Summon(Controller, "Damaged Golem")
 		};
 
 		// Priestess of Elune
@@ -241,9 +248,10 @@ namespace Brimstone
 		// TODO: Conditional selectors, Enchantments (EX1_055o)
 
 		// Sunfury Protector
-		public static Behaviour EX1_058 = new Behaviour {
-			Battlecry = GiveTaunt(AdjacentMinions)
-		};
+		/*public static Behaviour EX1_058 = new Behaviour {
+			Battlecry = SetTag(AdjacentMinions, GameTag.TAUNT, 1)
+		};*/
+		// TODO: Tag setting action
 
 		// Crazed Alchemist
 		// public static Behaviour EX1_059 = new Behaviour {
@@ -299,7 +307,7 @@ namespace Brimstone
 		// Imp Master
 		public static Behaviour EX1_597 = new Behaviour {
 			Triggers = {
-				OnEndTurn(Controller, Damage(Self, 1).Then(Summon(Controller, "EX1_598")))
+				OnEndTurn(IsControllersTurn, Damage(Self, 1).Then(Summon(Controller, "EX1_598")))
 			}
 		};
 
@@ -322,9 +330,10 @@ namespace Brimstone
 		};
 
 		// Bloodsail Corsair
-		public static Behaviour New1_025 = new Behaviour {
+		/*public static Behaviour New1_025 = new Behaviour {
 			Battlecry = Damage(OpponentWeapon, 1)
-		};
+		};*/
+		// TODO: Weapon selectors
 
 		// Violet Teacher
 		// public static Behaviour NEW1_026 = new Behaviour {
@@ -386,11 +395,12 @@ namespace Brimstone
 		};
 
 		// Armorsmith
-		public static Behaviour EX1_402 = new Behaviour {
+		/*public static Behaviour EX1_402 = new Behaviour {
 			Triggers = {
 				OnDamage(FriendlyMinions, GainArmour(FriendlyHero, 1))
 			}
-		};
+		};*/
+		// TODO: Tag-setting action
 
 		// Imp Gang Boss
 		public static Behaviour BRM_006 = new Behaviour {
@@ -401,12 +411,12 @@ namespace Brimstone
 
 		// Arathi Weaponsmith
 		public static Behaviour EX1_398 = new Behaviour {
-			Battlecry = EquipWeapon(Controller, "EX1_398t")
+			Battlecry = EquipWeapon(Controller, "Battle Axe")
 		};
 
 		//Explosive Sheep
 		public static Behaviour GVG_076 = new Behaviour {
-			Battlecry = Damage(AllMinions, 2)
+			Deathrattle = Damage(AllMinions, 2)
 		};
 
 		//Deathlord
@@ -418,6 +428,13 @@ namespace Brimstone
 		public static Behaviour EX1_614 = new Behaviour {
 			Triggers = {
 				OnPlay(Controller, Summon(Controller, "EX1_614t"))
+			}
+		};
+
+		//Baron Geddon
+		public static Behaviour EX1_249 = new Behaviour {
+			Triggers = {
+				OnEndTurn(IsControllersTurn, Damage(AllCharacters, 2)) //TODO: Should be AllCharacters - Self
 			}
 		};
 	}
