@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +10,12 @@ namespace Brimstone
 {
 	public static class Cards
 	{
-		private static CardDefs data = new CardDefs();
+		static Cards()
+		{
+			data = new CardDefs();
+			data.CompileBehaviours();
+		}
+		private static CardDefs data;
 		
 		public static Card FromId(string cardId) {
 			if (data.Cards.ContainsKey(cardId))
@@ -115,15 +120,7 @@ namespace Brimstone
 							c.Name = tag.Value;
 					}
 				}
-				// Get behaviour script and compile ActionGraph for cards with behaviours
-				// TODO: Allow fetch from card name as well as ID
-				var b = typeof(BehaviourScripts).GetField(c.Id, BindingFlags.Static | BindingFlags.Public);
-				if (b != null) {
-					var script = b.GetValue(null) as Behaviour;
-					c.Behaviour = CompiledBehaviour.Compile(script);
-				}
-				else
-					c.Behaviour = new CompiledBehaviour();
+				
 				Cards.Add(c.Id, c);
 			}
 
@@ -146,6 +143,20 @@ namespace Brimstone
 				Requirements = new Dictionary<PlayRequirements, int>(),
 				Behaviour = null
 			});
+		}
+
+		internal void CompileBehaviours() {
+			foreach (var c in Cards.Values) {
+				// Get behaviour script and compile ActionGraph for cards with behaviours
+				// TODO: Allow fetch from card name as well as ID
+				var b = typeof(BehaviourScripts).GetField(c.Id, BindingFlags.Static | BindingFlags.Public);
+				if (b != null) {
+					var script = b.GetValue(null) as Behaviour;
+					c.Behaviour = CompiledBehaviour.Compile(script);
+				}
+				else
+					c.Behaviour = new CompiledBehaviour();
+			}
 		}
 
 		public IEnumerator<Card> GetEnumerator() {
