@@ -41,8 +41,8 @@ namespace Test1
 			var sw = new Stopwatch();
 			sw.Start();
 
-			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Actions.Damage(Actions.RandomOpponentCharacter, 1) * 2;
-			Cards.FromName("Boom Bot").Behaviour.Deathrattle = Actions.Damage(Actions.RandomOpponentMinion, Actions.RandomAmount(1, 4));
+			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Actions.Damage(Actions.RandomOpponentHealthyCharacter, 1) * 2;
+			Cards.FromName("Boom Bot").Behaviour.Deathrattle = Actions.Damage(Actions.RandomOpponentHealthyMinion, Actions.RandomAmount(1, 4));
 
 			// Create first layer of nodes underneath the root node
 			// and add them to the search queue, then do breadth-first search

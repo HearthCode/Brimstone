@@ -109,8 +109,8 @@ namespace Brimstone.Benchmark
 		}
 
 		private void _missilesUniqueStates(Game g, int it, int missiles, ITreeActionWalker search) {
-			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Actions.Damage(Actions.RandomOpponentCharacter, 1) * missiles;
-			Cards.FromName("Boom Bot").Behaviour.Deathrattle = Actions.Damage(Actions.RandomOpponentMinion, Actions.RandomAmount(1, 4));
+			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Actions.Damage(Actions.RandomOpponentHealthyCharacter, 1) * missiles;
+			Cards.FromName("Boom Bot").Behaviour.Deathrattle = Actions.Damage(Actions.RandomOpponentHealthyMinion, Actions.RandomAmount(1, 4));
 
 			var ArcaneMissiles = g.CurrentPlayer.Give("Arcane Missiles");
 			var tree = RandomOutcomeSearch.Build(
