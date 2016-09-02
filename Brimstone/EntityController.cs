@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -130,8 +130,26 @@ namespace Brimstone
 						case Step.BEGIN_MULLIGAN:
 							Game.ActiveTriggers.Queue(TriggerType.BeginMulligan, entity);
 							break;
+						case Step.MAIN_NEXT:
+							Game.ActiveTriggers.Queue(TriggerType.PhaseMainNext, entity);
+							break;
 						case Step.MAIN_READY:
 							Game.ActiveTriggers.Queue(TriggerType.PhaseMainReady, entity);
+							break;
+						case Step.MAIN_START_TRIGGERS:
+							Game.ActiveTriggers.Queue(TriggerType.PhaseMainStartTriggers, entity);
+							break;
+						case Step.MAIN_START:
+							Game.ActiveTriggers.Queue(TriggerType.PhaseMainStart, entity);
+							break;
+						case Step.MAIN_ACTION:
+							Game.ActiveTriggers.Queue(TriggerType.PhaseMainAction, entity);
+							break;
+						case Step.MAIN_END:
+							Game.ActiveTriggers.Queue(TriggerType.PhaseMainEnd, entity);
+							break;
+						case Step.MAIN_CLEANUP:
+							Game.ActiveTriggers.Queue(TriggerType.PhaseMainCleanup, entity);
 							break;
 					}
 					break;
@@ -149,7 +167,9 @@ namespace Brimstone
 					break;
 
 				case GameTag.DAMAGE:
-					Game.ActiveTriggers.Queue(TriggerType.Damage, entity);
+					if (entity is ICharacter ? !((ICharacter)entity).IgnoreDamage : false) {
+						Game.ActiveTriggers.Queue(TriggerType.Damage, entity);
+					}
 					break;
 			}
 		}
