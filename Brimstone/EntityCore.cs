@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -167,6 +167,7 @@ namespace Brimstone
 				return _entity[t];
 			}
 			set {
+				if (value < 0) value = 0;
 				// Ignore unchanged data
 				if (_entity.Tags.ContainsKey(t) && _entity[t] == value)
 					return;
