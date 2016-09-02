@@ -13,6 +13,8 @@ namespace Brimstone
 
 	public class Actions {
 		// Factory functions for DSL syntax
+		public static ActionGraph StartGame(int FirstPlayer = 0, bool SkipMulligan = false) { return new StartGame { FirstPlayer = FirstPlayer, SkipMulligan = SkipMulligan}; }
+		public static ActionGraph BeginMulligan { get { return new BeginMulligan(); } }
 		public static ActionGraph BeginTurn { get { return new BeginTurn(); } }
 		public static ActionGraph BeginTurnForPlayer { get { return new BeginTurnForPlayer(); } }
 		public static ActionGraph EndTurn { get { return new EndTurn(); } }

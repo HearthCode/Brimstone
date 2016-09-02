@@ -136,6 +136,56 @@ namespace Brimstone
 		}
 	}
 
+	// Runs when STATE = RUNNING
+	public class StartGame : QueueAction
+	{
+		public int FirstPlayer { get; set; }
+		public bool SkipMulligan { get; set; }
+
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+			// Pick a random starting player
+			if (FirstPlayer == 0)
+				game.FirstPlayer = game.Players[RNG.Between(0, 1)];
+			else
+				game.FirstPlayer = game.Players[FirstPlayer - 1];
+			game.CurrentPlayer = game.FirstPlayer;
+
+			// Set turn counter
+			game.Turn = 1;
+
+			// Draw cards
+			foreach (var p in game.Players)
+			{
+				p.Draw((game.FirstPlayer == p ? 3 : 4));
+				p.NumTurnsLeft = 1;
+
+				// Give 2nd player the coin
+				if (p != game.FirstPlayer)
+					p.Give("The Coin");
+			}
+
+			// TODO: Set TIMEOUT for each player here if desired
+
+			if (!SkipMulligan)
+				game.NextStep = Step.BEGIN_MULLIGAN;
+			else
+				game.NextStep = Step.MAIN_READY;
+
+			return ActionResult.None;
+		}
+	}
+
+	// Runs when STEP = BEGIN_MULLIGAN
+	public class BeginMulligan : QueueAction
+	{
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
+		{
+			foreach (var p in game.Players)
+				p.StartMulligan();
+			return ActionResult.None;
+		}
+	}
+
 	// Runs when STEP = MAIN_READY
 	public class BeginTurn : QueueAction
 	{

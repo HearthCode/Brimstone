@@ -1,4 +1,4 @@
-#define _GAME_DEBUG
+//#define _GAME_DEBUG
 
 using System;
 using System.Collections.Generic;
@@ -224,45 +224,9 @@ namespace Brimstone
 			// TODO: Insert event call precisely here so our server can iterate all created entities
 
 			// Attach all game triggers
-			// TODO: Clean these up into named functions
-			ActiveTriggers.At<IEntity, IEntity>(TriggerType.GameStart, (Action<IEntity>)(_ =>
-			{;
-				// Pick a random starting player
-				if (FirstPlayer == 0)
-					this.FirstPlayer = Players[RNG.Between(0, 1)];
-				else
-					this.FirstPlayer = Players[FirstPlayer - 1];
-				CurrentPlayer = this.FirstPlayer;
-
-				// Set turn counter
-				Turn = 1;
-
-				// Draw cards
-				foreach (var p in Players)
-				{
-					p.Draw((this.FirstPlayer == p ? 3 : 4));
-					p.NumTurnsLeft = 1;
-
-					// Give 2nd player the coin
-					if (p != this.FirstPlayer)
-						p.Give("The Coin");
-				}
-
-				// TODO: Set TIMEOUT for each player here if desired
-
-				if (!SkipMulligan)
-					NextStep = Step.BEGIN_MULLIGAN;
-				else
-					NextStep = Step.MAIN_READY;
-			}));
-
-			ActiveTriggers.At<IEntity, IEntity>(TriggerType.BeginMulligan, (Action<IEntity>) (_ =>
-			{
-				foreach (var p in Players)
-					p.StartMulligan();
-			}));
+			ActiveTriggers.At<IEntity, IEntity>(TriggerType.GameStart, Actions.StartGame(FirstPlayer, SkipMulligan));
+			ActiveTriggers.At<IEntity, IEntity>(TriggerType.BeginMulligan, Actions.BeginMulligan);
 			ActiveTriggers.At<IEntity, IEntity>(TriggerType.PhaseMainReady, Actions.BeginTurn);
-
 			ActiveTriggers.At<IEntity, IEntity>(TriggerType.PhaseMainNext, Actions.EndTurn);
 
 			// Set game state
