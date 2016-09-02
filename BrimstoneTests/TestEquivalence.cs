@@ -354,7 +354,7 @@ namespace BrimstoneTests
 			Assert.AreEqual(new HashSet<TagChange> { new TagChange(1, GameTag.STEP, (int)Step.MAIN_ACTION) }, game1.PowerHistory.CrunchedDelta(pa));
 
 			// Same game, change list is equal to the exact local delta
-			Assert.AreEqual(game2.PowerHistory.Delta.Count, game2.PowerHistory.DeltaSince(game2).Count);
+			Assert.AreEqual(game2.PowerHistory.Delta.Count, game2.PowerHistory.DeltaSince(game2).Count());
 
 			// Game1 does not derive from Game2
 			Assert.IsNull(game1.PowerHistory.DeltaSince(game2));
@@ -407,8 +407,8 @@ namespace BrimstoneTests
 
 			// (creating an entity and putting it in the player's hand creates 3 actions)
 			Assert.AreEqual(6, game13.PowerHistory.Delta.Count);
-			Assert.AreEqual(1 + 3, game14.PowerHistory.DeltaSince(game13).Count);
-			Assert.AreEqual(1 + 3, game15.PowerHistory.DeltaSince(game13).Count);
+			Assert.AreEqual(1 + 3, game14.PowerHistory.DeltaSince(game13).Count());
+			Assert.AreEqual(1 + 3, game15.PowerHistory.DeltaSince(game13).Count());
 
 			// Change a base game and its branched game at the same time with different ordering
 			game9.Player1.Give("Bloodfen Raptor");

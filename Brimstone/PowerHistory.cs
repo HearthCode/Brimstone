@@ -270,25 +270,25 @@ namespace Brimstone
 				OnPowerAction(this, new PowerActionEventArgs(Game, a));
 		}
 
-		public List<PowerAction> DeltaTo(int childBranchPoint) {
-			return Delta.Take(childBranchPoint - ParentBranchEntry).ToList();
+		public IEnumerable<PowerAction> DeltaTo(int childBranchPoint) {
+			return Delta.Take(childBranchPoint - ParentBranchEntry);
 		}
 
 		// Return the PowerHistory delta from the point where the specified game was created
-		public List<PowerAction> DeltaSince(Game game) {
+		public IEnumerable<PowerAction> DeltaSince(Game game) {
 			if (ReferenceEquals(game, null))
 				return null;
 
 			if (ReferenceEquals(game, Game))
 				return Delta;
 
-			var delta = new List<PowerAction>();
+			IEnumerable<PowerAction> delta = null;
 
 			bool found = false;
 			int branchPoint = SequenceNumber;
 
 			for (Game g = Game; g != null && !found; g = g.PowerHistory.Parent) {
-				delta = g.PowerHistory.DeltaTo(branchPoint).Concat(delta).ToList();
+				delta = delta != null ? g.PowerHistory.DeltaTo(branchPoint).Concat(delta) : g.PowerHistory.DeltaTo(branchPoint);
 				branchPoint = g.PowerHistory.ParentBranchEntry;
 				found = g == game;
 			}
@@ -296,9 +296,9 @@ namespace Brimstone
 		}
 
 		// Crunch changes to get only latest changed tags for each changed entity
-		public HashSet<TagChange> CrunchedDelta(List<PowerAction> delta) {
+		public HashSet<TagChange> CrunchedDelta(IEnumerable<PowerAction> delta) {
 			var collapsedDelta = new HashSet<TagChange>(new CompareEntityAndTagName());
-			foreach (var entry in delta.Reverse<PowerAction>()) {
+			foreach (var entry in delta.Reverse()) {
 				// TODO: All the other PowerAction types
 				// Ignore BlockStart and BlockEnd
 				if (entry is CreateEntity) {
