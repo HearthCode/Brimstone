@@ -167,7 +167,7 @@ namespace Brimstone
 					break;
 
 				case GameTag.DAMAGE:
-					if (entity is ICharacter ? !((ICharacter)entity).IgnoreDamage : false) {
+					if (value != 0) { // TODO: Replace with checking if the value increased
 						Game.ActiveTriggers.Queue(TriggerType.Damage, entity);
 					}
 					break;
