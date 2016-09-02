@@ -205,6 +205,9 @@ namespace Brimstone
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
 		{
 			game.Step = Step.MAIN_END;
+			
+			// TODO: DEATHs block for e.g. Baron Geddon
+
 			game.NextStep = Step.MAIN_CLEANUP;
 			game.Step = Step.MAIN_CLEANUP;
 
@@ -307,6 +310,10 @@ namespace Brimstone
 #if _ACTIONS_DEBUG
 			DebugLog.WriteLine("Game {0}: {1} is playing {2}", game.GameId, player.FriendlyName, entity.ShortDescription);
 #endif
+			game.ActiveTriggers.Queue(TriggerType.Play, entity);
+
+			// TODO: Deaths
+
 			game.Queue(source, entity.Card.Behaviour.Battlecry);
 			game.Queue(source, new Action<IEntity>(_ =>
 			{
@@ -317,6 +324,11 @@ namespace Brimstone
 				if (entity is Spell)
 					entity.Zone = entity.Controller.Graveyard;
 			}));
+
+			game.ActiveTriggers.Queue(TriggerType.AfterPlay, entity);
+
+			// TODO: Deaths, other triggers, etc
+
 			return (Entity) entity;
 		}
 	}
@@ -336,7 +348,7 @@ namespace Brimstone
 					game.Environment.LastDamaged = e;
 					e.Damage += args[DAMAGE];
 
-					// TODO: Handle Predamage, on-damage triggers and more, full specification here https://hearthstone.gamepedia.com/Advanced_rulebook#Damage_and_Healing
+					// TODO: Handle Spell Damage +1, Prophet Velen, Fallen Hero, Predamage, on-damage triggers and more, full specification here https://hearthstone.gamepedia.com/Advanced_rulebook#Damage_and_Healing
 				}
 			return ActionResult.None;
 		}
@@ -391,7 +403,7 @@ namespace Brimstone
 
 	public class GainMana : QueueAction
 	{
-		public const int CONTROLLER = 0;
+		public const int PLAYER = 0;
 		public const int AMOUNT = 1;
 
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
@@ -401,7 +413,7 @@ namespace Brimstone
 
 	public class Summon : QueueAction
 	{
-		public const int CONTROLLER = 0;
+		public const int PLAYER = 0;
 		public const int ENTITY = 1;
 		public const int AMOUNT = 2;
 
@@ -416,46 +428,6 @@ namespace Brimstone
 			// 5) Deathrattle, known amount: the position the minion died in (Haunted Creeper, Soul of the Forest, Ancestral Spirit) see https://hearthstone.gamepedia.com/Advanced_rulebook#Where_do_Minions_summoned_by_Deathrattles_spawn.3F
 			// 6) Other: All to the far right (Reincarnate, Resurrect)
 			// For edge cases where the played minion died or returned to hand before its summoning Battlecry resolves, see https://www.youtube.com/watch?v=nuzvKVL2Vlg
-		}
-	}
-
-	public class InPlaceSwap : QueueAction
-	{
-		public const int MINION1 = 0;
-		public const int MINION2 = 1;
-
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
-			throw new NotImplementedException(); // TODO: implement https://www.youtube.com/watch?v=YhJlDd7NxNg + log in description
-		}
-	}
-
-	public class GiveTaunt : QueueAction
-	{
-		public const int TARGETS = 0;
-
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
-			if (args[TARGETS].HasResult)
-				foreach (ICharacter e in args[TARGETS]) {
-					DebugLog.WriteLine("{0} is given Taunt", e.ShortDescription);
-
-					e.HasTaunt = true;
-				}
-			return ActionResult.None;
-		}
-	}
-
-	public class GainArmour : QueueAction
-	{
-		public const int TARGETS = 0;
-		public const int AMOUNT = 1;
-
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
-			if (args[TARGETS].HasResult)
-				foreach (Hero e in args[TARGETS]) {
-					DebugLog.WriteLine("{0} gains {1} Armor", e.ShortDescription, args[AMOUNT]);
-					e.GainArmour(args[AMOUNT]);
-				}
-			return ActionResult.None;
 		}
 	}
 
@@ -503,7 +475,11 @@ namespace Brimstone
 
 					// Minion death
 					if (e is Minion) {
-						((Minion) e).Damage = 0;
+						var minion = ((Minion)e);
+						minion.IgnoreDamage = true;
+						minion.Damage = 0;
+						minion.IgnoreDamage = false;
+						// TODO: fully implement IGNORE_DAMAGE/IGNORE_DAMAGE_OFF behaviour https://gist.github.com/Patashu/a6b43f765d9ae3605c91 https://gist.github.com/Patashu/de7befdffb329ba12903 https://gist.github.com/Patashu/5eb066f3a2b16c2554bc
 						game.Queue(e, e.Card.Behaviour.Deathrattle);
 					}
 
