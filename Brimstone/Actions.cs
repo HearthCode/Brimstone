@@ -431,18 +431,6 @@ namespace Brimstone
 		}
 	}
 
-	public class EquipWeapon : QueueAction
-	{
-		public const int CONTROLLER = 0;
-		public const int ENTITY = 1;
-
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
-			throw new NotImplementedException(); // TODO: implement (equipping over a weapon destroys it and removes it from play).
-
-			// Possibly this could just be a special case of Summon, by the way. That's how Fireplace does it at least.
-		}
-	}
-
 	public class Discard : QueueAction
 	{
 		public const int TARGETS = 0;
