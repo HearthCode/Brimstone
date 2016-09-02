@@ -78,39 +78,17 @@ namespace Brimstone
 		}
 
 		public void Start() {
-			// TODO: Clean these up into named functions
-			Game.ActiveTriggers.At(TriggerType.DealMulligan, (Action<IEntity>) (_ => {
-				// Perform mulligan
-				foreach (var e in Choice.Discarding)
-					e.ZoneSwap(Deck[RNG.Between(1, Deck.Count)]);
-				Choice = null;
-
-				MulliganState = MulliganState.WAITING;
-			}), this, Actions.IsSelf);
-
-			Game.ActiveTriggers.At(TriggerType.MulliganWaiting, (Action<IEntity>) (_ => {
-				MulliganState = MulliganState.DONE;
-
-				// Start main game if both players have completed mulligan
-				if (Opponent.MulliganState == MulliganState.DONE)
-					Game.NextStep = Step.MAIN_READY;
-			}), this, Actions.IsSelf);
-
+			// Attach all per-player triggers
+			Game.ActiveTriggers.At(TriggerType.DealMulligan, Actions.PerformMulligan, this, Actions.IsSelf);
+			Game.ActiveTriggers.At(TriggerType.MulliganWaiting, Actions.WaitForMulliganComplete, this, Actions.IsSelf);
 			Game.ActiveTriggers.At(TriggerType.PhaseMainStart, Actions.BeginTurnForPlayer, this, Actions.IsControllersTurn);
-
 			Game.ActiveTriggers.At(TriggerType.PhaseMainAction, (Action<IEntity>) (_ => {
 				// At this point the player is offered options to play via the Options property
 				// The game step will not advance until the player chooses to end turn
 				Game.NextStep = Step.MAIN_END;
 			}), this, Actions.IsControllersTurn);
-
 			Game.ActiveTriggers.At(TriggerType.PhaseMainEnd, Actions.EndTurnForPlayer, this, Actions.IsControllersTurn);
-
-			Game.ActiveTriggers.At(TriggerType.PhaseMainCleanup, (Action<IEntity>) (_ => {
-				foreach (IPlayable e in Game.Entities.Where(x => x is IPlayable && ((IPlayable)x).JustPlayed && x.Controller == Game.CurrentPlayer))
-					e.JustPlayed = false;
-				Game.NextStep = Step.MAIN_NEXT;
-			}), this, Actions.IsControllersTurn);
+			Game.ActiveTriggers.At(TriggerType.PhaseMainCleanup, Actions.EndTurnCleanupForPlayer, this, Actions.IsControllersTurn);
 		}
 
 		public void StartMulligan() {

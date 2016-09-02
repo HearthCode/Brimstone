@@ -175,6 +175,38 @@ namespace Brimstone
 		}
 	}
 
+	// Run for each player when MULLIGAN_STATE = DEALING
+	public class PerformMulligan : QueueAction
+	{
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
+		{
+			var player = source as Player;
+
+			// Perform mulligan
+			foreach (var e in player.Choice.Discarding)
+				e.ZoneSwap(player.Deck[RNG.Between(1, player.Deck.Count)]);
+			player.Choice = null;
+
+			player.MulliganState = MulliganState.WAITING;
+			return ActionResult.None;
+		}
+	}
+
+	// Run for each player when MULLIGAN_STATE = WAITING
+	public class WaitForMulliganComplete : QueueAction
+	{
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
+		{
+			var player = source as Player;
+			player.MulliganState = MulliganState.DONE;
+
+			// Start main game if both players have completed mulligan
+			if (player.Opponent.MulliganState == MulliganState.DONE)
+				game.NextStep = Step.MAIN_READY;
+			return ActionResult.None;
+		}
+	}
+
 	// Runs when STEP = BEGIN_MULLIGAN
 	public class BeginMulligan : QueueAction
 	{
@@ -251,6 +283,18 @@ namespace Brimstone
 	{
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			game.NextStep = Step.MAIN_CLEANUP;
+			return ActionResult.None;
+		}
+	}
+
+	// Run when STEP = MAIN_CLEANUP
+	public class EndTurnCleanupForPlayer : QueueAction
+	{
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
+		{
+			foreach (IPlayable e in game.Entities.Where(x => x is IPlayable && ((IPlayable)x).JustPlayed && x.Controller == source))
+				e.JustPlayed = false;
+			game.NextStep = Step.MAIN_NEXT;
 			return ActionResult.None;
 		}
 	}
