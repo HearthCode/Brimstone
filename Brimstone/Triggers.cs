@@ -9,8 +9,6 @@ namespace Brimstone
 	// TODO: We need to supply the trigger indexes to Game.ActionBlock
 	public enum TriggerType
 	{
-		BeginTurn,
-		EndTurn,
 		Play,
 		AfterPlay,
 		Spellbender,
@@ -152,9 +150,11 @@ namespace Brimstone
 			foreach (var trigger in Triggers[type]) {
 				var owningEntity = Game.Entities[trigger.EntityId];
 
-				// Test trigger condition
-				if (trigger.Condition?.Eval(owningEntity, source) ?? true)
-					Game.ActionBlock(BlockType.TRIGGER, owningEntity, trigger.Action);
+				// Only allow triggers to trigger in PLAY for now. TODO: Add support for triggers in HAND etc, or make it so triggers attach/detach only while they're in the correct zone
+				if (owningEntity.Zone.Type == Zone.PLAY)
+					// Test trigger condition
+					if (trigger.Condition?.Eval(owningEntity, source) ?? true)
+						Game.ActionBlock(BlockType.TRIGGER, owningEntity, trigger.Action);
 			}
 		}
 
