@@ -107,7 +107,8 @@ namespace Brimstone
 			Game.ActiveTriggers.At(TriggerType.PhaseMainEnd, Actions.EndTurnForPlayer, this, Actions.IsControllersTurn);
 
 			Game.ActiveTriggers.At(TriggerType.PhaseMainCleanup, (Action<IEntity>) (_ => {
-				// TODO: reset JUST_PLAYEDs for current player to zero here
+				foreach (IPlayable e in Game.Entities.Where(x => x is IPlayable && ((IPlayable)x).JustPlayed && x.Controller == Game.CurrentPlayer))
+					e.JustPlayed = false;
 				Game.NextStep = Step.MAIN_NEXT;
 			}), this, Actions.IsControllersTurn);
 		}
