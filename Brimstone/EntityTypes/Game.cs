@@ -1,4 +1,4 @@
-﻿#define _GAME_DEBUG
+#define _GAME_DEBUG
 
 using System;
 using System.Collections.Generic;
@@ -165,12 +165,12 @@ namespace Brimstone
 				e?.CheckForDeath();
 
 			// Advance game step if necessary (probably setting off new triggers)
-			var nextStep = NextStep;
+			/*var nextStep = NextStep;
 			var step = Step;
 			if (nextStep != step) {
 				DebugLog.WriteLine("Advancing game step from " + step + " to " + nextStep);
 				Step = nextStep;
-			}
+			}*/ // TODO: This code has a bug, it advances MAIN_ACTION to MAIN_END before the user hits End Turn button
 		}
 
 		public void Start(int FirstPlayer = 0, bool SkipMulligan = false) {
