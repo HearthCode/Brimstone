@@ -132,12 +132,12 @@ namespace Brimstone
 			set {
 				if (_zoneController == value)
 					return;
-				if (Game != null)
-					if (Game.Entities != null)
-						Changing(false);
+				var oldValue = _zoneController?.Id ?? 0;
+				if (Game?.Entities != null)
+						Changing(GameTag.CONTROLLER, oldValue, value.Id, false);
 				_zoneController = value;
-				if (Game != null && Game.Entities != null)
-					Game.EntityChanged(Id, GameTag.CONTROLLER, value.Id);
+				if (Game?.Entities != null)
+					Game.EntityChanged(this, GameTag.CONTROLLER, oldValue, value.Id);
 			}
 		}
 
@@ -168,23 +168,21 @@ namespace Brimstone
 			set {
 				if (value < 0) value = 0;
 				// Ignore unchanged data
-				if (_entity.Tags.ContainsKey(t) && _entity[t] == value)
+				var oldValue = _entity.Tags.ContainsKey(t) ? _entity[t] : 0;
+				if (value == oldValue)
 					return;
-				else if (value == 0 && !_entity.Tags.ContainsKey(t))
-					return;
-
-				else if (t == GameTag.CONTROLLER) {
+				if (t == GameTag.CONTROLLER) {
 					ZoneController = (IZoneController) Game.Entities[value];
 				}
 				else if (t == GameTag.ENTITY_ID) {
-					Changing();
+					Changing(t, oldValue, value);
 					_entity.Id = value;
 				} else {
-					Changing();
+					Changing(t, oldValue, value);
 					_entity[t] = value;
 				}
 				if (Game != null && t != GameTag.CONTROLLER)
-					Game.EntityChanged(Id, t, value);
+					Game.EntityChanged(this, t, oldValue, value);
 			}
 		}
 
@@ -213,9 +211,8 @@ namespace Brimstone
 			return Clone() as IEntity;
 		}
 
-		private void Changing(bool cow = true) {
-			// TODO: Replace with a C# event
-			Game.EntityChanging(Id, _fuzzyHash);
+		private void Changing(GameTag tag, int oldValue, int newValue, bool cow = true) {
+			Game.EntityChanging(this, tag, oldValue, newValue, _fuzzyHash);
 			_fuzzyHash = 0;
 			if (cow) CopyOnWrite();
 		}

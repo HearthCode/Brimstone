@@ -302,26 +302,24 @@ namespace Brimstone
 			ActiveTriggers.Add(e);
 		}
 
-		public void EntityChanging(int id, int previousHash) {
+		public void EntityChanging(IEntity e, GameTag tag, int oldValue, int newValue, int previousHash) {
 			if (Settings.GameHashCaching)
 				_changed = true;
 		}
 
 		// TODO: Change this to a delegate event
-		public void EntityChanged(int id, GameTag tag, int value) {
-			PowerHistory?.Add(new TagChange(id, tag, value));
-
-			var entity = Entities[id];
+		public void EntityChanged(IEntity entity, GameTag tag, int oldValue, int newValue) {
+			PowerHistory?.Add(new TagChange(entity, tag, newValue));
 
 			// Tag change triggers
 			switch (tag) {
 				case GameTag.STATE:
-					if (value == (int)GameState.RUNNING)
+					if (newValue == (int)GameState.RUNNING)
 						Game.ActiveTriggers.Queue(TriggerType.GameStart, entity);
 					break;
 
 				case GameTag.STEP:
-					switch ((Step)value) {
+					switch ((Step)newValue) {
 						case Step.BEGIN_MULLIGAN:
 							Game.ActiveTriggers.Queue(TriggerType.BeginMulligan, entity);
 							break;
@@ -350,7 +348,7 @@ namespace Brimstone
 					break;
 
 				case GameTag.MULLIGAN_STATE:
-					switch ((MulliganState)value) {
+					switch ((MulliganState)newValue) {
 						case MulliganState.DEALING:
 							Game.ActiveTriggers.Queue(TriggerType.DealMulligan, entity);
 							break;
@@ -361,7 +359,7 @@ namespace Brimstone
 					break;
 
 				case GameTag.DAMAGE:
-					if (value != 0) { // TODO: Replace with checking if the value increased
+					if (newValue != 0) { // TODO: Replace with checking if the value increased
 						Game.ActiveTriggers.Queue(TriggerType.Damage, entity);
 					}
 					break;
