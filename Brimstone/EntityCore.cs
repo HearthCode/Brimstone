@@ -260,7 +260,7 @@ namespace Brimstone
 					if (StartingZone == null)
 						e = new Spell(Card, Tags);
 					else
-						e = new Minion(Card, Tags) {Zone = StartingZone};
+						e = new Spell(Card, Tags) {Zone = StartingZone};
 					break;
 				
 				// TODO: Weapons etc.

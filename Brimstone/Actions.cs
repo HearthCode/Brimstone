@@ -291,7 +291,6 @@ namespace Brimstone
 			if (entity is Minion)
 				player.NumMinionsPlayedThisTurn++;
 
-			// TODO: Stop spells from getting a zone position
 			entity.Zone = player.Board;
 
 			if (entity is Minion && !((Minion) entity).HasCharge)
