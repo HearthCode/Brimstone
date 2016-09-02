@@ -78,6 +78,16 @@ namespace Brimstone
 		}
 
 		public void Start() {
+			// Shuffle deck
+			Deck.Shuffle();
+
+			// Add player to board
+			Zone = Board;
+
+			// Create hero entity
+			// TODO: Add Start() parameters for non-default hero skins
+			Hero = Game.Add(new Hero(DefaultHero.For(HeroClass)), this) as Hero;
+
 			// Attach all per-player triggers
 			Game.ActiveTriggers.At(TriggerType.DealMulligan, Actions.PerformMulligan, this, Actions.IsSelf);
 			Game.ActiveTriggers.At(TriggerType.MulliganWaiting, Actions.WaitForMulliganComplete, this, Actions.IsSelf);

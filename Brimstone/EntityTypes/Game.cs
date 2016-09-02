@@ -208,20 +208,6 @@ namespace Brimstone
 
 
 		public void Start(int FirstPlayer = 0, bool SkipMulligan = false) {
-			// Shuffle player decks
-			foreach (var p in Players)
-				p.Deck.Shuffle();
-
-			// Add players to board
-			foreach (var p in Players)
-				p.Zone = p.Board;
-
-			// Generate player heroes
-			// TODO: Add Start() parameters for non-default hero skins
-			foreach (var p in Players)
-				p.Hero = Add(new Hero(DefaultHero.For(p.HeroClass)), p) as Hero;
-
-			// TODO: Insert event call precisely here so our server can iterate all created entities
 
 			// Attach all game triggers
 			ActiveTriggers.At<IEntity, IEntity>(TriggerType.GameStart, Actions.StartGame(FirstPlayer, SkipMulligan));
@@ -229,10 +215,14 @@ namespace Brimstone
 			ActiveTriggers.At<IEntity, IEntity>(TriggerType.PhaseMainReady, Actions.BeginTurn);
 			ActiveTriggers.At<IEntity, IEntity>(TriggerType.PhaseMainNext, Actions.EndTurn);
 
-			// Set game state
-			State = GameState.RUNNING;
+			// Configure players
 			foreach (var p in Players)
 				p.Start();
+
+			// TODO: Insert event call precisely here so our server can iterate all created entities
+
+			// Set game state
+			State = GameState.RUNNING;
 
 			ActionQueue.ProcessAll();
 			// TODO: POWERED_UP settings and stuff go here
