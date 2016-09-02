@@ -329,10 +329,12 @@ namespace Brimstone
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			if (args[TARGETS].HasResult)
 				foreach (ICharacter e in args[TARGETS]) {
-					DebugLog.WriteLine("{0} is getting hit for {1} points of damage", e.ShortDescription, args[DAMAGE]);
+#if _ACTIONS_DEBUG
+					DebugLog.WriteLine("Game {0}: {1} is getting hit for {2} points of damage", game.GameId, e.ShortDescription, args[DAMAGE]);
+#endif
 
-					e.Damage += args[DAMAGE];
 					game.Environment.LastDamaged = e;
+					e.Damage += args[DAMAGE];
 
 					// TODO: Handle Predamage, on-damage triggers and more, full specification here https://hearthstone.gamepedia.com/Advanced_rulebook#Damage_and_Healing
 				}
