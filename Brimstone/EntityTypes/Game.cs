@@ -170,9 +170,18 @@ namespace Brimstone
 			var nextStep = NextStep;
 			var step = Step;
 			if (nextStep != step) {
-				// TODO: Game step should not advance if player has options available
-				DebugLog.WriteLine("Advancing game step from " + step + " to " + nextStep);
-				Step = nextStep;
+				// Only advance to end turn when current player has no options remaining
+				if (nextStep != Step.MAIN_END || !CurrentPlayer.Options.Any())
+				{
+#if _GAME_DEBUG
+					DebugLog.WriteLine("Advancing game step from " + step + " to " + nextStep);
+#endif
+					Step = nextStep;
+				} else {
+#if _GAME_DEBUG
+					DebugLog.WriteLine("Waiting for player to select next option");
+#endif
+				}
 			}
 
 			if (nextStep == Step.MAIN_START_TRIGGERS) {

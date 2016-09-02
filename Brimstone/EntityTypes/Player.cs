@@ -57,6 +57,7 @@ namespace Brimstone
 		// All the entities that we can potentially play or attack with when it's our turn
 		public IEnumerable<IEntity> LiveEntities => Hand.Concat(Board).Concat(new List<IEntity> {this, /* HeroPower */});
 
+		// TODO: Cache options
 		public IEnumerable<Option> Options
 		{
 			get
@@ -98,8 +99,8 @@ namespace Brimstone
 			Game.ActiveTriggers.At(TriggerType.PhaseMainStart, Actions.BeginTurnForPlayer, this, Actions.IsControllersTurn);
 
 			Game.ActiveTriggers.At(TriggerType.PhaseMainAction, (Action<IEntity>) (_ => {
-				// TODO: At this point the player should be offered options to play
-
+				// At this point the player is offered options to play via the Options property
+				// The game step will not advance until there are no options remaining
 				Game.NextStep = Step.MAIN_END;
 			}), this, Actions.IsControllersTurn);
 		}
