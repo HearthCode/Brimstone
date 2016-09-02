@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Brimstone
 {
@@ -20,7 +21,7 @@ namespace Brimstone
 		protected Character(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
 		protected Character(Character<T> cloneFrom) : base(cloneFrom) { }
 
-		public bool CanAttack => !IsExhausted && AttackDamage > 0 && ValidTargets.Count > 0;
+		public bool CanAttack => !IsExhausted && AttackDamage > 0 && ValidTargets.Any();
 
 		public bool MortallyWounded {
 			get { return Health <= 0 || ToBeDestroyed; }

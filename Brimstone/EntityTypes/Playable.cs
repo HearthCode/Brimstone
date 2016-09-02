@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Brimstone
 {
@@ -35,7 +36,7 @@ namespace Brimstone
 				if (!Controller.SufficientResources(this))
 					return false;
 
-				if (Card.RequiresTarget && ValidTargets.Count == 0)
+				if (Card.RequiresTarget && ValidTargets.Any())
 					return false;
 
 				// TODO: Alot more criteria
