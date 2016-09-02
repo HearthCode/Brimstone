@@ -520,7 +520,7 @@ namespace Brimstone
 
 			game.NextStep = Step.MAIN_ACTION;
 			game.Step = Step.MAIN_COMBAT;
-			game.NumOptionsPlayedThisTurn++;
+			attacker.Controller.NumOptionsPlayedThisTurn++;
 
 			defender.IsDefending = true;
 

@@ -175,11 +175,6 @@ namespace Brimstone
 			get { return this[GameTag.NUM_MINIONS_PLAYER_KILLED_THIS_TURN]; }
 			set { this[GameTag.NUM_MINIONS_PLAYER_KILLED_THIS_TURN] = value; }
 		}
-
-		public int NumOptionsPlayedThisTurn {
-			get { return this[GameTag.NUM_OPTIONS_PLAYED_THIS_TURN]; }
-			set { this[GameTag.NUM_OPTIONS_PLAYED_THIS_TURN] = value; }
-		}
 	}
 
 	public partial class Player : Entity, IZoneController

@@ -412,9 +412,9 @@ namespace BrimstoneTests
 
 			// Change a base game and its branched game at the same time with different ordering
 			game9.Player1.Give("Bloodfen Raptor");
-			game9.NumOptionsPlayedThisTurn++;
+			game9.Player1.NumOptionsPlayedThisTurn++;
 
-			game12.NumOptionsPlayedThisTurn++;
+			game12.Player1.NumOptionsPlayedThisTurn++;
 			game12.Player1.Give("Bloodfen Raptor");
 
 			// Tag order should be ignored, Game9 and Game12 are equivalent
