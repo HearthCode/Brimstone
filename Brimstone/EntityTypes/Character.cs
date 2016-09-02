@@ -5,6 +5,8 @@ namespace Brimstone
 	public partial interface ICharacter : IPlayable
 	{
 		bool CanAttack { get; }
+		
+		bool MortallyWounded { get; }
 
 		ICanTarget Attack(ICharacter Target = null);
 
@@ -19,6 +21,10 @@ namespace Brimstone
 		protected Character(Character<T> cloneFrom) : base(cloneFrom) { }
 
 		public bool CanAttack => !IsExhausted && AttackDamage > 0 && ValidTargets.Count > 0;
+
+		public bool MortallyWounded {
+			get { return Health <= 0 || ToBeDestroyed; }
+		}
 
 		public ICanTarget Attack(ICharacter target = null) {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
