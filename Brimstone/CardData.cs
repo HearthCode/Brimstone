@@ -13,7 +13,7 @@ namespace Brimstone
 		static Cards()
 		{
 			data = new CardDefs();
-			data.CompileBehaviours();
+			data.Load();
 		}
 		private static CardDefs data;
 		
@@ -50,7 +50,9 @@ namespace Brimstone
 			return Cards.FirstOrDefault(x => x.Value.Name == cardName).Value;
 		}
 
-		public CardDefs() {
+		public CardDefs() { }
+
+		internal void Load() {
 			// Get XML definitions from assembly embedded resource
 			var assembly = Assembly.GetExecutingAssembly();
 			var def = XDocument.Load(assembly.GetManifestResourceStream("Brimstone.Data.CardDefs.xml"));
@@ -143,9 +145,7 @@ namespace Brimstone
 				Requirements = new Dictionary<PlayRequirements, int>(),
 				Behaviour = null
 			});
-		}
-
-		internal void CompileBehaviours() {
+			
 			foreach (var c in Cards.Values) {
 				// Get behaviour script and compile ActionGraph for cards with behaviours
 				// TODO: Allow fetch from card name as well as ID
