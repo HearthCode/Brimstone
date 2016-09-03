@@ -18,6 +18,7 @@ namespace Brimstone
 		public static ActionGraph PerformMulligan { get { return new PerformMulligan(); } }
 		public static ActionGraph WaitForMulliganComplete { get { return new WaitForMulliganComplete(); } }
 		public static ActionGraph BeginTurn { get { return new BeginTurn(); } }
+		public static ActionGraph BeginTurnTriggers { get { return new BeginTurnTriggers(); } }
 		public static ActionGraph BeginTurnForPlayer { get { return new BeginTurnForPlayer(); } }
 		public static ActionGraph EndTurn { get { return new EndTurn(); } }
 		public static ActionGraph EndTurnForPlayer { get { return new EndTurnForPlayer(); } }

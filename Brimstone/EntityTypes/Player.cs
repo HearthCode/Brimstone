@@ -92,6 +92,7 @@ namespace Brimstone
 			Game.ActiveTriggers.At(TriggerType.DealMulligan, Actions.PerformMulligan, this, Actions.IsSelf);
 			Game.ActiveTriggers.At(TriggerType.MulliganWaiting, Actions.WaitForMulliganComplete, this, Actions.IsSelf);
 			Game.ActiveTriggers.At(TriggerType.PhaseMainReady, Actions.BeginTurn, this, Actions.IsControllersTurn);
+			Game.ActiveTriggers.At(TriggerType.PhaseMainStartTriggers, Actions.BeginTurnTriggers, this, Actions.IsControllersTurn);
 			Game.ActiveTriggers.At(TriggerType.PhaseMainStart, Actions.BeginTurnForPlayer, this, Actions.IsControllersTurn);
 			Game.ActiveTriggers.At(TriggerType.PhaseMainAction, (Action<IEntity>) (_ => {
 				// At this point the player is offered options to play via the Options property

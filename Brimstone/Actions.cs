@@ -261,6 +261,16 @@ namespace Brimstone
 		}
 	}
 
+	// Runs when STEP = MAIN_START_TRIGGERS
+	public class BeginTurnTriggers : QueueAction
+	{
+		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
+		{
+			game.NextStep = Step.MAIN_START;
+			return ActionResult.None;
+		}
+	}
+
 	// Runs when STEP = MAIN_START
 	public class BeginTurnForPlayer : QueueAction
 	{

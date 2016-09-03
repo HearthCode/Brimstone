@@ -207,14 +207,7 @@ namespace Brimstone
 #endif
 				}
 			}
-
-			if (nextStep == Step.MAIN_START_TRIGGERS) {
-				// TODO: Do something exciting with turn start triggers for the current player here
-				NextStep = Step.MAIN_START;
-				Step = Step.MAIN_START;
-			}
 		}
-
 
 		public void Start(int FirstPlayer = 0, bool SkipMulligan = false) {
 
