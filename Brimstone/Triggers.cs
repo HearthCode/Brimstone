@@ -5,8 +5,6 @@ using System.Collections.Generic;
 
 namespace Brimstone
 {
-	// TODO: We need a list of which TriggerTypes are top-level only (ie. MulliganWaiting)
-	// TODO: We need to supply the trigger indexes to Game.ActionBlock
 	public enum TriggerType
 	{
 		Play,
@@ -208,9 +206,8 @@ namespace Brimstone
 						case MulliganState.DEALING:
 							Queue(TriggerType.DealMulligan, entity);
 							break;
-						case MulliganState.WAITING:
-							Queue(TriggerType.MulliganWaiting, entity);
-							break;
+						// NOTE: We can't trigger on MulliganState.WAITING here
+						// because the trigger must run on the top level of the queue
 					}
 					break;
 

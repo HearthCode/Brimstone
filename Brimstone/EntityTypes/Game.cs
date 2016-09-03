@@ -185,27 +185,37 @@ namespace Brimstone
 #if _GAME_DEBUG
 			DebugLog.WriteLine("Action queue resolved");
 #endif
+			// Check if one of the other players is waiting for the other one to mulligan
+			var step = Step;
+			if (step == Step.BEGIN_MULLIGAN)
+				foreach (var p in Players)
+					if (p.MulliganState == MulliganState.WAITING) {
+						ActiveTriggers.Queue(TriggerType.MulliganWaiting, p);
+						return;
+					}
+
 			// Death checking phase
 			// TODO: Only do this if game state has changed
+#if _GAME_DEBUG
+			DebugLog.WriteLine("Death processing phase");
+#endif
 			foreach (var e in Characters)
 				e?.CheckForDeath();
 
 			// Advance game step if necessary (probably setting off new triggers)
 			var nextStep = NextStep;
-			var step = Step;
-			if (nextStep != step) {
-				// Only advance to end turn when current player chooses to
-				if (nextStep != Step.MAIN_END)
-				{
+
+			// Only advance to end turn when current player chooses to
+			if (nextStep == Step.MAIN_END) {
+#if _GAME_DEBUG
+				DebugLog.WriteLine("Waiting for player to select next option");
+#endif
+			}
+			else if (nextStep != step) {
 #if _GAME_DEBUG
 					DebugLog.WriteLine("Advancing game step from " + step + " to " + nextStep);
 #endif
 					Step = nextStep;
-				} else {
-#if _GAME_DEBUG
-					DebugLog.WriteLine("Waiting for player to select next option");
-#endif
-				}
 			}
 		}
 
