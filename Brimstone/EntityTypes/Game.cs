@@ -276,7 +276,6 @@ namespace Brimstone
 
 		public void EntityCreated(IEntity entity) {
 			OnEntityCreated?.Invoke(this, entity);
-			ActiveTriggers.Add(entity);
 		}
 
 		public void EntityChanging(IEntity entity, GameTag tag, int oldValue, int newValue, int previousHash) {

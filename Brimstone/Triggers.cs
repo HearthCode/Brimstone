@@ -99,10 +99,13 @@ namespace Brimstone
 			get { return _game; }
 			set
 			{
-				if (_game != null && _game != value)
+				if (_game != null && _game != value) {
 					_game.OnEntityChanged -= OnEntityChanged;
+					_game.OnEntityCreated -= OnEntityCreated;
+				}
 				_game = value;
 				_game.OnEntityChanged += OnEntityChanged;
+				_game.OnEntityCreated += OnEntityCreated;
 			}
 		}
 
@@ -126,7 +129,7 @@ namespace Brimstone
 					Add(entity, t);
 		}
 
-		public void Add(IEntity entity, ITrigger trigger) {
+		private void Add(IEntity entity, ITrigger trigger) {
 #if _TRIGGER_DEBUG
 			DebugLog.WriteLine("Associating trigger " + trigger.Type + " for entity " + entity.ShortDescription + " with game " + Game.GameId);
 #endif
@@ -134,6 +137,10 @@ namespace Brimstone
 				Triggers[trigger.Type].Add(entity.Id);
 			else
 				Triggers.Add(trigger.Type, new List<int> { entity.Id });
+		}
+
+		private void OnEntityCreated(Game game, IEntity entity) {
+			Add(entity);
 		}
 
 		private void OnEntityChanged(Game game, IEntity entity, GameTag tag, int oldValue, int newValue) {
