@@ -85,6 +85,7 @@ namespace Brimstone
 			SkipMulligan = cloneFrom.SkipMulligan;
 			// Generate zones owned by game
 			Zones = new Zones(this, this);
+			_deathCheckQueue = new List<int>(cloneFrom._deathCheckQueue);
 			// Update tree
 			GameId = ++SequenceNumber;
 			Depth = cloneFrom.Depth + 1;
@@ -106,6 +107,7 @@ namespace Brimstone
 			ActiveTriggers = new TriggerManager(this);
 			Entities = new EntityController(this);
 			Environment = new Environment(this);
+			_deathCheckQueue = new List<int>();
 
 			// Generate zones owned by game
 			Zones = new Zones(this, this);
@@ -183,10 +185,13 @@ namespace Brimstone
 			PowerHistory?.Add(new BlockEnd(Block.Type));
 		}
 
+		private List<int> _deathCheckQueue;
 		public void OnQueueEmpty() {
 #if _GAME_DEBUG
 			DebugLog.WriteLine("Action queue resolved");
 #endif
+			// Don't do anything if the game state hasn't changed
+
 			// Check if one of the other players is waiting for the other one to mulligan
 			var step = Step;
 			if (step == Step.BEGIN_MULLIGAN)
@@ -197,12 +202,12 @@ namespace Brimstone
 					}
 
 			// Death checking phase
-			// TODO: Only do this if game state has changed
 #if _GAME_DEBUG
 			DebugLog.WriteLine("Death processing phase");
 #endif
-			foreach (var e in Characters)
-				e?.CheckForDeath();
+			foreach (var eId in _deathCheckQueue)
+				((ICharacter)Entities[eId]).CheckForDeath();
+			_deathCheckQueue.Clear();
 
 			// Advance game step if necessary (probably setting off new triggers)
 			var nextStep = NextStep;
@@ -282,6 +287,8 @@ namespace Brimstone
 		}
 
 		public void EntityChanged(IEntity entity, GameTag tag, int oldValue, int newValue) {
+			if (tag == GameTag.DAMAGE && ((ICharacter) entity).Health <= 0)
+				_deathCheckQueue.Add(entity.Id);
 			OnEntityChanged?.Invoke(this, entity, tag, oldValue, newValue);
 		}
 
