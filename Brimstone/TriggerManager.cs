@@ -1,83 +1,10 @@
-#define _TRIGGER_DEBUG
-
+﻿#define _TRIGGER_DEBUG
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Brimstone
 {
-	public enum TriggerType
-	{
-		Play,
-		AfterPlay,
-		Spellbender,
-		PreSummon,
-		Summon,
-		AfterSummon,
-		ProposedAttack,
-		Attack,
-		AfterAttack,
-		Inspire,
-		Death,
-		DrawCard,
-		AddToHand,
-		PreDamage,
-		Damage, // 0
-		Heal,
-		Silence,
-		Discard,
-		GainArmour,
-		RevealSecret,
-		EquipWeapon,
-		WeaponAttack, // 3
-
-		GameStart, // -1
-		BeginMulligan, // -1
-		DealMulligan, // 6
-		MulliganWaiting, // 7
-		PhaseMainReady, // 1
-		PhaseMainStartTriggers, // 8
-		PhaseMainStart, // 0
-		PhaseMainAction, // 2
-		PhaseMainEnd, // 4
-		PhaseMainCleanup, // 5
-		PhaseMainNext, // -1
-	}
-
-	public interface ITrigger {
-		ICondition Condition { get; }
-		List<QueueAction> Action { get; }
-		TriggerType Type { get; }
-	}
-
-	public class Trigger<T, U> : ITrigger where T : IEntity where U : IEntity
-	{
-		ICondition ITrigger.Condition => Condition;
-		public Condition<T, U> Condition { get; }
-		public List<QueueAction> Action { get; }= new List<QueueAction>();
-		public TriggerType Type { get; }
-
-		public Trigger(TriggerType type, ActionGraph action, Condition<T, U> condition = null) {
-#if _TRIGGER_DEBUG
-			DebugLog.WriteLine("Creating trigger " + type + " using " + action.Graph[0].GetType().Name);
-#endif
-			Condition = condition;
-			Action = action.Unravel();
-			Type = type;
-		}
-
-		public Trigger(Trigger<T, U> t) {
-			// Only a shallow copy is necessary because Args and Action don't change and are lazily evaluated
-			Condition = t.Condition;
-			Action = t.Action;
-			Type = t.Type;
-		}
-
-		public static Trigger<T, U> At(TriggerType type, ActionGraph g, Condition<T, U> condition = null) {
-			return new Trigger<T, U>(type, g, condition);
-		}
-	}
-
 	public class TriggerManager : ICloneable
 	{
 		private static readonly Dictionary<TriggerType, int> TriggerIndices = new Dictionary<TriggerType, int>
@@ -94,11 +21,9 @@ namespace Brimstone
  		};
 
 		private Game _game;
-		public Game Game
-		{
+		public Game Game {
 			get { return _game; }
-			set
-			{
+			set {
 				if (_game != null && _game != value) {
 					_game.OnEntityChanged -= OnEntityChanged;
 					_game.OnEntityCreated -= OnEntityCreated;
@@ -185,8 +110,8 @@ namespace Brimstone
 						case MulliganState.DEALING:
 							Queue(TriggerType.DealMulligan, entity);
 							break;
-						// NOTE: We can't trigger on MulliganState.WAITING here
-						// because the trigger must run on the top level of the queue
+							// NOTE: We can't trigger on MulliganState.WAITING here
+							// because the trigger must run on the top level of the queue
 					}
 					break;
 
@@ -210,8 +135,7 @@ namespace Brimstone
 #endif
 			foreach (var entityId in Triggers[type]) {
 				var owningEntity = Game.Entities[entityId];
-				if (owningEntity.Zone.Type == Zone.PLAY || owningEntity.Zone.Type == Zone.HAND)
-				{
+				if (owningEntity.Zone.Type == Zone.PLAY || owningEntity.Zone.Type == Zone.HAND) {
 #if _TRIGGER_DEBUG
 					DebugLog.WriteLine("Checking trigger conditions for " + owningEntity.ShortDescription);
 #endif
@@ -226,9 +150,10 @@ namespace Brimstone
 						Game.ActionBlock(BlockType.TRIGGER, owningEntity, trigger.Action,
 							// Trigger index: 0 for normal entities; -1 for Game; specific index for player if specified, otherwise -1
 							Index: TriggerIndices.ContainsKey(type) ? TriggerIndices[type] :
-								source == Game? -1 : source is Player? -1 : 0);
+								source == Game ? -1 : source is Player ? -1 : 0);
 					}
-				} else {
+				}
+				else {
 #if _TRIGGER_DEBUG
 					DebugLog.WriteLine("Ignoring triggers for " + owningEntity.ShortDescription + " because it wasn't in an active zone");
 #endif

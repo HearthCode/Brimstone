@@ -524,4 +524,42 @@ namespace Brimstone
 		FATIGUE = 8,
 		RITUAL = 9
 	}
+
+	public enum TriggerType
+	{
+		Play,
+		AfterPlay,
+		Spellbender,
+		PreSummon,
+		Summon,
+		AfterSummon,
+		ProposedAttack,
+		Attack,
+		AfterAttack,
+		Inspire,
+		Death,
+		DrawCard,
+		AddToHand,
+		PreDamage,
+		Damage, // 0
+		Heal,
+		Silence,
+		Discard,
+		GainArmour,
+		RevealSecret,
+		EquipWeapon,
+		WeaponAttack, // 3
+
+		GameStart, // -1
+		BeginMulligan, // -1
+		DealMulligan, // 6
+		MulliganWaiting, // 7
+		PhaseMainReady, // 1
+		PhaseMainStartTriggers, // 8
+		PhaseMainStart, // 0
+		PhaseMainAction, // 2
+		PhaseMainEnd, // 4
+		PhaseMainCleanup, // 5
+		PhaseMainNext, // -1
+	}
 }
