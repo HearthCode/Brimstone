@@ -221,7 +221,6 @@ namespace Brimstone
 			// Attach all game triggers
 			ActiveTriggers.At<IEntity, IEntity>(TriggerType.GameStart, Actions.StartGame(FirstPlayer, SkipMulligan));
 			ActiveTriggers.At<IEntity, IEntity>(TriggerType.BeginMulligan, Actions.BeginMulligan);
-			ActiveTriggers.At<IEntity, IEntity>(TriggerType.PhaseMainReady, Actions.BeginTurn);
 			ActiveTriggers.At<IEntity, IEntity>(TriggerType.PhaseMainNext, Actions.EndTurn);
 
 			// Configure players
