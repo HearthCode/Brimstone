@@ -105,27 +105,17 @@ namespace Brimstone
 			if (s.Length > 2)
 				s[1] = Union(s.Skip(1).ToArray());
 
-			if (s[0].SelectionSource != s[1].SelectionSource)
-				throw new SelectorException("All selectors in a union must use the same selection source");
-
 			var sel = new Selector {
-				SelectionSource = s[0].SelectionSource,
 				Lambda = e => s[0].Lambda(e).Concat(s[1].Lambda(e))
 			};
 			return sel;
 		}
 
 		public static Selector Select(Func<IEntity, IEntity> selector) {
-			return new Selector {
-				SelectionSource = SelectionSource.ActionSource,
-				Lambda = e => new List<IEntity> { selector(e) }
-			};
+			return new Selector { Lambda = e => new List<IEntity> { selector(e) } };
 		}
 		public static Selector Select(Func<IEntity, IEnumerable<IEntity>> selector) {
-			return new Selector {
-				SelectionSource = SelectionSource.ActionSource,
-				Lambda = selector
-			};
+			return new Selector { Lambda = selector };
 		}
 
 		public static ActionGraph Damage(ActionGraph Targets = null, ActionGraph Amount = null) { return new Damage { Args = { Targets, Amount } }; }

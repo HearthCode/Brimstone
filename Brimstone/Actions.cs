@@ -50,26 +50,10 @@ namespace Brimstone
 
 	public class Selector : QueueAction
 	{
-		public SelectionSource SelectionSource { get; set; }
-
 		public Func<IEntity, IEnumerable<IEntity>> Lambda { get; set; }
 
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
-			switch (SelectionSource) {
-				case SelectionSource.Game:
-					return Lambda(game).ToList();
-				case SelectionSource.Player:
-					if (source is Game)
-						return Lambda(game.CurrentPlayer).ToList();
-					else if (source is Player)
-						return Lambda(source).ToList();
-					else
-						return Lambda(source.Controller).ToList();
-				case SelectionSource.ActionSource:
-					return Lambda(source).ToList();
-				default:
-					throw new NotImplementedException();
-			}
+			return Lambda(source).ToList();
 		}
 	}
 
