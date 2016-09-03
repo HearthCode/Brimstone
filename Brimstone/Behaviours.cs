@@ -150,12 +150,11 @@ namespace Brimstone
 		}
 
 		// Triggers
-		// TODO: BeginTurn and EndTurn shouldn't match against Game, but against CurrentPlayer.
-		public static Trigger<IEntity, Game> OnBeginTurn(Condition<IEntity, Game> Condition, ActionGraph Action) {
-			return Trigger<IEntity, Game>.At(TriggerType.PhaseMainStartTriggers, Action, Condition);
+		public static Trigger<IEntity, IEntity> OnBeginTurn(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
+			return Trigger<IEntity, IEntity>.At(TriggerType.PhaseMainStartTriggers, Action, Condition);
 		}
-		public static Trigger<IEntity, Game> OnEndTurn(Condition<IEntity, Game> Condition, ActionGraph Action) {
-			return Trigger<IEntity, Game>.At(TriggerType.PhaseMainEnd, Action, Condition);
+		public static Trigger<IEntity, IEntity> OnEndTurn(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
+			return Trigger<IEntity, IEntity>.At(TriggerType.PhaseMainEnd, Action, Condition);
 		}
 		public static Trigger<IEntity, IEntity> OnPlay(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
 			return Trigger<IEntity, IEntity>.At(TriggerType.Play, Action, Condition);
@@ -229,8 +228,8 @@ namespace Brimstone
 
 		// Trigger conditions
 		public static Condition<IEntity, IEntity> IsSelf = new Condition<IEntity, IEntity>((me, other) => me == other);
-		public static Condition<IEntity, IEntity> IsFriendlySpell = new Condition<IEntity, IEntity>((me, spell) => me.Controller == spell.Controller && spell.Card.Type == CardType.SPELL);
-		public static Condition<IEntity, Game> IsControllersTurn = new Condition<IEntity, Game>((me, game) => me.Controller == game.CurrentPlayer);
-		public static Condition<IEntity, Game> IsOpponentsTurn = new Condition<IEntity, Game>((me, game) => me.Controller == game.CurrentOpponent);
+		public static Condition<IEntity, IEntity> IsFriendlySpell = new Condition<IEntity, IEntity>((me, entity) => me.Controller == entity.Controller && entity is Spell);
+		public static Condition<IEntity, IEntity> IsFriendly = new Condition<IEntity, IEntity>((me, entity) => me.Controller == entity.Controller);
+		public static Condition<IEntity, IEntity> IsOpposing = new Condition<IEntity, IEntity>((me, entity) => me.Controller == entity.Controller.Opponent);
 	}
 }

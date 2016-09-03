@@ -34,7 +34,7 @@ namespace Brimstone
 		// Demolisher
 		public static Behaviour EX1_102 = new Behaviour {
 			Triggers = {
-				OnBeginTurn(IsControllersTurn, Damage(RandomOpponentHealthyCharacter, 2))
+				OnBeginTurn(IsFriendly, Damage(RandomOpponentHealthyCharacter, 2))
 			}
 		};
 
@@ -239,7 +239,7 @@ namespace Brimstone
 
 		// Coldlight Oracle
 		public static Behaviour EX1_050 = new Behaviour {
-			Battlecry = (Draw(Controller) * 2).Then((Draw(Opponent) * 2))
+			Battlecry = (Draw(Controller) * 2).Then(Draw(Opponent) * 2)
 		};
 
 		// Mana Addict
@@ -306,7 +306,7 @@ namespace Brimstone
 		// Imp Master
 		public static Behaviour EX1_597 = new Behaviour {
 			Triggers = {
-				OnEndTurn(IsControllersTurn, Damage(Self, 1).Then(Summon(Controller, "EX1_598")))
+				OnEndTurn(IsFriendly, Damage(Self, 1).Then(Summon(Controller, "EX1_598")))
 			}
 		};
 
@@ -317,7 +317,7 @@ namespace Brimstone
 		// Knife Juggler
 		public static Behaviour NEW1_019 = new Behaviour {
 			Triggers = {
-				AfterSummon(Controller, Damage(RandomOpponentHealthyMinion, 1))
+				AfterSummon(IsFriendly, Damage(RandomOpponentHealthyMinion, 1))
 			}
 		};
 
@@ -426,14 +426,14 @@ namespace Brimstone
 		//Illidan Stormrage
 		public static Behaviour EX1_614 = new Behaviour {
 			Triggers = {
-				OnPlay(Controller, Summon(Controller, "EX1_614t"))
+				OnPlay(IsFriendly, Summon(Controller, "EX1_614t"))
 			}
 		};
 
 		//Baron Geddon
 		public static Behaviour EX1_249 = new Behaviour {
 			Triggers = {
-				OnEndTurn(IsControllersTurn, Damage(AllCharacters, 2)) //TODO: Should be AllCharacters - Self
+				OnEndTurn(IsFriendly, Damage(AllCharacters, 2)) //TODO: Should be AllCharacters - Self
 			}
 		};
 	}
