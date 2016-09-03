@@ -54,7 +54,7 @@ namespace Brimstone
 					Add(entity, t);
 		}
 
-		private void Add(IEntity entity, ITrigger trigger) {
+		private void Add(IEntity entity, Trigger trigger) {
 #if _TRIGGER_DEBUG
 			DebugLog.WriteLine("Associating trigger " + trigger.Type + " for entity " + entity.ShortDescription + " with game " + Game.GameId);
 #endif

@@ -3,29 +3,20 @@ using System.Linq;
 
 namespace Brimstone
 {
-	public interface ICondition {
-		bool Eval(IEntity owner, IEntity affected);
-	}
-
-
-	public class Condition<T, U> : ICondition where T : IEntity where U : IEntity
+	public class Condition
 	{
-		private readonly Func<T, U, bool> condition;
+		private readonly Func<IEntity, IEntity, bool> condition;
 
-		public Condition(Func<T, U, bool> Condition) {
+		public Condition(Func<IEntity, IEntity, bool> Condition) {
 			condition = Condition;
 		}
 
-		bool ICondition.Eval(IEntity owner, IEntity affected) {
-			return Eval((T) owner, (U) affected);
-		}
-
-		public bool Eval(T owner, U affected) {
+		public bool Eval(IEntity owner, IEntity affected) {
 			return condition(owner, affected);
 		}
 
-		public static implicit operator Condition<T, U>(Selector s) {
-			return new Condition<T, U>((x, y) => s.Lambda(x).Contains(y));
+		public static implicit operator Condition(Selector s) {
+			return new Condition((x, y) => s.Lambda(x).Contains(y));
 		}
 	}
 }

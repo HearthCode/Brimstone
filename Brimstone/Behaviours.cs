@@ -8,7 +8,7 @@ namespace Brimstone
 		// Defaulting to null for unimplemented cards or actions
 		public ActionGraph Battlecry;
 		public ActionGraph Deathrattle;
-		public List<ITrigger> Triggers = new List<ITrigger>();
+		public List<Trigger> Triggers = new List<Trigger>();
 	}
 
 	public class Actions {
@@ -129,97 +129,95 @@ namespace Brimstone
 		public static ActionGraph Discard(ActionGraph Targets = null) { return new Discard { Args = { Targets } }; }
 
 		// Generic triggers (use to create triggers for events not specified in Triggers section below)
-		public static Trigger<T, U> At<T, U>(TriggerType TriggerType, Condition<T, U> Condition, ActionGraph Action)
-			where T : IEntity where U : IEntity {
-			return Trigger<T, U>.At(TriggerType, Action, Condition);
+		public static Trigger At(TriggerType TriggerType, Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType, Action, Condition);
 		}
 
-		public static Trigger<T, U> At<T, U>(TriggerType TriggerType, ActionGraph Action)
-			where T : IEntity where U : IEntity {
-			return Trigger<T, U>.At(TriggerType, Action);
+		public static Trigger At(TriggerType TriggerType, ActionGraph Action) {
+			return Trigger.At(TriggerType, Action);
 		}
 
 		// Triggers
-		public static Trigger<IEntity, IEntity> OnBeginTurn(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.PhaseMainStartTriggers, Action, Condition);
+		public static Trigger OnBeginTurn(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.PhaseMainStartTriggers, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnEndTurn(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.PhaseMainEnd, Action, Condition);
+		public static Trigger OnEndTurn(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.PhaseMainEnd, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnPlay(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.Play, Action, Condition);
+		public static Trigger OnPlay(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.Play, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> AfterPlay(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.AfterPlay, Action, Condition);
+		public static Trigger AfterPlay(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.AfterPlay, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnSpellbender(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.Spellbender, Action, Condition);
+		public static Trigger OnSpellbender(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.Spellbender, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnPreSummon(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.PreSummon, Action, Condition);
+		public static Trigger OnPreSummon(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.PreSummon, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnSummon(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.Summon, Action, Condition);
+		public static Trigger OnSummon(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.Summon, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> AfterSummon(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.AfterSummon, Action, Condition);
+		public static Trigger AfterSummon(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.AfterSummon, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnProposedAttack(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.ProposedAttack, Action, Condition);
+		public static Trigger OnProposedAttack(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.ProposedAttack, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnAttack(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.Attack, Action, Condition);
+		public static Trigger OnAttack(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.Attack, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> AfterAttack(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.AfterAttack, Action, Condition);
+		public static Trigger AfterAttack(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.AfterAttack, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnInspire(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.Inspire, Action, Condition);
+		public static Trigger OnInspire(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.Inspire, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnDeath(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.Death, Action, Condition);
+		public static Trigger OnDeath(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.Death, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnDrawCard(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.DrawCard, Action, Condition);
+		public static Trigger OnDrawCard(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.DrawCard, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnAddToHand(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.AddToHand, Action, Condition);
+		public static Trigger OnAddToHand(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.AddToHand, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnPreDamage(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.PreDamage, Action, Condition);
+		public static Trigger OnPreDamage(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.PreDamage, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnDamage(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.Damage, Action, Condition);
+		public static Trigger OnDamage(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.Damage, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnHeal(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.Heal, Action, Condition);
+		public static Trigger OnHeal(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.Heal, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnSilence(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.Silence, Action, Condition);
+		public static Trigger OnSilence(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.Silence, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnDiscard(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.Discard, Action, Condition);
+		public static Trigger OnDiscard(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.Discard, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnGainArmour(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.GainArmour, Action, Condition);
+		public static Trigger OnGainArmour(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.GainArmour, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnRevealSecret(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.RevealSecret, Action, Condition);
+		public static Trigger OnRevealSecret(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.RevealSecret, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnEquipWeapon(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.EquipWeapon, Action, Condition);
+		public static Trigger OnEquipWeapon(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.EquipWeapon, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnWeaponAttack(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.WeaponAttack, Action, Condition);
+		public static Trigger OnWeaponAttack(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.WeaponAttack, Action, Condition);
 		}
-		public static Trigger<IEntity, IEntity> OnMainNext(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
-			return Trigger<IEntity, IEntity>.At(TriggerType.PhaseMainNext, Action, Condition);
+		public static Trigger OnMainNext(Condition Condition, ActionGraph Action) {
+			return Trigger.At(TriggerType.PhaseMainNext, Action, Condition);
 		}
 
 		// Trigger conditions
-		public static Condition<IEntity, IEntity> IsSelf = new Condition<IEntity, IEntity>((me, other) => me == other);
-		public static Condition<IEntity, IEntity> IsFriendlySpell = new Condition<IEntity, IEntity>((me, entity) => me.Controller == entity.Controller && entity is Spell);
-		public static Condition<IEntity, IEntity> IsFriendly = new Condition<IEntity, IEntity>((me, entity) => me.Controller == entity.Controller);
-		public static Condition<IEntity, IEntity> IsOpposing = new Condition<IEntity, IEntity>((me, entity) => me.Controller == entity.Controller.Opponent);
+		public static Condition IsSelf = new Condition((me, other) => me == other);
+		public static Condition IsFriendlySpell = new Condition((me, entity) => me.Controller == entity.Controller && entity is Spell);
+		public static Condition IsFriendly = new Condition((me, entity) => me.Controller == entity.Controller);
+		public static Condition IsOpposing = new Condition((me, entity) => me.Controller == entity.Controller.Opponent);
 	}
 }

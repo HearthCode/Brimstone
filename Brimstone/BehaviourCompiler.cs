@@ -6,7 +6,7 @@ namespace Brimstone
 	{
 		public List<QueueAction> Battlecry;
 		public List<QueueAction> Deathrattle;
-		public List<ITrigger> Triggers;
+		public List<Trigger> Triggers;
 
 		// Compile all the ActionGraph fields in a Behaviour into lists of QueueActions
 		public static CompiledBehaviour Compile(Behaviour b) {

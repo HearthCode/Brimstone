@@ -6,9 +6,9 @@
 		public static Behaviour Game = new Behaviour {
 			Triggers =
 			{
-				At<IEntity, IEntity>(TriggerType.GameStart, StartGame),
-				At<IEntity, IEntity>(TriggerType.BeginMulligan, BeginMulligan),
-				At<IEntity, IEntity>(TriggerType.PhaseMainNext, EndTurn)
+				At(TriggerType.GameStart, StartGame),
+				At(TriggerType.BeginMulligan, BeginMulligan),
+				At(TriggerType.PhaseMainNext, EndTurn)
 			}
 		};
 
