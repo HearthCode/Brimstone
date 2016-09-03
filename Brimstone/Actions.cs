@@ -257,7 +257,7 @@ namespace Brimstone
 	{
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			// Draw a card then reset all relevant flags
-			game.Queue(game.CurrentPlayer, Actions.Draw(game.CurrentPlayer).Then((Action<IEntity>)(_ => {
+			game.Queue(game.CurrentPlayer, Behaviours.Draw(game.CurrentPlayer).Then((Action<IEntity>)(_ => {
 				game.CurrentPlayer.NumMinionsPlayerKilledThisTurn = 0;
 				game.CurrentOpponent.NumMinionsPlayerKilledThisTurn = 0;
 				game.CurrentPlayer.NumFriendlyMinionsThatAttackedThisTurn = 0;
@@ -627,12 +627,12 @@ namespace Brimstone
 
 			defender.LastAffectedBy = attacker;
 
-			game.Queue(attacker, Actions.Damage((Entity)defender, attacker.AttackDamage));
+			game.Queue(attacker, Behaviours.Damage((Entity)defender, attacker.AttackDamage));
 
 			// TODO: Attacker Predamage
 
 			if (defAttack > 0)
-				game.Queue(defender, Actions.Damage((Entity)attacker, defAttack));
+				game.Queue(defender, Behaviours.Damage((Entity)attacker, defAttack));
 
 			// TODO: Attacker LastAffectedBy
 

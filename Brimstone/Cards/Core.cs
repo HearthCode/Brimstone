@@ -1,6 +1,6 @@
 ﻿namespace Brimstone
 {
-	public partial class BehaviourScripts : Actions
+	public partial class BehaviourScripts : Behaviours
 	{
 		// Game
 		public static Behaviour Game = new Behaviour {

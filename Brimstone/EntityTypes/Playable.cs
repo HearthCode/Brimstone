@@ -57,7 +57,7 @@ namespace Brimstone
 
 			// TODO: Check targeting validity
 			Target = target;
-			return (T) Game.Action(this, Actions.Play(this));
+			return (T) Game.Action(this, Behaviours.Play(this));
 		}
 	}
 }

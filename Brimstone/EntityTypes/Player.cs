@@ -90,32 +90,32 @@ namespace Brimstone
 		}
 
 		public void StartMulligan() {
-			Game.Action(this, Actions.MulliganChoice(this));
+			Game.Action(this, Behaviours.MulliganChoice(this));
 		}
 			
 		public IPlayable Give(Card card) {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
 				throw new ChoiceException();
 
-			return (IPlayable)(Entity) Game.Action(Game, Actions.Give(this, card));
+			return (IPlayable)(Entity) Game.Action(Game, Behaviours.Give(this, card));
 		}
 
 		public T Draw<T>() where T : Entity {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
 				throw new ChoiceException();
 
-			return (T) Game.Action(Game, Actions.Draw(this));
+			return (T) Game.Action(Game, Behaviours.Draw(this));
 		}
 
 		public void Draw(ActionGraph qty) {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
 				throw new ChoiceException();
 
-			Game.Action(this, Actions.Draw(this) * qty);
+			Game.Action(this, Behaviours.Draw(this) * qty);
 		}
 
 		public void Concede() {
-			Game.Action(this, Actions.Concede(this));
+			Game.Action(this, Behaviours.Concede(this));
 		}
 
 		public override object Clone() {

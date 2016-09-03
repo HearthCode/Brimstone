@@ -13,11 +13,13 @@ namespace BrimstoneGameScript
     public class BrimstoneGame : IBrimstoneGame
 	{
 		public const int MaxMinions = 7;
+	    private IPlayable acolyte;
 
 		public Game SetupGame() {
 			var game = new Game(HeroClass.Hunter, HeroClass.Warlock, PowerHistory: true);
 			var p1 = game.Player1;
 			var p2 = game.Player2;
+			acolyte = p1.Deck.Add(new Minion("Acolyte of Pain"));
 			p1.Deck.Fill();
 			p2.Deck.Fill();
 
@@ -25,14 +27,38 @@ namespace BrimstoneGameScript
 		}
 
 		public void PlayGame(Game Game) {
-			Game.Player1.Choice.Keep(x => true);
-			Game.Player2.Choice.Keep(x => true);
+			Game.Player1.Choice.Keep(x => x.Cost <= 2);
+			Game.Player2.Choice.Keep(x => x.Cost <= 2);
 
-			var p = Game.CurrentPlayer;
+			if (Game.CurrentPlayer != Game.Player1)
+				Game.EndTurn();
 
-			p.Give("Acolyte of Pain").Play();
-			p.Give("Acolyte of Pain").Play();
-			p.Give("Whirlwind").Play();
+			var cardsInHand = Game.CurrentPlayer.Hand.Count;
+			// Acolyte is in deck, should not trigger
+			Game.CurrentPlayer.Give("Whirlwind").Play();
+			System.Diagnostics.Debug.Assert(cardsInHand == Game.CurrentPlayer.Hand.Count);
+
+			// Acolyte is in hand, should not trigger
+			acolyte.Zone = Game.CurrentPlayer.Hand;
+			cardsInHand++;
+			Game.CurrentPlayer.Give("Whirlwind").Play();
+			System.Diagnostics.Debug.Assert(cardsInHand == Game.CurrentPlayer.Hand.Count);
+
+			// Acolyte is in hand, trigger should be checked but not fire
+			Game.CurrentPlayer.Give("War Golem").Play();
+			Game.CurrentPlayer.Give("Whirlwind").Play();
+			System.Diagnostics.Debug.Assert(cardsInHand == Game.CurrentPlayer.Hand.Count);
+
+			// Acolyte is on board, trigger should be checked and fire
+			acolyte.Play();
+			cardsInHand--;
+			Game.CurrentPlayer.Give("Whirlwind").Play();
+			System.Diagnostics.Debug.Assert(cardsInHand + 1 == Game.CurrentPlayer.Hand.Count);
+
+			// Acolyte is in graveyard, should not trigger
+			acolyte.Zone = Game.CurrentPlayer.Graveyard;
+			Game.CurrentPlayer.Give("Whirlwind").Play();
+			System.Diagnostics.Debug.Assert(cardsInHand + 1 == Game.CurrentPlayer.Hand.Count);
 		}
 	}
 }

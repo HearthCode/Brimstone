@@ -55,7 +55,13 @@
     <Compile Include="ActionResult.cs" />
     <Compile Include="Actions.cs" />
     <Compile Include="BehaviourCompiler.cs" />
-    <Compile Include="Behaviours.cs" />
+    <Compile Include="Behaviours\Actions.cs" />
+    <Compile Include="Behaviours\Behaviour.cs" />
+    <Compile Include="Behaviours\Conditions.cs" />
+    <Compile Include="Behaviours\GamePhase.cs" />
+    <Compile Include="Behaviours\Selectors.cs" />
+    <Compile Include="Behaviours\SelectorTypes.cs" />
+    <Compile Include="Behaviours\TriggerTypes.cs" />
     <Compile Include="Card.cs" />
     <Compile Include="CardData.cs" />
     <Compile Include="Cards\All.cs" />

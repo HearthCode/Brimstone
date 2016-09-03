@@ -33,16 +33,16 @@ namespace Brimstone
 
 			// TODO: Check targeting validity
 			Target = target;
-			return (ICanTarget)(Entity)Game.Action(this, Actions.Attack(this, (Entity)target));
+			return (ICanTarget)(Entity)Game.Action(this, Behaviours.Attack(this, (Entity)target));
 		}
 
 		public void Hit(int amount) {
-			Game.Action(this, Actions.Damage(this, amount));
+			Game.Action(this, Behaviours.Damage(this, amount));
 		}
 
 		public void CheckForDeath() {
 			if (Health <= 0) {
-				Game.Queue(this, Actions.Death(this));
+				Game.Queue(this, Behaviours.Death(this));
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 namespace Brimstone
 {
-	public partial class BehaviourScripts : Actions
+	public partial class BehaviourScripts : Behaviours
 	{
 		// Basic, Neutral
 
