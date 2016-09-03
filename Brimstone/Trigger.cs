@@ -1,5 +1,3 @@
-#define _TRIGGER_DEBUG
-
 using System.Collections.Generic;
 
 namespace Brimstone

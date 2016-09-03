@@ -1,6 +1,4 @@
-﻿#define _DECK_DEBUG
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Brimstone

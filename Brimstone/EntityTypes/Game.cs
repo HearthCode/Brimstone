@@ -1,5 +1,3 @@
-//#define _GAME_DEBUG
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
