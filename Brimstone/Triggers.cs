@@ -220,9 +220,8 @@ namespace Brimstone
 					break;
 
 				case GameTag.DAMAGE:
-					if (newValue != 0) { // TODO: Replace with checking if the value increased
+					if (newValue > oldValue)
 						Queue(TriggerType.Damage, entity);
-					}
 					break;
 			}
 		}
