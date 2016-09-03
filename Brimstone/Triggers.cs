@@ -114,6 +114,19 @@ namespace Brimstone
 
 	public class TriggerManager : ICloneable
 	{
+		private static readonly Dictionary<TriggerType, int> TriggerIndices = new Dictionary<TriggerType, int>
+		{
+			{ TriggerType.PhaseMainStart, 0 },
+			{ TriggerType.PhaseMainReady, 1 },
+			{ TriggerType.PhaseMainAction, 2 },
+			{ TriggerType.WeaponAttack, 3 },
+			{ TriggerType.PhaseMainEnd, 4 },
+			{ TriggerType.PhaseMainCleanup, 5 },
+			{ TriggerType.DealMulligan, 6 },
+			{ TriggerType.MulliganWaiting, 7 },
+			{ TriggerType.PhaseMainStartTriggers, 8 }
+ 		};
+
 		private Game _game;
 		public Game Game
 		{
@@ -227,7 +240,10 @@ namespace Brimstone
 				if (owningEntity.Zone.Type == Zone.PLAY)
 					// Test trigger condition
 					if (trigger.Condition?.Eval(owningEntity, source) ?? true)
-						Game.ActionBlock(BlockType.TRIGGER, owningEntity, trigger.Action);
+						Game.ActionBlock(BlockType.TRIGGER, owningEntity, trigger.Action,
+							// Trigger index: 0 for normal entities; -1 for Game; specific index for player if specified, otherwise -1
+							Index: TriggerIndices.ContainsKey(type) ? TriggerIndices[type] :
+								source == Game? -1 : source is Player? -1 : 0);
 			}
 		}
 

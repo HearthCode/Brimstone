@@ -152,15 +152,25 @@ namespace Brimstone
 			ActionQueue.EnqueueDeferred(a);
 		}
 
-		public void ActionBlock(BlockType Type, IEntity Source, ActionGraph Actions, IEntity Target = null, int Index = -1) {
+		// Action block indexing rules:
+		// TRIGGER: 0 for normal entities; -1 for player if not specified; always -1 for Game; otherwise index in Triggers.cs
+		// PLAY: Always 0
+		// DEATHS: Always 0
+		// POWER: Always -1
+		// FATIGUE: Always 0
+		// ATTACK: Always -1
+		// JOUST: Always 0
+		// RITUAL: Always 0
+		public void ActionBlock(BlockType Type, IEntity Source, ActionGraph Actions, IEntity Target = null, int Index = -2) {
 			ActionBlock(Type, Source, Actions.Unravel(), Target, Index);
 		}
 
-		public void ActionBlock(BlockType Type, IEntity Source, List<QueueAction> Actions, IEntity Target = null, int Index = -1) {
+		public void ActionBlock(BlockType Type, IEntity Source, List<QueueAction> Actions, IEntity Target = null, int Index = -2) {
 #if _GAME_DEBUG
 			DebugLog.WriteLine("Queueing " + Type + " for " + Source.ShortDescription + " => " + (Target?.ShortDescription ?? "no target"));
 #endif
-			var block = new BlockStart(Type, Source, Target, Index);
+			int index = Index != -2 ? Index : (Type == BlockType.POWER || Type == BlockType.ATTACK ? -1 : 0);
+			var block = new BlockStart(Type, Source, Target, index);
 			Queue(Source, new GameBlock(block, Actions));
 		}
 
