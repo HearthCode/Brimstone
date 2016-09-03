@@ -261,13 +261,13 @@ namespace Brimstone
 
 		public List<ActionResult> ProcessBlock(object UserData = null) {
 #if _QUEUE_DEBUG
-			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): start processing current block");
+			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Start processing current block");
 			var depth = Depth;
 #endif
 			var result = ProcessAll(UserData, Depth);
 #if _QUEUE_DEBUG
 			System.Diagnostics.Debug.Assert(depth == Depth + 1);
-			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): end processing current block");
+			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): End processing current block");
 #endif
 			return result;
 		}

@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Brimstone
 {
@@ -47,7 +48,6 @@ namespace Brimstone
 		ICondition Condition { get; }
 		List<QueueAction> Action { get; }
 		TriggerType Type { get; }
-		IAttachedTrigger CreateAttachedTrigger(IEntity entity);
 	}
 
 	public class Trigger<T, U> : ITrigger where T : IEntity where U : IEntity
@@ -73,40 +73,8 @@ namespace Brimstone
 			Type = t.Type;
 		}
 
-		IAttachedTrigger ITrigger.CreateAttachedTrigger(IEntity entity) {
-			return CreateAttachedTrigger(entity);
-		}
-
-		public AttachedTrigger<T, U> CreateAttachedTrigger(IEntity entity) {
-			// The base Triggers property on Card.Behaviour has no linked entity
-			// Link by creating a copy of the trigger and setting EntityId
-			return new AttachedTrigger<T, U>(this, entity);
-		}
-
-		// TODO: Detach triggers
-
 		public static Trigger<T, U> At(TriggerType type, ActionGraph g, Condition<T, U> condition = null) {
 			return new Trigger<T, U>(type, g, condition);
-		}
-	}
-
-	public interface IAttachedTrigger : ITrigger {
-		int EntityId { get; }
-	}
-
-	public class AttachedTrigger<T, U> : Trigger<T, U>, IAttachedTrigger where T : IEntity where U : IEntity
-	{
-		public int EntityId { get; }
-
-		public AttachedTrigger(Trigger<T, U> t, IEntity e) : base(t) {
-#if _TRIGGER_DEBUG
-			DebugLog.WriteLine("Attaching trigger " + t.Type + " to entity " + e.ShortDescription);
-#endif
-			EntityId = e.Id;
-		}
-
-		public AttachedTrigger(AttachedTrigger<T, U> t) : base(t) {
-			EntityId = t.EntityId;
 		}
 	}
 
@@ -138,30 +106,34 @@ namespace Brimstone
 			}
 		}
 
-		public Dictionary<TriggerType, List<IAttachedTrigger>> Triggers { get; }
+		// Lists of entity IDs which have triggers of the key type
+		public Dictionary<TriggerType, List<int>> Triggers { get; }
 
 		public TriggerManager(Game game) {
 			Game = game;
-			Triggers = new Dictionary<TriggerType, List<IAttachedTrigger>>();
+			Triggers = new Dictionary<TriggerType, List<int>>();
 		}
 
 		public TriggerManager(TriggerManager tm) {
 			Game = tm.Game;
-			Triggers = new Dictionary<TriggerType, List<IAttachedTrigger>>(tm.Triggers);
+			// TODO: Write a unit test that clones twice, creates new entity with same ID and different triggers per game, check all 3 games trigger correctly
+			Triggers = new Dictionary<TriggerType, List<int>>(tm.Triggers);
 		}
 
 		public void Add(IEntity entity) {
-			if (entity.Card.Behaviour != null)
-				if (entity.Card.Behaviour.Triggers != null)
-					foreach (var t in entity.Card.Behaviour.Triggers)
-						Add(t.CreateAttachedTrigger(entity));
+			if (entity.Card.Behaviour?.Triggers != null)
+				foreach (var t in entity.Card.Behaviour.Triggers)
+					Add(entity, t);
 		}
 
-		public void Add(IAttachedTrigger t) {
-			if (Triggers.ContainsKey(t.Type))
-				Triggers[t.Type].Add(t);
+		public void Add(IEntity entity, ITrigger trigger) {
+#if _TRIGGER_DEBUG
+			DebugLog.WriteLine("Associating trigger " + trigger.Type + " for entity " + entity.ShortDescription + " with game " + Game.GameId);
+#endif
+			if (Triggers.ContainsKey(trigger.Type))
+				Triggers[trigger.Type].Add(entity.Id);
 			else
-				Triggers.Add(t.Type, new List<IAttachedTrigger> { t });
+				Triggers.Add(trigger.Type, new List<int> { entity.Id });
 		}
 
 		private void OnEntityChanged(Game game, IEntity entity, GameTag tag, int oldValue, int newValue) {
@@ -229,23 +201,32 @@ namespace Brimstone
 #if _TRIGGER_DEBUG
 			DebugLog.WriteLine("Checking triggers for " + type + " initiated by " + source.ShortDescription);
 #endif
-			foreach (var trigger in Triggers[type]) {
-				var owningEntity = Game.Entities[trigger.EntityId];
-
-				// Only allow triggers to trigger in PLAY for now. TODO: Add support for triggers in HAND etc, or make it so triggers attach/detach only while they're in the correct zone
-				if (owningEntity.Zone.Type == Zone.PLAY)
+			foreach (var entityId in Triggers[type]) {
+				var owningEntity = Game.Entities[entityId];
+				if (owningEntity.Zone.Type == Zone.PLAY || owningEntity.Zone.Type == Zone.HAND)
+				{
+#if _TRIGGER_DEBUG
+					DebugLog.WriteLine("Checking trigger conditions for " + owningEntity.ShortDescription);
+#endif
+					// TODO: Replace per-card trigger list with properties
+					var trigger = owningEntity.Card.Behaviour.Triggers.First(x => x.Type == type);
 					// Test trigger condition
-					if (trigger.Condition?.Eval(owningEntity, source) ?? true)
+					if (trigger.Condition?.Eval(owningEntity, source) ?? true) {
+#if _TRIGGER_DEBUG
+						DebugLog.WriteLine("Firing trigger for " + owningEntity.ShortDescription + " with actions: "
+							+ string.Join(" ", trigger.Action.Select(a => a.ToString())));
+#endif
 						Game.ActionBlock(BlockType.TRIGGER, owningEntity, trigger.Action,
 							// Trigger index: 0 for normal entities; -1 for Game; specific index for player if specified, otherwise -1
 							Index: TriggerIndices.ContainsKey(type) ? TriggerIndices[type] :
 								source == Game? -1 : source is Player? -1 : 0);
+					}
+				} else {
+#if _TRIGGER_DEBUG
+					DebugLog.WriteLine("Ignoring triggers for " + owningEntity.ShortDescription + " because it wasn't in an active zone");
+#endif
+				}
 			}
-		}
-
-		public void At<T, U>(TriggerType Type, ActionGraph Actions, IEntity Owner = null, Condition<T, U> Condition = null)
-			where T : IEntity where U : IEntity {
-			Add(new Trigger<T, U>(Type, Actions, Condition).CreateAttachedTrigger(Owner ?? Game));
 		}
 
 		public object Clone() {

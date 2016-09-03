@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define _ZONE_DEBUG
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -192,7 +194,9 @@ namespace Brimstone
 
 			if (ZonePosition != 0)
 				updateZonePositions();
-
+#if _ZONE_DEBUG
+			DebugLog.WriteLine("Adding " + Entity.ShortDescription + " to " + Entity.Controller.ShortDescription + "'s " + Type + " zone at position " + ZonePosition);
+#endif
 			if (Entity is T)
 				return (T) Entity;
 			return default(T);
@@ -201,6 +205,9 @@ namespace Brimstone
 		public T Remove(IEntity Entity, bool ClearZone = true) {
 			if (Entity.Zone.Type != Zone.INVALID)
 			{
+#if _ZONE_DEBUG
+				DebugLog.WriteLine("Removing " + Entity.ShortDescription + " from " + Entity.Controller.ShortDescription + "'s " + Type + " zone at position " + Entity.ZonePosition);
+#endif
 				bool removed = (Entity is T ? asList.Remove((T) Entity) : true);
 				if (removed)
 				{

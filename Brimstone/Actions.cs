@@ -139,15 +139,12 @@ namespace Brimstone
 	// Runs when STATE = RUNNING
 	public class StartGame : QueueAction
 	{
-		public int FirstPlayer { get; set; }
-		public bool SkipMulligan { get; set; }
-
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			// Pick a random starting player
-			if (FirstPlayer == 0)
+			if (game.FirstPlayerNum == 0)
 				game.FirstPlayer = game.Players[RNG.Between(0, 1)];
 			else
-				game.FirstPlayer = game.Players[FirstPlayer - 1];
+				game.FirstPlayer = game.Players[game.FirstPlayerNum - 1];
 			game.CurrentPlayer = game.FirstPlayer;
 
 			// Set turn counter
@@ -166,7 +163,7 @@ namespace Brimstone
 
 			// TODO: Set TIMEOUT for each player here if desired
 
-			if (!SkipMulligan)
+			if (!game.SkipMulligan)
 				game.NextStep = Step.BEGIN_MULLIGAN;
 			else
 				game.NextStep = Step.MAIN_READY;

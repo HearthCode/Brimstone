@@ -13,7 +13,7 @@ namespace Brimstone
 
 	public class Actions {
 		// Factory functions for DSL syntax
-		public static ActionGraph StartGame(int FirstPlayer = 0, bool SkipMulligan = false) { return new StartGame { FirstPlayer = FirstPlayer, SkipMulligan = SkipMulligan}; }
+		public static ActionGraph StartGame { get { return new StartGame(); } }
 		public static ActionGraph BeginMulligan { get { return new BeginMulligan(); } }
 		public static ActionGraph PerformMulligan { get { return new PerformMulligan(); } }
 		public static ActionGraph WaitForMulliganComplete { get { return new WaitForMulliganComplete(); } }
@@ -222,8 +222,8 @@ namespace Brimstone
 		public static Trigger<IEntity, IEntity> OnWeaponAttack(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
 			return Trigger<IEntity, IEntity>.At(TriggerType.WeaponAttack, Action, Condition);
 		}
-		public static Trigger<IEntity, Game> OnMainNext(Condition<IEntity, Game> Condition, ActionGraph Action) {
-			return Trigger<IEntity, Game>.At(TriggerType.PhaseMainNext, Action, Condition);
+		public static Trigger<IEntity, IEntity> OnMainNext(Condition<IEntity, IEntity> Condition, ActionGraph Action) {
+			return Trigger<IEntity, IEntity>.At(TriggerType.PhaseMainNext, Action, Condition);
 		}
 
 		// Trigger conditions

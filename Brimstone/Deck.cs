@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#define _DECK_DEBUG
+
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Brimstone
@@ -25,6 +27,9 @@ namespace Brimstone
 					{ GameTag.ZONE, (int)Zone.DECK },
 					{ GameTag.ZONE_POSITION, nextPos++ }
 				};
+#if _DECK_DEBUG
+				DebugLog.WriteLine("Adding " + card.Name + " to " + Controller.ShortDescription + "'s deck");
+#endif
 				Game.Add(Entity.FromCard(card, tags), Controller);
 			}
 			// Force deck zone contents to update
@@ -32,6 +37,9 @@ namespace Brimstone
 		}
 
 		public void Shuffle() {
+#if _DECK_DEBUG
+			DebugLog.WriteLine("Shuffling " + Controller.ShortDescription + "'s deck");
+#endif
 			var possiblePositions = Enumerable.Range(1, Count).ToList();
 			foreach (var c in this) {
 				int selIndex = RNG.Between(0, possiblePositions.Count - 1);
@@ -46,7 +54,9 @@ namespace Brimstone
 			// TODO: Add filters later
 			var cardsToAdd = MaxCards - Count;
 			var fillCards = new List<Card>(cardsToAdd);
-
+#if _DECK_DEBUG
+			DebugLog.WriteLine("Adding " + cardsToAdd + " random cards to " + Controller.ShortDescription + "'s deck");
+#endif
 			while (fillCards.Count < cardsToAdd) {
 				// TODO: Change Cards.All to a Linq statement selecting only relevant cards
 				var chosenCard = RNG<Card>.Choose(Cards.All);

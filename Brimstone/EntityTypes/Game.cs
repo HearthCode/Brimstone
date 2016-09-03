@@ -50,6 +50,8 @@ namespace Brimstone
 				Players[1] = value;
 			}
 		}
+		public int FirstPlayerNum { get; private set; }
+		public bool SkipMulligan { get; private set; }
 
 		// TODO: Other common set selectors
 		public IEnumerable<ICharacter> Characters => Player1.Board.Concat(Player2.Board).Concat(new List<ICharacter> {Player1.Hero, Player2.Hero});
@@ -81,6 +83,9 @@ namespace Brimstone
 
 		// Required by IEntity
 		public Game(Game cloneFrom) : base(cloneFrom) {
+			// Settings
+			FirstPlayerNum = cloneFrom.FirstPlayerNum;
+			SkipMulligan = cloneFrom.SkipMulligan;
 			// Generate zones owned by game
 			Zones = new Zones(this, this);
 			// Update tree
@@ -220,11 +225,9 @@ namespace Brimstone
 		}
 
 		public void Start(int FirstPlayer = 0, bool SkipMulligan = false) {
-
-			// Attach all game triggers
-			ActiveTriggers.At<IEntity, IEntity>(TriggerType.GameStart, Actions.StartGame(FirstPlayer, SkipMulligan));
-			ActiveTriggers.At<IEntity, IEntity>(TriggerType.BeginMulligan, Actions.BeginMulligan);
-			ActiveTriggers.At<IEntity, IEntity>(TriggerType.PhaseMainNext, Actions.EndTurn);
+			// Override settings
+			FirstPlayerNum = FirstPlayer;
+			this.SkipMulligan = SkipMulligan;
 
 			// Configure players
 			foreach (var p in Players)
