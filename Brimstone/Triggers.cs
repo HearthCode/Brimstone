@@ -169,34 +169,34 @@ namespace Brimstone
 			switch (tag) {
 				case GameTag.STATE:
 					if (newValue == (int)GameState.RUNNING)
-						Queue(TriggerType.GameStart, entity);
+						Queue(TriggerType.GameStart, game);
 					break;
 
 				case GameTag.STEP:
 					switch ((Step)newValue) {
 						case Step.BEGIN_MULLIGAN:
-							Queue(TriggerType.BeginMulligan, entity);
+							Queue(TriggerType.BeginMulligan, game);
 							break;
 						case Step.MAIN_NEXT:
-							Queue(TriggerType.PhaseMainNext, entity);
+							Queue(TriggerType.PhaseMainNext, game.CurrentPlayer);
 							break;
 						case Step.MAIN_READY:
-							Queue(TriggerType.PhaseMainReady, entity);
+							Queue(TriggerType.PhaseMainReady, game.CurrentPlayer);
 							break;
 						case Step.MAIN_START_TRIGGERS:
-							Queue(TriggerType.PhaseMainStartTriggers, entity);
+							Queue(TriggerType.PhaseMainStartTriggers, game.CurrentPlayer);
 							break;
 						case Step.MAIN_START:
-							Queue(TriggerType.PhaseMainStart, entity);
+							Queue(TriggerType.PhaseMainStart, game.CurrentPlayer);
 							break;
 						case Step.MAIN_ACTION:
-							Queue(TriggerType.PhaseMainAction, entity);
+							Queue(TriggerType.PhaseMainAction, game.CurrentPlayer);
 							break;
 						case Step.MAIN_END:
-							Queue(TriggerType.PhaseMainEnd, entity);
+							Queue(TriggerType.PhaseMainEnd, game.CurrentPlayer);
 							break;
 						case Step.MAIN_CLEANUP:
-							Queue(TriggerType.PhaseMainCleanup, entity);
+							Queue(TriggerType.PhaseMainCleanup, game.CurrentPlayer);
 							break;
 					}
 					break;
