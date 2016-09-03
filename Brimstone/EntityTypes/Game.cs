@@ -73,7 +73,6 @@ namespace Brimstone
 		public delegate void EntityChangeEventDelegate(Game Game, IEntity Entity, GameTag Tag, int OldValue, int NewValue);
 
 		public event EntityCreateEventDelegate OnEntityCreated;
-		public event EntityChangeEventDelegate OnEntityChanging;
 		public event EntityChangeEventDelegate OnEntityChanged;
 
 		// Game clones n-tree traversal
@@ -283,7 +282,6 @@ namespace Brimstone
 		public void EntityChanging(IEntity entity, GameTag tag, int oldValue, int newValue, int previousHash) {
 			if (Settings.GameHashCaching)
 				_changed = true;
-			OnEntityChanging?.Invoke(this, entity, tag, oldValue, newValue);
 		}
 
 		public void EntityChanged(IEntity entity, GameTag tag, int oldValue, int newValue) {
