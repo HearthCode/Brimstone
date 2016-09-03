@@ -304,5 +304,36 @@ namespace BrimstoneTests
 			Assert.That(w1.Zone == w1.Controller.Graveyard);
 			Assert.That(wisp.Zone == wisp.Controller.Graveyard);
 		}
+
+		[Test]
+		public void TestGadgetzanAuctioneer() {
+			var game = new Game(HeroClass.Rogue, HeroClass.Warlock);
+			game.Player1.Deck.Fill();
+			game.Player2.Deck.Fill();
+			game.Start(SkipMulligan: false);
+
+			game.Player1.Choice.Discard(new List<IEntity>());
+			game.Player2.Choice.Discard(new List<IEntity>());
+
+			var p1 = game.CurrentPlayer;
+			var p2 = game.CurrentPlayer.Opponent;
+
+			var auctioneer = new Minion("Gadgetzan Auctioneer").GiveTo(p1).Play();
+			var p1CardsInHand = p1.Hand.Count;
+			var p2CardsInHand = p2.Hand.Count;
+			new Spell("Darkbomb").GiveTo(p1).Play(p2.Hero);
+			Assert.AreEqual(p1CardsInHand + 1, p1.Hand.Count);
+			Assert.AreEqual(p2CardsInHand, p2.Hand.Count);
+			game.EndTurn();
+
+			new Spell("Darkbomb").GiveTo(p2).Play(p1.Hero);
+			Assert.AreEqual(p1CardsInHand + 1, p1.Hand.Count);
+			Assert.AreEqual(p2CardsInHand + 1, p2.Hand.Count);
+			game.EndTurn();
+
+			new Minion("Bloodfen Raptor").GiveTo(p1).Play();
+			Assert.AreEqual(p1CardsInHand + 2, p1.Hand.Count);
+			Assert.AreEqual(p2CardsInHand + 1, p2.Hand.Count);
+		}
 	}
 }

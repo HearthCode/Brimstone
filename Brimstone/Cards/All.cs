@@ -278,8 +278,11 @@ namespace Brimstone
 		// TODO: Enchantments providing Taunt, Enchantments (EX1_093e)
 
 		// Gadgetzan Auctioneer
-		// public static Behaviour EX1_095 = new Behaviour {
-		// TODO: Conditional selectors
+		public static Behaviour EX1_095 = new Behaviour {
+			Triggers = {
+				OnPlay(IsFriendlySpell, Draw(Controller))
+			}
+		};
 
 		// Abomination
 		public static Behaviour EX1_097 = new Behaviour {
