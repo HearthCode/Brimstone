@@ -147,7 +147,7 @@ namespace Brimstone
 				StartBlock(source, g.Unravel(), gameBlock);
 		}
 
-		public bool EndBlock() {
+		private bool EndBlock() {
 			if (Depth > 0) {
 #if _QUEUE_DEBUG
 				DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Destroying queue at depth " + Depth);
@@ -155,9 +155,7 @@ namespace Brimstone
 				var gameBlock = BlockStack.Pop();
 				if (gameBlock != null)
 					Game.OnBlockEmpty(gameBlock);
-				var remainingItems = Queue;
 				Queue = QueueStack.Pop();
-				Queue.AddFrontRange(remainingItems);
 			}
 			// When the queue is empty, notify the game - it may refill it with new actions
 			if (IsEmpty)
