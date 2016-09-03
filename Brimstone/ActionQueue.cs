@@ -7,9 +7,12 @@ namespace Brimstone
 {
 	public class QueueActionEventArgs : EventArgs, ICloneable
 	{
-		// TODO: Make this value-type cloneable (it might be already for not yet run actions)
 		public Game Game { get; set; }
-		public IEntity Source { get; set; }
+		private int _sourceId;
+		public IEntity Source {
+			get { return Game.Entities[_sourceId]; }
+			set { _sourceId = value.Id; }
+		}
 		public QueueAction Action { get; set; }
 		public List<ActionResult> Args { get; set; }
 		public bool Cancel { get; set; }
@@ -37,7 +40,9 @@ namespace Brimstone
 
 		public object Clone() {
 			// NOTE: Cancel flag is cleared when cloning
-			return new QueueActionEventArgs(Game, Source, Action, Args, UserData);
+			var clone = (QueueActionEventArgs)MemberwiseClone();
+			clone.Cancel = false;
+			return clone;
 		}
 	}
 
@@ -45,7 +50,7 @@ namespace Brimstone
 	{
 		public Game Game { get; private set; }
 		public Stack<Deque<QueueActionEventArgs>> QueueStack = new Stack<Deque<QueueActionEventArgs>>();
-		public Deque<QueueActionEventArgs> Queue = new Deque<QueueActionEventArgs>();
+		public Deque<QueueActionEventArgs> Queue;
 		public Stack<ActionResult> ResultStack = new Stack<ActionResult>();
 		public List<QueueActionEventArgs> History;
 
@@ -59,7 +64,7 @@ namespace Brimstone
 		public event EventHandler<QueueActionEventArgs> OnAction;
 
 		private readonly Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>> ReplacedActions;
-		private readonly Stack<BlockStart> BlockStack = new Stack<BlockStart>();
+		private readonly Stack<BlockStart> BlockStack;
 
 		public int Count => Queue.Count;
 		public bool IsBlockEmpty => Queue.Count == 0;
@@ -70,21 +75,18 @@ namespace Brimstone
 			Game = game;
 			Paused = false;
 			UserData = userData;
+			Queue = new Deque<QueueActionEventArgs>();
 			History = new List<QueueActionEventArgs>();
 			ReplacedActions = new Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>>();
+			BlockStack = new Stack<BlockStart>();
 		}
 
 		public ActionQueue(ActionQueue cloneFrom) {
 			// BlockStart is immutable and uses only value types so we can just shallow clone
 			BlockStack = new Stack<BlockStart>(cloneFrom.BlockStack.Reverse());
-			foreach (var queue in cloneFrom.QueueStack.Reverse()) {
-				var cq = new Deque<QueueActionEventArgs>();
-				foreach (var item in queue)
-					cq.AddBack((QueueActionEventArgs) item.Clone());
-				QueueStack.Push(cq);
-			}
-			foreach (var item in cloneFrom.Queue)
-				Queue.AddBack((QueueActionEventArgs)item.Clone());
+			foreach (var queue in cloneFrom.QueueStack.Reverse())
+				QueueStack.Push(new Deque<QueueActionEventArgs>(queue.Select(q => (QueueActionEventArgs) q.Clone())));
+			Queue = new Deque<QueueActionEventArgs>(cloneFrom.Queue.Select(q => (QueueActionEventArgs) q.Clone()));
 			var stack = new List<ActionResult>(cloneFrom.ResultStack);
 			stack.Reverse();
 			// TODO: Doesn't this clone some items twice?
