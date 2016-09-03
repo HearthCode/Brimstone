@@ -1,31 +1,7 @@
 namespace Brimstone
 {
-	public class BehaviourScripts : Actions
+	public partial class BehaviourScripts : Actions
 	{
-		// Game
-		public static Behaviour Game = new Behaviour {
-			Triggers =
-			{
-				At<IEntity, IEntity>(TriggerType.GameStart, StartGame),
-				At<IEntity, IEntity>(TriggerType.BeginMulligan, BeginMulligan),
-				At<IEntity, IEntity>(TriggerType.PhaseMainNext, EndTurn)
-			}
-		};
-
-		// Player
-		public static Behaviour Player = new Behaviour {
-			Triggers = {
-				At(TriggerType.DealMulligan, IsSelf, PerformMulligan),
-				At(TriggerType.MulliganWaiting, IsSelf, WaitForMulliganComplete),
-				At(TriggerType.PhaseMainReady, IsFriendly, BeginTurn),
-				At(TriggerType.PhaseMainStartTriggers, IsFriendly, BeginTurnTriggers),
-				At(TriggerType.PhaseMainStart, IsFriendly, BeginTurnForPlayer),
-				At(TriggerType.PhaseMainAction, IsFriendly, (System.Action<IEntity>)(p => { p.Game.NextStep = Step.MAIN_END; })),
-				At(TriggerType.PhaseMainEnd, IsFriendly, EndTurnForPlayer),
-				At(TriggerType.PhaseMainCleanup, IsFriendly, EndTurnCleanupForPlayer)
-			}
-		};
-
 		// Basic, Neutral
 
 		// Raid Leader
@@ -440,24 +416,24 @@ namespace Brimstone
 			Battlecry = Summon(Controller, "Battle Axe", 1)
 		};
 
-		//Explosive Sheep
+		// Explosive Sheep
 		public static Behaviour GVG_076 = new Behaviour {
 			Deathrattle = Damage(AllMinions, 2)
 		};
 
-		//Deathlord
+		// Deathlord
 		public static Behaviour FP1_009 = new Behaviour {
 			Deathrattle = Summon(Opponent, RandomOpponentMinionInDeck, 1)
 		};
 
-		//Illidan Stormrage
+		// Illidan Stormrage
 		public static Behaviour EX1_614 = new Behaviour {
 			Triggers = {
 				OnPlay(IsFriendly, Summon(Controller, "EX1_614t"))
 			}
 		};
 
-		//Baron Geddon
+		// Baron Geddon
 		public static Behaviour EX1_249 = new Behaviour {
 			Triggers = {
 				OnEndTurn(IsFriendly, Damage(AllCharacters, 2)) //TODO: Should be AllCharacters - Self
