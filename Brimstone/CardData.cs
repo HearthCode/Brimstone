@@ -47,8 +47,10 @@ namespace Brimstone
 		}
 
 		// Card must be collectible to avoid selecting duplicate cards. Use CardID to retrieve adventure cards etc.
-		public Card ByName(string cardName) {
-			return Cards.FirstOrDefault(x => x.Value.Name == cardName && x.Value.Collectible).Value;
+		public Card ByName(string cardName)
+		{
+			var card = Cards.FirstOrDefault(x => x.Value.Name == cardName && x.Value.Collectible);
+			return !card.Equals(default(KeyValuePair<string, Card>)) ? card.Value : null;
 		}
 
 		public CardDefs() { }

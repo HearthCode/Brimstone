@@ -146,7 +146,7 @@ namespace Brimstone.Actions
 
 				// Give 2nd player the coin
 				if (p != game.FirstPlayer)
-					p.Give("The Coin");
+					p.Give("GAME_005");
 			}
 
 			// TODO: Set TIMEOUT for each player here if desired
