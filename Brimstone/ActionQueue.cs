@@ -1,4 +1,7 @@
-﻿using System;
+﻿#define _USE_QUEUE
+//#define _USE_TREE
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -49,7 +52,6 @@ namespace Brimstone
 	public class ActionQueue : ListTree<QueueActionEventArgs>, ICloneable
 	{
 		public Game Game { get; private set; }
-		// TODO: Use depth queueing instead of a stack
 		public Stack<Deque<QueueActionEventArgs>> QueueStack = new Stack<Deque<QueueActionEventArgs>>();
 		public Deque<QueueActionEventArgs> Queue;
 		public Stack<ActionResult> ResultStack = new Stack<ActionResult>();
@@ -67,10 +69,17 @@ namespace Brimstone
 		private readonly Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>> ReplacedActions;
 		private readonly Stack<BlockStart> BlockStack;
 
-		public int Count => Queue.Count;
+		private QueueTree Tree = new QueueTree();
+#if _USE_TREE
+		public bool IsBlockEmpty => Tree.CurrentDequeuePoint == null;
+		public bool IsEmpty => Tree.CurrentDequeuePoint == null && Tree.Depth == 0;
+		public int Depth => Tree.Depth;
+#endif
+#if _USE_QUEUE
 		public bool IsBlockEmpty => Queue.Count == 0;
-		public bool IsEmpty => Queue.Count == 0 && QueueStack.Count == 0;
+		public bool IsEmpty => Queue.Count == 0 && Depth == 0;
 		public int Depth => QueueStack.Count;
+#endif
 
 		public ActionQueue(Game game, object userData = null) : base(null) {
 			Game = game;
@@ -79,6 +88,10 @@ namespace Brimstone
 			Queue = new Deque<QueueActionEventArgs>();
 			ReplacedActions = new Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>>();
 			BlockStack = new Stack<BlockStart>();
+#if _USE_TREE
+			Tree.OnBranchResolved += EndBlock;
+			Tree.OnTreeResolved += EndQueue;
+#endif
 		}
 
 		public ActionQueue(ActionQueue cloneFrom) : base(cloneFrom) {
@@ -102,6 +115,8 @@ namespace Brimstone
 			OnAction = cloneFrom.OnAction;
 			// Copy user data
 			UserData = cloneFrom.UserData;
+			// TODO: Temporary
+			Tree = null;
 		}
 
 		public void Attach(Game game) {
@@ -131,6 +146,7 @@ namespace Brimstone
 			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Spawning new queue at depth " + (Depth + 1) + " for " + source.ShortDescription + " with actions: " +
 			                   string.Join(" ", qa.Select(a => a.ToString())) + " for action block: " + (gameBlock?.ToString() ?? "none"));
 #endif
+			Tree?.Stack();
 			QueueStack.Push(Queue);
 			BlockStack.Push(gameBlock);
 			Queue = new Deque<QueueActionEventArgs>();
@@ -147,7 +163,7 @@ namespace Brimstone
 				StartBlock(source, g.Unravel(), gameBlock);
 		}
 
-		private bool EndBlock() {
+		private void EndBlock() {
 			if (Depth > 0) {
 #if _QUEUE_DEBUG
 				DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Destroying queue at depth " + Depth);
@@ -159,8 +175,11 @@ namespace Brimstone
 			}
 			// When the queue is empty, notify the game - it may refill it with new actions
 			if (IsEmpty)
-				Game.OnQueueEmpty();
-			return !IsEmpty;
+				EndQueue();
+		}
+
+		private void EndQueue() {
+			Game.OnQueueEmpty();
 		}
 
 		// Gets a QueueAction that can put into the queue
@@ -221,12 +240,15 @@ namespace Brimstone
 			if (OnQueueing != null) {
 				OnQueueing(this, e);
 				// TODO: Count the number of arguments the cancelled action would take and remove those too
-				if (!e.Cancel)
+				if (!e.Cancel) {
 					Queue.AddBack(e);
+					Tree?.Enqueue(e);
+				}
 			}
-			else
+			else {
 				Queue.AddBack(e);
-
+				Tree?.Enqueue(e);
+			}
 			OnQueued?.Invoke(this, e);
 		}
 
@@ -274,15 +296,27 @@ namespace Brimstone
 				return false;
 
 			// Unwind queue when blocks are empty
-			while (IsBlockEmpty && Depth > MaxUnwindDepth && EndBlock())
-				;
+			Tree?.Unwind(MaxUnwindDepth + 1);
+#if _USE_QUEUE
+			while (IsBlockEmpty && Depth > MaxUnwindDepth)
+				EndBlock();
+#endif
 
 			// Exit if we have unwound the entire queue or reached the unwind limit
 			if (IsBlockEmpty)
 				return false;
 
 			// Get next action and make sure it's up to date if cloned from another game
-			var action = Queue.RemoveFront();
+			var treeAction = Tree?.Dequeue();
+			var queueAction = Queue.RemoveFront();
+
+#if _USE_TREE
+			var action = treeAction;
+#endif
+#if _USE_QUEUE
+			var action = queueAction;
+#endif
+			//var action = Queue.RemoveFront();
 			action.Game = Game;
 			if (action.Source.Game.GameId != Game.GameId)
 				action.Source = Game.Entities[action.Source.Id];
@@ -322,9 +356,14 @@ namespace Brimstone
 				ResultStack.Push(result);
 
 			// The >= allows the current block to unwind for ProcessBlock()
-			while (IsBlockEmpty && Depth >= MaxUnwindDepth && EndBlock())
-				;
-
+			Tree?.Unwind(MaxUnwindDepth);
+#if _USE_QUEUE
+			while (IsBlockEmpty && Depth >= MaxUnwindDepth) {
+				EndBlock();
+				if (IsEmpty)
+					break;
+			}
+#endif
 			OnAction?.Invoke(this, action);
 
 			return !action.Cancel;
