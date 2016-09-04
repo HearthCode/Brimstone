@@ -237,7 +237,7 @@ namespace Brimstone
 			Game.OnEntityChanged += (g, e, t, o, n) => Add(new TagChange(e, t, n));
 		}
 
-		public override void Add(PowerAction a) {
+		public void Add(PowerAction a) {
 			// Ignore PowerHistory for untracked games
 			if (Game == null)
 				return;

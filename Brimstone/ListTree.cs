@@ -9,7 +9,7 @@ namespace Brimstone
 		public ListTree<TItem> Parent { get; }
 		public List<TItem> Delta { get; } = new List<TItem>();
 		public int SequenceNumber { get; private set; }
-		public int ParentBranchEntry { get; private set; }
+		public int ParentBranchEntry { get; }
 
 		public ListTree(ListTree<TItem> parent = null) {
 			if (parent != null) {
@@ -23,8 +23,6 @@ namespace Brimstone
 				ParentBranchEntry = 0;
 			}
 		}
-
-		public abstract void Add(TItem i);
 
 		protected void AddItem(TItem i) {
 			Delta.Add(i);

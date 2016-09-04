@@ -46,14 +46,14 @@ namespace Brimstone
 		}
 	}
 
-	public class ActionQueue : ICloneable
+	public class ActionQueue : ListTree<QueueActionEventArgs>, ICloneable
 	{
 		public Game Game { get; private set; }
 		// TODO: Use depth queueing instead of a stack
 		public Stack<Deque<QueueActionEventArgs>> QueueStack = new Stack<Deque<QueueActionEventArgs>>();
 		public Deque<QueueActionEventArgs> Queue;
 		public Stack<ActionResult> ResultStack = new Stack<ActionResult>();
-		public List<QueueActionEventArgs> History;
+		public IEnumerable<QueueActionEventArgs> History => this;
 
 		public bool Paused { get; set; }
 
@@ -72,17 +72,16 @@ namespace Brimstone
 		public bool IsEmpty => Queue.Count == 0 && QueueStack.Count == 0;
 		public int Depth => QueueStack.Count;
 
-		public ActionQueue(Game game, object userData = null) {
+		public ActionQueue(Game game, object userData = null) : base(null) {
 			Game = game;
 			Paused = false;
 			UserData = userData;
 			Queue = new Deque<QueueActionEventArgs>();
-			History = new List<QueueActionEventArgs>();
 			ReplacedActions = new Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>>();
 			BlockStack = new Stack<BlockStart>();
 		}
 
-		public ActionQueue(ActionQueue cloneFrom) {
+		public ActionQueue(ActionQueue cloneFrom) : base(cloneFrom) {
 			// BlockStart is immutable and uses only value types so we can just shallow clone
 			BlockStack = new Stack<BlockStart>(cloneFrom.BlockStack.Reverse());
 			foreach (var queue in cloneFrom.QueueStack.Reverse())
@@ -93,9 +92,7 @@ namespace Brimstone
 			// TODO: Doesn't this clone some items twice?
 			foreach (var item in stack)
 				ResultStack.Push((ActionResult)item.Clone());
-			// TODO: This is ugly. Make History chain in a linked list like Delta does
 			// TODO: Option to disable History
-			History = new List<QueueActionEventArgs>(cloneFrom.History);
 			ReplacedActions = new Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>>(cloneFrom.ReplacedActions);
 			Paused = cloneFrom.Paused;
 			// Events are immutable so this creates copies
@@ -333,7 +330,7 @@ namespace Brimstone
 				// action.Cancel implied when action is replaced
 				return false;
 			}
-			History.Add(action);
+			AddItem(action);
 
 			// Run action and push results onto stack
 #if _QUEUE_DEBUG
