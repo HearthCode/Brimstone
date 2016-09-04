@@ -56,7 +56,7 @@ namespace Brimstone
 
 		private void Add(IEntity entity, TriggerType type, Trigger trigger) {
 #if _TRIGGER_DEBUG
-			DebugLog.WriteLine("Associating trigger " + trigger.Type + " for entity " + entity.ShortDescription + " with game " + Game.GameId);
+			DebugLog.WriteLine("Associating trigger " + type + " for entity " + entity.ShortDescription + " with game " + Game.GameId);
 #endif
 			if (Triggers.ContainsKey(type))
 				Triggers[type].Add(entity.Id);
