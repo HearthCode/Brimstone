@@ -168,25 +168,6 @@ namespace Brimstone
 			return new QueueActionEventArgs(Game, source, qa);
 		}
 
-		// TODO: Insertion from multiple threads (eg. two players mulliganing simultaneously) is not thread-safe
-		// TODO: Possible bug - should the list be reversed first?
-		public void InsertDeferred(IEntity source, List<QueueAction> qa) {
-			if (qa != null)
-				foreach (var a in qa)
-					// No event triggers when inserting at front of queue
-					Queue.AddFront(initializeAction(source, a));
-		}
-
-		public void InsertDeferred(IEntity source, ActionGraph g) {
-			if (g != null)
-				InsertDeferred(source, g.Unravel());
-		}
-
-		public void InsertDeferred(IEntity source, QueueAction a) {
-			if (a != null)
-				Queue.AddFront(initializeAction(source, a));
-		}
-
 		public List<ActionResult> RunMultiResult(IEntity source, List<QueueAction> qa) {
 			if (qa == null)
 				return new List<ActionResult>();

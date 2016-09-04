@@ -106,7 +106,7 @@ namespace Brimstone
 				// to effectively replace it
 				var clonedNode = ((ProbabilisticGameNode)e.UserData).Branch(perItemWeight);
 				NodeCount++;
-				clonedNode.Game.ActionQueue.InsertDeferred(e.Source, entity);
+				clonedNode.Game.ActionQueue.ResultStack.Push((Entity)clonedNode.Game.Entities[entity.Id]);
 				clonedNode.Game.ActionQueue.ProcessAll(clonedNode);
 				searcher.Visitor(clonedNode, this, e);
 			}
@@ -131,7 +131,7 @@ namespace Brimstone
 				// to effectively replace it
 				var clonedNode = ((ProbabilisticGameNode)e.UserData).Branch(perItemWeight);
 				NodeCount++;
-				clonedNode.Game.ActionQueue.InsertDeferred(e.Source, i);
+				clonedNode.Game.ActionQueue.ResultStack.Push(i);
 				clonedNode.Game.ActionQueue.ProcessAll(clonedNode);
 				searcher.Visitor(clonedNode, this, e);
 			}
@@ -158,7 +158,7 @@ namespace Brimstone
 						// to effectively replace it
 						var clonedNode = ((ProbabilisticGameNode)e.UserData).Branch(perItemWeight);
 						NodeCount++;
-						clonedNode.Game.ActionQueue.InsertDeferred(e.Source, (Entity)entity);
+						clonedNode.Game.ActionQueue.ResultStack.Push((Entity) clonedNode.Game.Entities[entity.Id]);
 						await clonedNode.Game.ActionQueue.ProcessAllAsync(clonedNode);
 						searcher.Visitor(clonedNode, this, e);
 					})
@@ -186,7 +186,7 @@ namespace Brimstone
 						// to effectively replace it
 						var clonedNode = ((ProbabilisticGameNode)e.UserData).Branch(perItemWeight);
 						NodeCount++;
-						clonedNode.Game.ActionQueue.InsertDeferred(e.Source, i);
+						clonedNode.Game.ActionQueue.ResultStack.Push(i);
 						await clonedNode.Game.ActionQueue.ProcessAllAsync(clonedNode);
 						searcher.Visitor(clonedNode, this, e);
 					})
