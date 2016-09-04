@@ -26,7 +26,7 @@ namespace Brimstone
 				Lambda = e => {
 					var r = s[0].Lambda(e);
 					for (int i = 1; i < s.Length; i++)
-						r = r.Concat(s[i].Lambda(e));
+						r = r?.Concat((s[i].Lambda(e)) ?? new List<IEntity>()) ?? s[i].Lambda(e);
 					return r;
 				}
 			};
@@ -35,7 +35,7 @@ namespace Brimstone
 		// Remove any occurrences of items in Y from X (set difference)
 		public static Selector Except(Selector x, Selector y) {
 			return new Selector {
-				Lambda = e => x.Lambda(e).Except(y.Lambda(e))
+				Lambda = e => x.Lambda(e)?.Except((y.Lambda(e)) ?? new List<IEntity>())
 			};
 		}
 
@@ -49,7 +49,7 @@ namespace Brimstone
 				Lambda = e => {
 					var r = s[0].Lambda(e);
 					for (int i = 1; i < s.Length; i++)
-						r = r.Intersect(s[i].Lambda(e));
+						r = r?.Intersect((s[i].Lambda(e)) ?? new List<IEntity>()) ?? s[i].Lambda(e);
 					return r;
 				}
 			};

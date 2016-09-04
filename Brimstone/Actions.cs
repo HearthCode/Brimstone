@@ -40,13 +40,6 @@ namespace Brimstone.Actions
 		}
 	}
 
-	public enum SelectionSource
-	{
-		Game,
-		Player,
-		ActionSource
-	}
-
 	public class Selector : QueueAction
 	{
 		public Func<IEntity, IEnumerable<IEntity>> Lambda { get; set; }
