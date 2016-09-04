@@ -32,12 +32,12 @@ namespace Test1
 			for (int i = 0; i < MaxMinions - NumBoomBots; i++)
 				game.CurrentPlayer.Give(FillMinion).Play();
 			for (int i = 0; i < NumBoomBots; i++)
-				game.CurrentPlayer.Give("Boom Bot").Play();
+				game.CurrentPlayer.Give("GVG_110t").Play();
 			game.EndTurn();
 			for (int i = 0; i < MaxMinions - NumBoomBots; i++)
 				game.CurrentPlayer.Give(FillMinion).Play();
 			for (int i = 0; i < NumBoomBots; i++)
-				game.CurrentPlayer.Give("Boom Bot").Play();
+				game.CurrentPlayer.Give("GVG_110t").Play();
 
 			var ArcaneMissiles = game.CurrentPlayer.Give("Arcane Missiles");
 
@@ -46,7 +46,7 @@ namespace Test1
 			sw.Start();
 
 			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Damage(RandomOpponentHealthyCharacter, 1) * 2;
-			Cards.FromName("Boom Bot").Behaviour.Deathrattle = Damage(RandomOpponentHealthyMinion, RandomAmount(1, 4));
+			Cards.FromId("GVG_110t").Behaviour.Deathrattle = Damage(RandomOpponentHealthyMinion, RandomAmount(1, 4));
 
 			// Start the search going on another thread and retrieve its task handle
 			var treeTask = RandomOutcomeSearch.BuildAsync(

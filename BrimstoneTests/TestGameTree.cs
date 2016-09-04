@@ -50,20 +50,20 @@ namespace BrimstoneTests
 				Assert.AreEqual(1.0 / 48.0, p, 0.0000001);
 
 			// 4/48
-			var bothBoomBotsRCDead = uniqueGames.First(x => x.Key.Player1.Board.Concat(x.Key.Player2.Board).Count(y => y.Card.Name == "Boom Bot") == 0
+			var bothBoomBotsRCDead = uniqueGames.First(x => x.Key.Player1.Board.Concat(x.Key.Player2.Board).Count(y => y.Card.Id == "GVG_110t") == 0
 														&& x.Key.Player2.Board.Count(y => y.Card.Name == "River Crocolisk") == 1).Value;
 			Assert.AreEqual(4.0 / 48.0, bothBoomBotsRCDead, 0.0000001);
 
 			// 12/48
 			var opponentRCDamaged = uniqueGames.Where(x => x.Key.Player1.Board.Count(y => y.Card.Name == "River Crocolisk") == 2
-													&& x.Key.Player1.Board.Count(y => y.Card.Name == "Boom Bot") == 1
+													&& x.Key.Player1.Board.Count(y => y.Card.Id == "GVG_110t") == 1
 													&& x.Key.Player1.Hero.Health == 30).Select(x => x.Value).ToList();
 			foreach (var p in opponentRCDamaged)
 				Assert.AreEqual(3.0 / 48.0, p, 0.0000001);
 
 			// 4/48
 			var friendlyRCDamaged = uniqueGames.Where(x => x.Key.Player2.Board.Count(y => y.Card.Name == "River Crocolisk") == 2
-													&& x.Key.Player1.Board.All(y => y.Card.Name != "Boom Bot"))
+													&& x.Key.Player1.Board.All(y => y.Card.Id != "GVG_110t"))
 													.Select(x => x.Value).ToList();
 			foreach (var p in friendlyRCDamaged)
 				Assert.AreEqual(1.0 / 48.0, p, 0.0000001);
@@ -78,7 +78,7 @@ namespace BrimstoneTests
 			Settings.ParallelTreeSearch = Parallel;
 
 			// Our paper-verified tests use Boom Bots that cannot go face, and Arcane Missiles which fires only 2 missiles
-			Cards.FromName("Boom Bot").Behaviour.Deathrattle = Damage(RandomOpponentHealthyMinion, RandomAmount(1, 4));
+			Cards.FromId("GVG_110t").Behaviour.Deathrattle = Damage(RandomOpponentHealthyMinion, RandomAmount(1, 4));
 			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Damage(RandomOpponentHealthyCharacter, 1) * 2;
 
 			var game = _setupGame(MaxMinions: 7, NumBoomBots: 2, FillMinion: "Bloodfen Raptor");
@@ -88,17 +88,17 @@ namespace BrimstoneTests
 			Assert.AreEqual(154, uniqueGames.Count);
 
 			// Check that each filtered tree section has the expected number of game states
-			var noBoomBotsDead = uniqueGames.Where(x => x.Player1.Board.Concat(x.Player2.Board).Where(y => y.Card.Name == "Boom Bot").Count() == 4);
-			var oneBoomBotDead = uniqueGames.Where(x => x.Player1.Board.Concat(x.Player2.Board).Where(y => y.Card.Name == "Boom Bot").Count() == 3);
-			var bothOpponentBoomBotsDead = uniqueGames.Where(x => x.CurrentPlayer.Board.Where(y => y.Card.Name == "Boom Bot").Count() == 2
-														&& x.CurrentPlayer.Opponent.Board.Where(y => y.Card.Name == "Boom Bot").Count() == 0);
-			var oneFoneOBoomBotsDead = uniqueGames.Where(x => x.CurrentPlayer.Board.Where(y => y.Card.Name == "Boom Bot").Count() == 1
-														&& x.CurrentPlayer.Opponent.Board.Where(y => y.Card.Name == "Boom Bot").Count() == 1);
-			var oneFtwoOBoomBotsDead = uniqueGames.Where(x => x.CurrentPlayer.Board.Where(y => y.Card.Name == "Boom Bot").Count() == 1
-														&& x.CurrentPlayer.Opponent.Board.Where(y => y.Card.Name == "Boom Bot").Count() == 0);
-			var twoFoneOBoomBotsDead = uniqueGames.Where(x => x.CurrentPlayer.Board.Where(y => y.Card.Name == "Boom Bot").Count() == 0
-														&& x.CurrentPlayer.Opponent.Board.Where(y => y.Card.Name == "Boom Bot").Count() == 1);
-			var allBoomBotsDead = uniqueGames.Where(x => x.Player1.Board.Concat(x.Player2.Board).Where(y => y.Card.Name == "Boom Bot").Count() == 0);
+			var noBoomBotsDead = uniqueGames.Where(x => x.Player1.Board.Concat(x.Player2.Board).Where(y => y.Card.Id == "GVG_110t").Count() == 4);
+			var oneBoomBotDead = uniqueGames.Where(x => x.Player1.Board.Concat(x.Player2.Board).Where(y => y.Card.Id == "GVG_110t").Count() == 3);
+			var bothOpponentBoomBotsDead = uniqueGames.Where(x => x.CurrentPlayer.Board.Where(y => y.Card.Id == "GVG_110t").Count() == 2
+														&& x.CurrentPlayer.Opponent.Board.Where(y => y.Card.Id == "GVG_110t").Count() == 0);
+			var oneFoneOBoomBotsDead = uniqueGames.Where(x => x.CurrentPlayer.Board.Where(y => y.Card.Id == "GVG_110t").Count() == 1
+														&& x.CurrentPlayer.Opponent.Board.Where(y => y.Card.Id == "GVG_110t").Count() == 1);
+			var oneFtwoOBoomBotsDead = uniqueGames.Where(x => x.CurrentPlayer.Board.Where(y => y.Card.Id == "GVG_110t").Count() == 1
+														&& x.CurrentPlayer.Opponent.Board.Where(y => y.Card.Id == "GVG_110t").Count() == 0);
+			var twoFoneOBoomBotsDead = uniqueGames.Where(x => x.CurrentPlayer.Board.Where(y => y.Card.Id == "GVG_110t").Count() == 0
+														&& x.CurrentPlayer.Opponent.Board.Where(y => y.Card.Id == "GVG_110t").Count() == 1);
+			var allBoomBotsDead = uniqueGames.Where(x => x.Player1.Board.Concat(x.Player2.Board).Where(y => y.Card.Id == "GVG_110t").Count() == 0);
 
 			Assert.AreEqual(17, noBoomBotsDead.Count());
 			Assert.AreEqual(36, oneBoomBotDead.Count());
@@ -119,7 +119,7 @@ namespace BrimstoneTests
 					// This is the action that shall be taken to build the tree
 					switch (testAction) {
 						case TestAction.BoomBot:
-							game.CurrentPlayer.Board.First(t => t.Card.Name == "Boom Bot").Hit(1);
+							game.CurrentPlayer.Board.First(t => t.Card.Id == "GVG_110t").Hit(1);
 							break;
 
 						case TestAction.ArcaneMissiles:
@@ -142,12 +142,12 @@ namespace BrimstoneTests
 			for (int i = 0; i < MaxMinions - NumBoomBots; i++)
 				game.CurrentPlayer.Give(FillMinion).Play();
 			for (int i = 0; i < NumBoomBots; i++)
-				game.CurrentPlayer.Give("Boom Bot").Play();
+				game.CurrentPlayer.Give("GVG_110t").Play();
 			game.EndTurn();
 			for (int i = 0; i < MaxMinions - NumBoomBots; i++)
 				game.CurrentPlayer.Give(FillMinion).Play();
 			for (int i = 0; i < NumBoomBots; i++)
-				game.CurrentPlayer.Give("Boom Bot").Play();
+				game.CurrentPlayer.Give("GVG_110t").Play();
 
 			game.CurrentPlayer.Give("Arcane Missiles");
 			return game;
@@ -201,7 +201,7 @@ namespace BrimstoneTests
 			}
 
 			// Do a random action on the first game in depth 1 and add all possible outcomes as children
-			Minion FirstBoomBot = depth1Games[0].CurrentPlayer.Board.First(x => x.Card.Name == "Boom Bot");
+			Minion FirstBoomBot = depth1Games[0].CurrentPlayer.Board.First(x => x.Card.Id == "GVG_110t");
 			var boomBotResults = RandomOutcomeSearch.Find(depth1Games[0], () => FirstBoomBot.Hit(1));
 
 			var depth2Nodes = depth1Nodes[0].AddChildren(boomBotResults).ToList();

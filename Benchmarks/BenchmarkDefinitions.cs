@@ -66,7 +66,7 @@ namespace Brimstone.Benchmark
 		}
 
 		public void Test_BoomBotPreHit(Game g, int it) {
-			var BoomBotId = g.Player1.Board.First(t => t.Card.Name == "Boom Bot").Id;
+			var BoomBotId = g.Player1.Board.First(t => t.Card.Id == "GVG_110t").Id;
 			for (int i = 0; i < it; i++) {
 				Game cloned = g.CloneState();
 				((Minion)cloned.Entities[BoomBotId]).Hit(1);
@@ -75,7 +75,7 @@ namespace Brimstone.Benchmark
 
 		public void Test_BoomBotPreDeathrattle(Game g, int it) {
 			// Capture after Boom Bot has died but before Deathrattle executes
-			var BoomBot = g.Player1.Board.First(t => t.Card.Name == "Boom Bot");
+			var BoomBot = g.Player1.Board.First(t => t.Card.Id == "GVG_110t");
 			g.ActionQueue.OnAction += (o, e) => {
 				ActionQueue queue = o as ActionQueue;
 				if (e.Action is Death && e.Source == BoomBot) {
@@ -89,7 +89,7 @@ namespace Brimstone.Benchmark
 		}
 
 		private void _boomBotUniqueStates(Game g, int it, ITreeActionWalker search) {
-			var BoomBot = g.CurrentPlayer.Board.First(t => t.Card.Name == "Boom Bot");
+			var BoomBot = g.CurrentPlayer.Board.First(t => t.Card.Id == "GVG_110t");
 			var tree = RandomOutcomeSearch.Build(
 				Game: g,
 				SearchMode: search,
@@ -112,7 +112,7 @@ namespace Brimstone.Benchmark
 
 		private void _missilesUniqueStates(Game g, int it, int missiles, ITreeActionWalker search) {
 			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Damage(RandomOpponentHealthyCharacter, 1) * missiles;
-			Cards.FromName("Boom Bot").Behaviour.Deathrattle = Damage(RandomOpponentHealthyMinion, RandomAmount(1, 4));
+			Cards.FromId("GVG_110t").Behaviour.Deathrattle = Damage(RandomOpponentHealthyMinion, RandomAmount(1, 4));
 
 			var ArcaneMissiles = g.CurrentPlayer.Give("Arcane Missiles");
 			var tree = RandomOutcomeSearch.Build(

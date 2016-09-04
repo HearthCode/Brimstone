@@ -107,7 +107,7 @@ namespace BrimstoneTests
 					firstId = id;
 			}
 			game.EndTurn();
-			var boomBot = new Minion("Boom Bot").GiveTo(game.CurrentPlayer).Play();
+			var boomBot = new Minion("GVG_110t").GiveTo(game.CurrentPlayer).Play();
 
 			// Act
 
@@ -233,7 +233,7 @@ namespace BrimstoneTests
 					firstId = id;
 			}
 			game.EndTurn();
-			boomBot = new Minion("Boom Bot").GiveTo(game.CurrentPlayer).Play();
+			boomBot = new Minion("GVG_110t").GiveTo(game.CurrentPlayer).Play();
 			clones.Clear();
 
 			game.ActionQueue.OnActionStarting += (o, e) => {
@@ -306,7 +306,7 @@ namespace BrimstoneTests
 			var game9 = game4.CloneState();
 
 			// Game7: Player1 <- Boom Bot
-			game7.Player1.Give("Boom Bot");
+			game7.Player1.Give("GVG_110t");
 
 			// Game8: Player1 <- Murloc Tinyfin
 			game8.Player1.Give("Murloc Tinyfin");

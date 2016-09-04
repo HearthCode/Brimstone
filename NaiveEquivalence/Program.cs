@@ -35,12 +35,12 @@ namespace Test1
 			for (int i = 0; i < MaxMinions - NumBoomBots; i++)
 				game.CurrentPlayer.Give(FillMinion).Play();
 			for (int i = 0; i < NumBoomBots; i++)
-				game.CurrentPlayer.Give("Boom Bot").Play();
+				game.CurrentPlayer.Give("GVG_110t").Play();
 			game.EndTurn();
 			for (int i = 0; i < MaxMinions - NumBoomBots; i++)
 				game.CurrentPlayer.Give(FillMinion).Play();
 			for (int i = 0; i < NumBoomBots; i++)
-				game.CurrentPlayer.Give("Boom Bot").Play();
+				game.CurrentPlayer.Give("GVG_110t").Play();
 
 			// Start timing
 			var sw = new Stopwatch();
