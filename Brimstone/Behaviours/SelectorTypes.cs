@@ -8,8 +8,6 @@ namespace Brimstone
 	// All of the selector types you can use
 	public partial class Behaviours
 	{
-		// TODO: Add selector set ops
-
 		// Base selectors taking any lambda expression
 		public static Selector Select(Func<IEntity, IEntity> selector) {
 			return new Selector { Lambda = e => new List<IEntity> { selector(e) } };
@@ -18,18 +16,43 @@ namespace Brimstone
 			return new Selector { Lambda = selector };
 		}
 
-		// Merge the output of N selectors, allowing duplicates
-		public static Selector Union(params Selector[] s) {
-			if (s.Length < 2)
-				throw new SelectorException("Selector union requires at least 2 arguments");
-
-			if (s.Length > 2)
-				s[1] = Union(s.Skip(1).ToArray());
-
-			var sel = new Selector {
-				Lambda = e => s[0].Lambda(e).Concat(s[1].Lambda(e))
+		// Merge the output of N selectors, allowing duplicates (multi-set union)
+		public static Selector Combine(params Selector[] s) {
+			if (s.Length == 0)
+				return null;
+			if (s.Length == 1)
+				return s[0];
+			return new Selector {
+				Lambda = e => {
+					var r = s[0].Lambda(e);
+					for (int i = 1; i < s.Length; i++)
+						r = r.Concat(s[i].Lambda(e));
+					return r;
+				}
 			};
-			return sel;
+		}
+
+		// Remove any occurrences of items in Y from X (set difference)
+		public static Selector Except(Selector x, Selector y) {
+			return new Selector {
+				Lambda = e => x.Lambda(e).Except(y.Lambda(e))
+			};
+		}
+
+		// Return only items present in all N selectors (set intersection)
+		public static Selector InAll(params Selector[] s) {
+			if (s.Length == 0)
+				return null;
+			if (s.Length == 1)
+				return s[0];
+			return new Selector {
+				Lambda = e => {
+					var r = s[0].Lambda(e);
+					for (int i = 1; i < s.Length; i++)
+						r = r.Intersect(s[i].Lambda(e));
+					return r;
+				}
+			};
 		}
 	}
 }

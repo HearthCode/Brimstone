@@ -54,6 +54,18 @@ namespace Brimstone.Actions
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			return Lambda(source).ToList();
 		}
+
+		public static Selector operator+(Selector x, Selector y) {
+			return Combine(x, y);
+		}
+
+		public static Selector operator-(Selector x, Selector y) {
+			return Except(x, y);
+		}
+
+		public static Selector operator&(Selector x, Selector y) {
+			return InAll(x, y);
+		}
 	}
 
 	public class Func : QueueAction

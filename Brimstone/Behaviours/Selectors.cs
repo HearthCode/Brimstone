@@ -45,13 +45,13 @@ namespace Brimstone
 
 		// Character selectors (including mortally wounded)
 		public static Selector AllCharacters => Select(e => e.Game.Characters);
-		public static Selector FriendlyCharacters => Union(FriendlyMinions, FriendlyHero);
-		public static Selector OpponentCharacters => Union(OpponentMinions, OpponentHero);
+		public static Selector FriendlyCharacters => Combine(FriendlyMinions, FriendlyHero);
+		public static Selector OpponentCharacters => Combine(OpponentMinions, OpponentHero);
 
 		// Character selectors (excluding mortally wounded)
 		public static Selector AllHealthyCharacters => Select(e => e.Game.Characters.Where(x => !x.MortallyWounded));
-		public static Selector FriendlyHealthyCharacters => Union(FriendlyHealthyMinions, FriendlyHealthyHero);
-		public static Selector OpponentHealthyCharacters => Union(OpponentHealthyMinions, OpponentHealthyHero);
+		public static Selector FriendlyHealthyCharacters => Combine(FriendlyHealthyMinions, FriendlyHealthyHero);
+		public static Selector OpponentHealthyCharacters => Combine(OpponentHealthyMinions, OpponentHealthyHero);
 
 		// Minion-in-deck selectors
 		public static Selector FriendlyMinionsInDeck => Select(e => e.Controller.Deck.Where(x => x is Minion));
