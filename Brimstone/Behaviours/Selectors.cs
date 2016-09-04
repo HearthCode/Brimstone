@@ -61,7 +61,7 @@ namespace Brimstone
 		public static Selector FriendlyMinionsInHand => Select(e => e.Controller.Hand.Where(x => x is Minion));
 
 		// Board adjacency selectors
-		public static Selector AdjacentMinions => Select(e => e.Controller.Board.Where(x => x.ZonePosition == e.ZonePosition + 1 || x.ZonePosition == e.ZonePosition - 1));
+		public static Selector AdjacentMinions => Select(e => new List<IEntity> { e.Controller.Board[e.ZonePosition - 1], e.Controller.Board[e.ZonePosition + 1] }.Where(x => x != null));
 
 		// Random selectors
 		public static ActionGraph RandomMinion => Random(AllMinions);

@@ -87,6 +87,8 @@ namespace Brimstone
 
 		public T this[int zone_position] {
 			get {
+				if (zone_position <= 0 || zone_position > Count)
+					return default(T);
 				return asList[zone_position - 1];
 			}
 			set {
