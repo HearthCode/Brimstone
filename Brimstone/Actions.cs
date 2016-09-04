@@ -52,7 +52,7 @@ namespace Brimstone.Actions
 		public Func<IEntity, IEnumerable<IEntity>> Lambda { get; set; }
 
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
-			return Lambda(source).ToList();
+			return Lambda(source)?.ToList() ?? new List<IEntity>();
 		}
 
 		public static Selector operator+(Selector x, Selector y) {

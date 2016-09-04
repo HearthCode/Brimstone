@@ -26,8 +26,8 @@ namespace Brimstone
 		public static Selector OpponentHero => Select(e => e.Controller.Opponent.Hero);
 
 		// Hero selectors (excluding mortally wounded)
-		public static Selector FriendlyHealthyHero => Select(e => new List<Hero> { e.Controller.Hero }.Where(x => !x.MortallyWounded));
-		public static Selector OpponentHealthyHero => Select(e => new List<Hero> { e.Controller.Opponent.Hero }.Where(x => !x.MortallyWounded));
+		public static Selector FriendlyHealthyHero => Select(e => !e.Controller.Hero.MortallyWounded? e.Controller.Hero : null);
+		public static Selector OpponentHealthyHero => Select(e => !e.Controller.Opponent.Hero.MortallyWounded? e.Controller.Opponent.Hero : null);
 
 		// Weapon selectors
 		//public static Selector FriendlyWeapon { get { throw new NotImplementedException(); } } // TODO: implement
