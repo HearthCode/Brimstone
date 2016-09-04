@@ -83,6 +83,7 @@
     <Compile Include="GameNode.cs" />
     <Compile Include="GameTree.cs" />
     <Compile Include="Heroes.cs" />
+    <Compile Include="ListTree.cs" />
     <Compile Include="Option.cs" />
     <Compile Include="PowerHistory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

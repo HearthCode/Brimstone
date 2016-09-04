@@ -218,81 +218,44 @@ namespace Brimstone
 		}
 	}
 
-	public class PowerHistory : IEnumerable<PowerAction>
+	public class PowerHistory : ListTree<PowerAction>
 	{
 		public Game Game { get; private set; }
-		public Game Parent { get; }
-		public List<PowerAction> Delta { get; } = new List<PowerAction>();
-		public int SequenceNumber { get; private set; }
-		public int ParentBranchEntry { get; private set; }
 
 		public int OrderedHash { get; private set; }
 		public int UnorderedHash { get; private set; }
 
 		public event EventHandler<PowerActionEventArgs> OnPowerAction;
 
-		public PowerHistory(Game game, Game parent = null) {
+		public PowerHistory(Game game, Game parent = null) : base(parent?.PowerHistory) {
 			Game = game;
-			if (parent != null) {
-				Parent = parent;
-				SequenceNumber = parent.PowerHistory.SequenceNumber;
-				ParentBranchEntry = SequenceNumber;
-				OrderedHash = parent.PowerHistory.OrderedHash;
-				UnorderedHash = parent.PowerHistory.UnorderedHash;
-			} else {
-				Parent = null;
-				SequenceNumber = 0;
-				ParentBranchEntry = 0;
-				OrderedHash = 17;
-				UnorderedHash = 0;
-			}
+			OrderedHash = parent?.PowerHistory.OrderedHash ?? 17;
+			UnorderedHash = parent?.PowerHistory.UnorderedHash ?? 0;
+
 			// Subscribe to game events
 			Game.OnEntityCreated += (g, e) => Add(new CreateEntity(e));
 			Game.OnEntityChanged += (g, e, t, o, n) => Add(new TagChange(e, t, n));
 		}
 
-		public void Add(PowerAction a) {
+		public override void Add(PowerAction a) {
 			// Ignore PowerHistory for untracked games
 			if (Game == null)
 				return;
 
 			// Tag changes indicate they are filtered out by setting entity ID to zero
 			if (a.EntityId != 0) {
-				Delta.Add(a);
-				SequenceNumber++;
+				AddItem(a);
 
 				var hash = a.GetHashCode();
 				OrderedHash = OrderedHash * 31 + hash;
 				UnorderedHash += hash;
 			}
-
-			if (OnPowerAction != null)
-				OnPowerAction(this, new PowerActionEventArgs(Game, a));
-		}
-
-		public IEnumerable<PowerAction> DeltaTo(int childBranchPoint) {
-			return Delta.Take(childBranchPoint - ParentBranchEntry);
+			OnPowerAction?.Invoke(this, new PowerActionEventArgs(Game, a));
 		}
 
 		// Return the PowerHistory delta from the point where the specified game was created
 		public IEnumerable<PowerAction> DeltaSince(Game game) {
-			if (ReferenceEquals(game, null))
-				return null;
-
-			if (ReferenceEquals(game, Game))
-				return Delta;
-
-			IEnumerable<PowerAction> delta = null;
-
-			bool found = false;
-			int branchPoint = SequenceNumber;
-
-			for (Game g = Game; g != null && !found; g = g.PowerHistory.Parent) {
-				delta = delta != null ? g.PowerHistory.DeltaTo(branchPoint).Concat(delta) : g.PowerHistory.DeltaTo(branchPoint);
-				branchPoint = g.PowerHistory.ParentBranchEntry;
-				found = g == game;
-			}
-			return found ? delta : null;
+			return DeltaSince(game.PowerHistory);
 		}
 
 		// Crunch changes to get only latest changed tags for each changed entity
@@ -326,25 +289,8 @@ namespace Brimstone
 			if (ReferenceEquals(Game, History.Game))
 				return true;
 
-			// Get all ancestors of each PowerHistory log
-			var ancestorsA = new Stack<Game>();
-			var ancestorsB = new Stack<Game>();
-			
-			for (Game g = Game; g != null; g = g.PowerHistory.Parent)
-				ancestorsA.Push(g);
-			for (Game g = History.Game; g != null; g = g.PowerHistory.Parent)
-				ancestorsB.Push(g);
-				
-			// Search from root game to find lowest common ancestor of each game
-			// TODO: This also needs to work when there is no LCA
-			Game lca = null;
-			foreach (var pair in ancestorsA.Zip(ancestorsB, (x, y) => new { A = x, B = y }))
-				if (pair.A != pair.B)
-					break;
-				else {
-					lca = pair.A;
-				}
-
+			// Get LCA of both logs
+			var lca = LowestCommonAncestor(History);
 			// TODO: Delta caching
 
 			// Calculate deltas from LCA to leaf
@@ -390,25 +336,6 @@ namespace Brimstone
 				return cDeltaA.SetEquals(cDeltaB);
 			}
 		}
-
-		public IEnumerator<PowerAction> GetEnumerator() {
-			if (ParentBranchEntry == 0)
-				return Delta.GetEnumerator();
-
-			return Parent.PowerHistory.Concat(Delta).GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator() {
-			return GetEnumerator();
-		}
-
-		public override string ToString() {
-			string ph = string.Empty;
-			foreach (var p in Delta)
-				ph += p.ToString() + "\n";
-			return ph;
-		}
-
 		// TODO: PowerHistory views for each player
 	}
 }
