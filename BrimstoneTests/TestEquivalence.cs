@@ -2,6 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Brimstone;
+using Brimstone.Actions;
 
 namespace BrimstoneTests
 {

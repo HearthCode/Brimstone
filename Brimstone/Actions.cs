@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Brimstone.Behaviours;
 
-namespace Brimstone
+namespace Brimstone.Actions
 {
 	public class Empty : QueueAction
 	{
@@ -255,7 +256,7 @@ namespace Brimstone
 	{
 		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
 			// Draw a card then reset all relevant flags
-			game.Queue(game.CurrentPlayer, Behaviours.Draw(game.CurrentPlayer).Then((Action<IEntity>)(_ => {
+			game.Queue(game.CurrentPlayer, Draw(game.CurrentPlayer).Then((Action<IEntity>)(_ => {
 				game.CurrentPlayer.NumMinionsPlayerKilledThisTurn = 0;
 				game.CurrentOpponent.NumMinionsPlayerKilledThisTurn = 0;
 				game.CurrentPlayer.NumFriendlyMinionsThatAttackedThisTurn = 0;
@@ -625,12 +626,12 @@ namespace Brimstone
 
 			defender.LastAffectedBy = attacker;
 
-			game.Queue(attacker, Behaviours.Damage((Entity)defender, attacker.AttackDamage));
+			game.Queue(attacker, Damage((Entity)defender, attacker.AttackDamage));
 
 			// TODO: Attacker Predamage
 
 			if (defAttack > 0)
-				game.Queue(defender, Behaviours.Damage((Entity)attacker, defAttack));
+				game.Queue(defender, Damage((Entity)attacker, defAttack));
 
 			// TODO: Attacker LastAffectedBy
 

@@ -61,7 +61,6 @@
     <Compile Include="Behaviours\GamePhase.cs" />
     <Compile Include="Behaviours\Selectors.cs" />
     <Compile Include="Behaviours\SelectorTypes.cs" />
-    <Compile Include="Behaviours\TriggerTypes.cs" />
     <Compile Include="Card.cs" />
     <Compile Include="CardData.cs" />
     <Compile Include="Cards\All.cs" />

@@ -49,6 +49,7 @@ namespace Brimstone
 	public class ActionQueue : ICloneable
 	{
 		public Game Game { get; private set; }
+		// TODO: Use depth queueing instead of a stack
 		public Stack<Deque<QueueActionEventArgs>> QueueStack = new Stack<Deque<QueueActionEventArgs>>();
 		public Deque<QueueActionEventArgs> Queue;
 		public Stack<ActionResult> ResultStack = new Stack<ActionResult>();

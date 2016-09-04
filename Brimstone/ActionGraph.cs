@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Brimstone.Actions;
 
 namespace Brimstone
 {
@@ -59,6 +60,14 @@ namespace Brimstone
 		// Repeated action
 		public static ActionGraph operator *(ActionGraph x, ActionGraph y) {
 			return x.Repeat(y);
+		}
+
+		// Convert "Condition > ActionGraph" into a Trigger
+		public static Trigger operator>(Condition x, ActionGraph y) {
+			return new Trigger(y, x);
+		}
+		public static Trigger operator<(Condition x, ActionGraph y) {
+			throw new NotImplementedException();
 		}
 
 		// Add the graph to the game's action queue

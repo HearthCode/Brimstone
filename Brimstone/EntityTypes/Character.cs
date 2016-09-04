@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using static Brimstone.Behaviours;
 
 namespace Brimstone
 {
@@ -37,12 +38,12 @@ namespace Brimstone
 		}
 
 		public void Hit(int amount) {
-			Game.Action(this, Behaviours.Damage(this, amount));
+			Game.Action(this, Damage(this, amount));
 		}
 
 		public void CheckForDeath() {
 			if (Health <= 0) {
-				Game.Queue(this, Behaviours.Death(this));
+				Game.Queue(this, Death(this));
 			}
 		}
 	}

@@ -527,39 +527,39 @@ namespace Brimstone
 
 	public enum TriggerType
 	{
-		Play,
+		OnPlay,
 		AfterPlay,
-		Spellbender,
-		PreSummon,
-		Summon,
+		OnSpellbender,
+		OnPreSummon,
+		OnSummon,
 		AfterSummon,
-		ProposedAttack,
-		Attack,
+		OnProposedAttack,
+		OnAttack,
 		AfterAttack,
-		Inspire,
-		Death,
-		DrawCard,
-		AddToHand,
-		PreDamage,
-		Damage, // 0
-		Heal,
-		Silence,
-		Discard,
-		GainArmour,
-		RevealSecret,
-		EquipWeapon,
-		WeaponAttack, // 3
+		OnHeroPower,
+		OnDeath,
+		OnDraw,
+		OnAddToHand,
+		OnPreDamage,
+		OnDamage, // 0
+		OnHeal,
+		OnSilence,
+		OnDiscard,
+		OnGainArmour,
+		OnRevealSecret,
+		OnEquipWeapon,
+		OnWeaponAttack, // 3
 
-		GameStart, // -1
-		BeginMulligan, // -1
-		DealMulligan, // 6
-		MulliganWaiting, // 7
-		PhaseMainReady, // 1
-		PhaseMainStartTriggers, // 8
-		PhaseMainStart, // 0
-		PhaseMainAction, // 2
-		PhaseMainEnd, // 4
-		PhaseMainCleanup, // 5
-		PhaseMainNext, // -1
+		OnGameStart, // -1
+		OnBeginMulligan, // -1
+		OnDealMulligan, // 6
+		OnMulliganWaiting, // 7
+		OnBeginTurnTransition, // 1
+		OnBeginTurn, // 8
+		OnBeginTurnForPlayer, // 0
+		OnWaitForAction, // 2
+		OnEndTurn, // 4
+		OnEndTurnCleanup, // 5
+		OnEndTurnTransition, // -1
 	}
 }

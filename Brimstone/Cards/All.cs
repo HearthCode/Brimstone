@@ -1,6 +1,9 @@
+using static Brimstone.TriggerType;
+using static Brimstone.Behaviours;
+
 namespace Brimstone
 {
-	public partial class BehaviourScripts : Behaviours
+	public partial class BehaviourScripts
 	{
 		// Basic, Neutral
 
@@ -34,7 +37,7 @@ namespace Brimstone
 		// Demolisher
 		public static Behaviour EX1_102 = new Behaviour {
 			Triggers = {
-				OnBeginTurn(IsFriendly, Damage(RandomOpponentHealthyCharacter, 2))
+				[OnBeginTurn] = IsFriendly > Damage(RandomOpponentHealthyCharacter, 2)
 			}
 		};
 
@@ -111,7 +114,7 @@ namespace Brimstone
 		// Acolyte of Pain
 		public static Behaviour EX1_007 = new Behaviour {
 			Triggers = {
-				OnDamage(IsSelf, Draw(Controller))
+				[OnDamage] = IsSelf > Draw(Controller)
 			}
 		};
 
@@ -280,7 +283,7 @@ namespace Brimstone
 		// Gadgetzan Auctioneer
 		public static Behaviour EX1_095 = new Behaviour {
 			Triggers = {
-				OnPlay(IsFriendlySpell, Draw(Controller))
+				[OnPlay] = IsFriendlySpell > Draw(Controller)
 			}
 		};
 
@@ -309,7 +312,7 @@ namespace Brimstone
 		// Imp Master
 		public static Behaviour EX1_597 = new Behaviour {
 			Triggers = {
-				OnEndTurn(IsFriendly, Damage(Self, 1).Then(Summon(Controller, "EX1_598")))
+				[OnEndTurn] = IsFriendly > Damage(Self, 1).Then(Summon(Controller, "EX1_598"))
 			}
 		};
 
@@ -320,14 +323,14 @@ namespace Brimstone
 		// Knife Juggler
 		public static Behaviour NEW1_019 = new Behaviour {
 			Triggers = {
-				AfterSummon(IsFriendly, Damage(RandomOpponentHealthyMinion, 1))
+				[AfterSummon] = IsFriendly > Damage(RandomOpponentHealthyMinion, 1)
 			}
 		};
 
 		// Wild Pyromancer
 		public static Behaviour NEW1_020 = new Behaviour {
 			Triggers = {
-				AfterPlay(IsFriendlySpell, Damage(AllMinions, 1))
+				[AfterPlay] = IsFriendlySpell > Damage(AllMinions, 1)
 			}
 		};
 
@@ -407,7 +410,7 @@ namespace Brimstone
 		// Imp Gang Boss
 		public static Behaviour BRM_006 = new Behaviour {
 			Triggers = {
-				OnDamage(Self, Summon(Controller, "BRM_006t"))
+				[OnDamage] = IsSelf > Summon(Controller, "BRM_006t")
 			}
 		};
 
@@ -429,14 +432,14 @@ namespace Brimstone
 		// Illidan Stormrage
 		public static Behaviour EX1_614 = new Behaviour {
 			Triggers = {
-				OnPlay(IsFriendly, Summon(Controller, "EX1_614t"))
+				[OnPlay] = IsFriendly > Summon(Controller, "EX1_614t")
 			}
 		};
 
 		// Baron Geddon
 		public static Behaviour EX1_249 = new Behaviour {
 			Triggers = {
-				OnEndTurn(IsFriendly, Damage(AllCharacters, 2)) //TODO: Should be AllCharacters - Self
+				[OnEndTurn] = IsFriendly > Damage(AllCharacters, 2) //TODO: Should be AllCharacters - Self
 			}
 		};
 	}

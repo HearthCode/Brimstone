@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using Brimstone;
+using static Brimstone.Behaviours;
 
 namespace BrimstoneTests
 {
@@ -77,8 +78,8 @@ namespace BrimstoneTests
 			Settings.ParallelTreeSearch = Parallel;
 
 			// Our paper-verified tests use Boom Bots that cannot go face, and Arcane Missiles which fires only 2 missiles
-			Cards.FromName("Boom Bot").Behaviour.Deathrattle = Behaviours.Damage(Behaviours.RandomOpponentHealthyMinion, Behaviours.RandomAmount(1, 4));
-			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Behaviours.Damage(Behaviours.RandomOpponentHealthyCharacter, 1) * 2;
+			Cards.FromName("Boom Bot").Behaviour.Deathrattle = Damage(RandomOpponentHealthyMinion, RandomAmount(1, 4));
+			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Damage(RandomOpponentHealthyCharacter, 1) * 2;
 
 			var game = _setupGame(MaxMinions: 7, NumBoomBots: 2, FillMinion: "Bloodfen Raptor");
 			var uniqueGames = _search(game, (ITreeActionWalker)Activator.CreateInstance(SearchMode), TestAction.ArcaneMissiles).Keys;

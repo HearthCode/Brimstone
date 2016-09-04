@@ -1,4 +1,6 @@
-﻿namespace Brimstone
+﻿using Brimstone.Actions;
+
+namespace Brimstone
 {
 	// All of the game phase actions
 	public partial class Behaviours

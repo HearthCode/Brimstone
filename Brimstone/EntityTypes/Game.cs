@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
 using System.Threading.Tasks;
 
 namespace Brimstone
@@ -175,7 +174,7 @@ namespace Brimstone
 #endif
 			int index = Index != -2 ? Index : (Type == BlockType.POWER || Type == BlockType.ATTACK ? -1 : 0);
 			var block = new BlockStart(Type, Source, Target, index);
-			Queue(Source, new GameBlock(block, Actions));
+			Queue(Source, new Actions.GameBlock(block, Actions));
 		}
 
 		public void OnBlockEmpty(BlockStart Block) {
@@ -197,7 +196,7 @@ namespace Brimstone
 			if (step == Step.BEGIN_MULLIGAN)
 				foreach (var p in Players)
 					if (p.MulliganState == MulliganState.WAITING) {
-						ActiveTriggers.Queue(TriggerType.MulliganWaiting, p);
+						ActiveTriggers.Queue(TriggerType.OnMulliganWaiting, p);
 						return;
 					}
 

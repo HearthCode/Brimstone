@@ -1,28 +1,31 @@
-﻿namespace Brimstone
+﻿using static Brimstone.TriggerType;
+using static Brimstone.Behaviours;
+
+namespace Brimstone
 {
-	public partial class BehaviourScripts : Behaviours
+	public partial class BehaviourScripts
 	{
 		// Game
 		public static Behaviour Game = new Behaviour {
 			Triggers =
 			{
-				At(TriggerType.GameStart, StartGame),
-				At(TriggerType.BeginMulligan, BeginMulligan),
-				At(TriggerType.PhaseMainNext, EndTurn)
+				[OnGameStart]			= StartGame,
+				[OnBeginMulligan]		= BeginMulligan,
+				[OnEndTurnTransition]	= EndTurn
 			}
 		};
 
 		// Player
 		public static Behaviour Player = new Behaviour {
 			Triggers = {
-				At(TriggerType.DealMulligan, IsSelf, PerformMulligan),
-				At(TriggerType.MulliganWaiting, IsSelf, WaitForMulliganComplete),
-				At(TriggerType.PhaseMainReady, IsFriendly, BeginTurn),
-				At(TriggerType.PhaseMainStartTriggers, IsFriendly, BeginTurnTriggers),
-				At(TriggerType.PhaseMainStart, IsFriendly, BeginTurnForPlayer),
-				At(TriggerType.PhaseMainAction, IsFriendly, (System.Action<IEntity>)(p => { p.Game.NextStep = Step.MAIN_END; })),
-				At(TriggerType.PhaseMainEnd, IsFriendly, EndTurnForPlayer),
-				At(TriggerType.PhaseMainCleanup, IsFriendly, EndTurnCleanupForPlayer)
+				[OnDealMulligan]		= IsSelf > PerformMulligan,
+				[OnMulliganWaiting]		= IsSelf > WaitForMulliganComplete,
+				[OnBeginTurnTransition]	= IsFriendly > BeginTurn,
+				[OnBeginTurn]			= IsFriendly > BeginTurnTriggers,
+				[OnBeginTurnForPlayer]	= IsFriendly > BeginTurnForPlayer,
+				[OnWaitForAction]		= IsFriendly > (ActionGraph)(System.Action<IEntity>)(p => { p.Game.NextStep = Step.MAIN_END; }),
+				[OnEndTurn]				= IsFriendly > EndTurnForPlayer,
+				[OnEndTurnCleanup]		= IsFriendly > EndTurnCleanupForPlayer
 			}
 		};
 	}

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Brimstone.Behaviours;
 
 namespace Brimstone
 {
@@ -41,7 +42,7 @@ namespace Brimstone
 				throw new ChoiceException("Attempting to select an unavailable card with Pick");
 
 			Keeping = new List<IEntity>() {Choice};
-			Controller.Game.Action(Controller, Behaviours.Choose(Controller));
+			Controller.Game.Action(Controller, Choose(Controller));
 		}
 
 		public void Keep(Func<IEntity, bool> Chooser) {
@@ -57,7 +58,7 @@ namespace Brimstone
 				throw new ChoiceException("Attempting to keep unavailable cards in mulligan selection");
 
 			Keeping = new List<IEntity>(Choices);
-			Controller.Game.Action(Controller, Behaviours.Choose(Controller));
+			Controller.Game.Action(Controller, Choose(Controller));
 		}
 
 		public void Discard(Func<IEntity, bool> Chooser) {
@@ -72,7 +73,7 @@ namespace Brimstone
 				throw new ChoiceException("Attempting to discard unavailable cards in mulligan selection");
 
 			Keeping = new List<IEntity>(this.Choices.Except(Choices));
-			Controller.Game.Action(Controller, Behaviours.Choose(Controller));
+			Controller.Game.Action(Controller, Choose(Controller));
 		}
 	}
 

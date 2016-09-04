@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Brimstone;
+using static Brimstone.Behaviours;
 
 namespace Test1
 {
@@ -44,8 +45,8 @@ namespace Test1
 			var sw = new Stopwatch();
 			sw.Start();
 
-			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Behaviours.Damage(Behaviours.RandomOpponentHealthyCharacter, 1) * 2;
-			Cards.FromName("Boom Bot").Behaviour.Deathrattle = Behaviours.Damage(Behaviours.RandomOpponentHealthyMinion, Behaviours.RandomAmount(1, 4));
+			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Damage(RandomOpponentHealthyCharacter, 1) * 2;
+			Cards.FromName("Boom Bot").Behaviour.Deathrattle = Damage(RandomOpponentHealthyMinion, RandomAmount(1, 4));
 
 			// Start the search going on another thread and retrieve its task handle
 			var treeTask = RandomOutcomeSearch.BuildAsync(

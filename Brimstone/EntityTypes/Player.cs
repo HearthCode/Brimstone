@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using static Brimstone.Behaviours;
 
 namespace Brimstone
 {
@@ -90,7 +89,7 @@ namespace Brimstone
 		}
 
 		public void StartMulligan() {
-			Game.Action(this, Behaviours.MulliganChoice(this));
+			Game.Action(this, MulliganChoice(this));
 		}
 			
 		public IPlayable Give(Card card) {

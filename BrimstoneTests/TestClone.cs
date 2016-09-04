@@ -2,6 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Brimstone;
+using static Brimstone.Behaviours;
 
 namespace BrimstoneTests
 {
@@ -33,7 +34,7 @@ namespace BrimstoneTests
 			Assert.AreEqual(30, game.Entities.Count);
 
 			// Put a referenced entity on the stack
-			game.Queue(game, Behaviours.Draw(p1));
+			game.Queue(game, Draw(p1));
 			game.ActionQueue.ProcessOne(); // places reference to player 1 on the stack
 
 			// Act

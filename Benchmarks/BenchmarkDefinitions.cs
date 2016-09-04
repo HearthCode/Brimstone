@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Brimstone.Actions;
+using static Brimstone.Behaviours;
 
 namespace Brimstone.Benchmark
 {
@@ -109,8 +111,8 @@ namespace Brimstone.Benchmark
 		}
 
 		private void _missilesUniqueStates(Game g, int it, int missiles, ITreeActionWalker search) {
-			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Behaviours.Damage(Behaviours.RandomOpponentHealthyCharacter, 1) * missiles;
-			Cards.FromName("Boom Bot").Behaviour.Deathrattle = Behaviours.Damage(Behaviours.RandomOpponentHealthyMinion, Behaviours.RandomAmount(1, 4));
+			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Damage(RandomOpponentHealthyCharacter, 1) * missiles;
+			Cards.FromName("Boom Bot").Behaviour.Deathrattle = Damage(RandomOpponentHealthyMinion, RandomAmount(1, 4));
 
 			var ArcaneMissiles = g.CurrentPlayer.Give("Arcane Missiles");
 			var tree = RandomOutcomeSearch.Build(

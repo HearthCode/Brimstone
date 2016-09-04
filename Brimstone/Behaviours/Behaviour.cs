@@ -7,6 +7,7 @@ namespace Brimstone
 	{
 		public ActionGraph Battlecry;
 		public ActionGraph Deathrattle;
-		public List<Trigger> Triggers = new List<Trigger>();
+
+		public Dictionary<TriggerType, Trigger> Triggers = new Dictionary<TriggerType, Trigger>();
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Brimstone.TriggerType;
 
 namespace Brimstone
 {
@@ -8,15 +9,15 @@ namespace Brimstone
 	{
 		private static readonly Dictionary<TriggerType, int> TriggerIndices = new Dictionary<TriggerType, int>
 		{
-			{ TriggerType.PhaseMainStart, 0 },
-			{ TriggerType.PhaseMainReady, 1 },
-			{ TriggerType.PhaseMainAction, 2 },
-			{ TriggerType.WeaponAttack, 3 },
-			{ TriggerType.PhaseMainEnd, 4 },
-			{ TriggerType.PhaseMainCleanup, 5 },
-			{ TriggerType.DealMulligan, 6 },
-			{ TriggerType.MulliganWaiting, 7 },
-			{ TriggerType.PhaseMainStartTriggers, 8 }
+			{ OnBeginTurnForPlayer, 0 },
+			{ OnBeginTurnTransition, 1 },
+			{ OnWaitForAction, 2 },
+			{ OnWeaponAttack, 3 },
+			{ OnEndTurn, 4 },
+			{ OnEndTurnCleanup, 5 },
+			{ OnDealMulligan, 6 },
+			{ OnMulliganWaiting, 7 },
+			{ OnBeginTurn, 8 }
  		};
 
 		private Game _game;
@@ -50,17 +51,17 @@ namespace Brimstone
 		public void Add(IEntity entity) {
 			if (entity.Card.Behaviour?.Triggers != null)
 				foreach (var t in entity.Card.Behaviour.Triggers)
-					Add(entity, t);
+					Add(entity, t.Key, t.Value);
 		}
 
-		private void Add(IEntity entity, Trigger trigger) {
+		private void Add(IEntity entity, TriggerType type, Trigger trigger) {
 #if _TRIGGER_DEBUG
 			DebugLog.WriteLine("Associating trigger " + trigger.Type + " for entity " + entity.ShortDescription + " with game " + Game.GameId);
 #endif
-			if (Triggers.ContainsKey(trigger.Type))
-				Triggers[trigger.Type].Add(entity.Id);
+			if (Triggers.ContainsKey(type))
+				Triggers[type].Add(entity.Id);
 			else
-				Triggers.Add(trigger.Type, new List<int> { entity.Id });
+				Triggers.Add(type, new List<int> { entity.Id });
 		}
 
 		private void OnEntityCreated(Game game, IEntity entity) {
@@ -72,34 +73,34 @@ namespace Brimstone
 			switch (tag) {
 				case GameTag.STATE:
 					if (newValue == (int)GameState.RUNNING)
-						Queue(TriggerType.GameStart, game);
+						Queue(OnGameStart, game);
 					break;
 
 				case GameTag.STEP:
 					switch ((Step)newValue) {
 						case Step.BEGIN_MULLIGAN:
-							Queue(TriggerType.BeginMulligan, game);
+							Queue(OnBeginMulligan, game);
 							break;
 						case Step.MAIN_NEXT:
-							Queue(TriggerType.PhaseMainNext, game.CurrentPlayer);
+							Queue(OnEndTurnTransition, game.CurrentPlayer);
 							break;
 						case Step.MAIN_READY:
-							Queue(TriggerType.PhaseMainReady, game.CurrentPlayer);
+							Queue(OnBeginTurnTransition, game.CurrentPlayer);
 							break;
 						case Step.MAIN_START_TRIGGERS:
-							Queue(TriggerType.PhaseMainStartTriggers, game.CurrentPlayer);
+							Queue(OnBeginTurn, game.CurrentPlayer);
 							break;
 						case Step.MAIN_START:
-							Queue(TriggerType.PhaseMainStart, game.CurrentPlayer);
+							Queue(OnBeginTurnForPlayer, game.CurrentPlayer);
 							break;
 						case Step.MAIN_ACTION:
-							Queue(TriggerType.PhaseMainAction, game.CurrentPlayer);
+							Queue(OnWaitForAction, game.CurrentPlayer);
 							break;
 						case Step.MAIN_END:
-							Queue(TriggerType.PhaseMainEnd, game.CurrentPlayer);
+							Queue(OnEndTurn, game.CurrentPlayer);
 							break;
 						case Step.MAIN_CLEANUP:
-							Queue(TriggerType.PhaseMainCleanup, game.CurrentPlayer);
+							Queue(OnEndTurnCleanup, game.CurrentPlayer);
 							break;
 					}
 					break;
@@ -107,7 +108,7 @@ namespace Brimstone
 				case GameTag.MULLIGAN_STATE:
 					switch ((MulliganState)newValue) {
 						case MulliganState.DEALING:
-							Queue(TriggerType.DealMulligan, entity);
+							Queue(OnDealMulligan, entity);
 							break;
 							// NOTE: We can't trigger on MulliganState.WAITING here
 							// because the trigger must run on the top level of the queue
@@ -116,12 +117,12 @@ namespace Brimstone
 
 				case GameTag.JUST_PLAYED:
 					if (newValue == 1)
-						Queue(TriggerType.Play, entity);
+						Queue(OnPlay, entity);
 					break;
 
 				case GameTag.DAMAGE:
 					if (newValue > oldValue)
-						Queue(TriggerType.Damage, entity);
+						Queue(OnDamage, entity);
 					break;
 			}
 		}
@@ -134,12 +135,12 @@ namespace Brimstone
 #endif
 			foreach (var entityId in Triggers[type]) {
 				var owningEntity = Game.Entities[entityId];
+				// Ignore entity if not in an active zone
 				if (owningEntity.Zone.Type == Zone.PLAY || owningEntity.Zone.Type == Zone.HAND) {
 #if _TRIGGER_DEBUG
 					DebugLog.WriteLine("Checking trigger conditions for " + owningEntity.ShortDescription);
 #endif
-					// TODO: Replace per-card trigger list with properties
-					var trigger = owningEntity.Card.Behaviour.Triggers.First(x => x.Type == type);
+					var trigger = owningEntity.Card.Behaviour.Triggers[type];
 					// Test trigger condition
 					if (trigger.Condition?.Eval(owningEntity, source) ?? true) {
 #if _TRIGGER_DEBUG
