@@ -127,7 +127,7 @@ namespace BrimstoneTests
 			Assert.AreEqual(5, c1.StartingHealth);
 		}
 
-		/*[Test]
+		[Test]
 		public void TestMadBomber() {
 			var game = new Game(HeroClass.Priest, HeroClass.Priest);
 			game.Start(SkipMulligan: true);
@@ -144,8 +144,7 @@ namespace BrimstoneTests
 			else {
 				Assert.AreEqual(3, p1.Hero.Damage + p2.Hero.Damage);
 			}
-		}*/
-		// TODO: Uncomment this test when Mad Bomber is fixed
+		}
 
 		[Test]
 		public void TestDemolisher() {

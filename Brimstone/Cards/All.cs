@@ -31,7 +31,7 @@ namespace Brimstone
 
 		// Mad Bomber
 		public static Behaviour EX1_082 = new Behaviour {
-			Battlecry = Damage(RandomHealthyCharacter, 1) * 3 // TODO: Should be RandomHealthyCharacter - Self
+			Battlecry = Damage(Random(AllHealthyCharacters - Self), 1) * 3
 		};
 
 		// Demolisher
