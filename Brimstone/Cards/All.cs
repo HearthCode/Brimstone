@@ -439,7 +439,7 @@ namespace Brimstone
 		// Baron Geddon
 		public static Behaviour EX1_249 = new Behaviour {
 			Triggers = {
-				[OnEndTurn] = IsFriendly > Damage(AllCharacters, 2) //TODO: Should be AllCharacters - Self
+				[OnEndTurn] = IsFriendly > Damage(AllCharacters - Self, 2)
 			}
 		};
 	}

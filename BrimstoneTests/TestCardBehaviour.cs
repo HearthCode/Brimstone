@@ -201,8 +201,6 @@ namespace BrimstoneTests
 
 		[Test]
 		public void TestBaronGeddon() {
-			//TODO: When Baron Geddon is fixed, fix this test too
-
 			var game = new Game(HeroClass.Priest, HeroClass.Priest);
 			game.Start(SkipMulligan: true);
 
@@ -212,7 +210,7 @@ namespace BrimstoneTests
 			var c1 = (ICharacter)p1.Give("Chillwind Yeti").Play();
 			var c2 = (ICharacter)p2.Give("Chillwind Yeti").Play();
 
-			var b1 = (ICharacter)p1.Give("EX1_249").Play();
+			var b1 = (ICharacter)p1.Give("Baron Geddon").Play();
 			Assert.AreEqual(0, p1.Hero.Damage);
 			Assert.AreEqual(0, p2.Hero.Damage);
 			Assert.AreEqual(0, c1.Damage);
@@ -224,35 +222,35 @@ namespace BrimstoneTests
 			Assert.AreEqual(2, p2.Hero.Damage);
 			Assert.AreEqual(2, c1.Damage);
 			Assert.AreEqual(2, c2.Damage);
-			Assert.AreEqual(2, b1.Damage);
+			Assert.AreEqual(0, b1.Damage);
 
 			game.EndTurn();
 			Assert.AreEqual(2, p1.Hero.Damage);
 			Assert.AreEqual(2, p2.Hero.Damage);
 			Assert.AreEqual(2, c1.Damage);
 			Assert.AreEqual(2, c2.Damage);
-			Assert.AreEqual(2, b1.Damage);
+			Assert.AreEqual(0, b1.Damage);
 
 			game.EndTurn();
 			Assert.AreEqual(4, p1.Hero.Damage);
 			Assert.AreEqual(4, p2.Hero.Damage);
 			Assert.AreEqual(4, c1.Damage);
 			Assert.AreEqual(4, c2.Damage);
-			Assert.AreEqual(4, b1.Damage);
+			Assert.AreEqual(0, b1.Damage);
 
 			game.EndTurn();
 			Assert.AreEqual(4, p1.Hero.Damage);
 			Assert.AreEqual(4, p2.Hero.Damage);
 			Assert.AreEqual(4, c1.Damage);
 			Assert.AreEqual(4, c2.Damage);
-			Assert.AreEqual(4, b1.Damage);
+			Assert.AreEqual(0, b1.Damage);
 
 			game.EndTurn();
 			Assert.AreEqual(6, p1.Hero.Damage);
 			Assert.AreEqual(6, p2.Hero.Damage);
 			Assert.That(c1.Zone == c1.Controller.Graveyard);
 			Assert.That(c2.Zone == c2.Controller.Graveyard);
-			Assert.That(b1.Zone == b1.Controller.Graveyard);
+			Assert.That(b1.Zone == b1.Controller.Board);
 		}
 
 		[Test]
