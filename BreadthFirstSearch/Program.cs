@@ -21,7 +21,7 @@ namespace Test1
 			for (int missiles = 1; missiles <= 6; missiles++)
 			{
 				// Create initial game state
-				Console.WriteLine("Initializing game state...");
+				Console.WriteLine("Initializing game state for {0} missiles test...", missiles);
 
 				var game = new Game(HeroClass.Druid, HeroClass.Druid, PowerHistory: true);
 				game.Start(FirstPlayer: 1, SkipMulligan: true);
@@ -29,17 +29,17 @@ namespace Test1
 				for (int i = 0; i < MaxMinions - NumBoomBots; i++)
 					game.CurrentPlayer.Give(FillMinion).Play();
 				for (int i = 0; i < NumBoomBots; i++)
-					game.CurrentPlayer.Give("Boom Bot").Play();
+					game.CurrentPlayer.Give("GVG_110t").Play();
 				game.EndTurn();
 				for (int i = 0; i < MaxMinions - NumBoomBots; i++)
 					game.CurrentPlayer.Give(FillMinion).Play();
 				for (int i = 0; i < NumBoomBots; i++)
-					game.CurrentPlayer.Give("Boom Bot").Play();
+					game.CurrentPlayer.Give("GVG_110t").Play();
 
 				var ArcaneMissiles = game.CurrentPlayer.Give("Arcane Missiles");
 
 				Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Damage(RandomOpponentHealthyCharacter, 1) * missiles;
-				Cards.FromName("Boom Bot").Behaviour.Deathrattle = Damage(RandomOpponentHealthyMinion, RandomAmount(1, 4));
+				Cards.FromId("GVG_110t").Behaviour.Deathrattle = Damage(RandomOpponentHealthyMinion, RandomAmount(1, 4));
 
 				// Start timing
 				var sw = new Stopwatch();
@@ -73,11 +73,8 @@ namespace Test1
 				var uniqueGames = tree.GetUniqueGames();
 				sw.Stop();
 
-				/*foreach (var kv in uniqueGames) {
-				Console.WriteLine(Math.Round(kv.Value * 100, 2) + "%: ");
-				Console.WriteLine("{0:s}", kv.Key);
-			}*/
 				Console.WriteLine("{0} unique games found in {1}ms", uniqueGames.Count, sw.ElapsedMilliseconds);
+				Console.WriteLine("");
 			}
 		}
 	}
