@@ -55,12 +55,12 @@ namespace Brimstone
 		};
 
 		// Cult Master
-		/*public static Behaviour EX1_595 = new Behaviour {
+		// TODO: Unit test; OnDeath trigger not added yet
+		public static Behaviour EX1_595 = new Behaviour {
 			Triggers = {
-				OnDamage(FriendlyMinions, Draw(Controller)) // TODO: rewrite with boolean selectors once added
+				[OnDeath] = FriendlyMinions - Self > Draw(Controller)
 			}
-		};*/
-		// TODO: Boolean selectors (so I can say 'trigger if the dead minion is friendly', it won't be in the board anymore)
+		};
 
 		// Classic, Neutral, Common
 
