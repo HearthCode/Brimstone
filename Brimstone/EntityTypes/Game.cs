@@ -212,6 +212,7 @@ namespace Brimstone
 			var nextStep = NextStep;
 
 			// Only advance to end turn when current player chooses to
+			// TODO: Fix this displaying at wrong time when queue is not empty after death triggers are queued
 			if (nextStep == Step.MAIN_END) {
 #if _GAME_DEBUG
 				DebugLog.WriteLine("Waiting for player to select next option");

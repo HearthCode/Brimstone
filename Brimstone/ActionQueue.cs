@@ -69,10 +69,10 @@ namespace Brimstone
 		private readonly Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>> ReplacedActions;
 		private readonly Stack<BlockStart> BlockStack;
 
-		private QueueTree Tree = new QueueTree();
+		private QueueTree Tree;
 #if _USE_TREE
-		public bool IsBlockEmpty => Tree.CurrentDequeuePoint == null;
-		public bool IsEmpty => Tree.CurrentDequeuePoint == null && Tree.Depth == 0;
+		public bool IsBlockEmpty => Tree.IsBranchEmpty;
+		public bool IsEmpty => Tree.IsEmpty;
 		public int Depth => Tree.Depth;
 #endif
 #if _USE_QUEUE
@@ -88,8 +88,10 @@ namespace Brimstone
 			Queue = new Deque<QueueActionEventArgs>();
 			ReplacedActions = new Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>>();
 			BlockStack = new Stack<BlockStart>();
+			Tree = new QueueTree();
+			Tree.Game = game;
 #if _USE_TREE
-			Tree.OnBranchResolved += EndBlock;
+			Tree.OnBranchResolved += EndTreeBlock;
 			Tree.OnTreeResolved += EndQueue;
 #endif
 		}
@@ -115,12 +117,17 @@ namespace Brimstone
 			OnAction = cloneFrom.OnAction;
 			// Copy user data
 			UserData = cloneFrom.UserData;
-			// TODO: Temporary
-			Tree = null;
+			// Copy queue tree
+			Tree = (QueueTree)cloneFrom.Tree.Clone();
+#if _USE_TREE
+			Tree.OnBranchResolved += EndTreeBlock;
+			Tree.OnTreeResolved += EndQueue;
+#endif
 		}
 
 		public void Attach(Game game) {
 			Game = game;
+			Tree.Game = game;
 
 			// Make action stack entities point to new game
 			var stack = new List<ActionResult>(ResultStack);
@@ -143,10 +150,10 @@ namespace Brimstone
 			if (qa == null)
 				return;
 #if _QUEUE_DEBUG
-			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Spawning new queue at depth " + (Depth + 1) + " for " + source.ShortDescription + " with actions: " +
+			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Spawning new queue at depth " + (QueueStack.Count + 1) + " for " + source.ShortDescription + " with actions: " +
 			                   string.Join(" ", qa.Select(a => a.ToString())) + " for action block: " + (gameBlock?.ToString() ?? "none"));
 #endif
-			Tree?.Stack();
+			Tree.Stack();
 			QueueStack.Push(Queue);
 			BlockStack.Push(gameBlock);
 			Queue = new Deque<QueueActionEventArgs>();
@@ -163,19 +170,30 @@ namespace Brimstone
 				StartBlock(source, g.Unravel(), gameBlock);
 		}
 
+		private void EndTreeBlock() {
+			var gameBlock = BlockStack.Pop();
+			if (gameBlock != null)
+				Game.OnBlockEmpty(gameBlock);
+		}
+
 		private void EndBlock() {
-			if (Depth > 0) {
+			if (QueueStack.Count > 0) {
 #if _QUEUE_DEBUG
-				DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Destroying queue at depth " + Depth);
+				System.Diagnostics.Debug.Assert(Queue.Count == 0);
+				DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Destroying queue at depth " + QueueStack.Count);
 #endif
+#if _USE_QUEUE
 				var gameBlock = BlockStack.Pop();
 				if (gameBlock != null)
 					Game.OnBlockEmpty(gameBlock);
+#endif
 				Queue = QueueStack.Pop();
 			}
 			// When the queue is empty, notify the game - it may refill it with new actions
+#if _USE_QUEUE
 			if (IsEmpty)
 				EndQueue();
+#endif
 		}
 
 		private void EndQueue() {
@@ -234,7 +252,7 @@ namespace Brimstone
 			if (a == null)
 				return;
 #if _QUEUE_DEBUG
-			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Queueing action " + a + " for " + source.ShortDescription + " at depth " + Depth);
+			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Queueing action " + a + " for " + source.ShortDescription + " at depth " + QueueStack.Count);
 #endif
 			var e = initializeAction(source, a);
 			if (OnQueueing != null) {
@@ -242,12 +260,12 @@ namespace Brimstone
 				// TODO: Count the number of arguments the cancelled action would take and remove those too
 				if (!e.Cancel) {
 					Queue.AddBack(e);
-					Tree?.Enqueue(e);
+					Tree.Enqueue(e);
 				}
 			}
 			else {
 				Queue.AddBack(e);
-				Tree?.Enqueue(e);
+				Tree.Enqueue(e);
 			}
 			OnQueued?.Invoke(this, e);
 		}
@@ -296,20 +314,17 @@ namespace Brimstone
 				return false;
 
 			// Unwind queue when blocks are empty
-			Tree?.Unwind(MaxUnwindDepth + 1);
-#if _USE_QUEUE
-			while (IsBlockEmpty && Depth > MaxUnwindDepth)
+			Tree.Unwind(MaxUnwindDepth + 1);
+			while (Queue.Count == 0 && QueueStack.Count > MaxUnwindDepth)
 				EndBlock();
-#endif
 
 			// Exit if we have unwound the entire queue or reached the unwind limit
 			if (IsBlockEmpty)
 				return false;
 
 			// Get next action and make sure it's up to date if cloned from another game
-			var treeAction = Tree?.Dequeue();
+			var treeAction = Tree.Dequeue();
 			var queueAction = Queue.RemoveFront();
-
 #if _USE_TREE
 			var action = treeAction;
 #endif
@@ -321,6 +336,9 @@ namespace Brimstone
 			if (action.Source.Game.GameId != Game.GameId)
 				action.Source = Game.Entities[action.Source.Id];
 
+#if _QUEUE_DEBUG
+			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Dequeued action " + action + " for " + action.Source.ShortDescription + " at depth " + QueueStack.Count);
+#endif
 			// TODO: Make it work when not all of the arguments are supplied, for flexible syntax
 
 			// Get arguments for action from stack
@@ -349,21 +367,22 @@ namespace Brimstone
 
 			// Run action and push results onto stack
 #if _QUEUE_DEBUG
-			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Running action " + action + " for " + action.Source.ShortDescription + " at depth " + Depth);
+			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Running action " + action + " for " + action.Source.ShortDescription + " at depth " + QueueStack.Count);
 #endif
 			var result = action.Action.Execute(action.Game, action.Source, action.Args);
 			if (result.HasResult)
 				ResultStack.Push(result);
 
 			// The >= allows the current block to unwind for ProcessBlock()
-			Tree?.Unwind(MaxUnwindDepth);
-#if _USE_QUEUE
-			while (IsBlockEmpty && Depth >= MaxUnwindDepth) {
+			Tree.Advance();
+			Tree.Unwind(MaxUnwindDepth);
+			
+			while (Queue.Count == 0 && QueueStack.Count >= MaxUnwindDepth) {
 				EndBlock();
-				if (IsEmpty)
+				if (QueueStack.Count == 0)
 					break;
 			}
-#endif
+
 			OnAction?.Invoke(this, action);
 
 			return !action.Cancel;
