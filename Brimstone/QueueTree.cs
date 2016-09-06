@@ -9,11 +9,13 @@ namespace Brimstone
 		public Game Owner { get; }
 		public QueueActionEventArgs Data { get; }
 		public int Depth { get; }
+		public QueueNode Parent { get; }
 		public Dictionary<Game, QueueNode> Next { get; } = new Dictionary<Game, QueueNode>();
 
-		public QueueNode(Game owner, QueueActionEventArgs data, int depth = 0) {
+		public QueueNode(Game owner, QueueActionEventArgs data, QueueNode parent = null, int depth = 0) {
 			Owner = owner;
 			Data = data;
+			Parent = parent;
 			Depth = depth;
 		}
 	}
@@ -21,11 +23,11 @@ namespace Brimstone
 	public class QueueTree : ICloneable
 	{
 		private readonly Stack<QueueNode> InsertionPoints;
-		private readonly Stack<QueueNode> DequeuePoints;
 		private QueueNode RootNode;
 		private QueueNode CurrentInsertionPoint;
 		private QueueNode CurrentDequeuePoint;
 		private QueueNode PreviousDequeuePoint;
+		private QueueNode NextParentToDequeue;
 		private Game Tracking;
 
 		public Game Game { get; set; }
@@ -38,17 +40,16 @@ namespace Brimstone
 
 		public QueueTree() {
 			InsertionPoints = new Stack<QueueNode>();
-			DequeuePoints = new Stack<QueueNode>();
 		}
 
 		public QueueTree(QueueTree cloneFrom) {
 			// Does not clone events
 			InsertionPoints = new Stack<QueueNode>(cloneFrom.InsertionPoints.Reverse());
-			DequeuePoints = new Stack<QueueNode>(cloneFrom.DequeuePoints.Reverse());
 			RootNode = cloneFrom.RootNode;
 			CurrentInsertionPoint = cloneFrom.CurrentInsertionPoint;
 			CurrentDequeuePoint = cloneFrom.CurrentDequeuePoint;
 			PreviousDequeuePoint = cloneFrom.PreviousDequeuePoint;
+			NextParentToDequeue = cloneFrom.NextParentToDequeue;
 			Tracking = cloneFrom.Tracking;
 		}
 
@@ -61,22 +62,23 @@ namespace Brimstone
 				CurrentInsertionPoint = RootNode;
 				CurrentDequeuePoint = RootNode;
 				PreviousDequeuePoint = null;
+				NextParentToDequeue = null;
 				Tracking = Game;
 			}
 			else {
-				var node = new QueueNode(Game, action, Depth);
+				QueueNode node;
 				// Null insertion point means the tree is empty but we have spawned a new branch with no root action
-				if (CurrentInsertionPoint != null && node.Depth == CurrentInsertionPoint.Depth)
+				if (CurrentInsertionPoint != null && Depth == CurrentInsertionPoint.Depth)
 				{
 #if _QUEUE_DEBUG
 					DebugLog.WriteLine("QueueTree [" + Game.GameId + "]: Adding node " + action + " - at depth " + Depth + " as sibling");
 #endif
-					CurrentInsertionPoint.Next.Add(Game, node);
+					CurrentInsertionPoint.Next.Add(Game, node = new QueueNode(Game, action, CurrentInsertionPoint.Parent, Depth));
 				} else {
 #if _QUEUE_DEBUG
 					DebugLog.WriteLine("QueueTree [" + Game.GameId + "]: Adding node " + action + " - at depth " + Depth + " as child");
 #endif
-					CurrentDequeuePoint = node;
+					CurrentDequeuePoint = node = new QueueNode(Game, action, CurrentInsertionPoint, Depth);
 				}
 				CurrentInsertionPoint = node;
 			}
@@ -97,19 +99,19 @@ namespace Brimstone
 				DebugLog.WriteLine("QueueTree [" + Game.GameId + "]: Restarting from root node");
 #endif
 			}
-			var node = CurrentDequeuePoint;
 #if _QUEUE_DEBUG
-			DebugLog.WriteLine("QueueTree [" + Game.GameId + "]: Fetched " + node.Data + " - at depth " + Depth);
+			DebugLog.WriteLine("QueueTree [" + Game.GameId + "]: Fetched " + CurrentDequeuePoint.Data + " - at depth " + Depth);
 #endif
 			// Let nodes we are finished with go out of scope so they can be garbage collected
 			if (Depth == 0)
-				RootNode = node;
-			return node.Data;
+				RootNode = CurrentDequeuePoint;
+
+			return CurrentDequeuePoint.Data;
 		}
 
 		public void Stack() {
 			InsertionPoints.Push(CurrentInsertionPoint);
-			DequeuePoints.Push(CurrentDequeuePoint);
+			NextParentToDequeue = CurrentDequeuePoint;
 			// In case there is no root node...
 			if (Tracking == null)
 				Tracking = Game;
@@ -156,13 +158,14 @@ namespace Brimstone
 			DebugLog.WriteLine("QueueTree [" + Game.GameId + "]: Unwinding to minimum depth " + MaxUnwindDepth);
 			bool changed = false;
 #endif
-			while (CurrentDequeuePoint == null && Depth >= MaxUnwindDepth && Depth > 0) {
+			while (IsBranchEmpty && Depth >= MaxUnwindDepth && Depth > 0) {
 #if _QUEUE_DEBUG
 				DebugLog.WriteLine("QueueTree [" + Game.GameId + "]: Reached end of branch at depth " + Depth);
 #endif
 				OnBranchResolved?.Invoke();
-				PreviousDequeuePoint = CurrentDequeuePoint = DequeuePoints.Pop();
+				PreviousDequeuePoint = CurrentDequeuePoint = NextParentToDequeue;
 				CurrentInsertionPoint = InsertionPoints.Pop();
+				NextParentToDequeue = CurrentDequeuePoint;
 				MoveNext();
 #if _QUEUE_DEBUG
 				changed = true;
@@ -170,7 +173,7 @@ namespace Brimstone
 			}
 
 			// Queue empty
-			if (CurrentDequeuePoint == null && Depth == 0) {
+			if (IsEmpty) {
 				RootNode = null;
 				OnTreeResolved?.Invoke();
 #if _QUEUE_DEBUG
