@@ -35,7 +35,7 @@ namespace Brimstone
 		public bool IsBranchEmpty => CurrentDequeuePoint == null;
 		public bool IsEmpty => CurrentDequeuePoint == null && Depth == 0;
 
-		public event Action OnBranchResolved;
+		public event Action<QueueNode> OnBranchResolved;
 		public event Action OnTreeResolved;
 
 		public QueueTree() { }
@@ -162,9 +162,9 @@ namespace Brimstone
 #if _QUEUE_DEBUG
 				DebugLog.WriteLine("QueueTree [" + Game.GameId + "]: Reached end of branch at depth " + Depth);
 #endif
-				OnBranchResolved?.Invoke();
 				PreviousDequeuePoint = CurrentDequeuePoint = NextParentToDequeue;
 				CurrentInsertionPoint = CurrentDequeuePoint?.NextInsertionPoint;
+				OnBranchResolved?.Invoke(PreviousDequeuePoint);
 				Depth--;
 				NextParentToDequeue = CurrentDequeuePoint;
 				MoveNext();

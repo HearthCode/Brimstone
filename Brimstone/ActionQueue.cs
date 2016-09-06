@@ -1,10 +1,11 @@
-﻿#define _USE_QUEUE
-//#define _USE_TREE
+﻿//#define _USE_QUEUE
+#define _USE_TREE
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Brimstone.Actions;
 
 namespace Brimstone
 {
@@ -55,6 +56,7 @@ namespace Brimstone
 #if _USE_QUEUE
 		public Stack<Deque<QueueActionEventArgs>> QueueStack = new Stack<Deque<QueueActionEventArgs>>();
 		public Deque<QueueActionEventArgs> Queue;
+		private readonly Stack<BlockStart> BlockStack;
 #endif
 #if _USE_TREE
 		public QueueTree Tree { get; }
@@ -72,7 +74,6 @@ namespace Brimstone
 		public event EventHandler<QueueActionEventArgs> OnAction;
 
 		private readonly Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>> ReplacedActions;
-		private readonly Stack<BlockStart> BlockStack;
 #if _USE_TREE
 		public bool IsBlockEmpty => Tree.IsBranchEmpty;
 		public bool IsEmpty => Tree.IsEmpty;
@@ -90,9 +91,9 @@ namespace Brimstone
 			UserData = userData;
 #if _USE_QUEUE
 			Queue = new Deque<QueueActionEventArgs>();
+			BlockStack = new Stack<BlockStart>();
 #endif
 			ReplacedActions = new Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>>();
-			BlockStack = new Stack<BlockStart>();
 #if _USE_TREE
 			Tree = new QueueTree();
 			Tree.Game = game;
@@ -102,9 +103,9 @@ namespace Brimstone
 		}
 
 		public ActionQueue(ActionQueue cloneFrom) : base(cloneFrom) {
+#if _USE_QUEUE
 			// BlockStart is immutable and uses only value types so we can just shallow clone
 			BlockStack = new Stack<BlockStart>(cloneFrom.BlockStack.Reverse());
-#if _USE_QUEUE
 			foreach (var queue in cloneFrom.QueueStack.Reverse())
 				QueueStack.Push(new Deque<QueueActionEventArgs>(queue.Select(q => (QueueActionEventArgs) q.Clone())));
 			Queue = new Deque<QueueActionEventArgs>(cloneFrom.Queue.Select(q => (QueueActionEventArgs) q.Clone()));
@@ -167,8 +168,8 @@ namespace Brimstone
 #if _USE_QUEUE
 			QueueStack.Push(Queue);
 			Queue = new Deque<QueueActionEventArgs>();
-#endif
 			BlockStack.Push(gameBlock);
+#endif
 			EnqueueDeferred(source, qa);
 		}
 
@@ -183,10 +184,11 @@ namespace Brimstone
 		}
 
 #if _USE_TREE
-		private void EndBlock() {
-			var gameBlock = BlockStack.Pop();
-			if (gameBlock != null)
-				Game.OnBlockEmpty(gameBlock);
+		private void EndBlock(QueueNode parent)
+		{
+			var block = parent?.Data.Action as GameBlock;
+			if (block != null)
+				Game.OnBlockEmpty(block.Block);
 		}
 #endif
 
