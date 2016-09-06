@@ -329,15 +329,7 @@ namespace Brimstone
 			if (Paused)
 				return false;
 
-			// Unwind queue when blocks are empty
-#if _USE_TREE
-			Tree.Unwind(MaxUnwindDepth + 1);
-#endif
-#if _USE_QUEUE
-			while (IsBlockEmpty && Depth > MaxUnwindDepth)
-				EndBlock();
-#endif
-			// Exit if we have unwound the entire queue or reached the unwind limit
+			// Exit if the current branch is empty
 			if (IsBlockEmpty)
 				return false;
 
