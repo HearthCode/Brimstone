@@ -97,21 +97,27 @@ namespace BrimstoneTests
 			Assert.AreSame(clone, clone.PowerHistory.Game);
 			Assert.AreEqual(0, clone.PowerHistory.Delta.Count);
 
-			// Queue and stack must be copied
-			Assert.AreEqual(1, game.ActionQueue.Queue.Count);
-			Assert.AreEqual(1, game.ActionQueue.ResultStack.Count);
-
+			// ActionQueue must be copied
 			Assert.AreNotSame(game.ActionQueue, clone.ActionQueue);
+#if _USE_QUEUE
+			Assert.AreEqual(1, game.ActionQueue.Queue.Count);
 			Assert.AreNotSame(game.ActionQueue.Queue, clone.ActionQueue.Queue);
-			Assert.AreNotSame(game.ActionQueue.ResultStack, clone.ActionQueue.ResultStack);
 			Assert.AreEqual(game.ActionQueue.Queue.Count, clone.ActionQueue.Queue.Count);
+#endif
+			// TODO: Check QueueTree is copied
+
+			// Result stack must be copied
+			Assert.AreEqual(1, game.ActionQueue.ResultStack.Count);
+			Assert.AreNotSame(game.ActionQueue.ResultStack, clone.ActionQueue.ResultStack);
 			Assert.AreEqual(game.ActionQueue.ResultStack.Count, clone.ActionQueue.ResultStack.Count);
 
-			while (game.ActionQueue.Queue.Count > 0) {
+#if _USE_QUEUE
+			while (!game.ActionQueue.IsBlockEmpty) {
 				var i1 = game.ActionQueue.Queue.RemoveFront();
 				var i2 = clone.ActionQueue.Queue.RemoveFront();
 				Assert.AreNotSame(i1, i2);
 			}
+#endif
 
 			if (copyOnWrite)
 				// All proxies must point to original entities

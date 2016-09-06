@@ -52,8 +52,13 @@ namespace Brimstone
 	public class ActionQueue : ListTree<QueueActionEventArgs>, ICloneable
 	{
 		public Game Game { get; private set; }
+#if _USE_QUEUE
 		public Stack<Deque<QueueActionEventArgs>> QueueStack = new Stack<Deque<QueueActionEventArgs>>();
 		public Deque<QueueActionEventArgs> Queue;
+#endif
+#if _USE_TREE
+		public QueueTree Tree { get; }
+#endif
 		public Stack<ActionResult> ResultStack = new Stack<ActionResult>();
 		public IEnumerable<QueueActionEventArgs> History => this;
 
@@ -68,8 +73,6 @@ namespace Brimstone
 
 		private readonly Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>> ReplacedActions;
 		private readonly Stack<BlockStart> BlockStack;
-
-		private QueueTree Tree;
 #if _USE_TREE
 		public bool IsBlockEmpty => Tree.IsBranchEmpty;
 		public bool IsEmpty => Tree.IsEmpty;
@@ -85,23 +88,27 @@ namespace Brimstone
 			Game = game;
 			Paused = false;
 			UserData = userData;
+#if _USE_QUEUE
 			Queue = new Deque<QueueActionEventArgs>();
+#endif
 			ReplacedActions = new Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>>();
 			BlockStack = new Stack<BlockStart>();
+#if _USE_TREE
 			Tree = new QueueTree();
 			Tree.Game = game;
-#if _USE_TREE
-			Tree.OnBranchResolved += EndTreeBlock;
-			Tree.OnTreeResolved += EndQueue;
+			Tree.OnBranchResolved += EndBlock;
+			Tree.OnTreeResolved += game.OnQueueEmpty;
 #endif
 		}
 
 		public ActionQueue(ActionQueue cloneFrom) : base(cloneFrom) {
 			// BlockStart is immutable and uses only value types so we can just shallow clone
 			BlockStack = new Stack<BlockStart>(cloneFrom.BlockStack.Reverse());
+#if _USE_QUEUE
 			foreach (var queue in cloneFrom.QueueStack.Reverse())
 				QueueStack.Push(new Deque<QueueActionEventArgs>(queue.Select(q => (QueueActionEventArgs) q.Clone())));
 			Queue = new Deque<QueueActionEventArgs>(cloneFrom.Queue.Select(q => (QueueActionEventArgs) q.Clone()));
+#endif
 			var stack = new List<ActionResult>(cloneFrom.ResultStack);
 			stack.Reverse();
 			// TODO: Doesn't this clone some items twice?
@@ -117,18 +124,19 @@ namespace Brimstone
 			OnAction = cloneFrom.OnAction;
 			// Copy user data
 			UserData = cloneFrom.UserData;
+#if _USE_TREE
 			// Copy queue tree
 			Tree = (QueueTree)cloneFrom.Tree.Clone();
-#if _USE_TREE
-			Tree.OnBranchResolved += EndTreeBlock;
-			Tree.OnTreeResolved += EndQueue;
+			Tree.OnBranchResolved += EndBlock;
 #endif
 		}
 
 		public void Attach(Game game) {
 			Game = game;
+#if _USE_TREE
 			Tree.Game = game;
-
+			Tree.OnTreeResolved += game.OnQueueEmpty;
+#endif
 			// Make action stack entities point to new game
 			var stack = new List<ActionResult>(ResultStack);
 			stack.Reverse();
@@ -150,13 +158,17 @@ namespace Brimstone
 			if (qa == null)
 				return;
 #if _QUEUE_DEBUG
-			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Spawning new queue at depth " + (QueueStack.Count + 1) + " for " + source.ShortDescription + " with actions: " +
+			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Spawning new queue at depth " + (Depth + 1) + " for " + source.ShortDescription + " with actions: " +
 			                   string.Join(" ", qa.Select(a => a.ToString())) + " for action block: " + (gameBlock?.ToString() ?? "none"));
 #endif
+#if _USE_TREE
 			Tree.Stack();
+#endif
+#if _USE_QUEUE
 			QueueStack.Push(Queue);
-			BlockStack.Push(gameBlock);
 			Queue = new Deque<QueueActionEventArgs>();
+#endif
+			BlockStack.Push(gameBlock);
 			EnqueueDeferred(source, qa);
 		}
 
@@ -170,35 +182,31 @@ namespace Brimstone
 				StartBlock(source, g.Unravel(), gameBlock);
 		}
 
-		private void EndTreeBlock() {
+#if _USE_TREE
+		private void EndBlock() {
 			var gameBlock = BlockStack.Pop();
 			if (gameBlock != null)
 				Game.OnBlockEmpty(gameBlock);
 		}
-
-		private void EndBlock() {
-			if (QueueStack.Count > 0) {
-#if _QUEUE_DEBUG
-				System.Diagnostics.Debug.Assert(Queue.Count == 0);
-				DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Destroying queue at depth " + QueueStack.Count);
 #endif
+
 #if _USE_QUEUE
+		private void EndBlock() {
+			if (Depth > 0) {
+#if _QUEUE_DEBUG
+				System.Diagnostics.Debug.Assert(IsBlockEmpty);
+				DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Destroying queue at depth " + Depth);
+#endif
 				var gameBlock = BlockStack.Pop();
 				if (gameBlock != null)
 					Game.OnBlockEmpty(gameBlock);
-#endif
 				Queue = QueueStack.Pop();
 			}
 			// When the queue is empty, notify the game - it may refill it with new actions
-#if _USE_QUEUE
 			if (IsEmpty)
-				EndQueue();
+				Game.OnQueueEmpty();
+		}
 #endif
-		}
-
-		private void EndQueue() {
-			Game.OnQueueEmpty();
-		}
 
 		// Gets a QueueAction that can put into the queue
 		private QueueActionEventArgs initializeAction(IEntity source, QueueAction qa) {
@@ -252,20 +260,28 @@ namespace Brimstone
 			if (a == null)
 				return;
 #if _QUEUE_DEBUG
-			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Queueing action " + a + " for " + source.ShortDescription + " at depth " + QueueStack.Count);
+			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Queueing action " + a + " for " + source.ShortDescription + " at depth " + Depth);
 #endif
 			var e = initializeAction(source, a);
 			if (OnQueueing != null) {
 				OnQueueing(this, e);
 				// TODO: Count the number of arguments the cancelled action would take and remove those too
 				if (!e.Cancel) {
+#if _USE_QUEUE
 					Queue.AddBack(e);
+#endif
+#if _USE_TREE
 					Tree.Enqueue(e);
+#endif
 				}
 			}
 			else {
-				Queue.AddBack(e);
+#if _USE_QUEUE
+					Queue.AddBack(e);
+#endif
+#if _USE_TREE
 				Tree.Enqueue(e);
+#endif
 			}
 			OnQueued?.Invoke(this, e);
 		}
@@ -314,30 +330,30 @@ namespace Brimstone
 				return false;
 
 			// Unwind queue when blocks are empty
+#if _USE_TREE
 			Tree.Unwind(MaxUnwindDepth + 1);
-			while (Queue.Count == 0 && QueueStack.Count > MaxUnwindDepth)
+#endif
+#if _USE_QUEUE
+			while (IsBlockEmpty && Depth > MaxUnwindDepth)
 				EndBlock();
-
+#endif
 			// Exit if we have unwound the entire queue or reached the unwind limit
 			if (IsBlockEmpty)
 				return false;
 
 			// Get next action and make sure it's up to date if cloned from another game
-			var treeAction = Tree.Dequeue();
-			var queueAction = Queue.RemoveFront();
 #if _USE_TREE
-			var action = treeAction;
+			var action = Tree.Current();
 #endif
 #if _USE_QUEUE
-			var action = queueAction;
+			var action = Queue.RemoveFront();
 #endif
-			//var action = Queue.RemoveFront();
 			action.Game = Game;
 			if (action.Source.Game.GameId != Game.GameId)
 				action.Source = Game.Entities[action.Source.Id];
 
 #if _QUEUE_DEBUG
-			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Dequeued action " + action + " for " + action.Source.ShortDescription + " at depth " + QueueStack.Count);
+			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Dequeued action " + action + " for " + action.Source.ShortDescription + " at depth " + Depth);
 #endif
 			// TODO: Make it work when not all of the arguments are supplied, for flexible syntax
 
@@ -354,38 +370,54 @@ namespace Brimstone
 
 			if (OnActionStarting != null) {
 				OnActionStarting(this, action);
-				if (action.Cancel)
+				if (action.Cancel) {
+#if _USE_TREE
+					Tree.MoveNext();
+#endif
 					return false;
+				}
 			}
 			var actionType = action.Action.GetType();
 			if (ReplacedActions.ContainsKey(actionType)) {
 				await ReplacedActions[actionType](this, action);
 				// action.Cancel implied when action is replaced
+#if _USE_TREE
+				Tree.MoveNext();
+#endif
 				return false;
 			}
 			AddItem(action);
 
 			// Run action and push results onto stack
 #if _QUEUE_DEBUG
-			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Running action " + action + " for " + action.Source.ShortDescription + " at depth " + QueueStack.Count);
+			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Running action " + action + " for " + action.Source.ShortDescription + " at depth " + Depth);
 #endif
 			var result = action.Action.Execute(action.Game, action.Source, action.Args);
 			if (result.HasResult)
 				ResultStack.Push(result);
 
-			// The >= allows the current block to unwind for ProcessBlock()
-			Tree.Advance();
+#if _USE_TREE
+			Tree.MoveNext();
 			Tree.Unwind(MaxUnwindDepth);
-			
-			while (Queue.Count == 0 && QueueStack.Count >= MaxUnwindDepth) {
+#endif
+#if _USE_QUEUE
+			// The >= allows the current block to unwind for ProcessBlock()
+			while (IsBlockEmpty && Depth >= MaxUnwindDepth) {
 				EndBlock();
-				if (QueueStack.Count == 0)
+				if (IsEmpty)
 					break;
 			}
-
+#endif
 			OnAction?.Invoke(this, action);
-
 			return !action.Cancel;
+		}
+
+		// Skip over an item (used when cloning mid-action to avoid an infinite loop)
+		// NOTE: Does nothing when using a QueueStack because dequeued items are automatically removed
+		public void MoveNext() {
+#if _USE_TREE
+			Tree.MoveNext();
+#endif
 		}
 
 		public void ReplaceAction<QAT>(Func<ActionQueue, QueueActionEventArgs, Task> evt) {
@@ -404,6 +436,7 @@ namespace Brimstone
 
 		public override string ToString() {
 			string s = string.Empty;
+#if _USE_QUEUE
 			s += "Current block:\n";
 			foreach (var a in Queue)
 				s += a + "\n";
@@ -413,6 +446,8 @@ namespace Brimstone
 				foreach (var a in b)
 					s += a + "\n";
 			}
+#endif
+			// TODO: QueueTree output
 			return s;
 		}
 

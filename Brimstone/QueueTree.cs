@@ -77,7 +77,7 @@ namespace Brimstone
 			}
 		}
 
-		public QueueActionEventArgs Dequeue(int MaxUnwindDepth = 0)
+		public QueueActionEventArgs Current()
 		{
 			PreviousDequeuePoint = CurrentDequeuePoint;
 			if (CurrentDequeuePoint == null) {
@@ -94,7 +94,7 @@ namespace Brimstone
 			}
 			var node = CurrentDequeuePoint;
 #if _QUEUE_DEBUG
-			DebugLog.WriteLine("QueueTree: Dequeued " + node.Data + " - at depth " + Depth);
+			DebugLog.WriteLine("QueueTree: Fetched " + node.Data + " - at depth " + Depth);
 #endif
 			// Let nodes we are finished with go out of scope so they can be garbage collected
 			if (Depth == 0)
@@ -109,8 +109,8 @@ namespace Brimstone
 			DebugLog.WriteLine("QueueTree: Created new branch at depth " + Depth + " (current dequeue point is: " + (CurrentDequeuePoint?.Data.ToString() ?? "<end of branch>") + ")");
 #endif
 		}
-		
-		public void Advance() {
+
+		public void MoveNext() {
 			if (CurrentDequeuePoint == null) {
 #if _QUEUE_DEBUG
 				DebugLog.WriteLine("QueueTree: Cannot advance further at depth " + Depth);
@@ -120,7 +120,7 @@ namespace Brimstone
 			if (CurrentDequeuePoint == PreviousDequeuePoint) {
 				CurrentDequeuePoint.Next.TryGetValue(Game, out CurrentDequeuePoint);
 #if _QUEUE_DEBUG
-				DebugLog.WriteLine("QueueTree: Next node to dequeue is: " + (CurrentDequeuePoint?.Data.ToString() ?? "<end of branch>") + " at depth " + Depth);
+				DebugLog.WriteLine("QueueTree: Moved to next node: " + (CurrentDequeuePoint?.Data.ToString() ?? "<end of branch>") + " at depth " + Depth);
 #endif
 			}
 		}
@@ -138,7 +138,7 @@ namespace Brimstone
 				OnBranchResolved?.Invoke();
 				PreviousDequeuePoint = CurrentDequeuePoint = DequeuePoints.Pop();
 				CurrentInsertionPoint = InsertionPoints.Pop();
-				Advance();
+				MoveNext();
 #if _QUEUE_DEBUG
 				changed = true;
 #endif
@@ -155,7 +155,7 @@ namespace Brimstone
 			}
 #if _QUEUE_DEBUG
 			if (changed)
-				DebugLog.WriteLine("QueueTree: Next node to dequeue after unwind is " + (CurrentDequeuePoint?.Data.ToString() ?? "<none>") + " at depth " + Depth);
+				DebugLog.WriteLine("QueueTree: Next node to dequeue after unwind is: " + (CurrentDequeuePoint?.Data.ToString() ?? "<none>") + " at depth " + Depth);
 #endif
 		}
 
