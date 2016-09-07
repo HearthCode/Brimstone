@@ -12,8 +12,8 @@ namespace Brimstone
 		// Allow owner game and controller to be changed for state cloning
 		Game Game { get; set; }
 		BaseEntityData BaseEntityData { get; }
-		IZoneController ZoneController { get; set; }
 		Card Card { get; }
+		IZoneController ZoneController { get; }
 		IZone Zone { get; set; }
 		int ZonePosition { get; set; }
 		void ZoneMove(Zone Zone, int ZonePosition = -1);
@@ -124,22 +124,7 @@ namespace Brimstone
 		public BaseEntityData BaseEntityData { get { return _entity; } }
 		public virtual Game Game { get; set; }
 		// TODO: Re-do Controller code as normal tag property
-		private IZoneController _zoneController;
-		public IZoneController ZoneController {
-			get {
-				return _zoneController;
-			}
-			set {
-				if (_zoneController == value)
-					return;
-				var oldValue = _zoneController?.Id ?? 0;
-				if (Game?.Entities != null)
-						Changing(GameTag.CONTROLLER, oldValue, value.Id, false);
-				_zoneController = value;
-				if (Game?.Entities != null)
-					Game.EntityChanged(this, GameTag.CONTROLLER, oldValue, value.Id);
-			}
-		}
+		public IZoneController ZoneController => (IZoneController)Controller ?? Game;
 
 		public Entity(Entity cloneFrom) {
 			_fuzzyHash = cloneFrom._fuzzyHash;
@@ -161,8 +146,6 @@ namespace Brimstone
 			get {
 				if (t == GameTag.ENTITY_ID)
 					return _entity.Id;
-				if (t == GameTag.CONTROLLER)
-					return ZoneController.Id;
 				return _entity[t];
 			}
 			set {
@@ -171,18 +154,14 @@ namespace Brimstone
 				var oldValue = _entity.Tags.ContainsKey(t) ? _entity[t] : 0;
 				if (value == oldValue)
 					return;
-				if (t == GameTag.CONTROLLER) {
-					ZoneController = (IZoneController) Game.Entities[value];
-				}
-				else if (t == GameTag.ENTITY_ID) {
+				if (t == GameTag.ENTITY_ID) {
 					Changing(t, oldValue, value);
 					_entity.Id = value;
 				} else {
 					Changing(t, oldValue, value);
 					_entity[t] = value;
 				}
-				if (Game != null && t != GameTag.CONTROLLER)
-					Game.EntityChanged(this, t, oldValue, value);
+				Game?.EntityChanged(this, t, oldValue, value);
 			}
 		}
 
@@ -234,8 +213,6 @@ namespace Brimstone
 				allTags[tag.Key] = tag.Value;
 
 			// Specially handled tags
-			if (ZoneController != null)
-				allTags[GameTag.CONTROLLER] = ZoneController.Id;
 			allTags[GameTag.ENTITY_ID] = _entity.Id;
 			return allTags;
 		}
@@ -302,8 +279,6 @@ namespace Brimstone
 						hash = (hash * prime) ^ (uint)(kv.Value >> 8);
 						hash = (hash * prime) ^ (uint)(kv.Value & 0xff);
 					}
-				hash = (hash * prime) ^ (uint)GameTag.CONTROLLER;
-				hash = (hash * prime) ^ (uint)ZoneController.Id;
 				_fuzzyHash = (int)hash;
 				return _fuzzyHash;
 			}
@@ -312,8 +287,6 @@ namespace Brimstone
 		public override string ToString() {
 			string s = Card.Name + " - ";
 			s += new Tag(GameTag.ENTITY_ID, _entity.Id) + ", ";
-			if (ZoneController != null)
-				s += new Tag(GameTag.CONTROLLER, ZoneController.Id) + ", ";
 			foreach (var tag in _entity.Tags) {
 				s += new Tag(tag.Key, tag.Value) + ", ";
 			}

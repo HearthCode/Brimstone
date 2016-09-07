@@ -410,10 +410,10 @@ namespace BrimstoneTests
 			game14.Step = Step.FINAL_GAMEOVER;
 			game15.Step = Step.FINAL_GAMEOVER;
 
-			// (creating an entity and putting it in the player's hand creates 3 actions)
-			Assert.AreEqual(6, game13.PowerHistory.Delta.Count);
-			Assert.AreEqual(1 + 3, game14.PowerHistory.DeltaSince(game13).Count());
-			Assert.AreEqual(1 + 3, game15.PowerHistory.DeltaSince(game13).Count());
+			// (creating an entity and putting it in the player's hand creates 4 actions)
+			Assert.AreEqual(8, game13.PowerHistory.Delta.Count);
+			Assert.AreEqual(1 + 4, game14.PowerHistory.DeltaSince(game13).Count());
+			Assert.AreEqual(1 + 4, game15.PowerHistory.DeltaSince(game13).Count());
 
 			// Change a base game and its branched game at the same time with different ordering
 			game9.Player1.Give("Bloodfen Raptor");

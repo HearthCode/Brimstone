@@ -76,10 +76,12 @@ namespace Brimstone
 			set { this[GameTag.NUM_TURNS_IN_PLAY] = value; }
 		}
 
-		// TODO: Finish this off
+		// NOTE: Assumes that Game = ID 1, Player 1 = ID 2 and Player 2 = ID 3 always
+		// Returns null when Game calls its own Controller property, or if the entity is not attached to a Game
+		// Returns Player for everything else
 		public Player Controller {
-			get { return ZoneController as Player; }
-			set { ZoneController = value; }
+			get { return Game?.Entities[this[GameTag.CONTROLLER] + 1] as Player; }
+			set { this[GameTag.CONTROLLER] = value.Id - 1; }
 		}
 
 		public int Cost {

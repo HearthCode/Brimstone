@@ -28,7 +28,7 @@ namespace Brimstone
 #if _DECK_DEBUG
 				DebugLog.WriteLine("Adding " + card.Name + " to " + Controller.ShortDescription + "'s deck");
 #endif
-				Game.Add(Entity.FromCard(card, tags), Controller);
+				Game.Add(Entity.FromCard(card, tags), (Player) Controller);
 			}
 			// Force deck zone contents to update
 			Init();

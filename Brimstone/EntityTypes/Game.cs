@@ -128,10 +128,11 @@ namespace Brimstone
 			Changed = false;
 		}
 
-		public IEntity Add(IEntity newEntity, IZoneController controller) {
+		public IEntity Add(IEntity newEntity, Player controller) {
 			if (newEntity != null) {
-				newEntity.ZoneController = controller;
-				return Entities.Add(newEntity);
+				Entities.Add(newEntity);
+				newEntity.Controller = controller;
+				return newEntity;
 			}
 			return null;
 		}
@@ -323,7 +324,7 @@ namespace Brimstone
 						if (entity.Zone.Type != Brimstone.Zone.PLAY || entity.ZonePosition == 0)
 							_gameHash += entity.FuzzyHash;
 						else
-							_gameHash += (entity.ZoneController.Id * 8 + entity.ZonePosition) * entity.FuzzyHash;
+							_gameHash += (entity.Controller.Id * 8 + entity.ZonePosition) * entity.FuzzyHash;
 					_changed = false;
 				}
 				return _gameHash;

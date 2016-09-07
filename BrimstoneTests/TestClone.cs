@@ -85,8 +85,10 @@ namespace BrimstoneTests
 			// All entities must have correct game and controllers
 			foreach (var e in clone.Entities) {
 				Assert.AreEqual(game.Entities[e.Id].ZoneController.Id, e.ZoneController.Id);
+				if (e != clone)
+					Assert.AreEqual(game.Entities[e.Id].Controller.Id, e.Controller.Id);
 				Assert.AreSame(clone, e.Game);
-				Assert.AreSame(clone.Entities[e.Id].ZoneController, e.ZoneController);
+				Assert.AreSame(clone.Entities[e.Id].Controller, e.Controller);
 			}
 
 			// PowerHistory must be linked properly

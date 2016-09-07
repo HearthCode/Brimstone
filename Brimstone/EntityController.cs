@@ -33,7 +33,6 @@ namespace Brimstone
 		public EntityController(Game game)
 		{
 			Game = game;
-			Game.ZoneController = game;
 			Add(game);
 		}
 
@@ -44,12 +43,8 @@ namespace Brimstone
 				Entities.Add(entity.Id, (IEntity) entity.Clone());
 			// Change ownership
 			Game = FindGame();
-			foreach (var entity in Entities)
-				entity.Value.Game = Game;
-			foreach (var entity in Entities)
-				entity.Value.ZoneController = (IZoneController) Entities[es.Entities[entity.Key].ZoneController.Id];
-
-			// Do this last so that changing Controller doesn't trigger EntityChanging
+			foreach (var entity in Entities.Values)
+				entity.Game = Game;
 			Game.Entities = this;
 		}
 

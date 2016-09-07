@@ -28,10 +28,10 @@ namespace Brimstone
 			Minion minion = target as Minion;
 
 			// Can't target your opponent's stealth minions
-			if (minion != null && minion.HasStealth && minion.Controller != ZoneController)
+			if (minion != null && minion.HasStealth && minion.Controller != Controller)
 				return false;
 
-			if (target.CantBeTargetedByOpponents && target.Controller != ZoneController)
+			if (target.CantBeTargetedByOpponents && target.Controller != Controller)
 				return false;
 
 			foreach (var item in Card.Requirements) {
