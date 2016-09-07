@@ -108,7 +108,7 @@ namespace BrimstoneTests
 
 			// Result stack must be copied
 			Assert.AreEqual(1, game.ActionQueue.ResultStack.Count());
-			Assert.AreNotSame(game.ActionQueue.ResultStack, clone.ActionQueue.ResultStack);
+			Assert.AreSame(game.ActionQueue.ResultStack, clone.ActionQueue.ResultStack); // Immutable stack copies pointer only
 			Assert.AreEqual(game.ActionQueue.ResultStack.Count(), clone.ActionQueue.ResultStack.Count());
 
 #if _USE_QUEUE
@@ -179,8 +179,11 @@ namespace BrimstoneTests
 							}
 						}
 
+			// Legacy: Entity stack references are now lazily updated rather than at cloning time
+
 			// All stack entity references must be updated
-			while (game.ActionQueue.ResultStack.Count() > 0) {
+			/*
+			while (game.ActionQueue.ResultStack.Any()) {
 				var i1 = game.ActionQueue.ResultStack.Peek();
 				var i2 = clone.ActionQueue.ResultStack.Peek();
 				game.ActionQueue.ResultStack = game.ActionQueue.ResultStack.Pop();
@@ -200,6 +203,7 @@ namespace BrimstoneTests
 					}
 				}
 			}
+			*/
 
 			// TODO: Check that ActiveTriggers is cloned correctly and only once
 			// TODO: Check Queue events are copied
