@@ -7,7 +7,7 @@ namespace Brimstone
 	public abstract class ListTree<TItem> : IEnumerable<TItem>
 	{
 		public ListTree<TItem> Parent { get; }
-		public List<TItem> Delta { get; } = new List<TItem>();
+		public Queue<TItem> Delta { get; } = new Queue<TItem>();
 		public int SequenceNumber { get; private set; }
 		public int ParentBranchEntry { get; }
 
@@ -25,7 +25,7 @@ namespace Brimstone
 		}
 
 		protected void AddItem(TItem i) {
-			Delta.Add(i);
+			Delta.Enqueue(i);
 			SequenceNumber++;
 		}
 
