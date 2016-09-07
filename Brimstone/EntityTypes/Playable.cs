@@ -57,7 +57,7 @@ namespace Brimstone
 
 			// TODO: Check targeting validity
 			Target = target;
-			return (T) Game.Action(this, Behaviours.Play(this));
+			return (T) Game.RunActionBlock(BlockType.PLAY, this, Behaviours.Play(this), Target);
 		}
 	}
 }
