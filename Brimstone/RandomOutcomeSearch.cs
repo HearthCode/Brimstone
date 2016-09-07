@@ -107,7 +107,7 @@ namespace Brimstone
 				var clonedNode = ((ProbabilisticGameNode)e.UserData).Branch(perItemWeight);
 				NodeCount++;
 				clonedNode.Game.ActionQueue.MoveNext();
-				clonedNode.Game.ActionQueue.ResultStack.Push((Entity)clonedNode.Game.Entities[entity.Id]);
+				clonedNode.Game.ActionQueue.StackPush((Entity)clonedNode.Game.Entities[entity.Id]);
 				clonedNode.Game.ActionQueue.ProcessAll(clonedNode);
 				searcher.Visitor(clonedNode, this, e);
 			}
@@ -133,7 +133,7 @@ namespace Brimstone
 				var clonedNode = ((ProbabilisticGameNode)e.UserData).Branch(perItemWeight);
 				NodeCount++;
 				clonedNode.Game.ActionQueue.MoveNext();
-				clonedNode.Game.ActionQueue.ResultStack.Push(i);
+				clonedNode.Game.ActionQueue.StackPush(i);
 				clonedNode.Game.ActionQueue.ProcessAll(clonedNode);
 				searcher.Visitor(clonedNode, this, e);
 			}
@@ -161,7 +161,7 @@ namespace Brimstone
 						var clonedNode = ((ProbabilisticGameNode)e.UserData).Branch(perItemWeight);
 						NodeCount++;
 						clonedNode.Game.ActionQueue.MoveNext();
-						clonedNode.Game.ActionQueue.ResultStack.Push((Entity) clonedNode.Game.Entities[entity.Id]);
+						clonedNode.Game.ActionQueue.StackPush((Entity) clonedNode.Game.Entities[entity.Id]);
 						await clonedNode.Game.ActionQueue.ProcessAllAsync(clonedNode);
 						searcher.Visitor(clonedNode, this, e);
 					})
@@ -190,7 +190,7 @@ namespace Brimstone
 						var clonedNode = ((ProbabilisticGameNode)e.UserData).Branch(perItemWeight);
 						NodeCount++;
 						clonedNode.Game.ActionQueue.MoveNext();
-						clonedNode.Game.ActionQueue.ResultStack.Push(i);
+						clonedNode.Game.ActionQueue.StackPush(i);
 						await clonedNode.Game.ActionQueue.ProcessAllAsync(clonedNode);
 						searcher.Visitor(clonedNode, this, e);
 					})

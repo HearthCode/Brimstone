@@ -107,9 +107,9 @@ namespace BrimstoneTests
 			// TODO: Check QueueTree is copied
 
 			// Result stack must be copied
-			Assert.AreEqual(1, game.ActionQueue.ResultStack.Count);
+			Assert.AreEqual(1, game.ActionQueue.ResultStack.Count());
 			Assert.AreNotSame(game.ActionQueue.ResultStack, clone.ActionQueue.ResultStack);
-			Assert.AreEqual(game.ActionQueue.ResultStack.Count, clone.ActionQueue.ResultStack.Count);
+			Assert.AreEqual(game.ActionQueue.ResultStack.Count(), clone.ActionQueue.ResultStack.Count());
 
 #if _USE_QUEUE
 			while (!game.ActionQueue.IsBlockEmpty) {
@@ -180,9 +180,11 @@ namespace BrimstoneTests
 						}
 
 			// All stack entity references must be updated
-			while (game.ActionQueue.ResultStack.Count > 0) {
-				var i1 = game.ActionQueue.ResultStack.Pop();
-				var i2 = clone.ActionQueue.ResultStack.Pop();
+			while (game.ActionQueue.ResultStack.Count() > 0) {
+				var i1 = game.ActionQueue.ResultStack.Peek();
+				var i2 = clone.ActionQueue.ResultStack.Peek();
+				game.ActionQueue.ResultStack = game.ActionQueue.ResultStack.Pop();
+				clone.ActionQueue.ResultStack = clone.ActionQueue.ResultStack.Pop();
 				Assert.AreNotSame(i1, i2);
 
 				List<IEntity> il1 = i1;

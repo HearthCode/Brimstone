@@ -183,7 +183,7 @@ namespace BrimstoneTests
 					foreach (var entity in e.Args[RandomChoice.ENTITIES]) {
 						Game cloned = e.Game.CloneState();
 						cloned.ActionQueue.MoveNext();
-						cloned.ActionQueue.ResultStack.Push((Entity)cloned.Entities[entity.Id]);
+						cloned.ActionQueue.StackPush((Entity)cloned.Entities[entity.Id]);
 						cloned.ActionQueue.ProcessAll();
 						if (!cloned.EquivalentTo(e.Game))
 							clones.Enqueue(cloned);
@@ -194,7 +194,7 @@ namespace BrimstoneTests
 					for (int i = e.Args[RandomAmount.MIN]; i <= e.Args[RandomAmount.MAX]; i++) {
 						Game cloned = e.Game.CloneState();
 						cloned.ActionQueue.MoveNext();
-						cloned.ActionQueue.ResultStack.Push(i);
+						cloned.ActionQueue.StackPush(i);
 						cloned.ActionQueue.ProcessAll();
 						if (!cloned.EquivalentTo(e.Game))
 							clones.Enqueue(cloned);
@@ -244,7 +244,7 @@ namespace BrimstoneTests
 					foreach (var entity in e.Args[RandomChoice.ENTITIES]) {
 						Game cloned = e.Game.CloneState();
 						cloned.ActionQueue.MoveNext();
-						cloned.ActionQueue.ResultStack.Push((Entity)cloned.Entities[entity.Id]);
+						cloned.ActionQueue.StackPush((Entity)cloned.Entities[entity.Id]);
 						cloned.ActionQueue.ProcessAll();
 						if (!cloned.EquivalentTo(e.Game))
 							clones.Enqueue(cloned);
@@ -255,7 +255,7 @@ namespace BrimstoneTests
 					for (int i = e.Args[RandomAmount.MIN]; i <= e.Args[RandomAmount.MAX]; i++) {
 						Game cloned = e.Game.CloneState();
 						cloned.ActionQueue.MoveNext();
-						cloned.ActionQueue.ResultStack.Push(i);
+						cloned.ActionQueue.StackPush(i);
 						cloned.ActionQueue.ProcessAll();
 						if (!cloned.EquivalentTo(e.Game))
 							clones.Enqueue(cloned);

@@ -1,8 +1,9 @@
-﻿//#define _USE_QUEUE
-#define _USE_TREE
+﻿#define _USE_QUEUE
+//#define _USE_TREE
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Brimstone.Actions;
@@ -61,7 +62,7 @@ namespace Brimstone
 #if _USE_TREE
 		public QueueTree Tree { get; }
 #endif
-		public Stack<ActionResult> ResultStack = new Stack<ActionResult>();
+		public ImmutableStack<ActionResult> ResultStack;
 		public IEnumerable<QueueActionEventArgs> History => this;
 
 		public bool Paused { get; set; }
@@ -93,10 +94,10 @@ namespace Brimstone
 			Queue = new Deque<QueueActionEventArgs>();
 			BlockStack = new Stack<BlockStart>();
 #endif
+			ResultStack = ImmutableStack.Create<ActionResult>();
 			ReplacedActions = new Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>>();
 #if _USE_TREE
-			Tree = new QueueTree();
-			Tree.Game = game;
+			Tree = new QueueTree {Game = game};
 			Tree.OnBranchResolved += EndBlock;
 			Tree.OnTreeResolved += game.OnQueueEmpty;
 #endif
@@ -110,11 +111,7 @@ namespace Brimstone
 				QueueStack.Push(new Deque<QueueActionEventArgs>(queue.Select(q => (QueueActionEventArgs) q.Clone())));
 			Queue = new Deque<QueueActionEventArgs>(cloneFrom.Queue.Select(q => (QueueActionEventArgs) q.Clone()));
 #endif
-			var stack = new List<ActionResult>(cloneFrom.ResultStack);
-			stack.Reverse();
-			// TODO: Doesn't this clone some items twice?
-			foreach (var item in stack)
-				ResultStack.Push((ActionResult)item.Clone());
+			ResultStack = cloneFrom.ResultStack;
 			// TODO: Option to disable History
 			ReplacedActions = new Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>>(cloneFrom.ReplacedActions);
 			Paused = cloneFrom.Paused;
@@ -141,17 +138,17 @@ namespace Brimstone
 			// Make action stack entities point to new game
 			var stack = new List<ActionResult>(ResultStack);
 			stack.Reverse();
-			ResultStack.Clear();
+			StackClear();
 			foreach (var ar in stack) {
 				List<IEntity> el = ar;
 				if (el == null) {
-					ResultStack.Push(ar);
+					StackPush(ar);
 					continue;
 				}
 				List<IEntity> nel = new List<IEntity>();
 				foreach (var item in el)
 					nel.Add(game.Entities[item.Id]);
-				ResultStack.Push(nel);
+				StackPush(nel);
 			}
 		}
 
@@ -318,7 +315,7 @@ namespace Brimstone
 			var stack = new List<ActionResult>(ResultStack);
 			if (Paused || !IsEmpty)
 				return stack;
-			ResultStack.Clear();
+			StackClear();
 			stack.Reverse();
 			return stack;
 		}
@@ -353,8 +350,9 @@ namespace Brimstone
 
 			// Get arguments for action from stack
 			action.Args = new List<ActionResult>();
-			for (int i = 0; i < action.Action.Args.Count; i++)
-				action.Args.Add(ResultStack.Pop());
+			for (int i = 0; i < action.Action.Args.Count; i++) {
+				action.Args.Add(StackPop());
+			}
 			action.Args.Reverse();
 
 			// Replace current UserData with new UserData if supplied
@@ -388,7 +386,7 @@ namespace Brimstone
 #endif
 			var result = action.Action.Execute(action.Game, action.Source, action.Args);
 			if (result.HasResult)
-				ResultStack.Push(result);
+				StackPush(result);
 
 #if _USE_TREE
 			Tree.MoveNext();
@@ -412,6 +410,20 @@ namespace Brimstone
 #if _USE_TREE
 			Tree.MoveNext();
 #endif
+		}
+
+		public void StackPush(ActionResult i) {
+			ResultStack = ResultStack.Push(i);
+		}
+
+		public ActionResult StackPop() {
+			var i = ResultStack.Peek();
+			ResultStack = ResultStack.Pop();
+			return i;
+		}
+
+		public void StackClear() {
+			ResultStack = ResultStack.Clear();
 		}
 
 		public void ReplaceAction<QAT>(Func<ActionQueue, QueueActionEventArgs, Task> evt) {
