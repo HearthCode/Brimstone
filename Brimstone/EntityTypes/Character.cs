@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using static Brimstone.Behaviours;
 
@@ -13,8 +13,6 @@ namespace Brimstone
 		ICanTarget Attack(ICharacter Target = null);
 
 		void Hit(int amount);
-
-		void CheckForDeath();
 	}
 
 	public abstract partial class Character<T> : Playable<T>, ICharacter where T : Entity
@@ -39,12 +37,6 @@ namespace Brimstone
 
 		public void Hit(int amount) {
 			Game.Action(this, Damage(this, amount));
-		}
-
-		public void CheckForDeath() {
-			if (Health <= 0) {
-				Game.Queue(this, Death(this));
-			}
 		}
 	}
 }
