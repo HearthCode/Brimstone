@@ -55,7 +55,6 @@ namespace Brimstone
 		};
 
 		// Cult Master
-		// TODO: Unit test; OnDeath trigger not added yet
 		public static Behaviour EX1_595 = new Behaviour {
 			Triggers = {
 				[OnDeath] = FriendlyMinions - Self > Draw(Controller)
@@ -76,7 +75,7 @@ namespace Brimstone
 
 		// Silver Hand Knight
 		public static Behaviour CS2_151 = new Behaviour {
-			Battlecry = Summon(Controller, "Squire")
+			Battlecry = Summon(Controller, "CS2_152")
 		};
 
 		// Elven Archer
@@ -124,7 +123,7 @@ namespace Brimstone
 
 		// Dragonling Mechanic
 		public static Behaviour EX1_025 = new Behaviour {
-			Battlecry = Summon(Controller, "Mechanical Dragonling")
+			Battlecry = Summon(Controller, "EX1_025t")
 		};
 
 		// Leper Gnome
@@ -178,12 +177,12 @@ namespace Brimstone
 
 		// Murloc Tidehunter
 		public static Behaviour EX1_506 = new Behaviour {
-			Battlecry = Summon(Controller, "Murloc Scout")
+			Battlecry = Summon(Controller, "EX1_506a")
 		};
 
 		// Harvest Golem
 		public static Behaviour EX1_556 = new Behaviour {
-			Deathrattle = Summon(Controller, "Damaged Golem")
+			Deathrattle = Summon(Controller, "skele21")
 		};
 
 		// Priestess of Elune
@@ -341,8 +340,11 @@ namespace Brimstone
 		// TODO: Weapon selectors
 
 		// Violet Teacher
-		// public static Behaviour NEW1_026 = new Behaviour {
-		// TODO: Conditional selectors
+		public static Behaviour NEW1_026 = new Behaviour {
+			Triggers = {
+				[OnPlay] = IsFriendlySpell > Summon(Controller, "NEW1_026t")
+			}
+		};
 
 		// Master Swordsmith
 		// public static Behaviour NEW1_037 = new Behaviour {
@@ -379,9 +381,19 @@ namespace Brimstone
 			Battlecry = Damage(Target, 6)
 		};
 
+		// Pyroblast
+		public static Behaviour EX1_279 = new Behaviour {
+			Battlecry = Damage(Target, 10)
+		};
+
 		// Arcane Explosion
 		public static Behaviour CS2_025 = new Behaviour {
 			Battlecry = Damage(OpponentMinions, 1)
+		};
+
+		// Flamestrike
+		public static Behaviour CS2_032 = new Behaviour {
+			Battlecry = Damage(OpponentMinions, 4)
 		};
 
 		// Moonfire
@@ -416,7 +428,7 @@ namespace Brimstone
 
 		// Arathi Weaponsmith
 		public static Behaviour EX1_398 = new Behaviour {
-			Battlecry = Summon(Controller, "Battle Axe", 1)
+			Battlecry = Summon(Controller, "EX1_398t")
 		};
 
 		// Explosive Sheep
@@ -426,7 +438,7 @@ namespace Brimstone
 
 		// Deathlord
 		public static Behaviour FP1_009 = new Behaviour {
-			Deathrattle = Summon(Opponent, RandomOpponentMinionInDeck, 1)
+			Deathrattle = Summon(Opponent, RandomOpponentMinionInDeck)
 		};
 
 		// Illidan Stormrage
@@ -440,6 +452,13 @@ namespace Brimstone
 		public static Behaviour EX1_249 = new Behaviour {
 			Triggers = {
 				[OnEndTurn] = IsFriendly > Damage(AllCharacters - Self, 2)
+			}
+		};
+
+		// Damage Reflector
+		public static Behaviour XXX_024 = new Behaviour {
+			Triggers = {
+				[OnDamage] = IsSelf > Damage(AllCharacters - Self, 1)
 			}
 		};
 	}
