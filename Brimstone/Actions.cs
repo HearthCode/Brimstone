@@ -366,6 +366,7 @@ namespace Brimstone.Actions
 			Player player = source.Controller;
 			IPlayable entity = (IPlayable)(Entity)args[ENTITY];
 
+			// TODO: Update TempResources
 			// TODO: Update ResourcesUsed
 			// TODO: Update NumResourcesSpentThisGame
 
@@ -375,25 +376,27 @@ namespace Brimstone.Actions
 
 			entity.Zone = player.Board;
 
-			if (entity is Minion && !((Minion)entity).HasCharge)
-				((Minion)entity).IsExhausted = true;
+			// TODO: Show card to opponent
+
+			if (entity is Minion && !((Minion) entity).HasCharge)
+				((Minion) entity).IsExhausted = true;
 
 			entity.JustPlayed = true;
 			player.LastCardPlayed = entity;
 #if _ACTIONS_DEBUG
 			DebugLog.WriteLine("Game {0}: {1} is playing {2}", game.GameId, player.FriendlyName, entity.ShortDescription);
 #endif
-			// TODO: Deaths
-
-			game.Queue(source, entity.Card.Behaviour.Battlecry);
+			game.QueueActionBlock(BlockType.POWER, source, entity.Card.Behaviour.Battlecry, entity.Target);
 			game.Queue(source, new Action<IEntity>(_ =>
 			{
-				player.IsComboActive = true;
-				player.NumOptionsPlayedThisTurn++;
-
 				// Spells go to the graveyard after they are played
 				if (entity is Spell)
 					entity.Zone = entity.Controller.Graveyard;
+
+				// TODO: Update hero's ATK if we played a weapon
+
+				player.IsComboActive = true;
+				player.NumOptionsPlayedThisTurn++;
 			}));
 
 			game.ActiveTriggers.Queue(TriggerType.AfterPlay, entity); // TODO: Attach this to a tag change
