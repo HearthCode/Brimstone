@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using static Brimstone.TriggerType;
 
@@ -35,17 +36,17 @@ namespace Brimstone
 		}
 
 		// Lists of entity IDs which have triggers of the key type
-		public Dictionary<TriggerType, List<int>> Triggers { get; }
+		public ImmutableDictionary<TriggerType, List<int>> Triggers { get; private set; }
 
 		public TriggerManager(Game game) {
 			Game = game;
-			Triggers = new Dictionary<TriggerType, List<int>>();
+			Triggers = ImmutableDictionary.Create<TriggerType, List<int>>();
 		}
 
 		public TriggerManager(TriggerManager tm) {
 			Game = tm.Game;
 			// TODO: Write a unit test that clones twice, creates new entity with same ID and different triggers per game, check all 3 games trigger correctly
-			Triggers = new Dictionary<TriggerType, List<int>>(tm.Triggers);
+			Triggers = tm.Triggers;
 		}
 
 		public void Add(IEntity entity) {
@@ -61,7 +62,7 @@ namespace Brimstone
 			if (Triggers.ContainsKey(type))
 				Triggers[type].Add(entity.Id);
 			else
-				Triggers.Add(type, new List<int> { entity.Id });
+				Triggers = Triggers.Add(type, new List<int> { entity.Id });
 		}
 
 		private void OnEntityCreated(Game game, IEntity entity) {
