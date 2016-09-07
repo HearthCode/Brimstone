@@ -141,8 +141,10 @@ namespace Brimstone
 		}
 
 		public void StartBlock(IEntity source, List<QueueAction> qa, BlockStart gameBlock = null) {
-			if (qa == null)
+			if (qa == null) {
+				Game.OnBlockEmpty(gameBlock);
 				return;
+			}
 #if _QUEUE_DEBUG
 			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Spawning new queue at depth " + (Depth + 1) + " for " + source.ShortDescription + " with actions: " +
 			                   string.Join(" ", qa.Select(a => a.ToString())) + " for action block: " + (gameBlock?.ToString() ?? "none"));
@@ -218,6 +220,7 @@ namespace Brimstone
 		public ActionResult Run(IEntity source, List<QueueAction> qa) {
 			if (qa == null)
 				return ActionResult.None;
+			// TODO: If qa.Count == 1 and qa[0] is GameBlock then find a shortcut to avoid double-nesting
 			StartBlock(source, qa);
 			var result = ProcessBlock();
 			// The default is new ActionResult() which is the same as ActionResult.None
