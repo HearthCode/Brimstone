@@ -75,7 +75,7 @@ namespace Brimstone
 		public event EventHandler<QueueActionEventArgs> OnActionStarting;
 		public event EventHandler<QueueActionEventArgs> OnAction;
 
-		private readonly Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>> ReplacedActions;
+		private ImmutableDictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>> ReplacedActions;
 #if _USE_TREE
 		public bool IsBlockEmpty => Tree.IsBranchEmpty;
 		public bool IsEmpty => Tree.IsEmpty;
@@ -97,7 +97,7 @@ namespace Brimstone
 			BlockStack = new Stack<BlockStart>();
 #endif
 			ResultStack = ImmutableStack.Create<ActionResult>();
-			ReplacedActions = new Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>>();
+			ReplacedActions = ImmutableDictionary.Create<Type, Func<ActionQueue, QueueActionEventArgs, Task>>();
 #if _USE_TREE
 			Tree = new QueueTree {Game = game};
 			Tree.OnBranchResolved += EndBlock;
@@ -115,7 +115,7 @@ namespace Brimstone
 #endif
 			ResultStack = cloneFrom.ResultStack;
 			// TODO: Option to disable History
-			ReplacedActions = new Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>>(cloneFrom.ReplacedActions);
+			ReplacedActions = cloneFrom.ReplacedActions;
 			HasHistory = cloneFrom.HasHistory;
 			Paused = cloneFrom.Paused;
 			// Events are immutable so this creates copies
@@ -431,10 +431,7 @@ namespace Brimstone
 		}
 
 		public void ReplaceAction<QAT>(Func<ActionQueue, QueueActionEventArgs, Task> evt) {
-			if (!ReplacedActions.ContainsKey(typeof(QAT)))
-				ReplacedActions.Add(typeof(QAT), evt);
-			else
-				ReplacedActions[typeof(QAT)] = evt;
+			ReplacedActions = ReplacedActions.SetItem(typeof(QAT), evt);
 		}
 
 		public string StackToString() {
