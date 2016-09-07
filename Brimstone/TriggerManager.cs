@@ -148,7 +148,7 @@ namespace Brimstone
 						DebugLog.WriteLine("Firing trigger for " + owningEntity.ShortDescription + " with actions: "
 							+ string.Join(" ", trigger.Action.Select(a => a.ToString())));
 #endif
-						Game.ActionBlock(BlockType.TRIGGER, owningEntity, trigger.Action,
+						Game.QueueActionBlock(BlockType.TRIGGER, owningEntity, trigger.Action,
 							// Trigger index: 0 for normal entities; -1 for Game; specific index for player if specified, otherwise -1
 							Index: TriggerIndices.ContainsKey(type) ? TriggerIndices[type] :
 								source == Game ? -1 : source is Player ? -1 : 0);

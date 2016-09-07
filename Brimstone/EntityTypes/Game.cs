@@ -141,6 +141,14 @@ namespace Brimstone
 			return ActionQueue.Run(source, g);
 		}
 
+		public ActionResult Action(IEntity source, List<QueueAction> l) {
+			return ActionQueue.Run(source, l);
+		}
+
+		public ActionResult Action(IEntity source, QueueAction a) {
+			return ActionQueue.Run(source, a);
+		}
+
 		public void Queue(IEntity source, ActionGraph g) {
 			ActionQueue.EnqueueDeferred(source, g);
 		}
@@ -166,17 +174,30 @@ namespace Brimstone
 		// ATTACK: Always -1
 		// JOUST: Always 0
 		// RITUAL: Always 0
-		public void ActionBlock(BlockType Type, IEntity Source, ActionGraph Actions, IEntity Target = null, int Index = -2) {
-			ActionBlock(Type, Source, Actions.Unravel(), Target, Index);
+		public void QueueActionBlock(BlockType Type, IEntity Source, ActionGraph Actions, IEntity Target = null, int Index = -2) {
+			QueueActionBlock(Type, Source, Actions.Unravel(), Target, Index);
 		}
 
-		public void ActionBlock(BlockType Type, IEntity Source, List<QueueAction> Actions, IEntity Target = null, int Index = -2) {
+		public void QueueActionBlock(BlockType Type, IEntity Source, List<QueueAction> Actions, IEntity Target = null, int Index = -2) {
 #if _GAME_DEBUG
 			DebugLog.WriteLine("Queueing " + Type + " for " + Source.ShortDescription + " => " + (Target?.ShortDescription ?? "no target"));
 #endif
 			int index = Index != -2 ? Index : (Type == BlockType.POWER || Type == BlockType.ATTACK ? -1 : 0);
 			var block = new BlockStart(Type, Source, Target, index);
 			Queue(Source, new Actions.GameBlock(block, Actions));
+		}
+
+		public ActionResult RunActionBlock(BlockType Type, IEntity Source, ActionGraph Actions, IEntity Target = null, int Index = -2) {
+			return RunActionBlock(Type, Source, Actions.Unravel(), Target, Index);
+		}
+
+		public ActionResult RunActionBlock(BlockType Type, IEntity Source, List<QueueAction> Actions, IEntity Target = null, int Index = -2) {
+#if _GAME_DEBUG
+			DebugLog.WriteLine("Running " + Type + " for " + Source.ShortDescription + " => " + (Target?.ShortDescription ?? "no target"));
+#endif
+			int index = Index != -2 ? Index : (Type == BlockType.POWER || Type == BlockType.ATTACK ? -1 : 0);
+			var block = new BlockStart(Type, Source, Target, index);
+			return Action(Source, new Actions.GameBlock(block, Actions));
 		}
 
 		public void OnBlockEmpty(BlockStart Block) {
