@@ -139,8 +139,7 @@ namespace Brimstone.Actions
 			game.Turn = 1;
 
 			// Draw cards
-			foreach (var p in game.Players)
-			{
+			foreach (var p in game.Players) {
 				p.Draw((game.FirstPlayer == p ? 3 : 4));
 				p.NumTurnsLeft = 1;
 
@@ -163,8 +162,7 @@ namespace Brimstone.Actions
 	// Run for each player when MULLIGAN_STATE = DEALING
 	public class PerformMulligan : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, ActionResult[] args)
-		{
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			var player = source as Player;
 
 			// Perform mulligan
@@ -180,8 +178,7 @@ namespace Brimstone.Actions
 	// Run for each player when MULLIGAN_STATE = WAITING
 	public class WaitForMulliganComplete : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, ActionResult[] args)
-		{
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			var player = source as Player;
 			player.MulliganState = MulliganState.DONE;
 
@@ -195,8 +192,7 @@ namespace Brimstone.Actions
 	// Runs when STEP = BEGIN_MULLIGAN
 	public class BeginMulligan : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, ActionResult[] args)
-		{
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			foreach (var p in game.Players)
 				p.StartMulligan();
 			return ActionResult.None;
@@ -249,8 +245,7 @@ namespace Brimstone.Actions
 	// Runs when STEP = MAIN_START_TRIGGERS
 	public class BeginTurnTriggers : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, ActionResult[] args)
-		{
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			game.NextStep = Step.MAIN_START;
 			return ActionResult.None;
 		}
@@ -285,8 +280,7 @@ namespace Brimstone.Actions
 	// Run when STEP = MAIN_CLEANUP
 	public class EndTurnCleanupForPlayer : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, ActionResult[] args)
-		{
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			foreach (IPlayable e in game.Entities.Where(x => x is IPlayable && ((IPlayable)x).JustPlayed && x.Controller == source))
 				e.JustPlayed = false;
 			game.NextStep = Step.MAIN_NEXT;
@@ -297,8 +291,7 @@ namespace Brimstone.Actions
 	// Runs when STEP = MAIN_NEXT
 	public class EndTurn : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, ActionResult[] args)
-		{
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			// This is probably going to be used to give players extra turns later
 			game.CurrentPlayer.NumTurnsLeft = 0;
 			game.CurrentOpponent.NumTurnsLeft = 1;
@@ -316,7 +309,7 @@ namespace Brimstone.Actions
 		public const int PLAYER = 0;
 
 		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
-			Player player = (Player) args[PLAYER];
+			Player player = (Player)args[PLAYER];
 			player.PlayState = PlayState.CONCEDED;
 			player.PlayState = PlayState.LOST;
 			player.Opponent.PlayState = PlayState.WON;
@@ -336,7 +329,7 @@ namespace Brimstone.Actions
 #if _ACTIONS_DEBUG
 			DebugLog.WriteLine("Game {0}: Giving {1} to {2}", game.GameId, card.Name, player.FriendlyName);
 #endif
-			return (Entity) Entity.FromCard(card, StartingZone: player.Hand) ?? ActionResult.None;
+			return (Entity)Entity.FromCard(card, StartingZone: player.Hand) ?? ActionResult.None;
 		}
 	}
 
@@ -354,7 +347,7 @@ namespace Brimstone.Actions
 #endif
 				entity.Zone = player.Hand;
 				player.NumCardsDrawnThisTurn++;
-				return (Entity) entity;
+				return (Entity)entity;
 			}
 #if _ACTIONS_DEBUG
 			DebugLog.WriteLine("Game {0}: {1} tries to draw but their deck is empty", game.GameId, player.FriendlyName);
@@ -371,7 +364,7 @@ namespace Brimstone.Actions
 
 		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			Player player = source.Controller;
-			IPlayable entity = (IPlayable) (Entity) args[ENTITY];
+			IPlayable entity = (IPlayable)(Entity)args[ENTITY];
 
 			// TODO: Update ResourcesUsed
 			// TODO: Update NumResourcesSpentThisGame
@@ -382,8 +375,8 @@ namespace Brimstone.Actions
 
 			entity.Zone = player.Board;
 
-			if (entity is Minion && !((Minion) entity).HasCharge)
-				((Minion) entity).IsExhausted = true;
+			if (entity is Minion && !((Minion)entity).HasCharge)
+				((Minion)entity).IsExhausted = true;
 
 			entity.JustPlayed = true;
 			player.LastCardPlayed = entity;
@@ -407,7 +400,7 @@ namespace Brimstone.Actions
 
 			// TODO: Deaths, other triggers, etc
 
-			return (Entity) entity;
+			return (Entity)entity;
 		}
 	}
 
@@ -492,11 +485,18 @@ namespace Brimstone.Actions
 	public class Summon : QueueAction
 	{
 		public const int PLAYER = 0;
-		public const int ENTITY = 1;
-		public const int AMOUNT = 2;
+		public const int CARD = 1;
 
 		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
-			throw new NotImplementedException(); // TODO: implement https://hearthstone.gamepedia.com/Advanced_rulebook#Playing.2Fsummoning_a_minion
+			Player player = (Player)args[PLAYER];
+			Card card = args[CARD];
+#if _ACTIONS_DEBUG
+			DebugLog.WriteLine("Game {0}: Summoning {1} for {2}", game.GameId, card.Name, player.FriendlyName);
+#endif
+			Entity.FromCard(card, StartingZone: player.Board);
+			return ActionResult.None;
+
+			// TODO: fully implement https://hearthstone.gamepedia.com/Advanced_rulebook#Playing.2Fsummoning_a_minion
 
 			// Notes on summon position:
 			// 1) Friendly summon, unknown amount, battlecry/trigger: All to the right of the summoning minion (N'Zoth, Kel'Thuzad, Herald Volazj)
@@ -543,7 +543,6 @@ namespace Brimstone.Actions
 					if (e is Minion) {
 						var minion = ((Minion)e);
 						minion.Damage = 0;
-						game.Queue(e, e.Card.Behaviour.Deathrattle);
 					}
 
 					// Hero death
@@ -552,6 +551,17 @@ namespace Brimstone.Actions
 						gameEnd = true;
 					}
 				}
+
+				foreach (var e in args[TARGETS]) {
+					if (e is Minion) {
+						var minion = ((Minion)e);
+						game.Queue(e, e.Card.Behaviour.Deathrattle);
+						game.ActiveTriggers.Queue(TriggerType.OnDeath, minion); // TODO: Attach this to a tag change
+					}
+					// TODO: Deathrattles and on-death triggers need to queue together, not one before the other
+					// TODO: Test that each queue resolves before the next one populates. If it doesn't, we can make queue populating lazy (and we probably don't even need two foreachs then)
+				}
+
 				if (gameEnd)
 					game.GameWon();
 			}
@@ -566,7 +576,7 @@ namespace Brimstone.Actions
 		public const int CHOICE_TYPE = 2;
 
 		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
-			var player = (Player) args[PLAYER];
+			var player = (Player)args[PLAYER];
 
 			var choice = new Choice(
 				Controller: player,
@@ -662,9 +672,8 @@ namespace Brimstone.Actions
 
 	public class Choose : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, ActionResult[] args)
-		{
-			var player = (Player) source;
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
+			var player = (Player)source;
 			var choices = player.Choice.Choices;
 
 			if (player.Choice == null)
