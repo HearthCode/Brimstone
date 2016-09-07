@@ -215,18 +215,18 @@ namespace Brimstone
 			return new QueueActionEventArgs(Game, source, qa);
 		}
 
-		public List<ActionResult> RunMultiResult(IEntity source, List<QueueAction> qa) {
+		public IEnumerable<ActionResult> RunMultiResult(IEntity source, List<QueueAction> qa) {
 			if (qa == null)
 				return new List<ActionResult>();
 			StartBlock(source, qa);
 			return ProcessBlock();
 		}
 
-		public List<ActionResult> RunMultiResult(IEntity source, ActionGraph g) {
+		public IEnumerable<ActionResult> RunMultiResult(IEntity source, ActionGraph g) {
 			return g != null ? RunMultiResult(source, g.Unravel()) : new List<ActionResult>();
 		}
 
-		public List<ActionResult> RunMultiResult(IEntity source, QueueAction a) {
+		public IEnumerable<ActionResult> RunMultiResult(IEntity source, QueueAction a) {
 			return a != null ? RunMultiResult(source, new List<QueueAction> {a}) : new List<ActionResult>();
 		}
 
@@ -235,7 +235,8 @@ namespace Brimstone
 				return ActionResult.None;
 			StartBlock(source, qa);
 			var result = ProcessBlock();
-			return result.Count > 0 ? result[0] : ActionResult.None;
+			// The default is new ActionResult() which is the same as ActionResult.None
+			return result.FirstOrDefault();
 		}
 
 		public ActionResult Run(IEntity source, ActionGraph g) {
@@ -294,33 +295,30 @@ namespace Brimstone
 			Paused = false;
 		}
 
-		public List<ActionResult> ProcessBlock(object UserData = null) {
+		public IEnumerable<ActionResult> ProcessBlock(object UserData = null) {
 #if _QUEUE_DEBUG
 			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Start processing current block");
 			var depth = Depth;
 #endif
 			var result = ProcessAll(UserData, Depth);
 #if _QUEUE_DEBUG
-			System.Diagnostics.Debug.Assert(depth == Depth + 1);
 			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): End processing current block");
 #endif
 			return result;
 		}
 
-		public List<ActionResult> ProcessAll(object UserData = null, int MaxUnwindDepth = 0) {
+		public IEnumerable<ActionResult> ProcessAll(object UserData = null, int MaxUnwindDepth = 0) {
 			return ProcessAllAsync(UserData, MaxUnwindDepth).Result;
 		}
 
-		public async Task<List<ActionResult>> ProcessAllAsync(object UserData = null, int MaxUnwindDepth = 0) {
+		public async Task<IEnumerable<ActionResult>> ProcessAllAsync(object UserData = null, int MaxUnwindDepth = 0) {
 			while (await ProcessOneAsync(UserData, MaxUnwindDepth))
 				;
 			// Return whatever is left on the stack
-			var stack = new List<ActionResult>(ResultStack);
-			if (Paused || !IsEmpty)
-				return stack;
-			StackClear();
-			stack.Reverse();
-			return stack;
+			var stack = ResultStack;
+			if (!Paused && IsEmpty)
+				StackClear();
+			return stack.Reverse();
 		}
 
 		public bool ProcessOne(object UserData = null, int MaxUnwindDepth = 0) {
