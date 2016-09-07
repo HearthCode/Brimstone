@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Brimstone.Behaviours;
 
 namespace Brimstone
 {
@@ -204,8 +205,11 @@ namespace Brimstone
 #if _GAME_DEBUG
 			DebugLog.WriteLine("Death processing phase");
 #endif
-			foreach (var eId in _deathCheckQueue)
-				((ICharacter)Entities[eId]).CheckForDeath();
+			// We only have to check health because ToBeDestroyed cannot be reversed without the minion leaving play.
+			var dyingEntities = _deathCheckQueue.Where(id => ((ICharacter)Entities[id]).Health <= 0 && Entities[id].Zone.Type == Brimstone.Zone.PLAY).Select(id => Entities[id]);
+			if (dyingEntities.Any()) {
+				Queue(this, Death(dyingEntities.ToList()));
+			}
 			_deathCheckQueue.Clear();
 
 			// Advance game step if necessary (probably setting off new triggers)
@@ -256,8 +260,7 @@ namespace Brimstone
 			ActionQueue.ProcessAll();
 		}
 
-		public void GameWon()
-		{
+		public void GameWon() {
 			foreach (var p in Players) {
 				if (p.PlayState != PlayState.LOSING) continue;
 
@@ -287,8 +290,10 @@ namespace Brimstone
 		}
 
 		public void EntityChanged(IEntity entity, GameTag tag, int oldValue, int newValue) {
-			if (tag == GameTag.DAMAGE && ((ICharacter) entity).Health <= 0)
+			if ((tag == GameTag.DAMAGE && ((ICharacter)entity).Health <= 0) || (tag == GameTag.TO_BE_DESTROYED && newValue == 1))
 				_deathCheckQueue.Add(entity.Id);
+			// TODO: Don't add to _deathCheckQueue if it's already in _deathCheckQueue (maybe make it a Set<int>?) OR make Death on a minion in GY a no-op
+			// TODO: Minions who reach 0 current Health because their maximum Health becomes 0 (such as due to Confuse) also need to be added to _deathCheckQueue
 			OnEntityChanged?.Invoke(this, entity, tag, oldValue, newValue);
 		}
 
