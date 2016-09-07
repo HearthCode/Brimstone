@@ -358,17 +358,19 @@ namespace Brimstone.Actions
 
 	public class Play : QueueAction
 	{
-		// TODO: Deal with targeting
-
 		public const int ENTITY = 0;
 
 		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			Player player = source.Controller;
 			IPlayable entity = (IPlayable)(Entity)args[ENTITY];
 
-			// TODO: Update TempResources
-			// TODO: Update ResourcesUsed
-			// TODO: Update NumResourcesSpentThisGame
+			// Pay casting cost
+			// TODO: Cho'gall
+			var cost = source.Cost;
+			var tempUsed = Math.Min(player.TemporaryMana, cost);
+			player.TemporaryMana -= tempUsed;
+			player.UsedMana += cost - tempUsed;
+			player.TotalManaSpentThisGame += cost;
 
 			player.NumCardsPlayedThisTurn++;
 			if (entity is Minion)
@@ -386,6 +388,7 @@ namespace Brimstone.Actions
 #if _ACTIONS_DEBUG
 			DebugLog.WriteLine("Game {0}: {1} is playing {2}", game.GameId, player.FriendlyName, entity.ShortDescription);
 #endif
+			// TODO: Meta tags for multi-targeting
 			game.QueueActionBlock(BlockType.POWER, source, entity.Card.Behaviour.Battlecry, entity.Target);
 			game.Queue(source, new Action<IEntity>(_ =>
 			{

@@ -84,6 +84,7 @@ namespace Brimstone
 			set { this[GameTag.CONTROLLER] = value.Id - 1; }
 		}
 
+		// TODO: Cost adjustments (eg. Emperor Thaurissan)
 		public int Cost {
 			get { return this[GameTag.COST]; }
 			set { this[GameTag.COST] = value; }
