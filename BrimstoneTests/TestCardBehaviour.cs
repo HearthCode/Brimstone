@@ -332,5 +332,95 @@ namespace BrimstoneTests
 			Assert.AreEqual(p1CardsInHand + 2, p1.Hand.Count);
 			Assert.AreEqual(p2CardsInHand + 1, p2.Hand.Count);
 		}
+
+		[Test]
+		public void TestCultMaster() {
+			var game = new Game(HeroClass.Rogue, HeroClass.Warlock);
+			game.Player1.Deck.Fill();
+			game.Player2.Deck.Fill();
+			game.Start(SkipMulligan: false);
+
+			game.Player1.Choice.Discard(new List<IEntity>());
+			game.Player2.Choice.Discard(new List<IEntity>());
+
+			var p1 = game.CurrentPlayer;
+			var p2 = game.CurrentPlayer.Opponent;
+			var p1CardsInHand = p1.Hand.Count;
+			var p2CardsInHand = p2.Hand.Count;
+
+			var cm1 = new Minion("Cult Master").GiveTo(p1).Play();
+			var w1 = new Minion("Wisp").GiveTo(p1).Play();
+			var w2 = new Minion("Wisp").GiveTo(p2).Play();
+			var w3 = new Minion("Wisp").GiveTo(p1).Play();
+			new Spell("Moonfire").GiveTo(p1).Play(w1);
+			Assert.AreEqual(p1CardsInHand + 1, p1.Hand.Count);
+			Assert.AreEqual(p2CardsInHand, p2.Hand.Count);
+			game.EndTurn();
+
+			new Spell("Moonfire").GiveTo(p2).Play(w2);
+			Assert.AreEqual(p1CardsInHand + 1, p1.Hand.Count);
+			Assert.AreEqual(p2CardsInHand + 1, p2.Hand.Count); // +1 from drawing not from cult master trigger
+
+			new Spell("Moonfire").GiveTo(p2).Play(w3);
+			Assert.AreEqual(p1CardsInHand + 2, p1.Hand.Count);
+			Assert.AreEqual(p2CardsInHand + 1, p2.Hand.Count);
+
+			new Spell("Fireball").GiveTo(p2).Play(cm1);
+			Assert.AreEqual(p1CardsInHand + 2, p1.Hand.Count);
+			Assert.AreEqual(p2CardsInHand + 1, p2.Hand.Count);
+
+			var cm2 = new Minion("Cult Master").GiveTo(p1).Play();
+			var cm3 = new Minion("Cult Master").GiveTo(p1).Play();
+			new Spell("Flamestrike").GiveTo(p2).Play();
+			Assert.AreEqual(p1CardsInHand + 2, p1.Hand.Count); // TODO: this currently fails
+			Assert.AreEqual(p2CardsInHand + 1, p2.Hand.Count);
+		}
+
+		[Test]
+		public void TestSilverHandKnight() {
+			var game = new Game(HeroClass.Rogue, HeroClass.Warlock);
+			game.Player1.Deck.Fill();
+			game.Player2.Deck.Fill();
+			game.Start(SkipMulligan: false);
+
+			game.Player1.Choice.Discard(new List<IEntity>());
+			game.Player2.Choice.Discard(new List<IEntity>());
+
+			var p1 = game.CurrentPlayer;
+			var p2 = game.CurrentPlayer.Opponent;
+
+			var s1 = new Minion("Silver Hand Knight").GiveTo(p1).Play();
+			Assert.AreEqual(2, p1.Board.Count());
+			Assert.AreEqual(1, p1.Board.Where(x => x.Card.Id == "CS2_151").Count());
+			Assert.AreEqual(1, p1.Board.Where(x => x.Card.Id == "CS2_152").Count());
+
+			// TODO: Test that the token is summoned in the right zone_position
+		}
+
+		[Test]
+		public void TestHarvestGolem() {
+			var game = new Game(HeroClass.Rogue, HeroClass.Warlock);
+			game.Player1.Deck.Fill();
+			game.Player2.Deck.Fill();
+			game.Start(SkipMulligan: false);
+
+			game.Player1.Choice.Discard(new List<IEntity>());
+			game.Player2.Choice.Discard(new List<IEntity>());
+
+			var p1 = game.CurrentPlayer;
+			var p2 = game.CurrentPlayer.Opponent;
+
+			var h1 = new Minion("Harvest Golem").GiveTo(p1).Play();
+			Assert.AreEqual(1, p1.Board.Count());
+			Assert.AreEqual(1, p1.Board.Where(x => x.Card.Id == "EX1_556").Count());
+			Assert.AreEqual(0, p1.Board.Where(x => x.Card.Id == "skele21").Count());
+
+			new Spell("Darkbomb").GiveTo(p1).Play(h1);
+			Assert.AreEqual(1, p1.Board.Count());
+			Assert.AreEqual(0, p1.Board.Where(x => x.Card.Id == "EX1_556").Count());
+			Assert.AreEqual(1, p1.Board.Where(x => x.Card.Id == "skele21").Count());
+
+			// TODO: Test that the token is summoned in the right zone_position
+		}
 	}
 }
