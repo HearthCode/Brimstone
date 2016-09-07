@@ -19,11 +19,11 @@ namespace Brimstone
 			set { _sourceId = value.Id; }
 		}
 		public QueueAction Action { get; set; }
-		public List<ActionResult> Args { get; set; }
+		public ActionResult[] Args { get; set; }
 		public bool Cancel { get; set; }
 		public object UserData { get; set; }
 
-		public QueueActionEventArgs(Game g, IEntity s, QueueAction a, List<ActionResult> p = null, object u = null) {
+		public QueueActionEventArgs(Game g, IEntity s, QueueAction a, ActionResult[] p = null, object u = null) {
 			Game = g;
 			Source = s;
 			Action = a;
@@ -34,7 +34,7 @@ namespace Brimstone
 
 		public override string ToString() {
 			string s = string.Format("Game {0:x8}: {1} ({2}) -> {3}", Game.FuzzyGameHash, Source.Card.Name, Source.Id, Action);
-			if (Args != null && Args.Count > 0) {
+			if (Args != null && Args.Any()) {
 				s += "(";
 				foreach (var a in Args)
 					s += a + ", ";
@@ -350,11 +350,9 @@ namespace Brimstone
 			// TODO: Make it work when not all of the arguments are supplied, for flexible syntax
 
 			// Get arguments for action from stack
-			action.Args = new List<ActionResult>();
-			for (int i = 0; i < action.Action.Args.Count; i++) {
-				action.Args.Add(StackPop());
-			}
-			action.Args.Reverse();
+			action.Args = new ActionResult[action.Action.Args.Count];
+			for (int i = 0; i < action.Action.Args.Count; i++)
+				action.Args[action.Action.Args.Count - i - 1] = StackPop();
 
 			// Replace current UserData with new UserData if supplied
 			if (UserData != null)

@@ -7,7 +7,7 @@ namespace Brimstone.Actions
 {
 	public class Empty : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			return ActionResult.Empty;
 		}
 	}
@@ -17,7 +17,7 @@ namespace Brimstone.Actions
 	{
 		public int Num { get; set; }
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			return Num;
 		}
 	}
@@ -26,7 +26,7 @@ namespace Brimstone.Actions
 	{
 		public Card Card { get; set; }
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			return Card;
 		}
 	}
@@ -35,7 +35,7 @@ namespace Brimstone.Actions
 	{
 		public int EntityId { get; set; }
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			return (Entity)game.Entities[EntityId];
 		}
 	}
@@ -44,7 +44,7 @@ namespace Brimstone.Actions
 	{
 		public Func<IEntity, IEnumerable<IEntity>> Lambda { get; set; }
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			return Lambda(source)?.ToList() ?? new List<IEntity>();
 		}
 
@@ -65,7 +65,7 @@ namespace Brimstone.Actions
 	{
 		public Action<IEntity> F { get; set; }
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			F(source);
 			return ActionResult.None;
 		}
@@ -81,7 +81,7 @@ namespace Brimstone.Actions
 			this.Actions = Actions;
 		}
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			game.PowerHistory?.Add(Block);
 			game.ActionQueue.StartBlock(source, Actions, Block);
 			return ActionResult.None;
@@ -92,7 +92,7 @@ namespace Brimstone.Actions
 	{
 		public const int ENTITIES = 0;
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			var entities = (List<IEntity>)args[ENTITIES];
 			if (entities.Count == 0)
 				return new List<IEntity>();
@@ -106,7 +106,7 @@ namespace Brimstone.Actions
 		public const int MIN = 0;
 		public const int MAX = 1;
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			return RNG.Between(args[MIN], args[MAX]);
 		}
 	}
@@ -117,7 +117,7 @@ namespace Brimstone.Actions
 
 		public const int AMOUNT = 0;
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			for (int i = 0; i < args[AMOUNT]; i++)
 				game.Queue(source, Actions);
 			return ActionResult.None;
@@ -127,7 +127,7 @@ namespace Brimstone.Actions
 	// Runs when STATE = RUNNING
 	public class StartGame : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			// Pick a random starting player
 			if (game.FirstPlayerNum == 0)
 				game.FirstPlayer = game.Players[RNG.Between(0, 1)];
@@ -163,7 +163,7 @@ namespace Brimstone.Actions
 	// Run for each player when MULLIGAN_STATE = DEALING
 	public class PerformMulligan : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args)
 		{
 			var player = source as Player;
 
@@ -180,7 +180,7 @@ namespace Brimstone.Actions
 	// Run for each player when MULLIGAN_STATE = WAITING
 	public class WaitForMulliganComplete : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args)
 		{
 			var player = source as Player;
 			player.MulliganState = MulliganState.DONE;
@@ -195,7 +195,7 @@ namespace Brimstone.Actions
 	// Runs when STEP = BEGIN_MULLIGAN
 	public class BeginMulligan : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args)
 		{
 			foreach (var p in game.Players)
 				p.StartMulligan();
@@ -206,7 +206,7 @@ namespace Brimstone.Actions
 	// Runs when STEP = MAIN_READY
 	public class BeginTurn : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			// Update the number of turns everything has been in play
 			game.CurrentPlayer.Hero.NumTurnsInPlay++;
 			// TODO: game.CurrentPlayer.HeroPower.NumTurnsInPlay++;
@@ -249,7 +249,7 @@ namespace Brimstone.Actions
 	// Runs when STEP = MAIN_START_TRIGGERS
 	public class BeginTurnTriggers : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args)
 		{
 			game.NextStep = Step.MAIN_START;
 			return ActionResult.None;
@@ -259,7 +259,7 @@ namespace Brimstone.Actions
 	// Runs when STEP = MAIN_START
 	public class BeginTurnForPlayer : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			// Draw a card then reset all relevant flags
 			game.Queue(game.CurrentPlayer, Draw(game.CurrentPlayer).Then((Action<IEntity>)(_ => {
 				game.CurrentPlayer.NumMinionsPlayerKilledThisTurn = 0;
@@ -276,7 +276,7 @@ namespace Brimstone.Actions
 	// Runs when STEP = MAIN_END
 	public class EndTurnForPlayer : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			game.NextStep = Step.MAIN_CLEANUP;
 			return ActionResult.None;
 		}
@@ -285,7 +285,7 @@ namespace Brimstone.Actions
 	// Run when STEP = MAIN_CLEANUP
 	public class EndTurnCleanupForPlayer : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args)
 		{
 			foreach (IPlayable e in game.Entities.Where(x => x is IPlayable && ((IPlayable)x).JustPlayed && x.Controller == source))
 				e.JustPlayed = false;
@@ -297,7 +297,7 @@ namespace Brimstone.Actions
 	// Runs when STEP = MAIN_NEXT
 	public class EndTurn : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args)
 		{
 			// This is probably going to be used to give players extra turns later
 			game.CurrentPlayer.NumTurnsLeft = 0;
@@ -315,7 +315,7 @@ namespace Brimstone.Actions
 	{
 		public const int PLAYER = 0;
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			Player player = (Player) args[PLAYER];
 			player.PlayState = PlayState.CONCEDED;
 			player.PlayState = PlayState.LOST;
@@ -330,7 +330,7 @@ namespace Brimstone.Actions
 		public const int PLAYER = 0;
 		public const int CARD = 1;
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			Player player = (Player)args[PLAYER];
 			Card card = args[CARD];
 #if _ACTIONS_DEBUG
@@ -344,7 +344,7 @@ namespace Brimstone.Actions
 	{
 		public const int PLAYER = 0;
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			Player player = (Player)args[PLAYER];
 
 			if (!player.Deck.IsEmpty) {
@@ -369,7 +369,7 @@ namespace Brimstone.Actions
 
 		public const int ENTITY = 0;
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			Player player = source.Controller;
 			IPlayable entity = (IPlayable) (Entity) args[ENTITY];
 
@@ -416,7 +416,7 @@ namespace Brimstone.Actions
 		public const int TARGETS = 0;
 		public const int DAMAGE = 1;
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			if (args[TARGETS].HasResult)
 				foreach (ICharacter e in args[TARGETS]) {
 #if _ACTIONS_DEBUG
@@ -437,7 +437,7 @@ namespace Brimstone.Actions
 		public const int TARGETS = 0;
 		public const int AMOUNT = 1;
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			if (args[TARGETS].HasResult)
 				foreach (ICharacter e in args[TARGETS]) {
 					DebugLog.WriteLine("{0} is getting healed for {1} points", e.ShortDescription, args[AMOUNT]);
@@ -456,7 +456,7 @@ namespace Brimstone.Actions
 	{
 		public const int TARGETS = 0;
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			throw new NotImplementedException(); // TODO: implement https://hearthstone.gamepedia.com/Advanced_rulebook#Silence + https://hearthstone.gamepedia.com/Silence
 		}
 	}
@@ -465,7 +465,7 @@ namespace Brimstone.Actions
 	{
 		public const int TARGETS = 0;
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			throw new NotImplementedException(); // TODO: implement https://hearthstone.gamepedia.com/Advanced_rulebook#Zones + https://hearthstone.gamepedia.com/Return_to_hand
 		}
 	}
@@ -474,7 +474,7 @@ namespace Brimstone.Actions
 	{
 		public const int TARGETS = 0;
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			throw new NotImplementedException(); // TODO: implement https://hearthstone.gamepedia.com/Advanced_rulebook#Destroy_effects_in_all_zones
 		}
 	}
@@ -484,7 +484,7 @@ namespace Brimstone.Actions
 		public const int PLAYER = 0;
 		public const int AMOUNT = 1;
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			throw new NotImplementedException(); // TODO: implement https://hearthstone.gamepedia.com/Advanced_rulebook#Mana_Crystals_and_mana_costs
 		}
 	}
@@ -495,7 +495,7 @@ namespace Brimstone.Actions
 		public const int ENTITY = 1;
 		public const int AMOUNT = 2;
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			throw new NotImplementedException(); // TODO: implement https://hearthstone.gamepedia.com/Advanced_rulebook#Playing.2Fsummoning_a_minion
 
 			// Notes on summon position:
@@ -513,7 +513,7 @@ namespace Brimstone.Actions
 	{
 		public const int TARGETS = 0;
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			if (args[TARGETS].HasResult)
 				foreach (IEntity e in args[TARGETS]) {
 					DebugLog.WriteLine("{0} is discarded", e.ShortDescription);
@@ -529,7 +529,7 @@ namespace Brimstone.Actions
 	{
 		public const int TARGETS = 0;
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			if (args[TARGETS].HasResult) {
 				bool gameEnd = false;
 
@@ -565,7 +565,7 @@ namespace Brimstone.Actions
 		public const int ENTITIES = 1;
 		public const int CHOICE_TYPE = 2;
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			var player = (Player) args[PLAYER];
 
 			var choice = new Choice(
@@ -593,7 +593,7 @@ namespace Brimstone.Actions
 		public const int ATTACKER = 0;
 		public const int DEFENDER = 1;
 
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args) {
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			var attacker = (ICharacter)(Entity)args[ATTACKER];
 			var defender = (ICharacter)(Entity)args[DEFENDER];
 
@@ -662,7 +662,7 @@ namespace Brimstone.Actions
 
 	public class Choose : QueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, List<ActionResult> args)
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args)
 		{
 			var player = (Player) source;
 			var choices = player.Choice.Choices;
