@@ -93,7 +93,7 @@ namespace Brimstone
 			Changed = cloneFrom.Changed;
 		}
 
-		public Game(HeroClass Hero1, HeroClass Hero2, string Player1Name = "", string Player2Name = "", bool PowerHistory = false)
+		public Game(HeroClass Hero1, HeroClass Hero2, string Player1Name = "", string Player2Name = "", bool PowerHistory = false, bool ActionHistory = false)
 					: base(Cards.FromId("Game"), new Dictionary<GameTag, int> {
 						{ GameTag.ZONE, (int) Brimstone.Zone.PLAY }
 					}) {
@@ -102,7 +102,7 @@ namespace Brimstone
 				this.PowerHistory = new PowerHistory(this);
 			}
 
-			ActionQueue = new ActionQueue(this);
+			ActionQueue = new ActionQueue(this, ActionHistory);
 			ActiveTriggers = new TriggerManager(this);
 			Entities = new EntityController(this);
 			Environment = new Environment(this);

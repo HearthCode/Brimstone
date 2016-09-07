@@ -66,6 +66,7 @@ namespace Brimstone
 		public IEnumerable<QueueActionEventArgs> History => this;
 
 		public bool Paused { get; set; }
+		public bool HasHistory { get; }
 
 		public object UserData { get; set; }
 
@@ -86,9 +87,10 @@ namespace Brimstone
 		public int Depth => QueueStack.Count;
 #endif
 
-		public ActionQueue(Game game, object userData = null) : base(null) {
+		public ActionQueue(Game game, bool actionHistory, object userData = null) : base(null) {
 			Game = game;
 			Paused = false;
+			HasHistory = actionHistory;
 			UserData = userData;
 #if _USE_QUEUE
 			Queue = new Deque<QueueActionEventArgs>();
@@ -114,6 +116,7 @@ namespace Brimstone
 			ResultStack = cloneFrom.ResultStack;
 			// TODO: Option to disable History
 			ReplacedActions = new Dictionary<Type, Func<ActionQueue, QueueActionEventArgs, Task>>(cloneFrom.ReplacedActions);
+			HasHistory = cloneFrom.HasHistory;
 			Paused = cloneFrom.Paused;
 			// Events are immutable so this creates copies
 			OnQueueing = cloneFrom.OnQueueing;
@@ -378,7 +381,8 @@ namespace Brimstone
 #endif
 				return false;
 			}
-			AddItem(action);
+			if (HasHistory)
+				AddItem(action);
 
 			// Run action and push results onto stack
 #if _QUEUE_DEBUG
