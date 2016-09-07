@@ -1,4 +1,4 @@
-﻿using Brimstone.Actions;
+using Brimstone.Actions;
 
 namespace Brimstone
 {
@@ -18,7 +18,7 @@ namespace Brimstone
 		public static ActionGraph Bounce(ActionGraph Targets = null) { return new Bounce { Args = { Targets } }; }
 		public static ActionGraph Destroy(ActionGraph Targets = null) { return new Destroy { Args = { Targets } }; }
 		public static ActionGraph GainMana(ActionGraph Player = null, ActionGraph Amount = null) { return new GainMana { Args = { Player, Amount } }; }
-		public static ActionGraph Summon(ActionGraph Player = null, ActionGraph Entity = null, ActionGraph Amount = null) { return new Summon { Args = { Player, Entity, Amount } }; }
+		public static ActionGraph Summon(ActionGraph Player = null, ActionGraph Card = null) { return new Summon { Args = { Player, Card } }; }
 		public static ActionGraph Discard(ActionGraph Targets = null) { return new Discard { Args = { Targets } }; }
 
 		// Random decision actions
