@@ -554,7 +554,7 @@ namespace Brimstone.Actions
 
 				foreach (var e in args[TARGETS]) {
 					if (e is Minion) {
-						var minion = ((Minion)e);
+						var minion = (Minion)e;
 						game.Queue(e, e.Card.Behaviour.Deathrattle);
 						game.ActiveTriggers.Queue(TriggerType.OnDeath, minion); // TODO: Attach this to a tag change
 					}
