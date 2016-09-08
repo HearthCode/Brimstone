@@ -85,7 +85,7 @@ namespace Brimstone
 			SkipMulligan = cloneFrom.SkipMulligan;
 			// Generate zones owned by game
 			Zones = new Zones(this, this);
-			_deathCheckQueue = new List<int>(cloneFrom._deathCheckQueue);
+			_deathCheckQueue = new HashSet<int>(cloneFrom._deathCheckQueue);
 			// Update tree
 			GameId = ++SequenceNumber;
 			Depth = cloneFrom.Depth + 1;
@@ -107,7 +107,7 @@ namespace Brimstone
 			ActiveTriggers = new TriggerManager(this);
 			Entities = new EntityController(this);
 			Environment = new Environment(this);
-			_deathCheckQueue = new List<int>();
+			_deathCheckQueue = new HashSet<int>();
 
 			// Generate zones owned by game
 			Zones = new Zones(this, this);
@@ -185,7 +185,7 @@ namespace Brimstone
 			PowerHistory?.Add(new BlockEnd(Block.Type));
 		}
 
-		private List<int> _deathCheckQueue;
+		private HashSet<int> _deathCheckQueue;
 		public void OnQueueEmpty() {
 #if _GAME_DEBUG
 			DebugLog.WriteLine("Action queue resolved");
@@ -292,7 +292,6 @@ namespace Brimstone
 		public void EntityChanged(IEntity entity, GameTag tag, int oldValue, int newValue) {
 			if ((tag == GameTag.DAMAGE && ((ICharacter)entity).Health <= 0) || (tag == GameTag.TO_BE_DESTROYED && newValue == 1))
 				_deathCheckQueue.Add(entity.Id);
-			// TODO: Don't add to _deathCheckQueue if it's already in _deathCheckQueue (maybe make it a Set<int>?) OR make Death on a minion in GY a no-op
 			// TODO: Minions who reach 0 current Health because their maximum Health becomes 0 (such as due to Confuse) also need to be added to _deathCheckQueue
 			OnEntityChanged?.Invoke(this, entity, tag, oldValue, newValue);
 		}
