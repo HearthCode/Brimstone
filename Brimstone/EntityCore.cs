@@ -151,7 +151,7 @@ namespace Brimstone
 			set {
 				if (value < 0) value = 0;
 				// Ignore unchanged data
-				var oldValue = _entity.Tags.ContainsKey(t) ? _entity[t] : 0;
+				var oldValue = _entity[t];
 				if (value == oldValue)
 					return;
 				if (t == GameTag.ENTITY_ID) {
