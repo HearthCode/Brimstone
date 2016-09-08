@@ -32,7 +32,7 @@ namespace Brimstone
 
 			// TODO: Check targeting validity
 			Target = target;
-			return (ICanTarget)(Entity)Game.Action(this, Behaviours.Attack(this, (Entity)target));
+			return (ICanTarget) (Entity) Game.RunActionBlock(BlockType.ATTACK, this, Behaviours.Attack(this, (Entity) target), target);
 		}
 
 		public void Hit(int amount) {
