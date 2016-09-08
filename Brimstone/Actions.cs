@@ -422,6 +422,12 @@ namespace Brimstone.Actions
 					DebugLog.WriteLine("Game {0}: {1} is getting hit for {2} points of damage", game.GameId, e.ShortDescription, args[DAMAGE]);
 #endif
 
+					e.PreDamage = args[DAMAGE];
+					e.PreDamage = 0;
+
+					// TODO: PowerHistory meta DAMAGE tag
+
+					e.LastAffectedBy = source;
 					game.Environment.LastDamaged = e;
 					e.Damage += args[DAMAGE];
 
@@ -627,34 +633,28 @@ namespace Brimstone.Actions
 
 			defender.IsDefending = true;
 
-			defender.PreDamage = attacker.AttackDamage;
-
 			// TODO: Allow other things to change the proposed attacker/defender here
-			defender.PreDamage = 0;
+			attacker = game.ProposedAttacker;
 			defender = game.ProposedDefender;
 
-			if (attacker.ShouldExitCombat) {
+			/*if (attacker.ShouldExitCombat) {
 				// TODO: Tag ordering unchecked for this case
 				game.ProposedAttacker = null;
 				game.ProposedDefender = null;
 				attacker.IsAttacking = false;
 				defender.IsDefending = false;
 				return ActionResult.None;
-			}
+			}*/
 
 			// Save defender's attack as it might change after being damaged (e.g. enrage)
 			int defAttack = defender.AttackDamage;
 
-			defender.LastAffectedBy = attacker;
-
+			// Damage from Attacker to Defender
 			game.Queue(attacker, Damage((Entity)defender, attacker.AttackDamage));
 
-			// TODO: Attacker Predamage
-
+			// Damage from Defender to Attacker (using Defender's pre-hit attack damage amount)
 			if (defAttack > 0)
 				game.Queue(defender, Damage((Entity)attacker, defAttack));
-
-			// TODO: Attacker LastAffectedBy
 
 			game.Queue(source, new Action<IEntity>(_ =>
 			{
@@ -666,13 +666,9 @@ namespace Brimstone.Actions
 				game.ProposedDefender = null;
 				attacker.IsAttacking = false;
 				defender.IsDefending = false;
-
-				// TODO: Move this to after death processing etc.
-				game.Step = Step.MAIN_ACTION;
-				game.NextStep = Step.MAIN_END;
 			}));
 
-			return ActionResult.None;
+			return (Entity) attacker;
 		}
 	}
 
