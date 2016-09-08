@@ -11,6 +11,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="420"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
@@ -23,17 +24,17 @@
             <RowDefinition Height="200"/>
         </Grid.RowDefinitions>
         <Label x:Name="label1" Content="Power History Log" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="label2" Grid.Column="1" Content="Action Queue" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="label3" Grid.Column="2" Content="Result Stack" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="label2" Grid.Column="2" Content="Action Queue" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="label3" Grid.Column="3" Content="Result Stack" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
         <ScrollViewer x:Name="svPowerHistory"  Grid.RowSpan="3" Grid.Row="1" Grid.Column="0">
             <TextBlock x:Name="tbPowerHistory" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top"
                     ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"/>
         </ScrollViewer>
-        <ScrollViewer Grid.Row="1" Grid.Column="1">
+        <ScrollViewer Grid.Row="1" Grid.Column="2">
             <TextBlock x:Name="tbActionQueue" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top"
                     ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"/>
         </ScrollViewer>
-        <ScrollViewer Grid.Row="1" Grid.Column="2">
+        <ScrollViewer Grid.Row="1" Grid.Column="3">
             <TextBlock x:Name="tbActionResultStack" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top"
                     ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"/>
         </ScrollViewer>
@@ -41,26 +42,27 @@
             <Button x:Name="btnStepQueue" Content="Step Queue" Margin="5,5,5,5" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="90" Click="btnStepQueue_Click"/>
             <Button x:Name="btnStepQueue5" Content="Step Queue x5" Margin="5,0,0,5" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="90" Click="btnStepQueue5_Click"/>
         </StackPanel>
-        <Label x:Name="label4" Grid.Row="2" Grid.Column="1" Content="Player 1 Hand" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="label5" Grid.Row="2" Grid.Column="2" Content="Player 1 Board" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
-        <ScrollViewer x:Name="svPlayer1Hand" Grid.Row="3" Grid.Column="1">
+        <Label x:Name="label4" Grid.Row="2" Grid.Column="2" Content="Player 1 Hand" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="label5" Grid.Row="2" Grid.Column="3" Content="Player 1 Board" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
+        <ScrollViewer x:Name="svPlayer1Hand" Grid.Row="3" Grid.Column="2">
             <TextBlock x:Name="tbPlayer1Hand" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top"
                     ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"/>
         </ScrollViewer>
-        <ScrollViewer x:Name="svPlayer1Board" Grid.Row="3" Grid.Column="2">
+        <ScrollViewer x:Name="svPlayer1Board" Grid.Row="3" Grid.Column="3">
             <TextBlock x:Name="tbPlayer1Board" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top"
                     ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"/>
         </ScrollViewer>
-        <Label x:Name="label6" Grid.Row="4" Grid.Column="1" Content="Player 2 Hand" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="label7" Grid.Row="4" Grid.Column="2" Content="Player 2 Board" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
-        <ScrollViewer x:Name="svPlayer2Hand" Grid.Row="5" Grid.Column="1">
+        <Label x:Name="label6" Grid.Row="4" Grid.Column="2" Content="Player 2 Hand" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="label7" Grid.Row="4" Grid.Column="3" Content="Player 2 Board" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
+        <ScrollViewer x:Name="svPlayer2Hand" Grid.Row="5" Grid.Column="2">
             <TextBlock x:Name="tbPlayer2Hand" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top"
                     ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"/>
         </ScrollViewer>
-        <ScrollViewer x:Name="svPlayer2Board" Grid.Row="5" Grid.Column="2">
+        <ScrollViewer x:Name="svPlayer2Board" Grid.Row="5" Grid.Column="3">
             <TextBlock x:Name="tbPlayer2Board" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top"
                     ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"/>
         </ScrollViewer>
-    </Grid>
+            <GridSplitter x:Name="gridSplitter" Grid.Column="1" Grid.Row="0" ResizeBehavior="BasedOnAlignment" ResizeDirection="Columns" Grid.RowSpan="6" HorizontalAlignment="Stretch" Height="Auto" Margin="0" VerticalAlignment="Stretch" Width="5"/>
+        </Grid>
     </StackPanel>
 </Window>
