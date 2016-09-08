@@ -206,7 +206,7 @@ namespace Brimstone
 			DebugLog.WriteLine("Death processing phase");
 #endif
 			// We only have to check health because ToBeDestroyed cannot be reversed without the minion leaving play.
-			var dyingEntities = _deathCheckQueue.Where(id => ((ICharacter)Entities[id]).Health <= 0 && Entities[id].Zone.Type == Brimstone.Zone.PLAY).Select(id => Entities[id]);
+			var dyingEntities = _deathCheckQueue.Where(id => ((ICharacter)Entities[id]).MortallyWounded && Entities[id].Zone.Type == Brimstone.Zone.PLAY).Select(id => Entities[id]);
 			if (dyingEntities.Any()) {
 				Queue(this, Death(dyingEntities.ToList()));
 			}
