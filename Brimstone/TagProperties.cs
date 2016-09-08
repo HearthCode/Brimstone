@@ -136,10 +136,8 @@ namespace Brimstone
 			}
 		}
 
-		public Player CurrentOpponent
-		{
-			get
-			{
+		public Player CurrentOpponent {
+			get {
 				return (Player1[GameTag.CURRENT_PLAYER] == 1 ? Player2 : Player2[GameTag.CURRENT_PLAYER] == 1 ? Player1 : null);
 			}
 		}
@@ -440,6 +438,11 @@ namespace Brimstone
 
 		public bool HasCharge {
 			get { return this[GameTag.CHARGE] == 1; }
+		}
+
+		public bool HasDivineShield {
+			get { return this[GameTag.DIVINE_SHIELD] == 1; }
+			set { this[GameTag.DIVINE_SHIELD] = value ? 1 : 0; }
 		}
 
 		public bool HasDeathrattle {
