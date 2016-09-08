@@ -421,15 +421,18 @@ namespace Brimstone.Actions
 #if _ACTIONS_DEBUG
 					DebugLog.WriteLine("Game {0}: {1} is getting hit for {2} points of damage", game.GameId, e.ShortDescription, args[DAMAGE]);
 #endif
-
 					e.PreDamage = args[DAMAGE];
 					e.PreDamage = 0;
 
-					// TODO: PowerHistory meta DAMAGE tag
+					// TODO: PowerHistory meta DAMAGE tag (contains defender ID)
 
-					e.LastAffectedBy = source;
-					game.Environment.LastDamaged = e;
-					e.Damage += args[DAMAGE];
+					if ((e as Minion)?.HasDivineShield ?? false) {
+						((Minion) e).HasDivineShield = false;
+					} else {
+						e.LastAffectedBy = source;
+						game.Environment.LastDamaged = e;
+						e.Damage += args[DAMAGE];
+					}
 
 					// TODO: Handle Spell Damage +1, Prophet Velen, Fallen Hero, Predamage, on-damage triggers and more, full specification here https://hearthstone.gamepedia.com/Advanced_rulebook#Damage_and_Healing
 				}
