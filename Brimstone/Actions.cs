@@ -390,11 +390,11 @@ namespace Brimstone.Actions
 #endif
 			// TODO: Meta tags for multi-targeting
 			game.QueueActionBlock(BlockType.POWER, source, entity.Card.Behaviour.Battlecry, entity.Target);
-			game.Queue(source, new Action<IEntity>(_ =>
+			game.Queue(source, new Action<IEntity>(e =>
 			{
 				// Spells go to the graveyard after they are played
-				if (entity is Spell)
-					entity.Zone = entity.Controller.Graveyard;
+				if (e is Spell)
+					e.Zone = e.Controller.Graveyard;
 
 				// TODO: Update hero's ATK if we played a weapon
 
