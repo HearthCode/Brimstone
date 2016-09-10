@@ -231,7 +231,8 @@ namespace Brimstone
 				// Same zone move
 				if (previous == this)
 				{
-					if (Type != Zone.PLAY || Entity.ZonePosition == ZonePosition)
+					// Same zone moves allowed only for HAND, or for PLAY where the zone position changes
+					if (Type != Zone.HAND && (Type != Zone.PLAY || Entity.ZonePosition == ZonePosition))
 						throw new ZoneException(Entity.ShortDescription + " attempted a same zone move in " + Type);
 
 					// We have to take a copy of asList here in case zone caching is disabled!
