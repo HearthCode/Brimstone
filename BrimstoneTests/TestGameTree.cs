@@ -135,8 +135,10 @@ namespace BrimstoneTests
 			Console.SetOut(TextWriter.Null);
 
 			var game = new Game(HeroClass.Druid, HeroClass.Druid, PowerHistory: true);
-			game.Player1.Deck.Fill();
-			game.Player2.Deck.Fill();
+			foreach (var p in game.Players)
+				for (int i = 0; i < 30; i++)
+					p.Deck.Add("Wisp");
+
 			game.Start(1, SkipMulligan: true);
 
 			for (int i = 0; i < MaxMinions - NumBoomBots; i++)
