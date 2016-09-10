@@ -229,16 +229,17 @@ namespace Brimstone
 			var previous = Entity.Zone;
 			if (previous != null && previous.Type != Zone.INVALID) {
 				// Same zone move
-				if (previous == this && Entity.Controller == Controller && ZonePosition > 0 && Entity.ZonePosition != ZonePosition) {
-					if (Entity is T)
-					{
-						// We have to take a copy of asList here in case zone caching is disabled!
-						var entities = asList;
-						entities.Remove((T)Entity);
-						entities.Insert(ZonePosition - 1, (T)Entity);
-						updateZonePositions();
-						return (T)Entity;
-					}
+				if (previous == this)
+				{
+					if (Type != Zone.PLAY || Entity.ZonePosition == ZonePosition)
+						throw new ZoneException(Entity.ShortDescription + " attempted a same zone move in " + Type);
+
+					// We have to take a copy of asList here in case zone caching is disabled!
+					var entities = asList;
+					entities.Remove((T)Entity);
+					entities.Insert(ZonePosition - 1, (T)Entity);
+					updateZonePositions();
+					return (T)Entity;
 				}
 				else {
 					// Other zone move
