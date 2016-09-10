@@ -376,7 +376,7 @@ namespace Brimstone
 #if _QUEUE_DEBUG
 			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Running action " + action + " for " + action.Source.ShortDescription + " at depth " + Depth);
 #endif
-			var result = action.Action.Execute(action.Game, action.Source, action.Args);
+			var result = action.Action.Run(action.Game, action.Source, action.Args);
 			if (result.HasResult)
 				StackPush(result);
 

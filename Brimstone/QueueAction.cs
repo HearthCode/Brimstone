@@ -9,10 +9,6 @@ namespace Brimstone
 		public List<ActionGraph> Args { get; } = new List<ActionGraph>();
 		public abstract ActionResult Run(Game game, IEntity source, ActionResult[] args);
 
-		public ActionResult Execute(Game game, IEntity source, ActionResult[] args) {
-			return Run(game, source, args);
-		}
-
 		public ActionGraph Then(ActionGraph g) {
 			return ((ActionGraph) this).Then(g);
 		}
