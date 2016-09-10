@@ -9,7 +9,6 @@ namespace Brimstone
 		public List<ActionGraph> Args { get; } = new List<ActionGraph>();
 		public abstract ActionResult Run(Game game, IEntity source, ActionResult[] args);
 
-		// TODO: Find a way to get rid of source altogether (we only need it for Play and Select at the moment)
 		public ActionResult Execute(Game game, IEntity source, ActionResult[] args) {
 			return Run(game, source, args);
 		}

@@ -123,7 +123,6 @@ namespace Brimstone
 		public long ReferenceCount { get { return _referenceCount.Count; } }
 		public BaseEntityData BaseEntityData { get { return _entity; } }
 		public virtual Game Game { get; set; }
-		// TODO: Re-do Controller code as normal tag property
 		public IZoneController ZoneController => (IZoneController)Controller ?? Game;
 
 		public Entity(Entity cloneFrom) {

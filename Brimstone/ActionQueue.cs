@@ -114,7 +114,6 @@ namespace Brimstone
 			Queue = new Deque<QueueActionEventArgs>(cloneFrom.Queue.Select(q => (QueueActionEventArgs) q.Clone()));
 #endif
 			ResultStack = cloneFrom.ResultStack;
-			// TODO: Option to disable History
 			ReplacedActions = cloneFrom.ReplacedActions;
 			HasHistory = cloneFrom.HasHistory;
 			Paused = cloneFrom.Paused;
