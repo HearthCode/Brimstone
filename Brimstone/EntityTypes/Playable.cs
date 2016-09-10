@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Brimstone
@@ -57,7 +58,13 @@ namespace Brimstone
 
 			// TODO: Check targeting validity
 			Target = target;
-			return Game.RunActionBlock(BlockType.PLAY, this, Behaviours.Play(this), Target) as T;
+			try {
+				return (T) Game.RunActionBlock(BlockType.PLAY, this, Behaviours.Play(this), Target);
+			}
+			// Action was probably cancelled causing an uninitialized ActionResult to be returned
+			catch (NullReferenceException) {
+				return default(T);
+			}
 		}
 	}
 }
