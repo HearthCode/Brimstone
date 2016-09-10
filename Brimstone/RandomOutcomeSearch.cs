@@ -1,4 +1,4 @@
-﻿//#define _TREE_DEBUG
+﻿#define _TREE_DEBUG
 
 using System;
 using System.Collections.Concurrent;
@@ -369,7 +369,7 @@ namespace Brimstone
 					if (!tlsUniqueGames.Value.ContainsKey(e.Game)) {
 						tlsUniqueGames.Value.Add(e.Game, e.UserData as ProbabilisticGameNode);
 #if _TREE_DEBUG
-						DebugLog.WriteLine("UNIQUE GAME FOUND ({0})", uniqueGames.Count);
+						DebugLog.WriteLine("UNIQUE GAME FOUND ({0})", uniqueGames.Count + tlsUniqueGames.Value.Count);
 #endif
 					}
 					else {
