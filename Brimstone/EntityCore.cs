@@ -267,13 +267,14 @@ namespace Brimstone
 				if (_fuzzyHash != 0 && Settings.EntityHashCaching)
 					return _fuzzyHash;
 				uint prime = 16777219;
-				bool inHand = Zone == ZoneController.Hand;
+				bool inPlay = Zone == ZoneController.Board;
 				uint hash = 2166136261;
 				// The card's asset ID uniquely identifies the set of immutable starting tags for the card
 				hash = (hash * prime) ^ (uint)(_entity.Card.AssetId >> 8);
 				hash = (hash * prime) ^ (uint)(_entity.Card.AssetId & 0xff);
 				foreach (var kv in _entity.Tags)
-					if ((kv.Key != GameTag.ZONE_POSITION || !inHand) && kv.Key != GameTag.LAST_AFFECTED_BY && kv.Key != GameTag.LAST_CARD_PLAYED) {
+					if ((kv.Key != GameTag.ZONE_POSITION || inPlay)
+						&& kv.Key != GameTag.LAST_AFFECTED_BY && kv.Key != GameTag.LAST_CARD_PLAYED && kv.Key != GameTag.NUM_OPTIONS_PLAYED_THIS_TURN) {
 						hash = (hash * prime) ^ ((uint)kv.Key >> 8);
 						hash = (hash * prime) ^ ((uint)kv.Key & 0xff);
 						hash = (hash * prime) ^ (uint)(kv.Value >> 8);
