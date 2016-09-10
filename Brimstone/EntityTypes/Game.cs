@@ -252,14 +252,14 @@ namespace Brimstone
 			}
 		}
 
-		public void Start(int FirstPlayer = 0, bool SkipMulligan = false) {
+		public void Start(int FirstPlayer = 0, bool SkipMulligan = false, bool Shuffle = true) {
 			// Override settings
 			FirstPlayerNum = FirstPlayer;
 			this.SkipMulligan = SkipMulligan;
 
 			// Configure players
 			foreach (var p in Players)
-				p.Start();
+				p.Start(Shuffle);
 
 			// TODO: Insert event call precisely here so our server can iterate all created entities
 

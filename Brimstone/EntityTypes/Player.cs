@@ -76,9 +76,10 @@ namespace Brimstone
 			}
 		}
 
-		public void Start() {
+		public void Start(bool Shuffle = true) {
 			// Shuffle deck
-			Deck.Shuffle();
+			if (Shuffle)
+				Deck.Shuffle();
 
 			// Add player to board
 			Zone = Board;
