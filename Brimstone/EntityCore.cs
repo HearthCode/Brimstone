@@ -273,7 +273,7 @@ namespace Brimstone
 				hash = (hash * prime) ^ (uint)(_entity.Card.AssetId >> 8);
 				hash = (hash * prime) ^ (uint)(_entity.Card.AssetId & 0xff);
 				foreach (var kv in _entity.Tags)
-					if ((kv.Key != GameTag.ZONE_POSITION || !inHand) && kv.Key != GameTag.LAST_AFFECTED_BY) {
+					if ((kv.Key != GameTag.ZONE_POSITION || !inHand) && kv.Key != GameTag.LAST_AFFECTED_BY && kv.Key != GameTag.LAST_CARD_PLAYED) {
 						hash = (hash * prime) ^ ((uint)kv.Key >> 8);
 						hash = (hash * prime) ^ ((uint)kv.Key & 0xff);
 						hash = (hash * prime) ^ (uint)(kv.Value >> 8);
