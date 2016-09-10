@@ -286,7 +286,7 @@ namespace Brimstone
 		}
 
 		public override string ToString() {
-			string s = Card.Name + " - ";
+			string s = "{{" + string.Format("{0:x8}", FuzzyHash) + "}} " + Card.Name + " - ";
 			s += new Tag(GameTag.ENTITY_ID, _entity.Id) + ", ";
 			foreach (var tag in _entity.Tags) {
 				s += new Tag(tag.Key, tag.Value) + ", ";
