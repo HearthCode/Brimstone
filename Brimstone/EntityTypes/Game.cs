@@ -180,7 +180,7 @@ namespace Brimstone
 
 		public void QueueActionBlock(BlockType Type, IEntity Source, List<QueueAction> Actions, IEntity Target = null, int Index = -2) {
 #if _GAME_DEBUG
-			DebugLog.WriteLine("Queueing " + Type + " for " + Source.ShortDescription + " => " + (Target?.ShortDescription ?? "no target"));
+			DebugLog.WriteLine("Game " + GameId + ": Queueing " + Type + " for " + Source.ShortDescription + " => " + (Target?.ShortDescription ?? "no target"));
 #endif
 			int index = Index != -2 ? Index : (Type == BlockType.POWER || Type == BlockType.ATTACK ? -1 : 0);
 			var block = new BlockStart(Type, Source, Target, index);
@@ -193,7 +193,7 @@ namespace Brimstone
 
 		public ActionResult RunActionBlock(BlockType Type, IEntity Source, List<QueueAction> Actions, IEntity Target = null, int Index = -2) {
 #if _GAME_DEBUG
-			DebugLog.WriteLine("Running " + Type + " for " + Source.ShortDescription + " => " + (Target?.ShortDescription ?? "no target"));
+			DebugLog.WriteLine("Game " + GameId + ": Running " + Type + " for " + Source.ShortDescription + " => " + (Target?.ShortDescription ?? "no target"));
 #endif
 			int index = Index != -2 ? Index : (Type == BlockType.POWER || Type == BlockType.ATTACK ? -1 : 0);
 			var block = new BlockStart(Type, Source, Target, index);
@@ -202,7 +202,7 @@ namespace Brimstone
 
 		public void OnBlockEmpty(BlockStart Block) {
 #if _GAME_DEBUG
-			DebugLog.WriteLine("Action block " + Block.Type + " for " + Entities[Block.Source].ShortDescription + " resolved");
+			DebugLog.WriteLine("Game " + GameId + ": Action block " + Block.Type + " for " + Entities[Block.Source].ShortDescription + " resolved");
 #endif
 			PowerHistory?.Add(new BlockEnd(Block.Type));
 		}
@@ -210,7 +210,7 @@ namespace Brimstone
 		private HashSet<int> _deathCheckQueue;
 		public void OnQueueEmpty() {
 #if _GAME_DEBUG
-			DebugLog.WriteLine("Action queue resolved");
+			DebugLog.WriteLine("Game " + GameId + ": Action queue resolved");
 #endif
 			// Don't do anything if the game state hasn't changed
 
@@ -225,7 +225,7 @@ namespace Brimstone
 
 			// Death checking phase
 #if _GAME_DEBUG
-			DebugLog.WriteLine("Death processing phase");
+			DebugLog.WriteLine("Game " + GameId + ": Death processing phase");
 #endif
 			// We only have to check health because ToBeDestroyed cannot be reversed without the minion leaving play.
 			var dyingEntities = _deathCheckQueue.Where(id => ((ICharacter)Entities[id]).MortallyWounded && Entities[id].Zone.Type == Brimstone.Zone.PLAY).Select(id => Entities[id]);
@@ -241,12 +241,12 @@ namespace Brimstone
 			// TODO: Fix this displaying at wrong time when queue is not empty after death triggers are queued
 			if (nextStep == Step.MAIN_END) {
 #if _GAME_DEBUG
-				DebugLog.WriteLine("Waiting for player to select next option");
+				DebugLog.WriteLine("Game " + GameId + ": Waiting for player to select next option");
 #endif
 			}
 			else if (nextStep != step) {
 #if _GAME_DEBUG
-					DebugLog.WriteLine("Advancing game step from " + step + " to " + nextStep);
+					DebugLog.WriteLine("Game " + GameId + ": Advancing game step from " + step + " to " + nextStep);
 #endif
 					Step = nextStep;
 			}
@@ -276,7 +276,7 @@ namespace Brimstone
 			if (Player1.Choice != null || Player2.Choice != null)
 				throw new ChoiceException();
 #if _GAME_DEBUG
-			DebugLog.WriteLine("Advancing game step from " + Step + " to " + NextStep);
+			DebugLog.WriteLine("Game " + GameId + ": Advancing game step from " + Step + " to " + NextStep);
 #endif
 			Step = Step.MAIN_END;
 			ActionQueue.ProcessAll();

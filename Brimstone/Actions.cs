@@ -448,7 +448,7 @@ namespace Brimstone.Actions
 		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			if (args[TARGETS].HasResult)
 				foreach (ICharacter e in args[TARGETS]) {
-					DebugLog.WriteLine("{0} is getting healed for {1} points", e.ShortDescription, args[AMOUNT]);
+					DebugLog.WriteLine("Game {0}: {1} is getting healed for {2} points", game.GameId, e.ShortDescription, args[AMOUNT]);
 
 					e.Damage -= args[AMOUNT];
 
@@ -531,7 +531,7 @@ namespace Brimstone.Actions
 		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			if (args[TARGETS].HasResult)
 				foreach (IEntity e in args[TARGETS]) {
-					DebugLog.WriteLine("{0} is discarded", e.ShortDescription);
+					DebugLog.WriteLine("Game {0}: {1} discards {2}", game.GameId, source.ShortDescription, e.ShortDescription);
 					game.Environment.LastCardDiscarded = e;
 					e.Zone = e.Controller.Graveyard;
 					//TODO: Detach Enchantments, run on discard triggers, etc

@@ -26,7 +26,7 @@ namespace Brimstone
 					{ GameTag.ZONE_POSITION, nextPos++ }
 				};
 #if _DECK_DEBUG
-				DebugLog.WriteLine("Adding " + card.Name + " to " + Controller.ShortDescription + "'s deck");
+				DebugLog.WriteLine("Game " + Game.GameId + ": Adding " + card.Name + " to " + Controller.ShortDescription + "'s deck");
 #endif
 				Game.Add(Entity.FromCard(card, tags), (Player) Controller);
 			}
@@ -36,7 +36,7 @@ namespace Brimstone
 
 		public void Shuffle() {
 #if _DECK_DEBUG
-			DebugLog.WriteLine("Shuffling " + Controller.ShortDescription + "'s deck");
+			DebugLog.WriteLine("Game " + Game.GameId + ": Shuffling " + Controller.ShortDescription + "'s deck");
 #endif
 			var possiblePositions = Enumerable.Range(1, Count).ToList();
 			foreach (var c in this) {
@@ -53,7 +53,7 @@ namespace Brimstone
 			var cardsToAdd = MaxCards - Count;
 			var fillCards = new List<Card>(cardsToAdd);
 #if _DECK_DEBUG
-			DebugLog.WriteLine("Adding " + cardsToAdd + " random cards to " + Controller.ShortDescription + "'s deck");
+			DebugLog.WriteLine("Game " + Game.GameId + ": Adding " + cardsToAdd + " random cards to " + Controller.ShortDescription + "'s deck");
 #endif
 			while (fillCards.Count < cardsToAdd) {
 				// TODO: Change Cards.All to a Linq statement selecting only relevant cards

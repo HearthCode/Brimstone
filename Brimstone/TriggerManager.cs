@@ -57,7 +57,7 @@ namespace Brimstone
 
 		private void Add(IEntity entity, TriggerType type, Trigger trigger) {
 #if _TRIGGER_DEBUG
-			DebugLog.WriteLine("Associating trigger " + type + " for entity " + entity.ShortDescription + " with game " + Game.GameId);
+			DebugLog.WriteLine("Game " + Game.GameId + ": Associating trigger " + type + " for entity " + entity.ShortDescription + " with game " + Game.GameId);
 #endif
 			if (Triggers.ContainsKey(type))
 				Triggers[type].Add(entity.Id);
@@ -132,20 +132,20 @@ namespace Brimstone
 			if (!Triggers.ContainsKey(type))
 				return;
 #if _TRIGGER_DEBUG
-			DebugLog.WriteLine("Checking triggers for " + type + " initiated by " + source.ShortDescription);
+			DebugLog.WriteLine("Game " + Game.GameId + ": Checking triggers for " + type + " initiated by " + source.ShortDescription);
 #endif
 			foreach (var entityId in Triggers[type]) {
 				var owningEntity = Game.Entities[entityId];
 				// Ignore entity if not in an active zone
 				if (owningEntity.Zone.Type == Zone.PLAY || owningEntity.Zone.Type == Zone.HAND) {
 #if _TRIGGER_DEBUG
-					DebugLog.WriteLine("Checking trigger conditions for " + owningEntity.ShortDescription);
+					DebugLog.WriteLine("Game " + Game.GameId + ": Checking trigger conditions for " + owningEntity.ShortDescription);
 #endif
 					var trigger = owningEntity.Card.Behaviour.Triggers[type];
 					// Test trigger condition
 					if (trigger.Condition?.Eval(owningEntity, source) ?? true) {
 #if _TRIGGER_DEBUG
-						DebugLog.WriteLine("Firing trigger for " + owningEntity.ShortDescription + " with actions: "
+						DebugLog.WriteLine("Game " + Game.GameId + ": Firing trigger for " + owningEntity.ShortDescription + " with actions: "
 							+ string.Join(" ", trigger.Action.Select(a => a.ToString())));
 #endif
 						Game.QueueActionBlock(BlockType.TRIGGER, owningEntity, trigger.Action,
@@ -156,7 +156,7 @@ namespace Brimstone
 				}
 				else {
 #if _TRIGGER_DEBUG
-					DebugLog.WriteLine("Ignoring triggers for " + owningEntity.ShortDescription + " because it wasn't in an active zone");
+					DebugLog.WriteLine("Game " + Game.GameId + ": Ignoring triggers for " + owningEntity.ShortDescription + " because it wasn't in an active zone");
 #endif
 				}
 			}
