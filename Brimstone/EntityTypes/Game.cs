@@ -403,8 +403,9 @@ namespace Brimstone
 					foreach (var e in Player2.Board)
 						s += "[" + e.ZonePosition + ":" + e.Card.AbbrieviatedName + "](" + e.Damage + ") ";
 					s += "\r\n";
-					foreach (var pa in PowerHistory.Skip(PowerHistory.Count() - 20))
-						s += pa + "\r\n";
+					if (PowerHistory != null)
+						foreach (var pa in PowerHistory.Skip(PowerHistory.Count() - 20))
+							s += pa + "\r\n";
 					return s;
 
 				case "s":
