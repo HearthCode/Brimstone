@@ -1,4 +1,4 @@
-﻿#define _TREE_DEBUG
+﻿//#define _TREE_DEBUG
 
 using System;
 using System.Collections.Concurrent;
@@ -92,6 +92,9 @@ namespace Brimstone
 			return tree.GetUniqueGames();
 		}
 
+		/* TODO: We can remove a lot of unnecessary cloning where we currently have this
+		   "double-branching" effect of random choice A then random choice B then some game state change.
+		   Find a way to only clone the merged aggregate of such multiple random choices */
 		protected Task replaceRandomChoice(ActionQueue q, QueueActionEventArgs e) {
 			// Choosing a random entity (minion in this case)
 			// Clone and start processing for every possibility
@@ -312,13 +315,14 @@ namespace Brimstone
 						if (!uniqueGames.ContainsKey(cloned.Game)) {
 							uniqueGames.Add(cloned.Game, cloned.Probability);
 #if _TREE_DEBUG
-							DebugLog.WriteLine("UNIQUE GAME FOUND ({0})", uniqueGames.Count);
+							DebugLog.WriteLine("UNIQUE GAME FOUND ({0}) - Hash: {1:x8}", uniqueGames.Count, cloned.Game.FuzzyGameHash);
+							DebugLog.WriteLine("{0:S}", cloned.Game);
 #endif
 						}
 						else {
 							uniqueGames[cloned.Game] += cloned.Probability;
 #if _TREE_DEBUG
-							DebugLog.WriteLine("DUPLICATE GAME FOUND");
+							DebugLog.WriteLine("DUPLICATE GAME FOUND - Hash: {0:x8}", cloned.Game.FuzzyGameHash);
 #endif
 						}
 					}
@@ -369,13 +373,14 @@ namespace Brimstone
 					if (!tlsUniqueGames.Value.ContainsKey(e.Game)) {
 						tlsUniqueGames.Value.Add(e.Game, e.UserData as ProbabilisticGameNode);
 #if _TREE_DEBUG
-						DebugLog.WriteLine("UNIQUE GAME FOUND ({0})", uniqueGames.Count + tlsUniqueGames.Value.Count);
+						DebugLog.WriteLine("UNIQUE GAME FOUND ({0}) - Hash: {1:x8}", uniqueGames.Count + tlsUniqueGames.Value.Count, e.Game.FuzzyGameHash);
+						DebugLog.WriteLine("{0:S}", e.Game);
 #endif
 					}
 					else {
 						tlsUniqueGames.Value[e.Game].Probability += ((ProbabilisticGameNode)e.UserData).Probability;
 #if _TREE_DEBUG
-						DebugLog.WriteLine("DUPLICATE GAME FOUND");
+						DebugLog.WriteLine("DUPLICATE GAME FOUND - Hash: {0:x8}", e.Game.FuzzyGameHash);
 #endif
 					}
 				}
