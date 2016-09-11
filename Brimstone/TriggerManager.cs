@@ -133,6 +133,15 @@ namespace Brimstone
 		}
 
 		public void Queue(TriggerType type, IEntity source) {
+			// Check for self-death (deathrattle)
+			if (type == OnDeath && source.Zone.Type == Zone.GRAVEYARD && source.Card.Behaviour.Deathrattle != null) {
+#if _TRIGGER_DEBUG
+				DebugLog.WriteLine("Game " + Game.GameId + ": Queueing deathrattle for " + source.ShortDescription);
+#endif
+				Game.QueueActionBlock(BlockType.TRIGGER, source, source.Card.Behaviour.Deathrattle);
+				QueuedTriggersCount++;
+			}
+
 			if (!Triggers.ContainsKey(type))
 				return;
 #if _TRIGGER_DEBUG
