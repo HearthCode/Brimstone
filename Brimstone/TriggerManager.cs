@@ -35,6 +35,9 @@ namespace Brimstone
 			}
 		}
 
+		// The number of pending triggers in the game's ActionQueue
+		public int QueuedTriggersCount { get; private set; }
+
 		// Lists of entity IDs which have triggers of the key type
 		public ImmutableDictionary<TriggerType, List<int>> Triggers { get; private set; }
 
@@ -47,6 +50,7 @@ namespace Brimstone
 			Game = tm.Game;
 			// TODO: Write a unit test that clones twice, creates new entity with same ID and different triggers per game, check all 3 games trigger correctly
 			Triggers = tm.Triggers;
+			QueuedTriggersCount = tm.QueuedTriggersCount;
 		}
 
 		public void Add(IEntity entity) {
@@ -152,6 +156,7 @@ namespace Brimstone
 							// Trigger index: 0 for normal entities; -1 for Game; specific index for player if specified, otherwise -1
 							Index: TriggerIndices.ContainsKey(type) ? TriggerIndices[type] :
 								source == Game ? -1 : source is Player ? -1 : 0);
+						QueuedTriggersCount++;
 					}
 				}
 				else {
@@ -160,6 +165,10 @@ namespace Brimstone
 #endif
 				}
 			}
+		}
+
+		public void TriggerResolved() {
+			QueuedTriggersCount--;
 		}
 
 		public object Clone() {

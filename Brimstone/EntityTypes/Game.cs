@@ -206,8 +206,11 @@ namespace Brimstone
 #endif
 			PowerHistory?.Add(new BlockEnd(Block.Type));
 
-			// Post-ATTACK DEATHS block
-			if (Block.Type == BlockType.ATTACK)
+			if (Block.Type == BlockType.TRIGGER)
+				ActiveTriggers.TriggerResolved();
+
+			// Post-ATTACK or Post-finalTRIGGER DEATHS block
+			if (Block.Type == BlockType.ATTACK || (Block.Type == BlockType.TRIGGER && ActiveTriggers.QueuedTriggersCount == 0))
 				RunDeathCreationStepIfNeeded();
 		}
 
