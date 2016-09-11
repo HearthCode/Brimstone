@@ -397,7 +397,7 @@ namespace Brimstone.Actions
 					e.Zone = e.Controller.Graveyard;
 
 				// Post-POWER block DEATHS block before triggers
-				e.Game.RunDeathCreationStepIfNeeded();
+				e.Game.RunDeathCreationStepIfNeededAsync();
 
 				// TODO: Update hero's ATK if we played a weapon
 

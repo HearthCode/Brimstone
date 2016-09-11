@@ -229,7 +229,7 @@ namespace Brimstone
 
 			// Post-ATTACK or Post-finalTRIGGER DEATHS block
 			if (Block.Type == BlockType.ATTACK || (Block.Type == BlockType.TRIGGER && ActiveTriggers.QueuedTriggersCount == 0))
-				await RunDeathCreationStepIfNeeded();
+				await RunDeathCreationStepIfNeededAsync();
 		}
 
 		private readonly HashSet<int> _deathCheckQueue;
@@ -266,7 +266,7 @@ namespace Brimstone
 		}
 
 		// Death checking phase
-		public async Task RunDeathCreationStepIfNeeded()
+		public async Task RunDeathCreationStepIfNeededAsync()
 		{
 #if _GAME_DEBUG
 			DebugLog.WriteLine("Game " + GameId + ": Checking for death creation step");
@@ -282,8 +282,7 @@ namespace Brimstone
 #endif
 				var dying = dyingEntities.ToList();
 				_deathCheckQueue.Clear();
-				// TODO: Await this
-				Action(this, Death(dying));
+				await ActionAsync(this, Death(dying));
 			}
 		}
 
