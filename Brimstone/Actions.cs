@@ -553,9 +553,18 @@ namespace Brimstone.Actions
 #if _ACTIONS_DEBUG
 					DebugLog.WriteLine("Game {0}: {1} dies", game.GameId, e.ShortDescription);
 #endif
+					// Queue deathrattles and OnDeath triggers before moving mortally wounded minion to graveyard
+					// (they will be executed after the zone move)
+
+					// TODO: Test that each queue resolves before the next one populates. If it doesn't, we can make queue populating lazy
+					if (e is Minion) {
+						game.ActiveTriggers.Queue(TriggerType.OnDeath, e);
+					}
+
+					// Move dead character to graveyard
 					e.Zone = e.Controller.Graveyard;
 
-					// Minion death
+					// TODO: Reset all minion tags to default
 					if (e is Minion) {
 						var minion = ((Minion)e);
 						minion.Damage = 0;
@@ -568,14 +577,6 @@ namespace Brimstone.Actions
 					}
 				}
 				game.PowerHistory?.Add(new BlockEnd(BlockType.DEATHS));
-
-				// Queue Deathrattles and on-death triggers
-				foreach (var e in args[TARGETS]) {
-					if (e is Minion) {
-						game.ActiveTriggers.Queue(TriggerType.OnDeath, e);
-					}
-					// TODO: Test that each queue resolves before the next one populates. If it doesn't, we can make queue populating lazy (and we probably don't even need two foreachs then)
-				}
 
 				if (gameEnd)
 					game.GameWon();
