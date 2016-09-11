@@ -37,6 +37,7 @@ namespace Brimstone
 
 		public void Hit(int amount) {
 			Game.Action(this, Damage(this, amount));
+			Game.RunDeathCreationStepIfNeeded();
 		}
 	}
 }
