@@ -172,6 +172,7 @@ namespace Brimstone
 		}
 
 #if _USE_TREE
+		// TODO: Obselete. Needs to be updated
 		private void EndBlock(QueueNode parent)
 		{
 			var block = parent?.Data.Action as GameBlock;
@@ -181,7 +182,7 @@ namespace Brimstone
 #endif
 
 #if _USE_QUEUE
-		private void EndBlock() {
+		private async Task EndBlockAsync() {
 			if (Depth > 0) {
 #if _QUEUE_DEBUG
 				System.Diagnostics.Debug.Assert(IsBlockEmpty);
@@ -190,7 +191,7 @@ namespace Brimstone
 				Queue = QueueStack.Pop();
 				var gameBlock = BlockStack.Pop();
 				if (gameBlock != null)
-					Game.OnBlockEmpty(gameBlock);
+					await Game.OnBlockEmptyAsync(gameBlock);
 			}
 			// When the queue is empty, notify the game - it may refill it with new actions
 			if (IsEmpty)
@@ -411,7 +412,7 @@ namespace Brimstone
 #if _USE_QUEUE
 			// The >= allows the current block to unwind for ProcessBlock()
 			while (IsBlockEmpty && Depth >= MaxUnwindDepth) {
-				EndBlock();
+				await EndBlockAsync();
 				if (IsEmpty)
 					break;
 			}
