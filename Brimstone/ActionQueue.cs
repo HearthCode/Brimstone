@@ -66,6 +66,7 @@ namespace Brimstone
 		public IEnumerable<QueueActionEventArgs> History => this;
 
 		public bool Paused { get; set; }
+		public bool LastActionCancelled { get; private set; }
 		public bool HasHistory { get; }
 
 		public object UserData { get; set; }
@@ -221,9 +222,7 @@ namespace Brimstone
 				return ActionResult.None;
 			// TODO: If qa.Count == 1 and qa[0] is GameBlock then find a shortcut to avoid double-nesting
 			StartBlock(source, qa);
-			var result = ProcessBlock();
-			// The default is new ActionResult() which is the same as ActionResult.None
-			return result.FirstOrDefault();
+			return ProcessBlock()?.FirstOrDefault() ?? ActionResult.None;
 		}
 
 		public ActionResult Run(IEntity source, ActionGraph g) {
@@ -290,7 +289,7 @@ namespace Brimstone
 			var result = ProcessAll(UserData, Depth);
 #if _QUEUE_DEBUG
 			// Block might not be finished if queue was cancelled
-			if (IsBlockEmpty)
+			if (!LastActionCancelled)
 				DebugLog.WriteLine("Queue (Game " + Game.GameId + "): End processing current block");
 #endif
 			return result;
@@ -304,6 +303,8 @@ namespace Brimstone
 			while (await ProcessOneAsync(UserData, MaxUnwindDepth))
 				;
 			// Return whatever is left on the stack
+			if (LastActionCancelled)
+				return null;
 			var stack = ResultStack;
 			if (!Paused && IsEmpty)
 				StackClear();
@@ -321,6 +322,8 @@ namespace Brimstone
 			// Exit if the current branch is empty
 			if (IsBlockEmpty)
 				return false;
+
+			LastActionCancelled = false;
 
 			// Get next action and make sure it's up to date if cloned from another game
 #if _USE_TREE
@@ -359,6 +362,7 @@ namespace Brimstone
 #if _USE_TREE
 					Tree.MoveNext();
 #endif
+					LastActionCancelled = true;
 					return false;
 				}
 			}
@@ -366,6 +370,7 @@ namespace Brimstone
 			if (ReplacedActions.ContainsKey(actionType)) {
 				await ReplacedActions[actionType](this, action);
 				// action.Cancel implied when action is replaced
+				LastActionCancelled = true;
 #if _USE_TREE
 				Tree.MoveNext();
 #endif
@@ -395,7 +400,12 @@ namespace Brimstone
 			}
 #endif
 			OnAction?.Invoke(this, action);
-			return !action.Cancel;
+
+			// Propagate cancellation up the chain by only changing it if not already set
+			if (!LastActionCancelled)
+				LastActionCancelled = action.Cancel;
+
+			return !LastActionCancelled;
 		}
 
 		// Skip over an item (used when cloning mid-action to avoid an infinite loop)
