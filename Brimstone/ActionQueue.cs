@@ -219,19 +219,31 @@ namespace Brimstone
 		}
 
 		public ActionResult Run(IEntity source, List<QueueAction> qa) {
+			return RunAsync(source, qa).Result;
+		}
+
+		public async Task<ActionResult> RunAsync(IEntity source, List<QueueAction> qa) {
 			if (qa == null)
 				return ActionResult.None;
 			// TODO: If qa.Count == 1 and qa[0] is GameBlock then find a shortcut to avoid double-nesting
 			StartBlock(source, qa);
-			return ProcessBlock()?.FirstOrDefault() ?? ActionResult.None;
+			return (await ProcessBlockAsync())?.FirstOrDefault() ?? ActionResult.None;
 		}
 
 		public ActionResult Run(IEntity source, ActionGraph g) {
-			return g != null ? Run(source, g.Unravel()) : ActionResult.None;
+			return RunAsync(source, g).Result;
+		}
+
+		public async Task<ActionResult> RunAsync(IEntity source, ActionGraph g) {
+			return g != null ? await RunAsync(source, g.Unravel()) : ActionResult.None;
 		}
 
 		public ActionResult Run(IEntity source, QueueAction a) {
-			return a != null ? Run(source, new List<QueueAction> {a}) : ActionResult.None;
+			return RunAsync(source, a).Result;
+		}
+
+		public async Task<ActionResult> RunAsync(IEntity source, QueueAction a) {
+			return a != null ? await RunAsync(source, new List<QueueAction> { a }) : ActionResult.None;
 		}
 
 		public void EnqueueDeferred(IEntity source, List<QueueAction> qa) {
@@ -283,11 +295,15 @@ namespace Brimstone
 		}
 
 		public IEnumerable<ActionResult> ProcessBlock(object UserData = null) {
+			return ProcessBlockAsync(UserData).Result;
+		}
+
+		public async Task<IEnumerable<ActionResult>> ProcessBlockAsync(object UserData = null) {
 #if _QUEUE_DEBUG
 			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Start processing current block");
 			var depth = Depth;
 #endif
-			var result = ProcessAll(UserData, Depth);
+			var result = await ProcessAllAsync(UserData, Depth);
 #if _QUEUE_DEBUG
 			// Block might not be finished if queue was cancelled
 			if (!LastActionCancelled)
