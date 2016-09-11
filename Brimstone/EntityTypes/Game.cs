@@ -137,6 +137,18 @@ namespace Brimstone
 			return null;
 		}
 
+		public async Task<ActionResult> ActionAsync(IEntity source, ActionGraph g) {
+			return await ActionQueue.RunAsync(source, g);
+		}
+
+		public async Task<ActionResult> ActionAsync(IEntity source, List<QueueAction> l) {
+			return await ActionQueue.RunAsync(source, l);
+		}
+
+		public async Task<ActionResult> ActionAsync(IEntity source, QueueAction a) {
+			return await ActionQueue.RunAsync(source, a);
+		}
+
 		public ActionResult Action(IEntity source, ActionGraph g) {
 			return ActionQueue.Run(source, g);
 		}
@@ -186,6 +198,8 @@ namespace Brimstone
 			var block = new BlockStart(Type, Source, Target, index);
 			Queue(Source, new Actions.GameBlock(block, Actions));
 		}
+
+		// TODO: RunActionBlockAsync
 
 		public ActionResult RunActionBlock(BlockType Type, IEntity Source, ActionGraph Actions, IEntity Target = null, int Index = -2) {
 			return RunActionBlock(Type, Source, Actions.Unravel(), Target, Index);
