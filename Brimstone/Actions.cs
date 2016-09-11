@@ -406,9 +406,6 @@ namespace Brimstone.Actions
 			}));
 
 			game.ActiveTriggers.Queue(TriggerType.AfterPlay, entity); // TODO: Attach this to a tag change
-
-			// TODO: Deaths, other triggers, etc
-
 			return (Entity)entity;
 		}
 	}
@@ -457,7 +454,6 @@ namespace Brimstone.Actions
 
 					// TODO: Handle on-healing triggers and more, full specification here https://hearthstone.gamepedia.com/Advanced_rulebook#Damage_and_Healing
 					// TODO: Handle Prehealing. Currently nothing cares about it, but it does exist in the log.
-					// TODO: In Hearthstone tags can't be set to a negative value (clamps to 0 instead), so I should be able to write it like this and not worry about reaching negative Damage.
 				}
 			return ActionResult.None;
 		}
