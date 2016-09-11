@@ -577,7 +577,7 @@ namespace Brimstone.Actions
 				foreach (var e in args[TARGETS]) {
 					if (e is Minion) {
 						var minion = (Minion)e;
-						game.Queue(e, e.Card.Behaviour.Deathrattle);
+						game.QueueActionBlock(BlockType.TRIGGER, e, e.Card.Behaviour.Deathrattle);
 						game.ActiveTriggers.Queue(TriggerType.OnDeath, minion); // TODO: Attach this to a tag change
 					}
 					// TODO: Deathrattles and on-death triggers need to queue together, not one before the other
