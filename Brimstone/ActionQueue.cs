@@ -185,10 +185,10 @@ namespace Brimstone
 				System.Diagnostics.Debug.Assert(IsBlockEmpty);
 				DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Destroying queue at depth " + Depth);
 #endif
+				Queue = QueueStack.Pop();
 				var gameBlock = BlockStack.Pop();
 				if (gameBlock != null)
 					Game.OnBlockEmpty(gameBlock);
-				Queue = QueueStack.Pop();
 			}
 			// When the queue is empty, notify the game - it may refill it with new actions
 			if (IsEmpty)
@@ -289,7 +289,9 @@ namespace Brimstone
 #endif
 			var result = ProcessAll(UserData, Depth);
 #if _QUEUE_DEBUG
-			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): End processing current block");
+			// Block might not be finished if queue was cancelled
+			if (IsBlockEmpty)
+				DebugLog.WriteLine("Queue (Game " + Game.GameId + "): End processing current block");
 #endif
 			return result;
 		}
