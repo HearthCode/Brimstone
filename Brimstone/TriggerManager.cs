@@ -176,6 +176,16 @@ namespace Brimstone
 			}
 		}
 
+		public void ForceRun(IEntity owningEntity, ActionGraph g, IEntity target = null) {
+			var actions = g.Unravel();
+#if _TRIGGER_DEBUG
+			DebugLog.WriteLine("Game " + Game.GameId + ": Running forced trigger for " + owningEntity.ShortDescription + " with actions: "
+				+ string.Join(" ", actions.Select(a => a.ToString())));
+#endif
+			QueuedTriggersCount++;
+			Game.RunActionBlock(BlockType.TRIGGER, owningEntity, actions, target);
+		}
+
 		public void TriggerResolved() {
 			QueuedTriggersCount--;
 		}
