@@ -205,9 +205,13 @@ namespace Brimstone
 			DebugLog.WriteLine("Game " + GameId + ": Action block " + Block.Type + " for " + Entities[Block.Source].ShortDescription + " resolved");
 #endif
 			PowerHistory?.Add(new BlockEnd(Block.Type));
+
+			// Post-ATTACK DEATHS block
+			if (Block.Type == BlockType.ATTACK)
+				RunDeathCreationStepIfNeeded();
 		}
 
-		private HashSet<int> _deathCheckQueue;
+		private readonly HashSet<int> _deathCheckQueue;
 		public void OnQueueEmpty() {
 #if _GAME_DEBUG
 			DebugLog.WriteLine("Game " + GameId + ": Action queue resolved");
@@ -222,17 +226,6 @@ namespace Brimstone
 						ActiveTriggers.Queue(TriggerType.OnMulliganWaiting, p);
 						return;
 					}
-
-			// Death checking phase
-#if _GAME_DEBUG
-			DebugLog.WriteLine("Game " + GameId + ": Death processing phase");
-#endif
-			// We only have to check health because ToBeDestroyed cannot be reversed without the minion leaving play.
-			var dyingEntities = _deathCheckQueue.Where(id => ((ICharacter)Entities[id]).MortallyWounded && Entities[id].Zone.Type == Brimstone.Zone.PLAY).Select(id => Entities[id]);
-			if (dyingEntities.Any()) {
-				QueueActionBlock(BlockType.DEATHS, this, Death(dyingEntities.ToList()));
-			}
-			_deathCheckQueue.Clear();
 
 			// Advance game step if necessary (probably setting off new triggers)
 			var nextStep = NextStep;
@@ -250,6 +243,26 @@ namespace Brimstone
 #endif
 					Step = nextStep;
 			}
+		}
+
+		// Death checking phase
+		public void RunDeathCreationStepIfNeeded()
+		{
+#if _GAME_DEBUG
+			DebugLog.WriteLine("Game " + GameId + ": Checking for death creation step");
+#endif
+			if (_deathCheckQueue.Count == 0)
+				return;
+
+			// We only have to check health because ToBeDestroyed cannot be reversed without the minion leaving play
+			var dyingEntities = _deathCheckQueue.Where(id => ((ICharacter)Entities[id]).MortallyWounded && Entities[id].Zone.Type == Brimstone.Zone.PLAY).Select(id => Entities[id]);
+			if (dyingEntities.Any()) {
+#if _GAME_DEBUG
+				DebugLog.WriteLine("Game " + GameId + ": Running death creation step");
+#endif
+				Action(this, Death(dyingEntities.ToList()));
+			}
+			_deathCheckQueue.Clear();
 		}
 
 		public void Start(int FirstPlayer = 0, bool SkipMulligan = false, bool Shuffle = true) {

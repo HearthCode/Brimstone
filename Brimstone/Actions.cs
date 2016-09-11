@@ -396,6 +396,9 @@ namespace Brimstone.Actions
 				if (e is Spell)
 					e.Zone = e.Controller.Graveyard;
 
+				// Post-POWER block DEATHS block before triggers
+				game.RunDeathCreationStepIfNeeded();
+
 				// TODO: Update hero's ATK if we played a weapon
 
 				player.IsComboActive = true;
@@ -548,6 +551,8 @@ namespace Brimstone.Actions
 			if (args[TARGETS].HasResult) {
 				bool gameEnd = false;
 
+				// Death Creation Step
+				game.PowerHistory?.Add(new BlockStart(BlockType.DEATHS, game, null, 0));
 				foreach (var e in args[TARGETS]) {
 #if _ACTIONS_DEBUG
 					DebugLog.WriteLine("Game {0}: {1} dies", game.GameId, e.ShortDescription);
@@ -566,7 +571,9 @@ namespace Brimstone.Actions
 						gameEnd = true;
 					}
 				}
+				game.PowerHistory?.Add(new BlockEnd(BlockType.DEATHS));
 
+				// Queue Deathrattles and on-death triggers
 				foreach (var e in args[TARGETS]) {
 					if (e is Minion) {
 						var minion = (Minion)e;
