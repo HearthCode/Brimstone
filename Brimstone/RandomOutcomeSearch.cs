@@ -388,7 +388,7 @@ namespace Brimstone
 					// The game state has changed but there are more actions to do
 					// (which may or may not involve further cloning) so add it to the search queue
 #if _TREE_DEBUG
-					DebugLog.WriteLine("QUEUEING FOR NEXT SEARCH");
+					DebugLog.WriteLine("QUEUEING GAME " + e.Game.GameId + " FOR NEXT SEARCH");
 #endif
 					if (!tlsSearchQueue.Value.ContainsKey(e.Game))
 						tlsSearchQueue.Value.Add(e.Game, e.UserData as ProbabilisticGameNode);
