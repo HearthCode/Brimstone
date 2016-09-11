@@ -397,12 +397,12 @@ namespace Brimstone.Actions
 					e.Zone = e.Controller.Graveyard;
 
 				// Post-POWER block DEATHS block before triggers
-				game.RunDeathCreationStepIfNeeded();
+				e.Game.RunDeathCreationStepIfNeeded();
 
 				// TODO: Update hero's ATK if we played a weapon
 
-				player.IsComboActive = true;
-				player.NumOptionsPlayedThisTurn++;
+				e.Controller.IsComboActive = true;
+				e.Controller.NumOptionsPlayedThisTurn++;
 			}));
 
 			game.ActiveTriggers.Queue(TriggerType.AfterPlay, entity); // TODO: Attach this to a tag change
