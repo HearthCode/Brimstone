@@ -13,8 +13,6 @@ namespace Brimstone
 		public static bool EntityHashCaching = true;
 		public static bool GameHashCaching = true;
 		public static bool UseGameHashForEquality = true;
-
-		// WARNING: If you enable ParallelTreeSearch, you MUST enable ParallelClone too
 		public static bool ParallelTreeSearch = true;
 		public static bool ParallelClone = true;
 	}
