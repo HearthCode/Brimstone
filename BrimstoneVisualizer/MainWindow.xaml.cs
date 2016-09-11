@@ -34,7 +34,7 @@ namespace BrimstoneVisualizer
 			tbPlayer2Hand.Text = App.Game.Player2.Hand.ToString();
 			tbPlayer1Board.Text = App.Game.Player1.Board.ToString();
 			tbPlayer2Board.Text = App.Game.Player2.Board.ToString();
-			svPowerHistory.ScrollToEnd();
+			tbPowerHistory.ScrollToEnd();
 		}
 
 		private void btnStepQueue_Click(object sender, RoutedEventArgs e) {

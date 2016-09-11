@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:BrimstoneVisualizer"
         mc:Ignorable="d"
         Title="Brimstone Visualizer" Height="780" Width="1200" Closing="Window_Closing">
     <StackPanel>
@@ -26,10 +25,10 @@
         <Label x:Name="label1" Content="Power History Log" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
         <Label x:Name="label2" Grid.Column="2" Content="Action Queue" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
         <Label x:Name="label3" Grid.Column="3" Content="Result Stack" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
-        <ScrollViewer x:Name="svPowerHistory"  Grid.RowSpan="3" Grid.Row="1" Grid.Column="0">
-            <TextBlock x:Name="tbPowerHistory" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top"
-                    ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"/>
-        </ScrollViewer>
+        <TextBox Grid.Row="1" Grid.Column="0" Grid.RowSpan="3"
+                 x:Name="tbPowerHistory" Background="Transparent" BorderThickness="0" IsReadOnly="True" TextWrapping="Wrap"
+                 ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"
+                 VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,10,0,0" />
         <ScrollViewer Grid.Row="1" Grid.Column="2">
             <TextBlock x:Name="tbActionQueue" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top"
                     ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True"/>
