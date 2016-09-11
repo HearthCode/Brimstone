@@ -118,6 +118,7 @@ namespace Brimstone
 			ReplacedActions = cloneFrom.ReplacedActions;
 			HasHistory = cloneFrom.HasHistory;
 			Paused = cloneFrom.Paused;
+			LastActionCancelled = cloneFrom.LastActionCancelled;
 			// Events are immutable so this creates copies
 			OnQueueing = cloneFrom.OnQueueing;
 			OnQueued = cloneFrom.OnQueued;
