@@ -12,7 +12,6 @@ namespace Brimstone.Actions
 		}
 	}
 
-	// TODO: Optimize this away during graph unravel
 	public class FixedNumber : QueueAction
 	{
 		public int Num { get; set; }

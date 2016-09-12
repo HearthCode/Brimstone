@@ -84,12 +84,20 @@ namespace Brimstone
 				g = this;
 			var ql = new List<QueueAction>();
 			foreach (var action in g.Graph) {
-				foreach (var arg in action.Args)
-					if (arg != null)
-						ql.AddRange(Unravel(arg));
+				action.CompiledArgs = new ActionResult[action.Args.Count];
+				for (int i = 0; i < action.Args.Count; i++)
+					if (action.Args[i] != null) {
+						var l = Unravel(action.Args[i]);
+						// If the argument unravels to a single action, check if it can be evaluated now
+						if (l.Count == 1 && (l[0] is FixedNumber || l[0] is FixedCard))
+							// These actions always give the same results and can be evaluated now
+							action.CompiledArgs[i] = l[0].Run(null, null, null);
+						else
+							ql.AddRange(l);
+					}
 					else
 						ql.Add(new Empty());
-				ql.Add(action);
+					ql.Add(action);
 			}
 			return ql;
 		}

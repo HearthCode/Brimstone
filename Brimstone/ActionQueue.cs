@@ -359,14 +359,17 @@ namespace Brimstone
 #endif
 			// TODO: Make it work when not all of the arguments are supplied, for flexible syntax
 
-			// Get arguments for action from stack
+			// Get needed arguments for action from stack
 			action.Args = new ActionResult[action.Action.Args.Count];
-			for (int i = 0; i < action.Action.Args.Count; i++) {
-				var arg = StackPop();
-				List<IEntity> eList = arg;
-				if (eList != null && eList.Count > 0 && eList[0].Game != Game)
-					arg= new List<IEntity>(eList.Select(e => Game.Entities[e.Id]));
-				action.Args[action.Action.Args.Count - i - 1] = arg;
+			for (int i = action.Action.Args.Count - 1; i >= 0; i--) {
+				var arg = action.Action.CompiledArgs[i];
+				if (arg == ActionResult.None) {
+					arg = StackPop();
+					List<IEntity> eList = arg;
+					if (eList != null && eList.Count > 0 && eList[0].Game != Game)
+						arg = new List<IEntity>(eList.Select(e => Game.Entities[e.Id]));
+				}
+				action.Args[i] = arg;
 			}
 
 			// Replace current UserData with new UserData if supplied

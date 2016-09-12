@@ -7,6 +7,8 @@ namespace Brimstone
 	public abstract class QueueAction : ICloneable
 	{
 		public List<ActionGraph> Args { get; } = new List<ActionGraph>();
+		public ActionResult[] CompiledArgs { get; set; }
+
 		public abstract ActionResult Run(Game game, IEntity source, ActionResult[] args);
 
 		public ActionGraph Then(ActionGraph g) {
