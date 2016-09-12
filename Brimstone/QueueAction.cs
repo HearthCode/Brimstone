@@ -16,7 +16,14 @@ namespace Brimstone
 		}
 
 		public override string ToString() {
-			return GetType().Name;
+			string s = GetType().Name;
+			if (CompiledArgs != null && CompiledArgs.Any()) {
+				s += "(";
+				foreach (var a in CompiledArgs)
+					s += a + ", ";
+				s = s.Substring(0, s.Length - 2) + ")";
+			}
+			return s;
 		}
 
 		public object Clone() {

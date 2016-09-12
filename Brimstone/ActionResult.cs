@@ -87,7 +87,7 @@ namespace Brimstone
 
 		public override string ToString() {
 			if (!hasValue)
-				return "<none>";
+				return "<not evaluated>";
 			else if (hasIntValue)
 				return intValue.ToString();
 			else if (hasBoolValue)
