@@ -27,8 +27,8 @@ namespace Brimstone
 			return data.ByName(cardName);
 		}
 
-		public static List<Card> All {
-			get { return data.Cards.Values.ToList(); }
+		public static IEnumerable<Card> All {
+			get { return data.Cards.Values; }
 		}
 
 		public static int Count {
