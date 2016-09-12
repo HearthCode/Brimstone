@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Brimstone
 {
@@ -49,18 +51,18 @@ namespace Brimstone
 		}
 
 		public void Fill() {
-			// TODO: Add filters later
+			// TODO: Add filter argument later
+			var cardClass = (CardClass) HeroClass;
+			Func<Card, bool> filter = c => c.Collectible && c.Class == cardClass && c.Type != CardType.HERO;
+			var availableCards = Cards.All.Where(filter).ToList();
+
 			var cardsToAdd = MaxCards - Count;
 			var fillCards = new List<Card>(cardsToAdd);
 #if _DECK_DEBUG
 			DebugLog.WriteLine("Game " + Game.GameId + ": Adding " + cardsToAdd + " random cards to " + Controller.ShortDescription + "'s deck");
 #endif
-			while (fillCards.Count < cardsToAdd) {
-				// TODO: Change Cards.All to a Linq statement selecting only relevant cards
-				var chosenCard = RNG<Card>.Choose(Cards.All);
-				if (chosenCard.Collectible && chosenCard.Class == (CardClass)HeroClass && chosenCard.Type != CardType.HERO)
-					fillCards.Add(chosenCard);
-			}
+			while (fillCards.Count < cardsToAdd)
+					fillCards.Add(RNG<Card>.Choose(availableCards));
 			Add(fillCards);
 		}
 
