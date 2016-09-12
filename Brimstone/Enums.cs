@@ -307,7 +307,8 @@ namespace Brimstone
 		SHAMAN,
 		WARLOCK,
 		WARRIOR,
-		DREAM
+		DREAM,
+		NEUTRAL
 	}
 
 	public enum GameState
