@@ -52,12 +52,13 @@ namespace Brimstone
 
 		public void Fill() {
 			// TODO: Add filter argument later
-			var cardClass = (CardClass) HeroClass;
-			Func<Card, bool> filter = c => c.Collectible && (c.Class == cardClass || c.Class == CardClass.NEUTRAL) && c.Type != CardType.HERO;
-			var availableCards = Cards.All.Where(filter).ToList();
-
 			var cardsToAdd = MaxCards - Count;
 			var fillCards = new List<Card>(cardsToAdd);
+			var cardClass = (CardClass)HeroClass;
+			Func<Card, bool> filter =
+				c => c.Collectible && (c.Class == cardClass || c.Class == CardClass.NEUTRAL) && c.Type != CardType.HERO
+				     && fillCards.Count(f => f == c) < c.MaxAllowedInDeck;
+			var availableCards = Cards.All.Where(filter).ToList();
 #if _DECK_DEBUG
 			DebugLog.WriteLine("Game " + Game.GameId + ": Adding " + cardsToAdd + " random cards to " + Controller.ShortDescription + "'s deck");
 #endif
