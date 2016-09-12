@@ -397,7 +397,7 @@ namespace Brimstone.Actions
 					e.Zone = e.Controller.Graveyard;
 
 				// Post-POWER block DEATHS block before triggers
-				e.Game.RunDeathCreationStepIfNeededAsync();
+				e.Game.RunDeathCreationStepIfNeeded();
 
 				// TODO: Update hero's ATK if we played a weapon
 
@@ -548,7 +548,6 @@ namespace Brimstone.Actions
 				bool gameEnd = false;
 
 				// Death Creation Step
-				game.PowerHistory?.Add(new BlockStart(BlockType.DEATHS, game, null, 0));
 				foreach (var e in args[TARGETS]) {
 #if _ACTIONS_DEBUG
 					DebugLog.WriteLine("Game {0}: {1} dies", game.GameId, e.ShortDescription);
@@ -576,8 +575,6 @@ namespace Brimstone.Actions
 						gameEnd = true;
 					}
 				}
-				game.PowerHistory?.Add(new BlockEnd(BlockType.DEATHS));
-
 				if (gameEnd)
 					game.GameWon();
 			}

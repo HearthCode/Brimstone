@@ -199,19 +199,25 @@ namespace Brimstone
 			Queue(Source, new Actions.GameBlock(block, Actions));
 		}
 
-		// TODO: RunActionBlockAsync
-
 		public ActionResult RunActionBlock(BlockType Type, IEntity Source, ActionGraph Actions, IEntity Target = null, int Index = -2) {
-			return RunActionBlock(Type, Source, Actions.Unravel(), Target, Index);
+			return RunActionBlockAsync(Type, Source, Actions.Unravel(), Target, Index).Result;
 		}
 
 		public ActionResult RunActionBlock(BlockType Type, IEntity Source, List<QueueAction> Actions, IEntity Target = null, int Index = -2) {
+			return RunActionBlockAsync(Type, Source, Actions, Target, Index).Result;
+		}
+
+		public async Task<ActionResult> RunActionBlockAsync(BlockType Type, IEntity Source, ActionGraph Actions, IEntity Target = null, int Index = -2) {
+			return await RunActionBlockAsync(Type, Source, Actions.Unravel(), Target, Index);
+		}
+
+		public async Task<ActionResult> RunActionBlockAsync(BlockType Type, IEntity Source, List<QueueAction> Actions, IEntity Target = null, int Index = -2) {
 #if _GAME_DEBUG
 			DebugLog.WriteLine("Game " + GameId + ": Running " + Type + " for " + Source.ShortDescription + " => " + (Target?.ShortDescription ?? "no target"));
 #endif
 			int index = Index != -2 ? Index : (Type == BlockType.POWER || Type == BlockType.ATTACK ? -1 : 0);
 			var block = new BlockStart(Type, Source, Target, index);
-			return Action(Source, new Actions.GameBlock(block, Actions));
+			return await ActionAsync(Source, new Actions.GameBlock(block, Actions));
 		}
 
 		public void OnBlockEmpty(BlockStart Block) {
@@ -266,8 +272,11 @@ namespace Brimstone
 		}
 
 		// Death checking phase
-		public async Task RunDeathCreationStepIfNeededAsync()
-		{
+		public void RunDeathCreationStepIfNeeded() {
+			RunDeathCreationStepIfNeededAsync().Wait();
+		}
+
+		public async Task RunDeathCreationStepIfNeededAsync() {
 #if _GAME_DEBUG
 			DebugLog.WriteLine("Game " + GameId + ": Checking for death creation step");
 #endif
@@ -275,14 +284,18 @@ namespace Brimstone
 				return;
 
 			// We only have to check health because ToBeDestroyed cannot be reversed without the minion leaving play
-			var dyingEntities = _deathCheckQueue.Where(id => ((ICharacter)Entities[id]).MortallyWounded && Entities[id].Zone.Type == Brimstone.Zone.PLAY).Select(id => Entities[id]);
-			if (dyingEntities.Any()) {
+			var dyingEntities =
+				_deathCheckQueue.Where(
+					id => ((ICharacter) Entities[id]).MortallyWounded && Entities[id].Zone.Type == Brimstone.Zone.PLAY)
+					.Select(id => Entities[id])
+					.ToList();
+			_deathCheckQueue.Clear();
+			if (dyingEntities.Count > 0) {
 #if _GAME_DEBUG
 				DebugLog.WriteLine("Game " + GameId + ": Running death creation step");
 #endif
 				var dying = dyingEntities.ToList();
-				_deathCheckQueue.Clear();
-				await ActionAsync(this, Death(dying));
+				await RunActionBlockAsync(BlockType.DEATHS, this, Death(dying));
 			}
 		}
 
