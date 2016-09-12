@@ -182,6 +182,8 @@ namespace Brimstone
 						ZonePosition = 0;
 					else
 						ZonePosition = Count + 1;
+				else if (Entity is Hero)
+					ZonePosition = 0;
 			if (Type == Zone.SETASIDE || Type == Zone.GRAVEYARD || (Type == Zone.PLAY && Controller is Game) || Entity is Player)
 				ZonePosition = 0;
 			if (ZonePosition != 0) {
