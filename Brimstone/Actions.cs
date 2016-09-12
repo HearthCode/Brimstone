@@ -540,49 +540,6 @@ namespace Brimstone.Actions
 		}
 	}
 
-	public class Death : QueueAction
-	{
-		public const int TARGETS = 0;
-
-		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
-			if (args[TARGETS].HasResult) {
-				bool gameEnd = false;
-
-				// Death Creation Step
-				foreach (var e in args[TARGETS]) {
-#if _ACTIONS_DEBUG
-					DebugLog.WriteLine("Game {0}: {1} dies", game.GameId, e.ShortDescription);
-#endif
-					// Queue deathrattles and OnDeath triggers before moving mortally wounded minion to graveyard
-					// (they will be executed after the zone move)
-
-					// TODO: Test that each queue resolves before the next one populates. If it doesn't, we can make queue populating lazy
-					if (e is Minion) {
-						game.ActiveTriggers.Queue(TriggerType.OnDeath, e);
-					}
-
-					// Move dead character to graveyard
-					e.Zone = e.Controller.Graveyard;
-
-					// TODO: Reset all minion tags to default
-					if (e is Minion) {
-						var minion = ((Minion)e);
-						minion.Damage = 0;
-					}
-
-					// Hero death
-					if (e is Hero) {
-						e.Controller.PlayState = PlayState.LOSING;
-						gameEnd = true;
-					}
-				}
-				if (gameEnd)
-					game.GameWon();
-			}
-			return ActionResult.None;
-		}
-	}
-
 	public class CreateChoice : QueueAction
 	{
 		public const int PLAYER = 0;

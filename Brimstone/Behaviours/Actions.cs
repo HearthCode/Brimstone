@@ -13,7 +13,6 @@ namespace Brimstone
 		public static ActionGraph Choose(ActionGraph Player = null) { return new Choose { Args = { Player } }; }
 		public static ActionGraph Damage(ActionGraph Targets = null, ActionGraph Amount = null) { return new Damage { Args = { Targets, Amount } }; }
 		public static ActionGraph Heal(ActionGraph Targets = null, ActionGraph Amount = null) { return new Heal { Args = { Targets, Amount } }; }
-		public static ActionGraph Death(ActionGraph Targets = null) { return new Death { Args = { Targets } }; }
 		public static ActionGraph Silence(ActionGraph Targets = null) { return new Silence { Args = { Targets } }; }
 		public static ActionGraph Bounce(ActionGraph Targets = null) { return new Bounce { Args = { Targets } }; }
 		public static ActionGraph Destroy(ActionGraph Targets = null) { return new Destroy { Args = { Targets } }; }

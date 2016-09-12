@@ -235,9 +235,9 @@ namespace Brimstone
 			if (Block.Type == BlockType.TRIGGER)
 				ActiveTriggers.TriggerResolved();
 
-			// Post-ATTACK or Post-finalTRIGGER DEATHS block
+			// Post-ATTACK or Post-final TRIGGER DEATHS block
 			if (Block.Type == BlockType.ATTACK || (Block.Type == BlockType.TRIGGER && ActiveTriggers.QueuedTriggersCount == 0))
-				await RunDeathCreationStepIfNeededAsync();
+				RunDeathCreationStepIfNeeded();
 		}
 
 		private readonly HashSet<int> _deathCheckQueue;
@@ -275,10 +275,6 @@ namespace Brimstone
 
 		// Death checking phase
 		public void RunDeathCreationStepIfNeeded() {
-			RunDeathCreationStepIfNeededAsync().Wait();
-		}
-
-		public async Task RunDeathCreationStepIfNeededAsync() {
 #if _GAME_DEBUG
 			DebugLog.WriteLine("Game " + GameId + ": Checking for death creation step");
 #endif
@@ -289,15 +285,50 @@ namespace Brimstone
 			var dyingEntities =
 				_deathCheckQueue.Where(
 					id => ((ICharacter) Entities[id]).MortallyWounded && Entities[id].Zone.Type == Brimstone.Zone.PLAY)
-					.Select(id => Entities[id])
-					.ToList();
-			_deathCheckQueue.Clear();
+					.Select(id => Entities[id]).ToList();
+
 			if (dyingEntities.Count > 0) {
 #if _GAME_DEBUG
 				DebugLog.WriteLine("Game " + GameId + ": Running death creation step");
 #endif
-				await RunActionBlockAsync(BlockType.DEATHS, this, Death(dyingEntities));
+				PowerHistory?.Add(new BlockStart(BlockType.DEATHS, this));
 			}
+
+			// Death Creation Step
+			bool gameEnd = false;
+			foreach (var e in dyingEntities) {
+#if _ACTIONS_DEBUG
+				DebugLog.WriteLine("Game {0}: {1} dies", game.GameId, e.ShortDescription);
+#endif
+				// Queue deathrattles and OnDeath triggers before moving mortally wounded minion to graveyard
+				// (they will be executed after the zone move)
+				// TODO: Test that each queue resolves before the next one populates. If it doesn't, we can make queue populating lazy
+				if (e is Minion) {
+					ActiveTriggers.Queue(TriggerType.OnDeath, e);
+				}
+
+				// Move dead character to graveyard
+				e.Zone = e.Controller.Graveyard;
+
+				// TODO: Reset all minion tags to default
+				if (e is Minion) {
+					var minion = ((Minion)e);
+					minion.Damage = 0;
+				}
+
+				// Hero death
+				if (e is Hero) {
+					e.Controller.PlayState = PlayState.LOSING;
+					gameEnd = true;
+				}
+			}
+			if (gameEnd)
+				GameWon();
+
+			if (dyingEntities.Count > 0) {
+				PowerHistory?.Add(new BlockEnd(BlockType.DEATHS));
+			}
+			_deathCheckQueue.Clear();
 		}
 
 		public void Start(int FirstPlayer = 0, bool SkipMulligan = false, bool Shuffle = true) {
