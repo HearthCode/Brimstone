@@ -296,8 +296,7 @@ namespace Brimstone
 #if _GAME_DEBUG
 				DebugLog.WriteLine("Game " + GameId + ": Running death creation step");
 #endif
-				var dying = dyingEntities.ToList();
-				await RunActionBlockAsync(BlockType.DEATHS, this, Death(dying));
+				await RunActionBlockAsync(BlockType.DEATHS, this, Death(dyingEntities));
 			}
 		}
 
