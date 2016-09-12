@@ -53,7 +53,7 @@ namespace Brimstone
 		public void Fill() {
 			// TODO: Add filter argument later
 			var cardClass = (CardClass) HeroClass;
-			Func<Card, bool> filter = c => c.Collectible && c.Class == cardClass && c.Type != CardType.HERO;
+			Func<Card, bool> filter = c => c.Collectible && (c.Class == cardClass || c.Class == CardClass.NEUTRAL) && c.Type != CardType.HERO;
 			var availableCards = Cards.All.Where(filter).ToList();
 
 			var cardsToAdd = MaxCards - Count;
