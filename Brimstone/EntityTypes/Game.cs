@@ -298,7 +298,7 @@ namespace Brimstone
 			bool gameEnd = false;
 			foreach (var e in dyingEntities) {
 #if _ACTIONS_DEBUG
-				DebugLog.WriteLine("Game {0}: {1} dies", game.GameId, e.ShortDescription);
+				DebugLog.WriteLine("Game {0}: {1} dies", GameId, e.ShortDescription);
 #endif
 				// Queue deathrattles and OnDeath triggers before moving mortally wounded minion to graveyard
 				// (they will be executed after the zone move)
