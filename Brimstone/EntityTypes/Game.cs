@@ -216,8 +216,8 @@ namespace Brimstone
 			DebugLog.WriteLine("Game " + GameId + ": Running " + Type + " for " + Source.ShortDescription + " => " + (Target?.ShortDescription ?? "no target"));
 #endif
 			int index = Index != -2 ? Index : (Type == BlockType.POWER || Type == BlockType.ATTACK ? -1 : 0);
-			var block = new BlockStart(Type, Source, Target, index);
-			return await ActionAsync(Source, new Actions.GameBlock(block, Actions));
+			ActionQueue.StartBlock(Source, Actions, new BlockStart(Type, Source, Target, index));
+			return (await ActionQueue.ProcessBlockAsync())?.FirstOrDefault() ?? ActionResult.None;
 		}
 
 		public void OnBlockEmpty(BlockStart Block) {
