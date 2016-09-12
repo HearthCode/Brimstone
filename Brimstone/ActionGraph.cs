@@ -85,13 +85,17 @@ namespace Brimstone
 			var ql = new List<QueueAction>();
 			foreach (var action in g.Graph) {
 				action.CompiledArgs = new ActionResult[action.Args.Count];
+				action.EagerArgs = new QueueAction[action.Args.Count];
 				for (int i = 0; i < action.Args.Count; i++)
 					if (action.Args[i] != null) {
 						var l = Unravel(action.Args[i]);
 						// If the argument unravels to a single action, check if it can be evaluated now
-						if (l.Count == 1 && (l[0] is FixedNumber || l[0] is FixedCard))
+						if (l.Count == 1 && l[0] is PreCompiledQueueAction)
 							// These actions always give the same results and can be evaluated now
 							action.CompiledArgs[i] = l[0].Run(null, null, null);
+						else if (l.Count == 1 && l[0] is EagerQueueAction)
+							// These actions should be evaluated as in-place arguments rather than queued directly
+							action.EagerArgs[i] = l[0];
 						else
 							ql.AddRange(l);
 					}

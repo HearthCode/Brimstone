@@ -5,14 +5,14 @@ using static Brimstone.Behaviours;
 
 namespace Brimstone.Actions
 {
-	public class Empty : QueueAction
+	public class Empty : PreCompiledQueueAction
 	{
 		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			return ActionResult.Empty;
 		}
 	}
 
-	public class FixedNumber : QueueAction
+	public class FixedNumber : PreCompiledQueueAction
 	{
 		public int Num { get; set; }
 
@@ -21,7 +21,7 @@ namespace Brimstone.Actions
 		}
 	}
 
-	public class FixedCard : QueueAction
+	public class FixedCard : PreCompiledQueueAction
 	{
 		public Card Card { get; set; }
 
@@ -30,7 +30,7 @@ namespace Brimstone.Actions
 		}
 	}
 
-	public class LazyEntity : QueueAction
+	public class LazyEntity : EagerQueueAction
 	{
 		public int EntityId { get; set; }
 
@@ -39,7 +39,7 @@ namespace Brimstone.Actions
 		}
 	}
 
-	public class Selector : QueueAction
+	public class Selector : EagerQueueAction
 	{
 		public Func<IEntity, IEnumerable<IEntity>> Lambda { get; set; }
 

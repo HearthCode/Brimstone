@@ -362,12 +362,19 @@ namespace Brimstone
 			// Get needed arguments for action from stack
 			action.Args = new ActionResult[action.Action.Args.Count];
 			for (int i = action.Action.Args.Count - 1; i >= 0; i--) {
+				// Prefer PreCompiledQueueAction items as arguments
 				var arg = action.Action.CompiledArgs[i];
-				if (arg == ActionResult.None) {
-					arg = StackPop();
-					List<IEntity> eList = arg;
-					if (eList != null && eList.Count > 0 && eList[0].Game != Game)
-						arg = new List<IEntity>(eList.Select(e => Game.Entities[e.Id]));
+				if (!arg.HasResult) {
+					// Otherwise prefer EagerQueueAction items as arguments
+					if (action.Action.EagerArgs[i] != null) {
+						arg = action.Action.EagerArgs[i].Run(Game, action.Source, null);
+					} else {
+						// Otherwise use the ResultStack to get regular QueueAction items as arguments
+						arg = StackPop();
+						List<IEntity> eList = arg;
+						if (eList != null && eList.Count > 0 && eList[0].Game != Game)
+							arg = new List<IEntity>(eList.Select(e => Game.Entities[e.Id]));
+					}
 				}
 				action.Args[i] = arg;
 			}
