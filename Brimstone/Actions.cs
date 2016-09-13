@@ -377,7 +377,7 @@ namespace Brimstone.Actions
 
 			// Pay casting cost
 			player.PayCost(source);
-
+			player.NumCardsPlayedThisTurn++;
 			if (entity is Minion)
 				player.NumMinionsPlayedThisTurn++;
 
