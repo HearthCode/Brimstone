@@ -5,12 +5,17 @@ namespace Brimstone
 {
 	public class Hero : Character<Hero>
 	{
-		// TODO: Add hero powers
-
-		public Hero(Hero cloneFrom) : base(cloneFrom) { }
 		public Hero(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
 
-		public HeroPower Power { get; set; }
+		public Hero(Hero cloneFrom) : base(cloneFrom) {
+			_heroPowerId = cloneFrom._heroPowerId;
+		}
+
+		private int _heroPowerId;
+		public HeroPower Power {
+			get { return (HeroPower) Game.Entities[_heroPowerId]; }
+			set { _heroPowerId = value.Id; }
+		}
 
 		public override bool IsPlayable => false;
 
