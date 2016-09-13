@@ -9,6 +9,7 @@ namespace Brimstone
 		public static ActionGraph Give(ActionGraph Player = null, ActionGraph Card = null) { return new Give { Args = { Player, Card } }; }
 		public static ActionGraph Draw(ActionGraph Player = null) { return new Draw { Args = { Player } }; }
 		public static ActionGraph Play(ActionGraph Entity = null) { return new Play { Args = { Entity } }; }
+		public static ActionGraph UseHeroPower { get { return new UseHeroPower(); } }
 		public static ActionGraph Attack(ActionGraph Attacker = null, ActionGraph Defender = null) { return new Attack { Args = { Attacker, Defender } }; }
 		public static ActionGraph Choose(ActionGraph Player = null) { return new Choose { Args = { Player } }; }
 		public static ActionGraph Damage(ActionGraph Targets = null, ActionGraph Amount = null) { return new Damage { Args = { Targets, Amount } }; }

@@ -18,6 +18,20 @@ namespace Brimstone
 			return (minion != null && minion.CantBeTargetedByAbilities ? false : base.MeetsGenericTargetingRequirements(target));
 		}
 
+		public HeroPower Activate(ICharacter target = null) {
+			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
+				throw new ChoiceException();
+
+			Target = target;
+			try {
+				return (HeroPower)Game.RunActionBlock(BlockType.PLAY, this, Behaviours.UseHeroPower, Target);
+			}
+			// Action was probably cancelled causing an uninitialized ActionResult to be returned
+			catch (NullReferenceException) {
+				return null;
+			}
+		}
+
 		public override object Clone() {
 			return new HeroPower(this);
 		}

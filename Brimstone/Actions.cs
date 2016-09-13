@@ -376,14 +376,8 @@ namespace Brimstone.Actions
 			IPlayable entity = (IPlayable)(Entity)args[ENTITY];
 
 			// Pay casting cost
-			// TODO: Cho'gall
-			var cost = source.Cost;
-			var tempUsed = Math.Min(player.TemporaryMana, cost);
-			player.TemporaryMana -= tempUsed;
-			player.UsedMana += cost - tempUsed;
-			player.TotalManaSpentThisGame += cost;
+			player.PayCost(source);
 
-			player.NumCardsPlayedThisTurn++;
 			if (entity is Minion)
 				player.NumMinionsPlayedThisTurn++;
 
@@ -419,6 +413,37 @@ namespace Brimstone.Actions
 
 			game.ActiveTriggers.Queue(TriggerType.AfterPlay, entity); // TODO: Attach this to a tag change
 			return (Entity)entity;
+		}
+	}
+
+	public class UseHeroPower : QueueAction
+	{
+		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
+			ICanTarget heroPower = (ICanTarget) source;
+			Player player = source.Controller;
+
+			// Pay casting cost
+			player.PayCost(source);
+
+#if _ACTIONS_DEBUG
+			DebugLog.WriteLine("Game {0}: {1} is using hero power {2}", game.GameId, player.FriendlyName, heroPower.ShortDescription);
+#endif
+			// TODO: Meta tags for targeting
+			game.QueueActionBlock(BlockType.POWER, source, source.Card.Behaviour.Battlecry, heroPower.Target);
+			game.Queue(source, new Action<IEntity>(e => {
+				player.HeroPowerActivationsThisTurn++;
+				// TODO: Hero power windfury etc.
+				heroPower.IsExhausted = true;
+
+				// Post-POWER block DEATHS block before triggers
+				// TODO: Use the awaitable RunDeathCreationStepIfNeededAsync()
+				e.Game.RunDeathCreationStepIfNeeded();
+
+				e.Controller.NumOptionsPlayedThisTurn++;
+			}));
+
+			game.ActiveTriggers.Queue(TriggerType.OnHeroPower, source); // TODO: Attach this to a tag change
+			return (Entity)source;
 		}
 	}
 
