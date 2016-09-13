@@ -73,7 +73,8 @@ namespace Brimstone
 				if (Hero.CanAttack)
 					yield return new Option {Source = Hero, Targets = Hero.ValidTargets};
 
-				// TODO: Hero power
+				if (!Hero.Power.IsExhausted)
+					yield return new Option {Source = Hero.Power, Targets = Hero.Power.ValidTargets};
 			}
 		}
 
