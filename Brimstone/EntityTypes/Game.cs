@@ -308,6 +308,9 @@ namespace Brimstone
 					ActiveTriggers.Queue(TriggerType.OnDeath, e);
 				}
 
+				// NumMinionsPlayerKilledThisTurn seems to be the number of minions that died this turn
+				// regardless of who or what killed what
+				e.Controller.NumMinionsPlayerKilledThisTurn++;
 				NumMinionsKilledThisTurn++;
 				e.IsExhausted = false;
 
