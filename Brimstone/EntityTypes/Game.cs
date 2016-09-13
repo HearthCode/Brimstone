@@ -84,6 +84,7 @@ namespace Brimstone
 			// Settings
 			FirstPlayerNum = cloneFrom.FirstPlayerNum;
 			SkipMulligan = cloneFrom.SkipMulligan;
+			MaxMinionsOnBoard = cloneFrom.MaxMinionsOnBoard;
 			// Generate zones owned by game
 			Zones = new Zones(this, this);
 			_deathCheckQueue = new HashSet<int>(cloneFrom._deathCheckQueue);

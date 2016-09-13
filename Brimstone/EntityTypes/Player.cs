@@ -24,6 +24,7 @@ namespace Brimstone
 		public Player(Player cloneFrom) : base(cloneFrom) {
 			FriendlyName = cloneFrom.FriendlyName;
 			HeroClass = cloneFrom.HeroClass;
+			MaxHandSize = cloneFrom.MaxHandSize;
 			// TODO: Shallow clone choices
 			// TODO: Update choices to point to new game entities
 		}
