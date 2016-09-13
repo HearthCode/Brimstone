@@ -281,6 +281,11 @@ namespace Brimstone
 			set { this[GameTag.HEROPOWER_ACTIVATIONS_THIS_TURN] = value; }
 		}
 
+		public int NumTimesHeroPowerUsedThisGame {
+			get { return this[GameTag.NUM_TIMES_HERO_POWER_USED_THIS_GAME]; }
+			set { this[GameTag.NUM_TIMES_HERO_POWER_USED_THIS_GAME] = value; }
+		}
+
 		public int NumTurnsLeft {
 			get { return this[GameTag.NUM_TURNS_LEFT]; }
 			set { this[GameTag.NUM_TURNS_LEFT] = value; }
