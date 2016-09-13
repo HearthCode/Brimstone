@@ -173,8 +173,8 @@ namespace Brimstone
 		}
 
 		public int NumMinionsKilledThisTurn {
-			get { return this[GameTag.NUM_MINIONS_PLAYER_KILLED_THIS_TURN]; }
-			set { this[GameTag.NUM_MINIONS_PLAYER_KILLED_THIS_TURN] = value; }
+			get { return this[GameTag.NUM_MINIONS_KILLED_THIS_TURN]; }
+			set { this[GameTag.NUM_MINIONS_KILLED_THIS_TURN] = value; }
 		}
 	}
 
