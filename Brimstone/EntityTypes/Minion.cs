@@ -33,19 +33,12 @@ namespace Brimstone
 			return false;
 		}
 
-		private IEnumerable<ICharacter> GetValidBattlecryTargets() {
-			if (!NeedsTargetList())
-				return new List<ICharacter>();
-
-			return Game.Characters.Where(MeetsGenericTargetingRequirements);
-		}
-
 		public override IEnumerable<ICharacter> ValidTargets {
 			get {
 				if (Zone == Controller.Hand)
-					return GetValidBattlecryTargets();
+					return GetValidAbilityTargets();
 				if (Zone == Controller.Board)
-					return GetValidAttackTargets();
+					return base.ValidTargets;
 				throw new TargetingException("Minion can't have targets while in zone " + Zone.Type);
 			}
 		}

@@ -12,8 +12,6 @@ namespace Brimstone
 
 		public override bool IsPlayable => false;
 
-		public override IEnumerable<ICharacter> ValidTargets => GetValidAttackTargets();
-
 		public override object Clone() {
 			return new Hero(this);
 		}

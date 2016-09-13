@@ -4,7 +4,7 @@ using System.Linq;
 namespace Brimstone
 {
 	public interface ICanTarget : IEntity
-	{	
+	{
 		// TODO: Caching
 		// TODO: HasTarget
 		IEnumerable<ICharacter> ValidTargets { get; }
@@ -17,8 +17,8 @@ namespace Brimstone
 	{
 		public ICharacter Target { get; set; }
 
-		protected CanTarget(CanTarget cloneFrom) : base(cloneFrom) { }
-		protected CanTarget(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
+		protected CanTarget(CanTarget cloneFrom) : base(cloneFrom) {}
+		protected CanTarget(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) {}
 
 		// Checks if target entity meets the targeting requirements that are shared by spells and battlecries
 		// Note that additional targeting requirements for spells, battlecries and hero powers are not checked here
@@ -62,7 +62,7 @@ namespace Brimstone
 							return false;
 						break;
 					case PlayRequirements.REQ_TARGET_WITH_RACE:
-						if (target.Race != (Race)param)
+						if (target.Race != (Race) param)
 							return false;
 						break;
 					case PlayRequirements.REQ_HERO_TARGET:
@@ -111,29 +111,15 @@ namespace Brimstone
 			return Card.RequiresTarget || Card.RequiresTargetIfAvailable;
 		}
 
-		// Default targeting for hero and minion attack targets
-		protected IEnumerable<ICharacter> GetValidAttackTargets() {
-			// Stealthed minions are ignored in both taunt and non-taunt targeting scenarios
-			var opponentNonStealthed = Controller.Opponent.Board.Where(x => !x.HasStealth).Concat(new List <ICharacter> { Controller.Opponent.Hero});
-
-			// Must attack non-stealthed taunts
-			var opponentTaunts = opponentNonStealthed.Where(x => x.HasTaunt);
-			if (opponentTaunts.Any())
-				return opponentTaunts;
-
-			// Can attack all opponent characters
-			return opponentNonStealthed;
-		}
-
 		// Default targeting for spells and hero powers
-		public virtual IEnumerable<ICharacter> ValidTargets {
-			get {
-				// If this is an untargeted card, return an empty list
-				if (!Card.RequiresTargetIfAvailable && !Card.RequiresTarget)
-					return new List<ICharacter>();
+		protected virtual IEnumerable<ICharacter> GetValidAbilityTargets() {
+			// If this is an untargeted card, return an empty list
+			if (!NeedsTargetList())
+				return new List<ICharacter>();
 
-				return Game.Characters.Where(MeetsGenericTargetingRequirements);
-			}
+			return Game.Characters.Where(MeetsGenericTargetingRequirements);
 		}
+
+		public abstract IEnumerable<ICharacter> ValidTargets { get; }
 	}
 }

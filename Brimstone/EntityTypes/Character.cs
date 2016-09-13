@@ -26,6 +26,23 @@ namespace Brimstone
 			get { return Health <= 0 || ToBeDestroyed; }
 		}
 
+		// Default targeting for hero and minion attack targets
+		public override IEnumerable<ICharacter> ValidTargets {
+			get {
+				// Stealthed minions are ignored in both taunt and non-taunt targeting scenarios
+				var opponentNonStealthed =
+					Controller.Opponent.Board.Where(x => !x.HasStealth).Concat(new List<ICharacter> {Controller.Opponent.Hero});
+
+				// Must attack non-stealthed taunts
+				var opponentTaunts = opponentNonStealthed.Where(x => x.HasTaunt);
+				if (opponentTaunts.Any())
+					return opponentTaunts;
+
+				// Can attack all opponent characters
+				return opponentNonStealthed;
+			}
+		}
+
 		public ICanTarget Attack(ICharacter target = null) {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
 				throw new ChoiceException();
