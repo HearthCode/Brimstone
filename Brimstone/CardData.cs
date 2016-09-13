@@ -27,6 +27,10 @@ namespace Brimstone
 			return data.ByName(cardName);
 		}
 
+		public static Card FromAssetId(int assetId) {
+			return data.Cards.Values.FirstOrDefault(x => x.AssetId == assetId);
+		}
+
 		public static IEnumerable<Card> All {
 			get { return data.Cards.Values; }
 		}
