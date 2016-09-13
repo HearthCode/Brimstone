@@ -10,7 +10,7 @@ namespace Brimstone
 		public Minion(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
 
 		// Checks if it is currently possible to play this minion with a target. Does not check if a suitable target is available
-		private bool NeedsTargetList() {
+		protected override bool NeedsTargetList() {
 			if (Card.RequiresTarget || Card.RequiresTargetIfAvailable)
 				return true;
 

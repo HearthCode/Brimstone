@@ -106,6 +106,11 @@ namespace Brimstone
 			return true;
 		}
 
+		// Default definition of whether the entity currently requires a target list to be calculated before use
+		protected virtual bool NeedsTargetList() {
+			return Card.RequiresTarget || Card.RequiresTargetIfAvailable;
+		}
+
 		// Default targeting for hero and minion attack targets
 		protected IEnumerable<ICharacter> GetValidAttackTargets() {
 			// Stealthed minions are ignored in both taunt and non-taunt targeting scenarios
