@@ -25,7 +25,7 @@ namespace Brimstone
 	public partial class Game : Entity, IZoneController, IFormattable
 	{
 		// Game settings
-		public int MaxMinionsOnBoard { get; private set; } = 7;
+		public int MaxMinionsOnBoard { get; set; } = 7;
 
 		public EntityController Entities;
 		public TriggerManager ActiveTriggers;
