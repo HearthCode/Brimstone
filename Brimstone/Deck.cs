@@ -7,7 +7,7 @@ namespace Brimstone
 {
 	public class Deck : Zone<IPlayable>
 	{
-		public const int MaxCards = 30;
+		public int StartingCards { get; set; } = 30;
 
 		public HeroClass HeroClass { get; }
 
@@ -52,7 +52,7 @@ namespace Brimstone
 
 		public void Fill() {
 			// TODO: Add filter argument later
-			var cardsToAdd = MaxCards - Count;
+			var cardsToAdd = StartingCards - Count;
 			var fillCards = new List<Card>(cardsToAdd);
 			var cardClass = (CardClass)HeroClass;
 			Func<Card, bool> filter =
