@@ -22,12 +22,8 @@ namespace Brimstone
 
 		// Checks if target entity meets the targeting requirements that are shared by spells and battlecries
 		// Note that additional targeting requirements for spells, battlecries and hero powers are not checked here
-		protected bool MeetsGenericTargetingRequirements(ICharacter target) {
+		protected virtual bool MeetsGenericTargetingRequirements(ICharacter target) {
 			Minion minion = target as Minion;
-
-			// Spells and hero powers can't target CantBeTargetedByAbilities minions
-			if (minion != null && this is Spell && minion.CantBeTargetedByAbilities)
-				return false;
 
 			// Can't target your opponent's stealth minions
 			if (minion != null && minion.HasStealth && minion.Controller != Controller)
