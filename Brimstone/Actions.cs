@@ -393,6 +393,9 @@ namespace Brimstone.Actions
 #if _ACTIONS_DEBUG
 			DebugLog.WriteLine("Game {0}: {1} is playing {2}", game.GameId, player.FriendlyName, entity.ShortDescription);
 #endif
+			if (entity is Spell && entity.Target != null)
+				entity[GameTag.CARD_TARGET] = entity.Target.Id;
+
 			game.QueueActionBlock(BlockType.POWER, source, entity.Card.Behaviour.Battlecry, entity.Target);
 			game.Queue(source, new Action<IEntity>(e =>
 			{
@@ -427,6 +430,9 @@ namespace Brimstone.Actions
 #if _ACTIONS_DEBUG
 			DebugLog.WriteLine("Game {0}: {1} is using hero power {2}", game.GameId, player.FriendlyName, heroPower.ShortDescription);
 #endif
+			if (heroPower.Target != null)
+				heroPower[GameTag.CARD_TARGET] = heroPower.Target.Id;
+
 			game.QueueActionBlock(BlockType.POWER, source, source.Card.Behaviour.Battlecry, heroPower.Target);
 			game.Queue(source, new Action<IEntity>(e => {
 				player.HeroPowerActivationsThisTurn++;
