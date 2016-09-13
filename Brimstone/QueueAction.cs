@@ -20,10 +20,18 @@ namespace Brimstone
 
 		public override string ToString() {
 			string s = GetType().Name;
-			if (CompiledArgs != null && CompiledArgs.Any()) {
+			if (Args.Count > 0) {
 				s += "(";
-				foreach (var a in CompiledArgs)
-					s += a + ", ";
+				for (int i = 0; i < Args.Count; i++) {
+					if (CompiledArgs != null && CompiledArgs[i].HasResult)
+						s += CompiledArgs[i];
+					else if (EagerArgs?[i] != null)
+						s += EagerArgs[i];
+					else {
+						s += "?";
+					}
+					s += ", ";
+				}
 				s = s.Substring(0, s.Length - 2) + ")";
 			}
 			return s;

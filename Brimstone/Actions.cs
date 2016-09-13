@@ -37,6 +37,10 @@ namespace Brimstone.Actions
 		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			return (Entity)game.Entities[EntityId];
 		}
+
+		public override string ToString() {
+			return "LazyEntity(" + EntityId + ")";
+		}
 	}
 
 	public class Selector : EagerQueueAction
@@ -84,6 +88,14 @@ namespace Brimstone.Actions
 			game.PowerHistory?.Add(Block);
 			game.ActionQueue.StartBlock(source, Actions, Block);
 			return ActionResult.None;
+		}
+
+		public override string ToString() {
+			string s = "GameBlock(" + Block.Type + ", ";
+			if (Actions != null)
+				foreach (var a in Actions)
+					s += a + ", ";
+			return s.Substring(0, s.Length - 2) + ")";
 		}
 	}
 
