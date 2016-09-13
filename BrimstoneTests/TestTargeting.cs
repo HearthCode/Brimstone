@@ -66,7 +66,7 @@ namespace BrimstoneTests
 				CollectionAssert.Contains(targets, out3);
 
 			// No other entities must be in the valid targets list
-			Assert.AreEqual(targets.Count, 6);
+			Assert.AreEqual(6, targets.Count());
 		}
 
 		[Test]
@@ -109,7 +109,7 @@ namespace BrimstoneTests
 			CollectionAssert.DoesNotContain(targets, out3);
 
 			// No other entities must be in the valid targets list
-			Assert.AreEqual(2, targets.Count);
+			Assert.AreEqual(2, targets.Count());
 		}
 
 		[Test]
@@ -141,7 +141,7 @@ namespace BrimstoneTests
 			p1.Board[4].Zone = p1.Graveyard;
 
 			// Test again
-			Assert.AreEqual(0, gormok.ValidTargets.Count);
+			Assert.AreEqual(0, gormok.ValidTargets.Count());
 		}
 
 		[Test]
@@ -167,7 +167,7 @@ namespace BrimstoneTests
 			Assert.False(blackwing.Card.RequiresTarget);
 
 			// No targets right now because requirements not met
-			Assert.AreEqual(0, blackwing.ValidTargets.Count);
+			Assert.AreEqual(0, blackwing.ValidTargets.Count());
 
 			// Act
 

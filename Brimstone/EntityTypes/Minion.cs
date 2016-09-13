@@ -11,11 +11,7 @@ namespace Brimstone
 
 		// Checks if it is currently possible to play this minion with a target. Does not check if a suitable target is available
 		private bool NeedsTargetList() {
-			if (Card.RequiresTarget)
-				return true;
-
-			// Targeted play, if available (e.g. Abusive Sergeant)
-			if (Card.Requirements.ContainsKey(PlayRequirements.REQ_TARGET_IF_AVAILABLE))
+			if (Card.RequiresTarget || Card.RequiresTargetIfAvailable)
 				return true;
 
 			// Targeted play, if combo is active (e.g. SI:7)
@@ -25,7 +21,7 @@ namespace Brimstone
 			// Targeted play, if dragon in controller's hand (e.g. Blackwing Corruptor)
 			if (Card.Requirements.ContainsKey(PlayRequirements.REQ_TARGET_IF_AVAILABLE_AND_DRAGON_IN_HAND) &&
 					Controller.Hand.Any(x => x is Minion && ((Minion)x).Race == Race.DRAGON))
-					      return true;
+				return true;
 
 			// Targeted play, if controller has a minimum number of minions (e.g. Gormok)
 			int minimumFriendlyMinions;
@@ -48,11 +44,9 @@ namespace Brimstone
 			get {
 				if (Zone == Controller.Hand)
 					return GetValidBattlecryTargets();
-				else if (Zone == Controller.Board)
+				if (Zone == Controller.Board)
 					return GetValidAttackTargets();
-				else {
-					throw new TargetingException("Minion can't have targets while in zone " + Zone.Type);
-				}
+				throw new TargetingException("Minion can't have targets while in zone " + Zone.Type);
 			}
 		}
 

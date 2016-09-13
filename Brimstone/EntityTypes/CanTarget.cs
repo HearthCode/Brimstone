@@ -27,6 +27,10 @@ namespace Brimstone
 		protected bool MeetsGenericTargetingRequirements(ICharacter target) {
 			Minion minion = target as Minion;
 
+			// Spells and hero powers can't target CantBeTargetedByAbilities minions
+			if (minion != null && this is Spell && minion.CantBeTargetedByAbilities)
+				return false;
+
 			// Can't target your opponent's stealth minions
 			if (minion != null && minion.HasStealth && minion.Controller != Controller)
 				return false;
