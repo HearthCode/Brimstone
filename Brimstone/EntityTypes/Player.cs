@@ -87,6 +87,7 @@ namespace Brimstone
 			// Create hero entity
 			// TODO: Add Start() parameters for non-default hero skins
 			Hero = new Hero(DefaultHero.For(HeroClass)) {Zone = Board};
+			Hero.Start();
 		}
 
 		public void StartMulligan() {
