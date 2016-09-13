@@ -17,8 +17,6 @@ namespace Brimstone
 	{
 		public ICharacter Target { get; set; }
 
-		public abstract IEnumerable<ICharacter> ValidTargets { get; }
-
 		protected CanTarget(CanTarget cloneFrom) : base(cloneFrom) { }
 		protected CanTarget(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
 
@@ -108,14 +106,28 @@ namespace Brimstone
 			return true;
 		}
 
+		// Default targeting for hero and minion attack targets
 		protected IEnumerable<ICharacter> GetValidAttackTargets() {
-			if (Controller.Opponent.Board.Any(x => x.HasTaunt && !x.HasStealth)) {
-				// Must attack non-stealthed taunts
-				return Controller.Opponent.Board.Where(x => x.HasTaunt && !x.HasStealth);
-			}
-			else {
-				// Can attack all opponent characters
-				return Controller.Opponent.Board.Where(x => !x.HasStealth).Concat(new List<ICharacter> { Controller.Opponent.Hero });
+			// Stealthed minions are ignored in both taunt and non-taunt targeting scenarios
+			var opponentNonStealthed = Controller.Opponent.Board.Where(x => !x.HasStealth).Concat(new List <ICharacter> { Controller.Opponent.Hero});
+
+			// Must attack non-stealthed taunts
+			var opponentTaunts = opponentNonStealthed.Where(x => x.HasTaunt);
+			if (opponentTaunts.Any())
+				return opponentTaunts;
+
+			// Can attack all opponent characters
+			return opponentNonStealthed;
+		}
+
+		// Default targeting for spells and hero powers
+		public virtual IEnumerable<ICharacter> ValidTargets {
+			get {
+				// If this is an untargeted card, return an empty list
+				if (!Card.RequiresTargetIfAvailable && !Card.RequiresTarget)
+					return new List<ICharacter>();
+
+				return Game.Characters.Where(MeetsGenericTargetingRequirements);
 			}
 		}
 	}
