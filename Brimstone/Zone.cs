@@ -188,13 +188,18 @@ namespace Brimstone
 				ZonePosition = 0;
 			if (ZonePosition != 0) {
 				if (Entity is T)
-					asList.Insert(ZonePosition - 1, (T)Entity);
+					asList.Insert(ZonePosition - 1, (T) Entity);
 			}
-			else
-				Entity[GameTag.ZONE_POSITION] = 0;
 			Entity[GameTag.ZONE] = (int)Type;
 
-			if (ZonePosition != 0)
+			if (Type == Zone.GRAVEYARD && Entity is Minion) {
+				Entity.Controller.NumFriendlyMinionsThatDiedThisTurn++;
+				Entity.Controller.NumFriendlyMinionsThatDiedThisGame++;
+			}
+
+			if (ZonePosition == 0)
+				Entity[GameTag.ZONE_POSITION] = 0;
+			else
 				updateZonePositions();
 #if _ZONE_DEBUG
 			DebugLog.WriteLine("Game " + Game.GameId + ": Adding " + Entity.ShortDescription + " to " + Entity.Controller.ShortDescription + "'s " + Type + " zone at position " + ZonePosition);
