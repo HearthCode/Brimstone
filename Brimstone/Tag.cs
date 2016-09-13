@@ -34,6 +34,11 @@ namespace Brimstone
 				return (GameIncludeFilters.Contains(Name) ? (Tag?)this : null);
 			if (e is Player)
 				return (PlayerIncludeFilters.Contains(Name) ? (Tag?)this : null);
+
+			// Never include zone positions in decks
+			if (Name == GameTag.ZONE_POSITION && e[GameTag.ZONE] == (int) Zone.DECK)
+				return null;
+
 			return this;
 		}
 
