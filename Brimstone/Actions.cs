@@ -216,11 +216,11 @@ namespace Brimstone.Actions
 		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			// Update the number of turns everything has been in play
 			game.CurrentPlayer.Hero.NumTurnsInPlay++;
-			// TODO: game.CurrentPlayer.HeroPower.NumTurnsInPlay++;
+			game.CurrentPlayer.Hero.Power.NumTurnsInPlay++;
 			foreach (Minion e in game.CurrentPlayer.Board)
 				e.NumTurnsInPlay++;
 			game.CurrentOpponent.Hero.NumTurnsInPlay++;
-			// TODO: game.CurrentPlayer.HeroPower.NumTurnsInPlay++;
+			game.CurrentPlayer.Hero.Power.NumTurnsInPlay++;
 			foreach (Minion e in game.CurrentOpponent.Board)
 				e.NumTurnsInPlay++;
 
