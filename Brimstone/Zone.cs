@@ -12,6 +12,8 @@ namespace Brimstone
 		IZoneController Controller { get; }
 		int Count { get; }
 		bool IsEmpty { get; }
+		int MaxSize { get; }
+		bool IsFull { get; }
 		IEntity this[int ZonePosition] { get; set; }
 		IEnumerable<IEntity> Slice(int? Start, int? End);
 		IEntity Add(IEntity Entity, int ZonePosition);
@@ -73,17 +75,13 @@ namespace Brimstone
 			Controller = controller;
 		}
 
-		public int Count {
-			get {
-				return asList.Count;
-			}
-		}
+		public int Count => asList.Count;
 
-		public bool IsEmpty {
-			get {
-				return (Count == 0);
-			}
-		}
+		public bool IsEmpty => (Count == 0);
+
+		public int MaxSize => (Type == Zone.PLAY ? Game.MaxMinionsOnBoard : (Type == Zone.HAND ? ((Player)Controller).MaxHandSize : 9999));
+
+		public bool IsFull => (Count == MaxSize);
 
 		public T this[int zone_position] {
 			get {
@@ -187,8 +185,11 @@ namespace Brimstone
 			if (Type == Zone.SETASIDE || Type == Zone.GRAVEYARD || (Type == Zone.PLAY && Controller is Game) || Entity is Player)
 				ZonePosition = 0;
 			if (ZonePosition != 0) {
-				if (Entity is T)
+				if (Entity is T) {
+					if (IsFull)
+						throw new ZoneException("Zone size exceeded when trying to move " + Entity.ShortDescription + " to zone " + Type);
 					asList.Insert(ZonePosition - 1, (T) Entity);
+				}
 			}
 			Entity[GameTag.ZONE] = (int)Type;
 
