@@ -286,7 +286,7 @@ namespace Brimstone
 			var dyingEntities =
 				_deathCheckQueue.Where(
 					id => ((ICharacter) Entities[id]).MortallyWounded && Entities[id].Zone.Type == Brimstone.Zone.PLAY)
-					.Select(id => Entities[id]).ToList();
+					.Select(id => (ICharacter) Entities[id]).ToList();
 
 			if (dyingEntities.Count > 0) {
 #if _GAME_DEBUG
@@ -307,6 +307,9 @@ namespace Brimstone
 				if (e is Minion) {
 					ActiveTriggers.Queue(TriggerType.OnDeath, e);
 				}
+
+				NumMinionsKilledThisTurn++;
+				e.IsExhausted = false;
 
 				// Move dead character to graveyard
 				e.Zone = e.Controller.Graveyard;
