@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using static Brimstone.Behaviours;
 
@@ -117,6 +118,17 @@ namespace Brimstone
 
 		public void Concede() {
 			Game.Action(this, Behaviours.Concede(this));
+		}
+
+		// For internal use only (by Actions)
+		internal void PayCost(IEntity source) {
+			// Pay casting cost
+			// TODO: Cho'gall
+			var cost = source.Cost;
+			var tempUsed = Math.Min(TemporaryMana, cost);
+			TemporaryMana -= tempUsed;
+			UsedMana += cost - tempUsed;
+			TotalManaSpentThisGame += cost;
 		}
 
 		public override object Clone() {
