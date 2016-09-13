@@ -31,7 +31,7 @@ namespace BrimstoneTests
 			for (int i = 0; i < 7; i++)
 				p2.Give("Wisp");
 
-			Assert.AreEqual(30, game.Entities.Count);
+			Assert.AreEqual(32, game.Entities.Count);
 
 			// Put a referenced entity on the stack
 			game.Queue(game, p1);
