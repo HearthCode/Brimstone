@@ -357,8 +357,6 @@ namespace Brimstone
 #if _QUEUE_DEBUG
 			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Dequeued action " + action + " for " + action.Source.ShortDescription + " at depth " + Depth);
 #endif
-			// TODO: Make it work when not all of the arguments are supplied, for flexible syntax
-
 			// Get needed arguments for action from stack
 			action.Args = new ActionResult[action.Action.Args.Count];
 			for (int i = action.Action.Args.Count - 1; i >= 0; i--) {
@@ -370,13 +368,27 @@ namespace Brimstone
 						arg = action.Action.EagerArgs[i].Run(Game, action.Source, null);
 					} else {
 						// Otherwise use the ResultStack to get regular QueueAction items as arguments
-						arg = StackPop();
-						List<IEntity> eList = arg;
-						if (eList != null && eList.Count > 0 && eList[0].Game != Game)
-							arg = new List<IEntity>(eList.Select(e => Game.Entities[e.Id]));
+						// In this round, only pop arguments for which ActionGraph parameters were supplied
+						// to the QueueAction as these will be at the top of the stack
+						if (action.Action.Args[i] != null) {
+							arg = StackPop();
+							List<IEntity> eList = arg;
+							if (eList != null && eList.Count > 0 && eList[0].Game != Game)
+								arg = new List<IEntity>(eList.Select(e => Game.Entities[e.Id]));
+						}
 					}
 				}
 				action.Args[i] = arg;
+			}
+			// Now go through all of the arguments that weren't supplied as ActionGraphs and pop them off the stack
+			for (int i = action.Action.Args.Count - 1; i >= 0; i--) {
+				if (action.Action.Args[i] == null) {
+					var arg = StackPop();
+					List<IEntity> eList = arg;
+					if (eList != null && eList.Count > 0 && eList[0].Game != Game)
+						arg = new List<IEntity>(eList.Select(e => Game.Entities[e.Id]));
+					action.Args[i] = arg;
+				}
 			}
 
 			// Replace current UserData with new UserData if supplied

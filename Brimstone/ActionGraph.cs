@@ -99,9 +99,7 @@ namespace Brimstone
 						else
 							ql.AddRange(l);
 					}
-					else
-						ql.Add(new Empty());
-					ql.Add(action);
+				ql.Add(action);
 			}
 			return ql;
 		}

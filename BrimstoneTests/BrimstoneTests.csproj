@@ -46,6 +46,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestActionGraph.cs" />
     <Compile Include="TestCardBehaviour.cs" />
     <Compile Include="TestEquivalence.cs" />
     <Compile Include="TestGameTree.cs" />
