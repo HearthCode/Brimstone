@@ -193,7 +193,7 @@ namespace Brimstone
 			}
 			Entity[GameTag.ZONE] = (int)Type;
 
-			if (Type == Zone.GRAVEYARD && Entity is Minion) {
+			if (Type == Zone.GRAVEYARD && Entity is Minion && Entity[GameTag.ZONE] == (int)Zone.PLAY) {
 				Entity.Controller.NumFriendlyMinionsThatDiedThisTurn++;
 				Entity.Controller.NumFriendlyMinionsThatDiedThisGame++;
 			}
