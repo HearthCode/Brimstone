@@ -55,8 +55,6 @@ namespace Brimstone
 				throw new ChoiceException();
 
 			// TODO: Check card is in player's hand
-
-			// TODO: Check targeting validity
 			Target = target;
 			try {
 				return (T) Game.RunActionBlock(BlockType.PLAY, this, Behaviours.Play(this), Target);

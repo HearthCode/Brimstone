@@ -5,7 +5,6 @@ namespace Brimstone
 {
 	public partial interface ICanTarget : IEntity
 	{
-		// TODO: Caching
 		// TODO: HasTarget
 		IEnumerable<ICharacter> ValidTargets { get; }
 
@@ -116,6 +115,7 @@ namespace Brimstone
 			return Game.Characters.Where(MeetsGenericTargetingRequirements);
 		}
 
+		// TODO: Cache ValidTargets
 		public abstract IEnumerable<ICharacter> ValidTargets { get; }
 	}
 }

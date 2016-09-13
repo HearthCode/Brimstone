@@ -47,7 +47,6 @@ namespace Brimstone
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
 				throw new ChoiceException();
 
-			// TODO: Check targeting validity
 			Target = target;
 			return (ICanTarget) (Entity) Game.RunActionBlock(BlockType.ATTACK, this, Behaviours.Attack(this, (Entity) target), target);
 		}
