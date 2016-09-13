@@ -312,6 +312,19 @@ namespace Brimstone
 		}
 	}
 
+	public partial interface ICanTarget : IEntity
+	{
+		bool IsExhausted { get; set; }
+	}
+
+	public abstract partial class CanTarget : Entity, ICanTarget
+	{
+		public bool IsExhausted {
+			get { return this[GameTag.EXHAUSTED] == 1; }
+			set { this[GameTag.EXHAUSTED] = value ? 1 : 0; }
+		}
+	}
+
 	public partial interface IPlayable : ICanTarget
 	{
 		bool JustPlayed { get; set; }
@@ -334,7 +347,6 @@ namespace Brimstone
 		bool ToBeDestroyed { get; set; }
 		bool IsAttacking { get; set; }
 		bool IsDefending { get; set; }
-		bool IsExhausted { get; set; }
 		bool IsFrozen { get; set; }
 		bool HasTaunt { get; set; }
 		int NumAttacksThisTurn { get; set; }
@@ -385,11 +397,6 @@ namespace Brimstone
 		public bool IsDefending {
 			get { return this[GameTag.DEFENDING] == 1; }
 			set { this[GameTag.DEFENDING] = value ? 1 : 0; }
-		}
-
-		public bool IsExhausted {
-			get { return this[GameTag.EXHAUSTED] == 1; }
-			set { this[GameTag.EXHAUSTED] = value ? 1 : 0; }
 		}
 
 		public bool IsFrozen {
