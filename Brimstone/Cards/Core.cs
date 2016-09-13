@@ -25,7 +25,8 @@ namespace Brimstone
 				[OnBeginTurnForPlayer]	= IsFriendly > BeginTurnForPlayer,
 				[OnWaitForAction]		= IsFriendly > (ActionGraph)(System.Action<IEntity>)(p => { p.Game.NextStep = Step.MAIN_END; }),
 				[OnEndTurn]				= IsFriendly > EndTurnForPlayer,
-				[OnEndTurnCleanup]		= IsFriendly > EndTurnCleanupForPlayer
+				[OnEndTurnCleanup]		= IsFriendly > EndTurnCleanupForPlayer,
+				[OnHeroPower]			= IsFriendly > (ActionGraph)(System.Action<IEntity>)(p => { ((Player)p).NumTimesHeroPowerUsedThisGame++; })
 			}
 		};
 	}
