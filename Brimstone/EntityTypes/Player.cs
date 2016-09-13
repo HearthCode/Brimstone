@@ -17,6 +17,8 @@ namespace Brimstone
 		public Zones Zones { get; private set; }
 		public HeroClass HeroClass { get; }
 
+		public int MaxHandSize { get; set; } = 10;
+
 		public Choice Choice { get; set; }
 
 		public Player(Player cloneFrom) : base(cloneFrom) {
