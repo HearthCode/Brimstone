@@ -461,5 +461,10 @@ namespace Brimstone
 				[OnDamage] = IsSelf > Damage(AllCharacters - Self, 1)
 			}
 		};
+
+		// Fiery Bat
+		public static Behaviour OG_179 = new Behaviour {
+			Deathrattle = Damage(RandomOpponentHealthyCharacter, 1)
+		};
 	}
 }
