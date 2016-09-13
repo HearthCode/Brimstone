@@ -69,6 +69,7 @@
     <Compile Include="CardData.cs" />
     <Compile Include="Cards\All.cs" />
     <Compile Include="Cards\Core.cs" />
+    <Compile Include="Cards\HeroPowers.cs" />
     <Compile Include="Condition.cs" />
     <Compile Include="Deck.cs" />
     <Compile Include="EntityController.cs" />
