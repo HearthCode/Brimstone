@@ -52,7 +52,8 @@ namespace Brimstone
 		public bool SkipMulligan { get; private set; }
 
 		// TODO: Other common set selectors
-		public IEnumerable<ICharacter> Characters => Player1.Board.Concat(Player2.Board).Concat(new List<ICharacter> {Player1.Hero, Player2.Hero});
+		public IEnumerable<Minion> Minions => Player1.Board.Concat(Player2.Board);
+		public IEnumerable<ICharacter> Characters => Minions.Concat(new List<ICharacter> {Player1.Hero, Player2.Hero});
 
 		public Zone<IPlayable> Setaside { get { return (Zone<IPlayable>) Zones[Brimstone.Zone.SETASIDE]; } }
 		public Zone<Minion> Board { get { return (Zone<Minion>) Zones[Brimstone.Zone.PLAY]; } }
