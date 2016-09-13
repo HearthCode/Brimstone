@@ -356,10 +356,21 @@ namespace Brimstone.Actions
 #if _ACTIONS_DEBUG
 				DebugLog.WriteLine("Game {0}: {1} draws {2}", game.GameId, player.FriendlyName, entity.ShortDescription);
 #endif
-				entity.Zone = player.Hand;
-				player.NumCardsDrawnThisTurn++;
-				return (Entity)entity;
+				if (!player.Hand.IsFull) {
+					// TODO: Show to drawing player
+					entity.Zone = player.Hand;
+					player.NumCardsDrawnThisTurn++;
+				}
+				else {
+#if _ACTIONS_DEBUG
+					DebugLog.WriteLine("Game {0}: {1}'s hand is full - overdrawing", game.GameId, player.FriendlyName);
+#endif
+					// TODO: Show to both players
+					entity.Zone = player.Graveyard;
+				}
+				return (Entity) entity;
 			}
+			// Fatigue
 #if _ACTIONS_DEBUG
 			DebugLog.WriteLine("Game {0}: {1} tries to draw but their deck is empty", game.GameId, player.FriendlyName);
 #endif
