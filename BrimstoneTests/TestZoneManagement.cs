@@ -64,6 +64,8 @@ namespace BrimstoneTests
 			var p1 = game.Player1;
 			var p2 = game.Player2;
 
+			game.MaxMinionsOnBoard = 9999;
+
 			// Act
 			List<IEntity> items = new List<IEntity>(5);
 

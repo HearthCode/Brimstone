@@ -160,6 +160,7 @@ namespace BrimstoneTests
 			Settings.ParallelClone = ParallelClone;
 
 			var game = _setupGame(7, 2, "Bloodfen Raptor");
+			game.MaxMinionsOnBoard = 10;
 
 			// Make a new tree with the game as the root
 			var tree = new GameTree<ProbabilisticGameNode>(new ProbabilisticGameNode(game));

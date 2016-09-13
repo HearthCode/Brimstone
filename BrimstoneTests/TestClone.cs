@@ -21,6 +21,9 @@ namespace BrimstoneTests
 			var p1 = game.CurrentPlayer;
 			var p2 = game.CurrentPlayer.Opponent;
 
+			p1.MaxHandSize = 999;
+			p2.MaxHandSize = 999;
+
 			// Add items to zones
 			for (int i = 0; i < 5; i++)
 				p1.Give("Wisp").Play();
