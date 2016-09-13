@@ -30,11 +30,14 @@ namespace BrimstoneTests
 				((ActionGraph)1).Then(4).Then(RandomAmount()).Then(Damage(Targets: RandomOpponentHealthyMinion))
 			};
 
-			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Damage(RandomOpponentHealthyCharacter, 1) * 1;
+			var originalMissiles = Cards.FromName("Arcane Missiles").Behaviour.Battlecry;
+			var originalBoomBot = Cards.FromId("GVG_110t").Behaviour.Deathrattle;
+			var newMissiles = Damage(RandomOpponentHealthyCharacter, 1) * 1;
 
 			foreach (var graph in ActionGraphs) {
 				// Arrange
 				var game = _setupGame(7, 2, "Bloodfen Raptor");
+				Cards.FromName("Arcane Missiles").Behaviour.Battlecry = newMissiles;
 
 				// This converts the ActionGraph to a List<QueueAction>
 				Cards.FromId("GVG_110t").Behaviour.Deathrattle = graph;
@@ -42,10 +45,18 @@ namespace BrimstoneTests
 				// Act
 				var count = RandomOutcomeSearch.Find(game, () => game.CurrentPlayer.Hand.First(t => t.Card.Name == "Arcane Missiles").Play()).Count;
 
+				// Reset
+				Cards.FromName("Arcane Missiles").Behaviour.Battlecry = originalMissiles;
+				Cards.FromId("GVG_110t").Behaviour.Deathrattle = originalBoomBot;
+
 				// Assert
 				// 1 missile produces 30 game states if Boom Bot deathrattle works correctly
 				Assert.AreEqual(30, count);
 			}
+
+			// Put stuff back to normal
+			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Damage(RandomOpponentHealthyCharacter, 1) * 3;
+
 		}
 
 		private Game _setupGame(int MaxMinions, int NumBoomBots, string FillMinion) {
