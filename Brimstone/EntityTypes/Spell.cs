@@ -17,24 +17,13 @@ namespace Brimstone
 			return MeetsGenericTargetingRequirements(targetable);
 		}
 
-		public override List<ICharacter> ValidTargets {
+		public override IEnumerable<ICharacter> ValidTargets {
 			get {
 				// If this is an untargeted spell, return an empty list
 				if (!Card.RequiresTargetIfAvailable && !Card.RequiresTarget)
 					return new List<ICharacter>();
 
-				var board = Controller.Board.Concat(Controller.Opponent.Board);
-				var targets = board.Where(isValidTarget).ToList<ICharacter>();
-
-				var hero = Controller.Hero;
-				if (isValidTarget(hero))
-					targets.Add(hero);
-
-				var opponentHero = Controller.Opponent.Hero;
-				if (isValidTarget(opponentHero))
-					targets.Add(opponentHero);
-
-				return targets;
+				return Game.Characters.Where(isValidTarget);
 			}
 		}
 

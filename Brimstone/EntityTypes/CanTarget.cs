@@ -7,7 +7,7 @@ namespace Brimstone
 	{	
 		// TODO: Caching
 		// TODO: HasTarget
-		List<ICharacter> ValidTargets { get; }
+		IEnumerable<ICharacter> ValidTargets { get; }
 
 		// TODO: Add cloning code + cloning unit test
 		ICharacter Target { get; set; }
@@ -17,7 +17,7 @@ namespace Brimstone
 	{
 		public ICharacter Target { get; set; }
 
-		public abstract List<ICharacter> ValidTargets { get; }
+		public abstract IEnumerable<ICharacter> ValidTargets { get; }
 
 		protected CanTarget(CanTarget cloneFrom) : base(cloneFrom) { }
 		protected CanTarget(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
@@ -104,16 +104,14 @@ namespace Brimstone
 			return true;
 		}
 
-		protected List<ICharacter> GetValidAttackTargets() {
+		protected IEnumerable<ICharacter> GetValidAttackTargets() {
 			if (Controller.Opponent.Board.Any(x => x.HasTaunt && !x.HasStealth)) {
 				// Must attack non-stealthed taunts
-				return Controller.Opponent.Board.Where(x => x.HasTaunt && !x.HasStealth).ToList<ICharacter>();
+				return Controller.Opponent.Board.Where(x => x.HasTaunt && !x.HasStealth);
 			}
 			else {
 				// Can attack all opponent characters
-				var targets = Controller.Opponent.Board.Where(x => !x.HasStealth).ToList<ICharacter>();
-				targets.Add(Controller.Opponent.Hero);
-				return targets;
+				return Controller.Opponent.Board.Where(x => !x.HasStealth).Concat(new List<ICharacter> { Controller.Opponent.Hero });
 			}
 		}
 	}

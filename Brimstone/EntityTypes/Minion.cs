@@ -37,26 +37,14 @@ namespace Brimstone
 			return false;
 		}
 
-		private List<ICharacter> GetValidBattlecryTargets() {
+		private IEnumerable<ICharacter> GetValidBattlecryTargets() {
 			if (!NeedsTargetList())
 				return new List<ICharacter>();
 
-			// TODO: Add Game.AllMinions
-			var board = Controller.Board.Concat(Controller.Opponent.Board);
-			var targets = board.Where(MeetsGenericTargetingRequirements).ToList<ICharacter>();
-
-			var hero = Controller.Hero;
-			if (MeetsGenericTargetingRequirements(hero))
-				targets.Add(hero);
-
-			var opponentHero = Controller.Opponent.Hero;
-			if (MeetsGenericTargetingRequirements(opponentHero))
-				targets.Add(opponentHero);
-
-			return targets;
+			return Game.Characters.Where(MeetsGenericTargetingRequirements);
 		}
 
-		public override List<ICharacter> ValidTargets {
+		public override IEnumerable<ICharacter> ValidTargets {
 			get {
 				if (Zone == Controller.Hand)
 					return GetValidBattlecryTargets();
