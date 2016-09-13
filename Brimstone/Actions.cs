@@ -393,7 +393,6 @@ namespace Brimstone.Actions
 #if _ACTIONS_DEBUG
 			DebugLog.WriteLine("Game {0}: {1} is playing {2}", game.GameId, player.FriendlyName, entity.ShortDescription);
 #endif
-			// TODO: Meta tags for multi-targeting
 			game.QueueActionBlock(BlockType.POWER, source, entity.Card.Behaviour.Battlecry, entity.Target);
 			game.Queue(source, new Action<IEntity>(e =>
 			{
@@ -402,7 +401,6 @@ namespace Brimstone.Actions
 					e.Zone = e.Controller.Graveyard;
 
 				// Post-POWER block DEATHS block before triggers
-				// TODO: Use the awaitable RunDeathCreationStepIfNeededAsync()
 				e.Game.RunDeathCreationStepIfNeeded();
 
 				// TODO: Update hero's ATK if we played a weapon
@@ -411,7 +409,8 @@ namespace Brimstone.Actions
 				e.Controller.NumOptionsPlayedThisTurn++;
 			}));
 
-			game.ActiveTriggers.Queue(TriggerType.AfterPlay, entity); // TODO: Attach this to a tag change
+			// TODO: Attach AfterPlay to a tag change
+			game.ActiveTriggers.Queue(TriggerType.AfterPlay, entity);
 			return (Entity)entity;
 		}
 	}
@@ -428,7 +427,6 @@ namespace Brimstone.Actions
 #if _ACTIONS_DEBUG
 			DebugLog.WriteLine("Game {0}: {1} is using hero power {2}", game.GameId, player.FriendlyName, heroPower.ShortDescription);
 #endif
-			// TODO: Meta tags for targeting
 			game.QueueActionBlock(BlockType.POWER, source, source.Card.Behaviour.Battlecry, heroPower.Target);
 			game.Queue(source, new Action<IEntity>(e => {
 				player.HeroPowerActivationsThisTurn++;
@@ -436,13 +434,13 @@ namespace Brimstone.Actions
 				heroPower.IsExhausted = true;
 
 				// Post-POWER block DEATHS block before triggers
-				// TODO: Use the awaitable RunDeathCreationStepIfNeededAsync()
 				e.Game.RunDeathCreationStepIfNeeded();
-
-				e.Controller.NumOptionsPlayedThisTurn++;
+				// TODO: Attach OnHeroPower to a tag change; this is probably in the wrong place (Inspire)
+				e.Game.ActiveTriggers.Queue(TriggerType.OnHeroPower, e);
+				e.Game.Queue(e.Controller, new Action<IEntity>(p => {
+					((Player)p).NumOptionsPlayedThisTurn++;
+				}));
 			}));
-
-			game.ActiveTriggers.Queue(TriggerType.OnHeroPower, source); // TODO: Attach this to a tag change
 			return (Entity)source;
 		}
 	}
@@ -454,6 +452,7 @@ namespace Brimstone.Actions
 
 		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			if (args[TARGETS].HasResult)
+				// TODO: PowerHistory meta TARGET tag (contains all target IDs)
 				foreach (ICharacter e in args[TARGETS]) {
 #if _ACTIONS_DEBUG
 					DebugLog.WriteLine("Game {0}: {1} is getting hit for {2} points of damage", game.GameId, e.ShortDescription, args[DAMAGE]);
@@ -461,7 +460,7 @@ namespace Brimstone.Actions
 					e.PreDamage = args[DAMAGE];
 					e.PreDamage = 0;
 
-					// TODO: PowerHistory meta DAMAGE tag (contains defender ID)
+					// TODO: PowerHistory meta DAMAGE tag (contains defender ID and damage amount in Data)
 
 					if ((e as Minion)?.HasDivineShield ?? false) {
 						((Minion) e).HasDivineShield = false;
