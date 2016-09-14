@@ -96,6 +96,15 @@ namespace Brimstone
 			Changed = cloneFrom.Changed;
 		}
 
+		/// <summary>
+		/// Create a new game
+		/// </summary>
+		/// <param name="Hero1"></param>
+		/// <param name="Hero2"></param>
+		/// <param name="Player1Name"></param>
+		/// <param name="Player2Name"></param>
+		/// <param name="PowerHistory"></param>
+		/// <param name="ActionHistory"></param>
 		public Game(HeroClass Hero1, HeroClass Hero2, string Player1Name = "", string Player2Name = "", bool PowerHistory = false, bool ActionHistory = false)
 					: base(Cards.FromId("Game"), new Dictionary<GameTag, int> {
 						{ GameTag.ZONE, (int) Brimstone.Zone.PLAY }
