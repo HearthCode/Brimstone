@@ -49,7 +49,7 @@
     <Preliminary>True</Preliminary>
     <NamingMethod>Guid</NamingMethod>
     <HelpTitle>Hearthstone Working Group</HelpTitle>
-    <CopyrightText>Hearthstone Working Group 2016 - Part of HearthSim.org</CopyrightText>
+    <CopyrightText>Hearthstone Working Group 2016 - Part of HearthSim.info</CopyrightText>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
     <VisibleItems>ExplicitInterfaceImplementations, InheritedMembers, InheritedFrameworkMembers, Protected, ProtectedInternalAsProtected</VisibleItems>
     <PlugInConfigurations />

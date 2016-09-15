@@ -6,7 +6,7 @@
 
     <introduction>
       <para>Brimstone aims to be a high-performance, high-parity simulator for Hearthstone and other CCGs, with software developers, game designers and artificial intelligence academics as the target audience. We have drawn on our experience of the two existing major simulators - Fireplace and Metastone, and their peripheral projects - to craft a new simulator which solves the design problems inherent in the existing projects.</para>
-      <para>We have the following design goals from Brimstone:</para>
+      <para>We have the following design goals for Brimstone:</para>
       <list class="bullet">
         <listItem>
           <para>High performance</para>
@@ -285,7 +285,7 @@
             <para>Import from the PowerHistory log or a partial PowerHistory log from another Game object</para>
           </listItem>
           <listItem>
-            <para>Import from an <legacyItalic>hdtreplay</legacyItalic> file</para>
+            <para>Import from an <legacyItalic>hsreplay</legacyItalic> XML file</para>
           </listItem>
           <listItem>
             <para>Import from a Hearthstone Power.log file</para>
