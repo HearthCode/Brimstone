@@ -58,7 +58,7 @@
           </definition>
           <definedTerm>Building for Mono at the command line</definedTerm>
           <definition>
-            <para>Type <codeInline>xbuild Brimstone.sln</codeInline></para>
+            <para>Type <codeInline>xbuild /p:Configuration=Release Brimstone.sln</codeInline></para>
           </definition>
         </definitionTable>
 

@@ -1232,8 +1232,8 @@
   <HelpKINode Title="Draw.PLAYER field" Url="html/41efdbd9-5c39-9644-0805-88ea080e43bf.htm" />
   <HelpKINode Title="Draw.Run method" Url="html/1f167bc0-078a-2907-981a-f7947d89a510.htm" />
   <HelpKINode Title="DREAM enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
-  <HelpKINode Title="Druid enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
   <HelpKINode Title="DRUID enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
+  <HelpKINode Title="Druid enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
   <HelpKINode Title="Druid field" Url="html/b663432d-607b-9f27-72ef-7d21ca73e403.htm" />
   <HelpKINode Title="DS1h_292 field" Url="html/a7540493-5f25-7116-b3a8-80f738ccd4bd.htm" />
   <HelpKINode Title="DS1_055 field" Url="html/d21b3fb4-4d64-ad07-5979-1129a43ab2e8.htm" />
@@ -1302,11 +1302,11 @@
   <HelpKINode Title="Enqueue method" Url="html/8c5e1751-ab9b-904d-3db4-4f6330d7a624.htm" />
   <HelpKINode Title="EnqueueDeferred method" Url="html/fc54292a-da2f-5859-f01b-4da905020609.htm" />
   <HelpKINode Title="ENRAGED enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
-  <HelpKINode Title="Entities field" Url="html/dfebda87-e18d-8fa8-bd69-ec123998d951.htm" />
   <HelpKINode Title="ENTITIES field">
     <HelpKINode Title="CreateChoice.ENTITIES Field" Url="html/bfb5bf5a-2fd2-9709-b16d-06885ee0b0d4.htm" />
     <HelpKINode Title="RandomChoice.ENTITIES Field" Url="html/a83c9797-819e-bcbc-02ab-1db90ccc1ea2.htm" />
   </HelpKINode>
+  <HelpKINode Title="Entities field" Url="html/dfebda87-e18d-8fa8-bd69-ec123998d951.htm" />
   <HelpKINode Title="Entity class">
     <HelpKINode Title="Entity Class" Url="html/89d0b279-8e40-dd63-28dc-d1712b29727d.htm" />
     <HelpKINode Title="about Entity class" Url="html/89d0b279-8e40-dd63-28dc-d1712b29727d.htm" />
@@ -2211,8 +2211,8 @@
   <HelpKINode Title="LowestCommonAncestor method" Url="html/99ae3cb8-8c8b-1580-8416-96cd737268ab.htm" />
   <HelpKINode Title="LOW_HEALTH_THRESHOLD enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="LOYALTY enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
-  <HelpKINode Title="MAGE enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Mage enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
+  <HelpKINode Title="MAGE enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Mage field" Url="html/3e6551a3-7387-fa1c-0494-cefac9bf9299.htm" />
   <HelpKINode Title="MAGNET enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="Magni field" Url="html/4d025ae5-7dff-9e3d-48df-03a169b02c90.htm" />
@@ -2544,15 +2544,15 @@
     <HelpKINode Title="properties" Url="html/b490277c-d7d3-dd70-12c7-638dbf1f0580.htm" />
   </HelpKINode>
   <HelpKINode Title="PLAYER enumeration member" Url="html/008de63d-7fc0-adc3-a3c2-3e4888724eea.htm" />
-  <HelpKINode Title="Player field" Url="html/16701a94-2e2f-1f53-ff85-955f7b9476c0.htm" />
   <HelpKINode Title="PLAYER field">
-    <HelpKINode Title="Concede.PLAYER Field" Url="html/ec5582be-c290-6a13-dbae-252b596e95ec.htm" />
     <HelpKINode Title="CreateChoice.PLAYER Field" Url="html/2d7a9e6f-6b58-d3ef-45af-6e82afb171d8.htm" />
     <HelpKINode Title="Draw.PLAYER Field" Url="html/41efdbd9-5c39-9644-0805-88ea080e43bf.htm" />
+    <HelpKINode Title="Concede.PLAYER Field" Url="html/ec5582be-c290-6a13-dbae-252b596e95ec.htm" />
     <HelpKINode Title="GainMana.PLAYER Field" Url="html/ed24d6fa-5871-45fe-8cf9-289871a6daaa.htm" />
     <HelpKINode Title="Give.PLAYER Field" Url="html/9bcdcc60-2fe0-7666-7ae8-32ec412652e1.htm" />
     <HelpKINode Title="Summon.PLAYER Field" Url="html/3ef5ab3b-6829-de3d-b3eb-30843098506a.htm" />
   </HelpKINode>
+  <HelpKINode Title="Player field" Url="html/16701a94-2e2f-1f53-ff85-955f7b9476c0.htm" />
   <HelpKINode Title="Player.BaseMana property" Url="html/c314baf5-5972-ccb2-4ed1-9fb09a25546d.htm" />
   <HelpKINode Title="Player.Board property" Url="html/94bbaa92-f2fa-4ca3-39b8-4363096a3b20.htm" />
   <HelpKINode Title="Player.Choice property" Url="html/471cd6ed-148c-d2a9-e4ee-e54b5aa308bf.htm" />
@@ -3131,8 +3131,8 @@
   <HelpKINode Title="Settings.UseGameHashForEquality field" Url="html/9cac5774-edd5-db21-f854-9385ee9e0816.htm" />
   <HelpKINode Title="Settings.ZoneCaching field" Url="html/045705d0-4a6e-3a96-06d2-b831fc3a4127.htm" />
   <HelpKINode Title="SHADOWFORM enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
-  <HelpKINode Title="SHAMAN enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Shaman enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
+  <HelpKINode Title="SHAMAN enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Shaman field" Url="html/30ad36ed-860f-7bcb-d800-9620ec914810.htm" />
   <HelpKINode Title="SHIFTING enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="ShortDescription property">
@@ -3317,8 +3317,8 @@
     <HelpKINode Title="Damage.TARGETS Field" Url="html/7a8a256b-744c-3289-6d10-fe54d779a64f.htm" />
     <HelpKINode Title="Destroy.TARGETS Field" Url="html/876202eb-51a4-9f0a-ecf7-e3381c0583e9.htm" />
     <HelpKINode Title="Discard.TARGETS Field" Url="html/82c2f08d-7e47-a837-bdc1-e777509d6f0f.htm" />
-    <HelpKINode Title="Heal.TARGETS Field" Url="html/b977f1a4-714b-24cd-8e98-c51ce3f0dd4f.htm" />
     <HelpKINode Title="Silence.TARGETS Field" Url="html/3c69129c-8a42-b8b1-bba9-1a96cbba1564.htm" />
+    <HelpKINode Title="Heal.TARGETS Field" Url="html/b977f1a4-714b-24cd-8e98-c51ce3f0dd4f.htm" />
   </HelpKINode>
   <HelpKINode Title="Targets field" Url="html/588c2a22-5f27-b403-9b7a-18d6359bf3a4.htm" />
   <HelpKINode Title="TAUNT enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
@@ -3500,8 +3500,8 @@
   <HelpKINode Title="Warlock enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
   <HelpKINode Title="WARLOCK enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Warlock field" Url="html/8688b644-df80-ec50-0502-a91612124d00.htm" />
-  <HelpKINode Title="WARRIOR enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Warrior enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
+  <HelpKINode Title="WARRIOR enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Warrior field" Url="html/b29f12dc-edb7-d07f-30fc-4e0df7fcd029.htm" />
   <HelpKINode Title="WEAPON enumeration member">
     <HelpKINode Title="CardType Enumeration" Url="html/008de63d-7fc0-adc3-a3c2-3e4888724eea.htm" />

@@ -19,8 +19,8 @@
     <Language>en-US</Language>
     <TransformComponentArguments>
       <Argument Key="logoFile" Value="HearthSim.png" />
-      <Argument Key="logoHeight" Value="100" />
-      <Argument Key="logoWidth" Value="100" />
+      <Argument Key="logoHeight" Value="64" />
+      <Argument Key="logoWidth" Value="64" />
       <Argument Key="logoAltText" Value="HearthSim" />
       <Argument Key="logoPlacement" Value="left" />
       <Argument Key="logoAlignment" Value="left" />
@@ -105,6 +105,7 @@
     <Folder Include="media" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Content\DesignGoals.aml" />
     <None Include="Content\VersionHistory\PreAlphaUpdate3.aml" />
     <None Include="Content\VersionHistory\VersionHistory.aml" />
     <None Include="Content\Welcome.aml" />
