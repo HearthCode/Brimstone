@@ -29,7 +29,8 @@
       <Argument Key="includeEnumValues" Value="false" />
     </TransformComponentArguments>
     <DocumentationSources>
-      <DocumentationSource sourceFile="..\Brimstone\Brimstone.csproj" xmlns="" />
+      <DocumentationSource sourceFile="..\Brimstone\bin\Documentation\Brimstone.xml" />
+      <DocumentationSource sourceFile="..\Brimstone\bin\Documentation\Brimstone.dll" />
     </DocumentationSources>
     <SaveComponentCacheCapacity>100</SaveComponentCacheCapacity>
     <BuildAssemblerVerbosity>OnlyWarningsAndErrors</BuildAssemblerVerbosity>
@@ -129,6 +130,6 @@
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Documentation' ">
-    <OutputPath>bin\Documentation\</OutputPath>
+    <OutputPath>..\docs\</OutputPath>
   </PropertyGroup>
 </Project>

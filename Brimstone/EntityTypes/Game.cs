@@ -348,6 +348,16 @@ namespace Brimstone
 			_deathCheckQueue.Clear();
 		}
 
+		/// <summary>
+		/// Start a new game
+		/// </summary>
+		/// <remarks>
+		/// Starting the game changes the <see cref="GameState"/> to RUNNING and each player's <see cref="PlayState"/> to PLAYING,
+		/// which triggers the game start sequence. The method returns once the game is running.
+		/// </remarks>
+		/// <param name="FirstPlayer">The player to act first (1 or 2) - the default is to choose randomly</param>
+		/// <param name="SkipMulligan">True to skip the initial mulligan, false otherwise - the default is to perform a mulligan phase</param>
+		/// <param name="Shuffle">True to shuffle the players' decks, false otherwise - the default is to shuffle the decks</param>
 		public void Start(int FirstPlayer = 0, bool SkipMulligan = false, bool Shuffle = true) {
 			// Override settings
 			FirstPlayerNum = FirstPlayer;
