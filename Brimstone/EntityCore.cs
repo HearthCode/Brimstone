@@ -45,7 +45,7 @@ namespace Brimstone
 			}
 		}
 
-		public BaseEntityData(Card card, Dictionary<GameTag, int> tags = null) {
+		internal BaseEntityData(Card card, Dictionary<GameTag, int> tags = null) {
 			Card = card;
 			if (tags != null)
 				Tags = tags;
@@ -54,7 +54,7 @@ namespace Brimstone
 		}
 
 		// Cloning copy constructor
-		public BaseEntityData(BaseEntityData cloneFrom) {
+		internal BaseEntityData(BaseEntityData cloneFrom) {
 			Card = cloneFrom.Card;
 			Id = cloneFrom.Id;
 			Tags = new Dictionary<GameTag, int>(cloneFrom.Tags);
@@ -72,7 +72,7 @@ namespace Brimstone
 		long Count { get; }
 	}
 
-	public class ReferenceCount : IReferenceCount
+	internal class ReferenceCount : IReferenceCount
 	{
 		private long _count;
 		public ReferenceCount() {
@@ -94,7 +94,7 @@ namespace Brimstone
 		}
 	}
 
-	public class ReferenceCountInterlocked : IReferenceCount
+	internal class ReferenceCountInterlocked : IReferenceCount
 	{
 		private long _count;
 		public ReferenceCountInterlocked() {
@@ -120,12 +120,12 @@ namespace Brimstone
 		private BaseEntityData _entity;
 		private IReferenceCount _referenceCount;
 
-		public long ReferenceCount { get { return _referenceCount.Count; } }
-		public BaseEntityData BaseEntityData { get { return _entity; } }
+		public long ReferenceCount => _referenceCount.Count;
+		public BaseEntityData BaseEntityData => _entity;
 		public virtual Game Game { get; set; }
 		public IZoneController ZoneController => (IZoneController)Controller ?? Game;
 
-		public Entity(Entity cloneFrom) {
+		protected internal Entity(Entity cloneFrom) {
 			_fuzzyHash = cloneFrom._fuzzyHash;
 			_referenceCount = cloneFrom._referenceCount;
 			if (Settings.CopyOnWrite) {
@@ -136,7 +136,7 @@ namespace Brimstone
 			}
 		}
 
-		public Entity(Card card, Dictionary<GameTag, int> tags = null) {
+		protected internal Entity(Card card, Dictionary<GameTag, int> tags = null) {
 			_entity = new BaseEntityData(card, tags);
 			_referenceCount = (Settings.ParallelClone ? (IReferenceCount) new ReferenceCountInterlocked() : new ReferenceCount());
 		}
@@ -184,8 +184,7 @@ namespace Brimstone
 			return new Entity(this);
 		}
 
-		IEntity IEntity.CloneState()
-		{
+		IEntity IEntity.CloneState() {
 			return Clone() as IEntity;
 		}
 
