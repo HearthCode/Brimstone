@@ -9,46 +9,70 @@
       <para>We have the following design goals for Brimstone:</para>
       <list class="bullet">
         <listItem>
-          <para>High performance</para>
+          <para>
+            <link xlink:href="#highperf">High performance</link>
+          </para>
         </listItem>
         <listItem>
-          <para>High level of parity with actual Hearthstone behaviour</para>
+          <para>
+            <link xlink:href="#parity">High level of parity with actual Hearthstone behaviour</link>
+          </para>
         </listItem>
         <listItem>
-          <para>Tag-driven, tick-based design with flexible hooks and infinite undo</para>
+          <para>
+            <link xlink:href="#tickbased">Tag-driven, tick-based design with flexible hooks and infinite undo</link>
+          </para>
         </listItem>
         <listItem>
-          <para>Extremely fast state cloning</para>
+          <para>
+            <link xlink:href="#cloning">Extremely fast state cloning</link>
+          </para>
         </listItem>
         <listItem>
-          <para>Multi-source game state importing</para>
+          <para>
+            <link xlink:href="#import">Multi-source game state importing</link>
+          </para>
         </listItem>
         <listItem>
-          <para>Game tree creation and traversal</para>
+          <para>
+            <link xlink:href="#gametree">Game tree creation and traversal</link>
+          </para>
         </listItem>
         <listItem>
-          <para>Probabilistic state outcome generation</para>
+          <para>
+            <link xlink:href="#probabilistic">Probabilistic state outcome generation</link>
+          </para>
         </listItem>
         <listItem>
-          <para>Declarative card definition language and easy-to-use API</para>
+          <para>
+            <link xlink:href="#carddef">Declarative card definition language and easy-to-use API</link>
+          </para>
         </listItem>
         <listItem>
-          <para>Connectors for CNTK/TensorFlow neural network packages</para>
+          <para>
+            <link xlink:href="#connectors">Connectors for CNTK/TensorFlow neural network packages</link>
+          </para>
         </listItem>
         <listItem>
-          <para>Extensibility features for other collectible card games</para>
+          <para>
+            <link xlink:href="#extensible">Extensibility features for other collectible card games</link>
+          </para>
         </listItem>
         <listItem>
-          <para>Easy black box installation and usage</para>
+          <para>
+            <link xlink:href="#easyuse">Easy black box installation and usage</link>
+          </para>
         </listItem>
         <listItem>
-          <para>Great documentation</para>
+          <para>
+            <link xlink:href="#docs">Great documentation</link>
+          </para>
         </listItem>
       </list>
       <para>To understand some of the items below, it may help to familiarize yourself with Brimstone's [TODO: Tags and Entities Model].</para>
     </introduction>
 
-    <section>
+    <section address="highperf">
       <title>High performance</title>
       <content>
         <para>Fireplace is reasonably accurate in behaviour but very slow (~5 games/sec, Intel Core i7-2600K, 16GB RAM), Metastone is inaccurate but very fast (~2000-3000 games/sec, same hardware). Brimstone aims to be fast and accurate.</para>
@@ -69,17 +93,17 @@
             <para>All commits to Brimstone's code base are benchmarked and profiled to monitor the performance impact of code changes over time and identify bottlenecks</para>
           </listItem>
         </list>
-        <alert class="implement">
+        <alert class="note">
           <para>One of our future goals is to enable Brimstone to divide work across process boundaries so that multiple servers can be used to process tasks</para>
         </alert>
       </content>
     </section>
 
-    <section>
+    <section address="parity">
       <title>High level of parity with actual Hearthstone behaviour</title>
       <content>
         <para>
-          Fireplace tries to produce similar gmae state log output (<legacyItalic>PowerHistory</legacyItalic>) to Hearthstone but is bound by a number of design limitations. Metastone does not attempt to produce Hearthstone-compatible log output.
+          Fireplace tries to produce similar game state log output (<legacyItalic>PowerHistory</legacyItalic>) to Hearthstone but is bound by a number of design limitations. Metastone does not attempt to produce Hearthstone-compatible log output.
         </para>
         <list class="bullet">
           <listItem>
@@ -94,13 +118,13 @@
             <para>Bugs in Hearthstone are not replicated unless they are critical to compatibility</para>
           </listItem>
         </list>
-        <alert class="implement">
+        <alert class="note">
           <para>* In a future release, a bridge server to connect Brimstone to Stove will be developed based on the existing Kettle protocol developed by HearthSim.</para>
         </alert>
       </content>
     </section>
 
-    <section>
+    <section address="tickbased">
       <title>Tag-driven, tick-based design with flexible hooks and infinite undo</title>
       <content>
 
@@ -143,12 +167,13 @@
             </para>
           </listItem>
         </list>
-        <alert class="implement">
+        <alert class="note">
           <para>* Undo is not yet implemented</para>
         </alert>
       </content>
     </section>
-    <section>
+    
+    <section address="cloning">
       <title>Extremely fast state cloning</title>
       <content>
         <para>A deep copy of the game state in Fireplace takes approximately 200ms to complete (Intel Core i7-2600K, 16GB RAM). Fireplace struggles with cloning because the game object contains cycles and unnecessary data making efficient cloning difficult. Additionally, setting attributes manually on a new shallow copy of the game object is not always possible or may cause undesired trigger effects. For AI work, we would like to go faster.</para>
@@ -178,7 +203,7 @@
       </content>
     </section>
 
-    <section>
+    <section address="gametree">
       <title>Game tree creation and traversal</title>
       <content>
         <para>Brimstone includes tools to allow you to create and traverse game trees.</para>
@@ -197,7 +222,7 @@
       </content>
     </section>
 
-    <section>
+    <section address="probabilistic">
       <title>Probabilistic state outcomes</title>
       <content>
         <para>AI tree searches require us to be able to produce all of the possible outcomes for a random event, such as a card draw or random damage effect. It can also be beneficial to produce an 'average' effect to save time creating every possibility. No other simulator that we are aware of has the ability to perform these calculations.</para>
@@ -219,7 +244,7 @@
       </content>
     </section>
 
-    <section>
+    <section address="carddef">
       <title>Declarative card definition language and easy-to-use API</title>
       <content>
         <para>The Fireplace end-user API is well designed and we have endeavoured to use a similar API in Brimstone so that existing Fireplace users can migrate their code to Brimstone easily without facing a steep learning curve.</para>
@@ -248,14 +273,14 @@
       </content>
     </section>
 
-    <section>
+    <section address="easyuse">
       <title>Easy black box installation and usage</title>
       <content>
         <para>One thing holding back potential developers from the other simulators is the high barrier of entry to get everything installed and running. Brimstone's core simulator is a single DLL that can be used as a black box API. We use the minimum number of dependencies, try to automate the compile process as much as possible and provide regular releases that can just be downloaded and used without modification or complicated setup. Brimstone is compatible with both Windows and Linux and performs equally on both platforms with no special modifications or setup requirements. All you need to get going is a .NET language compiler.</para>
       </content>
     </section>
 
-    <section>
+    <section address="docs">
       <title>Great Documentation</title>
       <content>
         <para>Many users struggle with writing new card definitions or gameplay scripts with other simulators due to poor documentation API documentation and a lack of examples and tutorials. We try to ensure excellent documentation and tutorials so that a community can grow around Brimstone.</para>
@@ -270,7 +295,7 @@
     <section>
       <title>Not yet implemented</title>
       <content>
-        <para>
+        <para address="import">
           <legacyBold>Multi-source game state importing</legacyBold>
         </para>
         <para>Other simulators have no simple way of importing game states from either completed games or those in progress, either from their output or from actual Hearthstone games or replay logs. We aim to create an import interface which users can implement to create their own imports, as well as providing out-of-the-box import functionality for common sources.</para>
@@ -296,13 +321,13 @@
         <para>To achieve these goals, we have designed game entity objects to be self-describing, such that a new game can be initialized simply by passing it a list of entities and allowing it to configure itself.</para>
         <para>The PowerHistory log currently supports producing a crunched version of itself with only the current tags of each entity. Importers should create PowerHistory logs from their import sources, retrieve the crunched log then initialize each game entity using the current tag set for each corresponding entity in the log.</para>
 
-        <para>
+        <para address="connectors">
           <legacyBold>Connectors for CNTK/TensorFlow neural network packages</legacyBold>
         </para>
 
         <para>Brimstone is optimized for AI performance and ML use. Microsoft's CNTK has C++ and C# APIs while Google's TensorFlow has a Python API and limited C++ API. In the future we would like to be able to evaluate models created from graphs in these ML APIs with the Brimstone simulator. It must also be easy for two ML AIs to play against each other.</para>
 
-        <para>
+        <para address="extensible">
           <legacyBold>Extensibility features for other collectible card games</legacyBold>
         </para>
 
