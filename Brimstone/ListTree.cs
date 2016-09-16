@@ -77,6 +77,10 @@ namespace Brimstone
 			return lca;
 		}
 
+		/// <summary>
+		/// Returns an enumerator that iterates through the list in chronological order, including all ancestors
+		/// </summary>
+		/// <returns></returns>
 		public IEnumerator<TItem> GetEnumerator() {
 			if (ParentBranchEntry == 0)
 				return Delta.GetEnumerator();

@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace Brimstone
 {
+	/// <summary>
+	/// Encapsulates the definition of a single card
+	/// </summary>
 	public partial class Card
 	{
 		public int AssetId { get; set; }

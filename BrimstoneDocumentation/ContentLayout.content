@@ -2,6 +2,7 @@
 <Topics>
   <Topic id="bbd3d95b-45e3-46e9-bd51-35ee4749d7b6" visible="True" isDefault="true" isExpanded="true" title="Brimstone Developer Documentation">
     <Topic id="7493ffc4-7c29-4d5e-b98f-b05779501025" visible="True" isSelected="true" title="Design Goals" />
+    <Topic id="aaa823e4-abc6-4151-9199-88f331bb4254" visible="True" title="Behavioural Model" />
     <Topic id="cfbc1e9f-a4cf-4463-8007-491c7ac285fc" visible="True" isExpanded="true" apiParentMode="InsertBefore" title="Version History">
       <Topic id="c1506970-e752-4aa2-9c66-98de53657db6" visible="True" title="Pre-alpha Update 3" />
     </Topic>

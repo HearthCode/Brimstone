@@ -1,0 +1,1114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="aaa823e4-abc6-4151-9199-88f331bb4254" revisionNumber="1">
+  <developerConceptualDocument
+    xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+
+    <introduction>
+      <para>This document explains the model we have created for Brimstone and how it can be modified at run-time. The model is designed for high-performance and to be highly flexible, with many available hooks.</para>
+      <alert class="note">
+        <para>This document is a work in progress and will be updated with each release. Items without annotations are complete, implemented and working.</para>
+      </alert>
+      <alert class="caution">
+        <para>This is a port of the Brimstone Behavioural Model document from Google Docs for Brimstone pre-alpha Update 2. It has not yet been fully formatted or sectioned. Elements of this document will be split up into a conceptual overview and a developer guide for Update 3.</para>
+      </alert>
+    </introduction>
+
+    <section>
+      <title>Basic Structure</title>
+      <content>
+        <para><legacyBold>Cards, Entities and Tags</legacyBold></para>
+        <para>Brimstone is based on a tag-based system. Each object in the game has a list of tags which define things such as board position, health, damage taken and so on.</para>
+
+        <para>Brimstone draws a sharp distinction between cards and in-game entities.</para>
+
+        <list class="bullet">
+          <listItem><para><codeEntityReference qualifyHint="false">T:Brimstone.Card</codeEntityReference> defines the starting tags and behaviours such as the battlecry and deathrattle of a card. Cards are not linked to a specific game and are immutable (they can't be changed)</para></listItem>
+          <listItem><para>
+            <codeEntityReference qualifyHint="false">T:Brimstone.Entity</codeEntityReference> defines an in-game entity which is composed of a <codeEntityReference qualifyHint="false">T:Brimstone.Card</codeEntityReference> and additional information such as added and changed tags, the <codeEntityReference qualifyHint="false">T:Brimstone.Game</codeEntityReference> instance which owns and manages the entity, the controller of the entity (a <codeEntityReference qualifyHint="false">T:Brimstone.Player</codeEntityReference>) and so on</para></listItem>
+        </list>
+
+        <para>
+          All of the elements of a game are entities, including everything in each player's deck, hand and side of the board, the players themselves, their heroes, hero powers<superscript>
+            <link xlink:href="#cmnt1">[a]</link>
+          </superscript> and the game itself.
+        </para>
+        <para>Cards cannot be played directly. They are first converted to entities by calling a class constructor such as <codeEntityReference qualifyHint="false" autoUpgrade="true" linkText="new Minion(Card)">M:Brimstone.Minion.#ctor(Brimstone.Card,System.Collections.Generic.Dictionary{Brimstone.GameTag,System.Int32})</codeEntityReference> or <codeEntityReference autoUpgrade="true" linkText="new Spell(Card)">M:Brimstone.Spell.#ctor(Brimstone.Spell)</codeEntityReference>, then added to the game. These classes derive from the <codeEntityReference qualifyHint="false">T:Brimstone.IEntity</codeEntityReference> interface which specifies that the class implements all of the required APIs for an in-game entity.</para>
+
+        <para>In practice, you do not need to worry about this as the conversions are normally handled for you.</para>
+
+        <para>Every <codeEntityReference qualifyHint="false">T:Brimstone.Entity</codeEntityReference> exposes its tags with the index operator, eg. <codeInline>someMinion[GameTag.DAMAGE]</codeInline> will return the number of points of damage the minion has taken.</para>
+
+        <para>Game entities can be accessed via the <codeEntityReference qualifyHint="false">P:Brimstone.Game.Entities</codeEntityReference> property.</para>
+
+        <alert class="important">
+          <para>End users should not read or modify tags directly. Instead, use the tag property helpers when you want to read or modify tags (the above would be <codeInline>SomeMinion.</codeInline><codeEntityReference qualifyHint="false">P:Brimstone.Character`1.Damage</codeEntityReference>) as tag accesses sometimes cause internal processing which must be done when the tag is accessed.</para>
+        </alert>
+        <para><legacyBold>Zone Management</legacyBold></para>
+        <para>All entities in a Brimstone game are separated into zones. A <codeEntityReference qualifyHint="false">T:Brimstone.Zone`1</codeEntityReference> can be the player's hand, the board, deck, graveyard for used cards, secrets area and the setaside zone used during actions such as Discover. Each player has their own set of <codeEntityReference qualifyHint="false">T:Brimstone.Zones</codeEntityReference>, as does the game itself. For easy access, you can fetch or modify just the items in a particular zone using shortcuts such as <codeInline>Game.Player1.Hand</codeInline> or <codeInline>Game.Player2.Board</codeInline>. Zones are 1-indexed from left to right, so <codeInline>Game.Player1.Board[2]</codeInline> is the 2nd minion to the left on player 1's side of the board.</para>
+
+        <para>Brimstone handles zones intelligently without duplicating game entity data, selecting zone data from the game's main entity list only when requested, then caching the results. Entities can be inserted at any position in any zone and the remaining items' zone positions will be updated correctly without needing to refresh the cache.</para>
+
+        <para>Items with no zone position (eg. items in the graveyard, spells in play, heroes in play etc.) are not tracked in the zone cache.</para>
+
+        <para>To disable zone caching: <codeInline>Settings.ZoneCaching = false</codeInline>
+      </para>
+        <para><legacyBold>Power History</legacyBold></para>
+        <para>
+          All entity creations, tag changes etc. are stored in the game's <codeEntityReference qualifyHint="false">T:Brimstone.PowerHistory</codeEntityReference> log. The PowerHistory is so-named because it is the mechanism that Hearthstone uses to communicate and update game state. This data can be sent directly on the wire as-is to emulate a Hearthstone game session.<superscript>
+            <link xlink:href="#cmnt2">[b]</link>
+          </superscript>
+        </para>
+
+        <para>
+          Brimstone is designed to be self-configuring, meaning that in the future you will be able to feed in power logs from real games and Brimstone will correctly recreate the entire game state.<superscript>
+            <link xlink:href="#cmnt3">[c]</link>
+          </superscript>
+        </para>
+
+        <para>The power history log implements <codeEntityReference qualifyHint="false">T:System.Collections.Generic.IEnumerable`1</codeEntityReference> and yields a collection of <codeEntityReference qualifyHint="false">T:Brimstone.PowerAction</codeEntityReference>.</para>
+      </content>
+    </section>
+    <section>
+      <title>Actions Model</title>
+      <content>
+        <para><legacyBold>Action Queue and Result Stack</legacyBold></para>
+
+        <para>Brimstone uses an action queue and a result stack to process in-game events.</para>
+
+        <list class="bullet">
+          <listItem><para>Action queue: queues forthcoming actions, eg. Play, Draw, Damage and so on. Arguments to each action are themselves actions.</para></listItem>
+          <listItem><para>Result stack: stores the results of previous actions in a LIFO order. Each action has a fixed number of arguments. When an action runs, the correct number of arguments is popped from the stack and passed to the action. When the action completes, any results from the action are pushed onto the stack</para></listItem>
+          <listItem><para>When the queue is empty, any remaining results on the result stack are returned to the caller</para></listItem>
+        </list>
+
+        <para>Example:</para>
+
+        <para>You call the Play action to move a card from a player's hand to the battlefield.</para>
+
+        <para>Play takes two arguments: the player who is playing the card, and the card to play.</para>
+
+        <para>These arguments are converted to actions, in this case both are LazyEntitys initialized with the player and card entities that will be arguments to Play (they are lazy because they are not resolved until the action runs). The argument actions are pushed onto the queue, followed by the Play action itself.</para>
+
+        <para>The queue can be processed immediately or at the caller's discretion.</para>
+
+        <para>When the queue is processed, each LazyEntity action takes 0 arguments. The first LazyEntity action executes and pushes the player entity onto the result stack. The second LazyEntity action executes and pushes the card entity to play onto the result stack. Finally, the Play action executes; it takes 2 arguments so it pops the last two results off the stack then is called. Play returns the entity of the played card, which is pushed onto the stack. At this point, the queue is empty, so the contents of the stack is emptied and transferred to the calling function.</para>
+
+        <para>The easiest way to understand this is to use the Brimstone Visualizer to step through the action queue one action at a time. The visualizer shows the action queue and result stack at each step.</para>
+
+        <para>Nested actions</para>
+
+        <para>Some actions may call other actions. For example the Play action may queue the battlecry behaviour of the played card. This will be pushed onto the queue and processed when Play completes, but before it returns to the caller. Therefore, the result stack may contain the results of these nested actions. Due to the fact the stack operates as a LIFO stack, results are always popped in the correct order.</para>
+
+        <para>Multi-queueing</para>
+
+        <para>
+          You can queue as many actions as you like before processing the queue. For example, you can queue playing all the cards in the player's hand before anything happens, and then process the entire queue at once. See the <link xlink:href="#h.jpen8v6ciamt">Game State Manipulation</link> section for further details.
+        </para>
+
+        <para>Queue history</para>
+
+        <para>A history log of all the actions for the game is stored and accessible for debugging purposes.</para>
+        <para><legacyBold>Action Graphs</legacyBold></para>
+
+        <para>An ActionGraph can be thought of as a unit of behaviour consisting of one or more actions. Each argument to an action is itself an ActionGraph.</para>
+
+        <para>Example:</para>
+
+        <para>Give(CurrentPlayer, Cards.ByName("Knife Juggler")) * 3.Then(Damage(AllMinions, 1))</para>
+
+        <para>Here, Give, CurrentPlayer, Card, Damage, AllMinions and the numbers 3 and 1 are all ActionGraphs.</para>
+
+        <para>The Then method chains two ActionGraphs together in sequential order. The * operator causes the ActionGraph to be replaced by a call to the Repeat action with the ActionGraph as an argument. ActionGraphs are unravelled into a list of QueueActions by taking the inner-most arguments first and otherwise using left-to-right order.</para>
+
+        <para>The example above will be unravelled in this order:</para>
+
+        <para>CurrentPlayer</para>
+        <para>Cards.ByName("Knife Juggler")</para>
+        <para>Give</para>
+        <para>3</para>
+        <para>Repeat</para>
+
+        <para>When encountering Repeat, the ActionGraph is moved into Repeat's arguments and unravelling continues:</para>
+
+        <para>Repeat [3, CurrentPlayer, Cards.ByName("Knife Juggler"), Give]</para>
+        <para>AllMinions</para>
+        <para>1</para>
+        <para>Damage</para>
+
+        <para>Behaviour compilation</para>
+
+        <para>For performance reasons, all card definition behaviours are unravelled into lists of QueueActions when Brimstone starts up. The action queue accepts single QueueActions, lists of QueueActions or ActionGraphs as queueing arguments. ActionGraphs created during runtime are unravelled into lists of QueueActions when they are added to the queue, and therefore do not receive the performance benefits of unravelling on startup. This real-time unravelling occurs whenever you queue an ActionGraph, which is to say, every time you perform an in-game action not predefined as a card behaviour.</para>
+
+        <para>Implicit casting of values to ActionGraphs</para>
+
+        <para>The ActionGraph class provides syntactic sugar to make composing ActionGraphs easier:</para>
+
+        <list class="bullet">
+          <listItem><para>Integer numbers are automatically converted to a FixedNumber action, which simply returns the number (which is then pushed to the result stack)</para></listItem>
+          <listItem><para>Cards are automatically converted to a FixedCard action, which returns the Card</para></listItem>
+          <listItem><para>Entitys are automatically converted to a LazyEntity action, which returns the state of the Entity at the time the action is executed</para></listItem>
+          <listItem><para>Functions (including lambdas) with take a single IEntity as an argument and return no value are automatically converted to a Func action, which executes the specified function at the time the action is executed. This is mainly used to add specialized behaviour to other actions and is described below</para></listItem>
+          <listItem><para>Single QueueActions are automatically converted to an ActionGraph with the action as its only content, so you can use QueueActions anywhere you can use an ActionGraph</para></listItem>
+        </list>
+
+        <para>ActionGraph helper methods</para>
+
+        <list class="bullet">
+          <listItem><para>The Repeat method creates a Repeat action from the existing ActionGraph. Note that The quantity argument is itself an ActionGraph, so graphs such as Draw(CurrentPlayer).Repeat(AllMinions) will work (this example draws a card for each mionion on the battlefield)</para></listItem>
+          <listItem><para>The multiply operator (*) is a syntax shortcut for Repeat. The above example is more easily written as: Draw(CurrentPlayer) * AllMinions</para></listItem>
+          <listItem><para>The Then method adds the ActionGraph supplied at the end of the current ActionGraph, such that the two run sequentially. The graph Draw(CurrentPlayer).Then(Damage(AllMinions, 1)) will chain the graphs such that the Draw graph executes first then the Damage graph</para></listItem>
+        </list>
+
+        <para>Now that we understand casting and helper methods, we can see how the example graph above is finally unravelled into a list of QueueActions. The items in square brackets are fixed arguments passed to the QueueAction when it is initialized and as such are not part of the queued arguments or result stack.</para>
+
+        <para>Give(CurrentPlayer, Cards.ByName("Knife Juggler")) * 3.Then(Damage(AllMinions, 1))</para>
+
+        <para>Unravels to:</para>
+
+        <para>FixedNumber [3]</para>
+        <para>Repeat [</para>
+        <para>LazyEntity [the current player's entity ID]</para>
+        <para>FixedCard [the Card definition for Knife Juggler]</para>
+        <para>Give</para>
+        <para>]</para>
+        <para>Select [SelectionSource = Game, lambda function which selects all minions]</para>
+        <para>FixedNumber [1]</para>
+        <para>Damage</para>
+
+        <para>Experiment with the Brimstone Visualizer to see how this works for different ActionGraphs.</para>
+
+        <para>ActionResults</para>
+
+        <para>When a QueueAction returns a value, it is pushed onto the result stack as an ActionResult. ActionResults are variant-like objects which can hold one of the following items:</para>
+
+        <list class="bullet">
+          <listItem><para>Boolean value</para></listItem>
+          <listItem><para>Integer value</para></listItem>
+          <listItem><para>Card definition</para></listItem>
+          <listItem><para>List of entities</para></listItem>
+          <listItem><para>Single entity (see below)</para></listItem>
+        </list>
+
+        <para>When storing a single entity, the entity is converted to a list of entities with only one item.</para>
+
+        <para>ActionResults can also specify no value (ActionResult.None), in which case the result is not pushed onto the stack, or an empty value (ActionResult.Empty), in which case a result with no value is pushed onto the stack. The former is used when you wish to write an action which does not return a value; the latter is mostly used for event trigger matching (see below).</para>
+
+        <para>ActionResults support implicit casting to and from any of the above types, which means you do not need to use casts when passing or returning these types. When implicitly casting to a single entity, the first entity in the entity list is returned. Therefore, list storage is transparent, but if you use the ActionResult in a list or set operation, the single entity will automatically be accepted as a list.</para>
+
+        <para>ActionResults support value equality comparisons with the == operator (and inequality with the != operator), which will compare both the type and value of each result. Note that entity lists only perform a reference comparison - the actual list contents are not compared.</para>
+
+        <para>ActionResults are enumerable if they contain a list of entities which means they can be used in foreach statements and so on.</para>
+
+        <h2 class="c4" id="h.zcs9xwj0kv3w">
+          Entity Selection<superscript>
+            <link xlink:href="#cmnt4">[d]</link>
+          </superscript>
+        </h2>
+        <para>Selection of entities is a crucial part of game simulation. In Brimstone, entity selection is itself an action which is pushed to the queue. Entity selection can either use predefined helpers such as OpponentMinions, or any function, lambda or anonymous method desired.</para>
+
+        <para>The selection function can take a Game, Player or IEntity and the input argument is automatically detected based on the properties and methods you access, so no casting is required.</para>
+
+        <para>Examples:</para>
+
+        <para>Select an entity's controller: Select(e =&gt; e.Controller)</para>
+        <para>Select the current player's minions on board: Select(g =&gt; g.CurrentPlayer.Board)</para>
+        <para>Select the opponent minions of an arbitrary player: Select(p =&gt; p.Opponent.Board)</para>
+
+        <para>The Select function generates a Selector action. The input to the selection function is determined as follows:</para>
+
+        <list class="bullet">
+          <listItem><para>If the input is a Game, use the Game bound to the action queue</para></listItem>
+          <listItem><para>If the input is an IEntity, use the source which generated the action</para></listItem>
+          <listItem><para>If the input is a Player:</para></listItem>
+        </list>
+        <list class="bullet">
+          <listItem><para>If the source of the action is a Game, use the current player</para></listItem>
+          <listItem><para>If the source of the action is a Player, use the specified player</para></listItem>
+          <listItem><para>If the source of the action is an IEntity, use the player which controls the entity</para></listItem>
+        </list>
+
+        <para>This mechanic ensures that the correct player is always selected, for example:</para>
+
+        <list class="bullet">
+          <listItem><para>A player is always the source of their own mulligan creation. The player whose mulligan choices are being selected will be used as the input to the selection function which returns all the cards in their hand excluding The Coin</para></listItem>
+          <listItem><para>If the source of OpponentMinions is a player, that player will be used as the input. If the source is a game, the current player will be used. If the source is an entity, the player who owns the entity will be used.</para></listItem>
+        </list>
+      </content>
+    </section>
+    <section>
+      <title>Event Model</title>
+      <content>
+        <para><legacyBold>Triggers</legacyBold></para>
+
+        <para>A trigger is something that occurs when a specific in-game action happens. Card definitions can create triggers on any ActionGraph. Each card definition takes a list of as many triggers as required. Here is an example from Acolyte of Pain:</para>
+
+        <para>Triggers = {</para>
+        <para>        When(Damage(Self), Draw(Controller))</para>
+        <para>}</para>
+
+        <para>This causes the controller of Acolyte of Pain to draw a card whenever it is damaged.</para>
+
+        <para>There are two types of triggers:</para>
+        <list class="bullet">
+          <listItem><para>When triggers execute in the same action block as the triggering action itself</para></listItem>
+          <listItem><para>After triggers execute after the action block of the triggering action</para></listItem>
+        </list>
+
+        <para>Trigger matching</para>
+
+        <para>Triggers must be matched to determine whether they should fire or not. For example, if we attach a trigger to a specific entity being damaged as above, we do not want the trigger to fire if a different entity is damaged.</para>
+
+        <para>A trigger's ActionGraph is unravelled (Damage(Self) in the above example) and all of the actions besides the last are used as match arguments to determine if the conditions for the trigger are met. The trigger is attached to the final action.</para>
+
+        <para>In the example above, Self will be used as a match argument and the trigger will be attached to the Damage action.</para>
+
+        <para>Notice that not all arguments need to be supplied. The usual format of Damage is Damage(characters, amount) (where characters and amount are ActionGraphs). Missing match arguments are considered as always matching.</para>
+
+        <para>For ease of use, you can supply keyword arguments when creating triggers, for example:</para>
+
+        <para>When(Damage(Amount: 1), Draw(Controller))</para>
+
+        <para>will draw a card for the damaged character's controller whenever any character is damaged by exactly 1 point.</para>
+
+        <para>Remember that everything is an ActionGraph, so:</para>
+
+        <para>When(Damage(Amount: NumOpponentMinions), Draw(Controller))</para>
+
+        <para>Will draw a card for the damaged character's controller whenever any character is damaged by the amount of minions the opponent has on the board.</para>
+
+        <para>Valid match arguments</para>
+
+        <para>For performance reasons, match arguments are not processed via the action queue and as such you cannot use any actions which take queued arguments. For example, you can use:</para>
+
+        <list class="bullet">
+          <listItem><para>A number (FixedNumber)</para></listItem>
+          <listItem><para>A card (FixedCard)</para></listItem>
+          <listItem><para>An entity (FixedEntity)</para></listItem>
+          <listItem><para>A function (Func)</para></listItem>
+          <listItem><para>A selector (Selector or a built-in helper such as AllMinions), ie. a list of entities</para></listItem>
+        </list>
+
+        <para>Run-time trigger creation</para>
+
+        <para>You can create triggers associated with a game at any point while the game is running. The methods Game.ActiveTriggers.When(x, y) and Game.ActiveTriggers.After(x, y) assist with this.</para>
+
+        <list class="bullet">
+          <listItem><para>X is the graph to match on</para></listItem>
+          <listItem><para>Y is the graph to execute if a match occurs</para></listItem>
+        </list>
+
+        <para><legacyBold>Action Queue</legacyBold></para>
+
+        <para>The following delegate events are fired during action queue processing:</para>
+
+        <list class="bullet">
+          <listItem><para>OnQueueing - a single action is about to be queued</para></listItem>
+          <listItem><para>OnQueued - a single action has just been queued</para></listItem>
+          <listItem><para>OnActionStarting - a single action is about to execute. Its arguments have not yet been popped off the result stack</para></listItem>
+          <listItem><para>OnAction - a single action has just executed</para></listItem>
+        </list>
+
+        <para>Each event receives a QueueActionEventArgs which specifies the owning game, action source and the action in question along with any arguments supplied to it plus optional user data, along with the ability to cancel the action.</para>
+
+        <para>In addition, action handlers can be replaced outright by registering a handler with ReplaceAction&lt;T&gt; where T is the Action type to replace. This is particularly useful for eg. modifying random outcomes.</para>
+        <para><legacyBold>Power History</legacyBold></para>
+
+        <para>The following delegate events are fired during power history processing:</para>
+
+        <list class="bullet">
+          <listItem><para>OnPowerAction - a power action (entity creation, tag change etc.) has just been added to the power history</para></listItem>
+        </list>
+
+        <para>Each event receives a PowerActionEventArgs which specifies the owning game and the PowerAction in question.</para>
+      </content>
+    </section>
+    <section>
+      <title>Game State Re-use Model</title>
+      <content>
+
+        <para>Brimstone supports re-using a game state in a number of ways:</para>
+
+        <list class="bullet">
+          <listItem><para>Naive deep copy</para></listItem>
+          <listItem><para>Copy-on-write cloning</para></listItem>
+          <listItem><para>Mass cloning</para></listItem>
+          <listItem><para>Parallel cloning</para></listItem>
+          <listItem><para>Action-based cloning</para></listItem>
+          <listItem><para>Rewind stack</para></listItem>
+          <listItem><para>PowerHistory import</para></listItem>
+        </list>
+
+        <para>The re-use paradigm can be changed at will at any point during run-time.</para>
+
+        <para>To clone a game, use: var clonedGame = myGame.GetClone();</para>
+        <para><legacyBold>Naive deep copy</legacyBold></para>
+        <para>In this mode, Brimstone makes a complete copy of the game state including all entities, the action queue, result stack, active triggers.</para>
+
+        <para>Card definitions and the starting tags of entities are immutable and are not deep copied; only the references are updated. The PowerHistory is not cloned but chained as a linked list (see below).</para>
+
+        <para>The game state includes a list of which entities are in which zones. As an optimization, these entities are not cloned as they form part of the game's entity list. Instead, the references in the zone lists are updated to point to the copied entities in the cloned game.</para>
+
+        <para>This is the slowest but most time-measurable form of cloning.</para>
+
+        <para>To enable: Settings.CopyOnWrite = false</para>
+        <para><legacyBold>Copy-on-write cloning</legacyBold></para>
+        <para>This is the default mode. Brimstone uses a proxy class to represent each entity and only copies the proxies when cloning. The base entities maintain a reference count of how many games are using them. When an entity in the cloned game is changed, that entity alone is deep copied with a new reference count of 1, and the original entity has its reference count decremented.</para>
+
+        <para>In this way, copy-on-write clones are much faster and consume less memory. They are particularly useful for game states which will be mostly read-only. We have typically experienced a 2.5x-3x speedup when using copy-on-write cloning over naive deep copy.</para>
+
+        <para>Additionally, copy-on-write clones can be made from other copy-on-write clones, such that an entity in a clone several levels deep will still refer to the original entity if it has not been modified.</para>
+
+        <para>Writing to an entity in a copy-on-write clone for the first time copies it, and as such the first modification to each entity will be slower than in a naive deep copy.</para>
+
+        <para>Copy-on-write cloning deep clones the action queue, result stack and active triggers as per naive deep copy.</para>
+
+        <para>Power History cloning is implemented by using a linked list approach whereby the cloned Power History is empty but points to the entry in the original power history where the clone was made. This is transparent and appears to the user as a single contiguous Power History log, even if the parent game subsequently receives new log entries.</para>
+
+        <para>IMPORTANT: Do not mix naive cloning and copy-on-write cloning within a single application. This may lead to undefined behaviour.</para>
+        <para><legacyBold>Mass cloning</legacyBold></para>
+        <para>If you require many clones using either of the above modes, you can use the GetClones() helper to create a specified number of clones from a specified game:</para>
+
+        <para>var clones = myGame.GetClones(100000);</para>
+
+        <para>returns a List&lt;Game&gt; containing 100,000 clones of myGame.</para>
+
+        <para>NOTE: List&lt;T&gt; use O(n) time to add each new item, meaning that the cloning overhead becomes larger the more clones you make per call.</para>
+
+        <para>NOTE: If you do not need all of the clones in memory at once (ie. if you are only processing one at a time and then throwing the result away), use standard cloning instead to improve the performance and reduce the memory footprint of your application.</para>
+        <para><legacyBold>Parallel cloning</legacyBold></para>
+        <para>Parallel cloning allows cloning to use all available processor cores. It also enables you to safely clone games in a multi-threaded environment. Parallel cloning is enabled by default.</para>
+
+        <para>When parallel cloning is enabled, games are cloned in a thread-safe manner, even if you are only making one clone at a time or using a single thread. Parallel cloning is therefore slower than sequential cloning when running single-threaded applications and should be disabled.</para>
+
+        <para>Note that when using parallel tree search (see below), parallel cloning must be enabled too.</para>
+
+        <para>To disable: Settings.ParallelClone = false</para>
+
+        <para>IMPORTANT: Do not mix parallel and sequential cloning in a single game tree. This may lead to undefined behaviour.</para>
+        <para><legacyBold>Action-based cloning</legacyBold></para>
+        <para>
+          Action-based cloning allows the game state to be automatically cloned before or after an action occurs. You can do this either by hooking OnActionStarting and/or OnAction (see above) to replace actions with an action that generates a clone instead, or by using the GameTree API to automatically build a tree of all possible game states resulting from a single action (see <link xlink:href="#h.1nerttr5024z">Working with random outcomes</link> below).
+        </para>
+        <h2 class="c4" id="h.6f39l3cnjz7p">
+          Rewind stack<superscript>
+            <link xlink:href="#cmnt5">[e]</link>
+          </superscript>
+        </h2>
+        <para>The rewind stack allows a reversal of the Power History by storing a 2nd Power History containing the previous states of tags before they are changed. Rewind points can be marked and the points rewound to at any time.</para>
+
+        <para>In this way, clones can be avoided altogether in some cases by simply rewinding an action you wish to perform repeatedly each time it completes.</para>
+        <h2 class="c4" id="h.99wevaamzfkp">
+          PowerHistory import<superscript>
+            <link xlink:href="#cmnt6">[f]</link>
+          </superscript>
+        </h2>
+        <para>Full or partial game states can be imported from a variety of file formats to configure a game state.</para>
+      </content>
+    </section>
+    <section>
+      <title>Game State Manipulation</title>
+      <content>
+        <para>Now we understand Brimstone's model we can look at some examples on how to manipulate the game state at run-time.</para>
+        <para><legacyBold>Working with the Action Queue</legacyBold></para>
+        <h3 class="c4" id="h.2yuh7lhm82x9">Adding items</h3>
+        <para>You can add QueueActions, ActionGraphs and List&lt;QueueAction&gt;s to the queue. These can be run immediately or deferred for later:</para>
+
+        <list class="bullet">
+          <listItem><para>Game.Action(source, action) queues an action and processes the entire queue immediately if it is not paused. If there are outstanding items in the queue, these are processed first. This method returns a single ActionResult which is the last item on the result stack after the queue has been fully processed.</para></listItem>
+          <listItem><para>Game.Queue(source, action) queues an action and returns immediately without processing</para></listItem>
+        </list>
+
+        <para>The source is the actor who originates the action. For example, a Minion that is played uses itself as the action source.</para>
+
+        <para>If you need to get all of the items on the result stack, use Game.ActionQueue.EnqueueMultiResult(source, action). This function returns a List&lt;ActionResult&gt;.</para>
+
+        <para>Many objects in Brimstone provide helper functions so that you don't have to deal with the queue directly. For example, to damage a minion by 3, you simply write:</para>
+
+        <para>Minion.Hit(3);</para>
+
+        <para>By default, these actions run immediately. To queue them without executing instead, simply wrap each helper call you want to queue inside a lambda call to Game.Queue like this:</para>
+
+        <para>Game.Queue(() =&gt; Minion.Hit(3));</para>
+
+        <para>Note that since the actions are not actually executed, you cannot use any results you would normally get from them inside your lambda function. Doing so will cause an exception. For example, the following will not work:</para>
+
+        <para>Game.Queue(() =&gt; player.Give("Wisp").Play());</para>
+
+        <para>This is because we cannot use the output of Give as an input to Play since Give will not have executed yet.</para>
+        <h3 class="c4" id="h.z0cyqkzggbry">Adding items to the front of the queue</h3>
+        <para>You can use Game.ActionQueue.InsertDeferred to insert actions at the front of the queue. This is mostly useful when you are using an event handler to cancel an action and replace it with something else. The events OnQueueing and OnQueued do not fire when adding to the front of the queue.</para>
+        <h3 class="c4" id="h.j0zcbgl5y98d">Processing the queue</h3>
+        <para>Unless you enqueue items deferred with Game.Queue as above, the queue will normally process immediately as soon as you call an action. If you have items waiting that you have enqueued earlier, you can process them as follows:</para>
+
+        <list class="bullet">
+          <listItem><para>Game.ActionQueue.ProcessAll() process all outstanding items in the queue and returns a List&lt;ActionResult&gt; of the result stack</para></listItem>
+          <listItem><para>Game.ActionQueue.ProcessOne() executes a single action and returns true on success, false on failure. Failure occurs when the queue is in a paused state (see below), the queue is empty or the action to be processed has been cancelled (see below)</para></listItem>
+        </list>
+
+        <para>You can also:</para>
+
+        <list class="bullet">
+          <listItem><para>
+            Check the size of the action queue with Game.ActionQueue.Count<superscript>
+              <link xlink:href="#cmnt7">[g]</link>
+            </superscript>
+          </para></listItem>
+          <listItem><para>Pause or unpause the queue by setting the boolean flag Game.ActionQueue.Paused. When the queue is paused, ProcessAll() and ProcessOne() do nothing, which means all helper functions that normally execute actions immediately will just queue them instead.</para></listItem>
+        </list>
+
+        <para>For example, the code above is analogous to:</para>
+
+        <para>Game.ActionQueue.Paused = true;</para>
+        <para>Minion.Hit(3);</para>
+        <para>Game.ActionQueue.Paused = false;</para>
+
+        <para>Note that the queue does not process when you unpause it - you must call ProcessAll() or ProcessOne() after unpausing.</para>
+        <h3 class="c4" id="h.jwshfbozdced">Queueing arbitrary actions</h3>
+        <para>Sometimes you may want to queue an action that does not have a helper method. You can create any ActionGraph you like and queue it at any time.</para>
+
+        <para>For example, to deal 3 damage to a minion (equivalent of calling Hit above), you can write the action directly as follows:</para>
+
+        <para>myGame.Action(myMinion, Actions.Damage(myMinion, amount));</para>
+
+        <para>It is recommended that you use the helper methods for readability and future compatibility wherever possible, rather than queueing actions directly. Only queue actions directly where no corresponding helper method exists.</para>
+        <h3 class="c4" id="h.korfca55n62v">Passing user-defined data</h3>
+        <para>Sometimes you may wish to pass custom data to the ActionQueue processor so you can track where the call to process the queue came from. This can be especially useful if you are using the same event handlers to handle many different games.</para>
+
+        <para>The custom data can be of any type and is supplied to event handlers in QueueActionEventArgs.UserData, which must be cast to the correct type.</para>
+
+        <para>To pass custom data:</para>
+
+        <list class="bullet">
+          <listItem><para>Game.ActionQueue.ProcessAll(myUserData)</para></listItem>
+          <listItem><para>Game.ActionQueue.ProcessOne(myUserData)</para></listItem>
+        </list>
+        <h2 class="c4" id="h.gt774711wtm6">
+          Modifying the action queue<superscript>
+            <link xlink:href="#cmnt8">[h]</link>
+          </superscript>
+        </h2>
+
+        <para>When an action is being queued</para>
+
+        <para>You can modify an action before it is queued by subscribing to the ActionQueue.OnQueueing event.</para>
+
+        <para>Example:</para>
+
+        <para>game.ActionQueue.OnQueueing += (o, e) =&gt; {</para>
+        <para>        ActionQueue queue = o as ActionQueue;</para>
+        <para>        if (e.Action is RandomChoice) {</para>
+        <para>                if (game.CurrentPlayer.Opponent.Board.Count &gt; 0) {</para>
+        <para>                        e.Game.Queue(e.Source, (Entity)game.CurrentPlayer.Opponent.Board[1]);</para>
+        <para>                        e.Cancel = true;</para>
+        <para>                }</para>
+        <para>        }</para>
+        <para>};</para>
+
+        <para>This code checks to see if a RandomChoice has been queued. If so, and the current player's opponent has at least one minion on board, the choice is replaced with the opponent's left-most minion. Setting the Cancel flag prevents the intercepted action from being queued. This overrides any previous entity selection that would have been fed into RandomChoice as an argument.</para>
+
+        <para>Note that in reality you will need a more specific set of conditions - the above example works when the selected minion will be damaged, but you do not want this behaviour when choosing eg. a card from a deck.</para>
+
+        <para>This example shows how random events in the game can be replaced with deterministic ones, which is useful for AI tree searching.</para>
+
+        <para>When an action is about to start</para>
+
+        <para>You can also modify actions as they are starting by subscribing to the ActionQueue.OnActionStarting event, and inspect or replace arguments that will be passed to the action by modifying the contents of QueueActionEventArgs (e in the code below):</para>
+
+        <list class="bullet">
+          <listItem><para>Source property allows you to get or set the source of the action</para></listItem>
+          <listItem><para>Action property allows you to get or set the action</para></listItem>
+          <listItem><para>Args property allows you to get or set the arguments to the action</para></listItem>
+          <listItem><para>Cancel property allows you to abort the action before it executes. This also defers the rest of the action queue</para></listItem>
+        </list>
+
+        <para>Example:</para>
+
+        <para>game.ActionQueue.OnActionStarting += (o, e) =&gt; {</para>
+        <para>        ActionQueue queue = o as ActionQueue;</para>
+        <para>        if (e.Action is Damage) {</para>
+        <para>                e.Args[Damage.DAMAGE] = 2;</para>
+        <para>        }</para>
+        <para>};</para>
+
+        <para>This code checks to see if the action about to execute is Damage, and if so, replaces the damage amount with 2, causing all Damage actions to always do exactly 2 damage regardless of the originally specified argument.</para>
+
+        <para>Similarly to above, you can cancel the action by setting the Cancel flag if you don't want it to run at all.</para>
+
+        <para>All actions have a set of arguments with names such as DAMAGE above. You can look at the constant definitions in Actions.cs to find which actions have which argument names so that you can refer to them in events.</para>
+
+        <para>Replacing all occurrences of an action</para>
+
+        <para>ActionQueue.ReplaceAction&lt;TAction&gt; can be used when you want to replace every instance of a specific action type with your own code. Each action can have at most one replacement. Replaced actions have the following properties:</para>
+
+        <list class="bullet">
+          <listItem><para>OnActionStarting executes as normal for the original action</para></listItem>
+          <listItem><para>The original action does not execute</para></listItem>
+          <listItem><para>OnAction does not execute</para></listItem>
+          <listItem><para>Neither the original nor replacement action is stored in the ActionQueue history log</para></listItem>
+          <listItem><para>Queue processing stops when the action completes even if there are more items remaining</para></listItem>
+        </list>
+
+        <para>Therefore, using this method essentially kills queue processing (but leaves the remaining queue items intact for later processing), and is mostly useful for splicing in different actions to the front of the queue with InsertDeferred.</para>
+        <h2 class="c4" id="h.s35jnjk5t0f0">
+          Modifying the result stack<superscript>
+            <link xlink:href="#cmnt9">[i]</link>
+          </superscript>
+        </h2>
+        <para>You can modify the top action on the result stack by using ActionQueue.ReplaceArg, eg:</para>
+
+        <para>Game.ActionQueue.ReplaceArg(2)</para>
+
+        <para>replaces the top item on the stack with 2.</para>
+
+        <para>You can use ActionQueue.ReplaceArgs to replace multiple stack arguments at the same time.</para>
+
+        <para>ReplaceArg and ReplaceArgs take an ActionResult or a list of ActionResults respectively as their arguments.</para>
+        <para><legacyBold>Cheat Actions</legacyBold></para>
+        <para>You can execute actions not normally possible in the game.</para>
+
+        <list class="bullet">
+          <listItem><para>Player.Give(Card) generates a new entity from a card and puts it in the player's hand</para></listItem>
+          <listItem><para>CanBeDamaged.Hit(int) damages the specified damageable entity by the specified amount</para></listItem>
+          <listItem><para>
+            More to come...<superscript>
+              <link xlink:href="#cmnt10">[j]</link>
+            </superscript>
+          </para></listItem>
+        </list>
+        <para><legacyBold>Working with entities</legacyBold></para>
+        <h3 class="c4" id="h.avjw48z1b6g5">Creating new entities</h3>
+        <para>
+          To create a new in-game entity, use the Minion, Spell and Weapon<superscript>
+            <link xlink:href="#cmnt11">[k]</link>
+          </superscript> classes.
+        </para>
+
+        <para>First, create an entity based on a card:</para>
+
+        <para>var myMinion = new Minion("Chromaggus");</para>
+
+        <para>(you can also use a card ID or an existing Card object as the constructor argument)</para>
+
+        <para>Then assign a location to it:</para>
+
+        <para>myGame.CurrentPlayer.Hand.MoveTo(Entity: myMinion, ZonePosition: 1);</para>
+
+        <para>(the ZonePosition argument is optional - if not specified, the entity will be placed right-most in the zone, or at the bottom of the deck if placing into a deck)</para>
+
+        <para>Until an entity is placed into a zone, it is in an orphan state with no owning game or controlling player. Once you move an entity into a zone, it automatically becomes owned by the player or game which controls the zone. If you subsequently move the entity into a zone owned by another player, ownership is transferred automatically. You cannot move entities between games.</para>
+        <h3 class="c4" id="h.689zm5mz4fuj">Direct tag manipulation</h3>
+        <para>To change an entity's tags directly, use the corresponding tag properties on the object. For example, to assign one more point of damage to a minion:</para>
+
+        <para>myMinion.Damage += 1;</para>
+
+        <para>Changes made this way will be reflected in the PowerHistory if it is enabled.</para>
+        <para><legacyBold>IMPORTANT: Only modify an entity's tags if you are sure you understand the consequences. Things such as death and trigger processing will not occur when you use direct tag manipulation, and it is possible to leave the game in an inconsistent state.</legacyBold></para>
+        <para><legacyBold>Clone immediately before action processing</legacyBold></para>
+        <para>Imagine a scenario where a Boom Bot is about to die (causing 1-4 damage to an opponent character). You could repeat this many times as follows:</para>
+
+        <para>var firstboombotId = game.Player1.Board.First(t =&gt; t.Card.Name == &quot;Boom Bot&quot;).Id;</para>
+        <para>for (int i = 0; i &lt; 100000; i++) {</para>
+        <para>        Game cloned = (Game) game.CloneState();</para>
+        <para>        ((Minion) cloned.Entities[firstboombotId]).Hit(1);</para>
+        <para>}</para>
+
+        <para>(Note: we take the entity ID of the desired Boom Bot before cloning so we don't have to search for it 100,000 times)</para>
+        <para>This works, but repeats a lot of unnecessary work in creating the same new set of actions in the queue 100,000 times.</para>
+
+        <para>Instead, we can clone after the Boom Bot has been killed but before its Deathrattle executes as follows:</para>
+
+        <para>var BoomBot = game.Player1.Board.First(t =&gt; t.Card.Id == &quot;Boom Bot&quot;) as Minion;</para>
+        <para>game.ActionQueue.OnAction += (o, e) =&gt; {</para>
+        <para>        ActionQueue queue = o as ActionQueue;</para>
+        <para>        if (e.Action is Death &amp;&amp; e.Source == BoomBot) {</para>
+        <para>                for (int i = 0; i &lt; 100000; i++) {</para>
+        <para>                        Game cloned = (Game)game.CloneState();</para>
+        <para>                        cloned.ActionQueue.ProcessAll();</para>
+        <para>                }</para>
+        <para>        }</para>
+        <para>};</para>
+        <para>BoomBot.Hit(1);</para>
+
+        <para>The Hit method queues up a Damage action on the Boom Bot. The Boom Bot dies, and its Death action is queued. This in turn queues the ActionGraph which selects a random enemy character, then a random number between 1 and 4, then applies damage to the selection. The Death action then returns and ActionQueue.OnAction is fired. At this point, the queue contains only the deathrattle actions for the Boom Bot. We then clone the game (which also clones the queue) and run the queue on each clone. This gives a performance improvement of approximately 20% in the above example where there are no minions on-board with damage triggers (eg. Acolyte of Pain), and a 100% or greater increase when there are.</para>
+        <para><legacyBold>Working with the PowerHistory</legacyBold></para>
+        <para>Every item in the Power History has a sequence number starting with 0 (zero) when a new non-cloned game is created. When a game is cloned, the current sequence number is copied to the child game and a new log is started. By using a linked list in this fashion, we save the need to copy the entire Power History when cloning a game.</para>
+
+        <para>Thus when iterating over a tree of games to a particular leaf game, the sequence numbers of the Power History log are always contiguous. If new entries are added to a parent game's Power History, that game's sequence number will continue to increment as if no clone had occurred. Because the child game stores the sequence number at the point at which it was cloned, an accurate Power History of the entire game can still be constructed.</para>
+        <h3 class="c4" id="h.pgzvpolcp0l1">Subscribing to PowerHistory events</h3>
+        <para>The PowerHistory.OnPowerAction event fires whenever a new item is added to the PowerHistory log.</para>
+        <h3 class="c4" id="h.34gxe3nkgdpc">PowerHistory deltas</h3>
+        <para>A delta is the change in the PowerHistory log between two specific points in time. You will generally want to look at deltas to understand what changes have occurred to the game state as the result of a specific action, or to compare game actions for equality.</para>
+
+        <list class="bullet">
+          <listItem><para>Game.PowerHistory.DeltaSince(Game) returns the delta from the point at which the specified game was created to the end of the PowerHistory on the game the method is being called on. The specified Game must be an ancestor. This allows you to fetch the precise delta from the point where you cloned from a specific known parent game</para></listItem>
+          <listItem><para>Game.PowerHistory.DeltaTo(int) returns the local delta (the delta of this clone only) up to but not including the specified sequence number</para></listItem>
+          <listItem><para>Game.PowerHistory.CrunchedDelta(List&lt;PowerAction&gt;) takes a log or partial log and returns only the most recently changed tags for each changed entity, therefore giving the smallest possible delta that still results in the same game state</para></listItem>
+        </list>
+
+        <para>See below for information about comparing PowerHistory logs for equality.</para>
+        <para><legacyBold>Attaching new event triggers</legacyBold></para>
+        <para>You can add arbitrary event triggers to the game just as you can to card definitions.</para>
+
+        <para>Example:</para>
+
+        <para>game.ActiveTriggers.When(</para>
+        <para>Actions.Damage(Actions.AllMinions),</para>
+        <para>Actions.Give(</para>
+        <para>Actions.CurrentPlayer, Cards.FromName(&quot;Wisp&quot;)));</para>
+
+        <para>This will cause the current player to be given a new Wisp every time any minion on the board is damaged.</para>
+
+        <para>Since ActionGraph automatically converts functions to Func actions, you can more usefully create a trigger which calls an arbitrary function:</para>
+
+        <para>game.ActiveTriggers.When(</para>
+        <para>Actions.Damage(Actions.AllMinions), </para>
+        <para>(Action&lt;IEntity&gt;)(g =&gt; {</para>
+        <para>                Console.WriteLine(&quot;A MINION IS ABOUT TO BE DAMAGED!&quot;);</para>
+        <para>}));</para>
+
+        <para>The game object is supplied in g.</para>
+
+        <para>The main differences between attaching an event trigger and intercepting an action with ActionQueue.OnActionStarting or ActionQueue.OnAction are:</para>
+
+        <para>With triggers -</para>
+
+        <list class="bullet">
+          <listItem><para>Trigger match arguments can be used to filter which events are captured</para></listItem>
+          <listItem><para>Triggers queue an ActionGraph of your choice</para></listItem>
+          <listItem><para>Triggers are much slower</para></listItem>
+        </list>
+
+        <para>With delegate events -</para>
+
+        <list class="bullet">
+          <listItem><para>The event fires on every action and always calls a user-defined callback function</para></listItem>
+          <listItem><para>Nothing is queued unless the event handler queues something</para></listItem>
+          <listItem><para>If you want to filter what is captured, you must check the action and its arguments in the event handler</para></listItem>
+          <listItem><para>Delegate events are much faster</para></listItem>
+        </list>
+      </content>
+    </section>
+    <section>
+      <title>Game State and Entity State Equality</title>
+      <content>
+        <para>Testing game states for equivalence is crucial in AI applications and search tree pruning.</para>
+
+        <list class="bullet">
+          <listItem><para>Equality in this document means that two game or entity states are identical in every way</para></listItem>
+          <listItem><para>Equivalent in this document means that two game or entity states are functionally the same and behave identically from the player's perspective, but may differ. For example, two identical minions on the board may have different entity IDs, or two cards in a player's hand may have swapped positions. This has no functional effect on the game but means that the games are equivalent but not equal.</para></listItem>
+        </list>
+
+        <para>For equivalence testing, Brimstone makes extensive uses of hashes. Hashes are a mathematical computation based on any input data (in this case, the game state) which are designed to be fast to compute and unlikely to produce the same hash for two different sets of data.</para>
+
+        <para>Technically speaking, hashes cannot be used to test for equality, only inequality: two sets of data having different hashes are guaranteed to be different, but two sets of data having the same hash are not guaranteed to be the same. The case where two different sets of data produce the same hash is called a hash collision. For our usage, such hash collisions are extremely rare and we therefore accept this compromise and use hashes to compare game states for equivalence.</para>
+
+        <para>Brimstone provides various ways to test two game states for equality or equivalence, each with advantages and disadvantages:</para>
+
+        <list class="bullet">
+          <listItem><para>
+            PowerHistory equivalence allows you to test the PowerHistory from any two games - including cloned games with an arbitrary number of ancestors - for equality. This can be ordered equivalence - where the order of tag changes matter and is essentially pure equality testing - or unordered equivalence, where tag change order is ignored. This form of testing also allows you to ignore the position of cards in hand if desired as an optional flag. You can also specify tags to include or exclude in the comparison.<superscript>
+              <link xlink:href="#cmnt12">[l]</link>
+            </superscript> PowerHistory equivalence is the slowest but most flexible form of equivalence testing.<para/>
+          </para></listItem>
+          <listItem><para>
+            PowerHistory hash equality allows you to compare a running hash which is updated every time a new PowerHistory entity is created to that of another game. The PowerHistory class maintains two hashes: OrderedHash and UnorderedHash, which mirror the PowerHistory equivalence tests. These are much faster but do not allow you to filter tags or ignore card positions in hand. The PowerHistory hashes are copied when a game is cloned, so the comparison requires no calculation and is extremely fast.<para/><para/>However you may experience unexpected behaviour: consider the case where a 1-health minion is killed by 2 or 3 damage. As far as the PowerHistory is concerned, these are different game states and will have different hashes. This is because every tag change is included in the hash, regardless of whether it affects the overall game state or not. This is by design: the PowerHistory object has no way of knowing which tags are relevant and which are not.<para/>
+          </para></listItem>
+          <listItem><para>Fuzzy hash equality can be used to compare two entities for equivalence using a specific set of rules:</para></listItem>
+        </list>
+        <list class="bullet">
+          <listItem><para>The entity ID is ignored. This allows otherwise identical spells and minions - or minions which have swapped board positions but are otherwise identical - to be considered equivalent</para></listItem>
+          <listItem><para>The zone position of entities in each player's hand is ignored</para></listItem>
+          <listItem><para>The base immutable tags for the card associated with the entity are ignored, but the card ID is included to represent these starting tags in an efficient way</para></listItem>
+          <listItem><para>All other tags are included, but using only the latest tag values for each entity, therefore the order of tag changes - or tag changes that were overridden by subsequent changes to the same tag - are ignored</para></listItem>
+        </list>
+        <para>
+          <para/>Fuzzy hash equality is the fastest way to compare two entities. Fuzzy hashes are re-calculated only when requested, and the re-calculated value is cached until the entity is next changed. Even when the entity is changed, the hash will not be re-calculated unless the programmer requests it.<para/><para/>Note that using fuzzy hash equality on a Game object only compares the tags of the Game entity itself, not the entire game state.
+        </para>
+
+        <list class="bullet">
+          <listItem><para>Fuzzy game hash equality can be used to compare two game states for equivalence. The hash is created as follows:</para></listItem>
+        </list>
+        <list class="bullet">
+          <listItem><para>An ordered hash is created from all of the minions on the game board using their fuzzy hashes</para></listItem>
+          <listItem><para>An unordered hash is created from all of the other entities in the game using their fuzzy hashes</para></listItem>
+          <listItem><para>The two hashes are combined</para></listItem>
+        </list>
+
+        <para>This ensures that you cannot get the same game hash for two games which have minions swapped on board but are otherwise identical, while also not caring in which order entities have been changed.</para>
+        <para>
+          <para/>Fuzzy game hash equality is the fastest way to compare two game states for functional equivalence. Fuzzy game hashes are re-calculated only when requested, and the re-calculated value is cached.
+        </para>
+        <para><legacyBold>Equivalence settings</legacyBold></para>
+        <para>You can control whether hashes are cached and the default equivalence scheme with the following settings:</para>
+
+        <list class="bullet">
+          <listItem><para>Settings.EntityHashCaching (default: enabled) - cache fuzzy entity hashes</para></listItem>
+          <listItem><para>Settings.GameHashCaching (default: enabled) - cache fuzzy game hashes</para></listItem>
+          <listItem><para>Settings.UseGameHashForEquality (default: enabled) - use fuzzy game hashes to compare games for equivalence; if disabled, uses the PowerHistory delta</para></listItem>
+        </list>
+        <para><legacyBold>Comparing single entities for equivalence</legacyBold></para>
+        <para>Directly: entity1.FuzzyHash == entity2.FuzzyHash</para>
+        <para><legacyBold>Comparing complete game states for equivalence</legacyBold></para>
+        <para>Using the default equivalence scheme: game1.EquivalentTo(game2)</para>
+
+        <para>Using fuzzy hashing: game1.Entities.FuzzyGameHash == game2.Entities.FuzzyGameHash</para>
+
+        <para>Using PowerHistory deltas: game1.PowerHistory.EquivalentTo(game2.PowerHistory)</para>
+
+        <para>Using PowerHistory hashes: game1.PowerHistory.OrderedHash == game2.PowerHistory.OrderedHash or game1.PowerHistory.UnorderedHash == game2.PowerHistory.UnorderedHash</para>
+
+        <para>By default, PowerHistory delta equivalence will ignore the order of tag changes and the position of cards in the players' hands. If you want to test for pure equality, use:</para>
+
+        <para>game1.PowerHistory.EquivalentTo(game2.PowerHistory, Ordered: true, IgnoreHandPosition: false)</para>
+        <para><legacyBold>Checking if a game state has changed</legacyBold></para>
+        <para>The Game.Changed property returns true if the game state has changed since its fuzzy game hash was last re-calculated. If you are only interested in testing whether a specific action causes the game state to change, you can use this property to avoid re-calculating the entire fuzzy game hash.</para>
+
+        <para>As soon as you access the fuzzy game hash (which may also include comparing a game with another, searching for it in or adding it to a collection etc.), Game.Changed will return false until the next change.</para>
+
+        <para>If you want to ignore all changes before a certain point, you don't need to fetch the fuzzy game hash; instead, you can set Game.Changed to false, perform your action, then check the property again to see if it returns true.</para>
+        <para><legacyBold>Games and Entities in Collections</legacyBold></para>
+        <para>Oftentimes you will want to keep a series of games or entities in a collection and filter out any duplicates. Brimstone provides the FuzzyEntityComparer and FuzzyGameComparer classes for this, both of which implement IEqualityComparer&lt;T&gt;, allowing them to be used as a KeyComparer in keyed collections.</para>
+
+        <para>The mechanics of both comparer classes are identical, so we will just focus on FuzzyGameComparer below.</para>
+
+        <para>We recommend using a HashSet&lt;IEntity&gt; or HashSet&lt;Game&gt; to store large amounts of games. HashSet&lt;T&gt; executes insertions, removals and contains-tests in O(1) time.</para>
+
+        <para>If you have a list of games in another collection, you can create a collection of just the fuzzy unique games as follows:</para>
+
+        <para>var myUniqueGames = new HashSet&lt;Game&gt;(myGames, new FuzzyGameComparer());</para>
+
+        <para>Alternatively, you can create an empty collection:</para>
+
+        <para>var myUniqueGames = new HashSet&lt;Game&gt;(new FuzzyGameComparer());</para>
+
+        <para>Then, each time you add a new game with:</para>
+
+        <para>myUniqueGames.Add(newGame);</para>
+
+        <para>newGame will be automatically discarded if it is a duplicate of a game state already in the collection.</para>
+
+        <para>To test if a particular game state is already in the collection, simply use:</para>
+
+        <para>myUniqueGames.Contains(gameToTest)</para>
+
+        <para>IMPORTANT: Hash keys in .NET collections are immutable. This means if the state of a game or entity in a collection changes, its hash key will not be updated with the entity's current fuzzy hash. Note the following code:</para>
+
+        <para>var myHashSet = HashSet&lt;Game&gt;(new FuzzyGameComparer());</para>
+        <para>myHashSet.Add(game);</para>
+        <para>
+          myHashSet.Contains(game)   // returns true<para/>game.Player1.Give("Wisp");<para/>myHashSet.Contains(game)   // returns false<para/>
+        </para>
+      </content>
+    </section>
+    <section>
+      <title>Game Tree Modelling</title>
+      <content>
+        <para>Game trees are a fundamental building block for both classic game AIs and those using Deep Machine Learning (ML). Brimstone provides you with powerful, first-in-class tools for modelling Hearthstone game trees:</para>
+
+        <list class="bullet">
+          <listItem><para>The GameTree class allows you to quickly create an n-tree with an existing game as the root node</para></listItem>
+          <listItem><para>The GameNode class allows you traverse a game's parent and children, and create new branches</para></listItem>
+          <listItem><para>Trees are thread-safe and can be built and traversed both asynchronously and in parallel using either depth-first or breadth-first search; users can implement their own search algorithms</para></listItem>
+          <listItem><para>GameNode can be derived from to include custom data and behaviour. Brimstone comes with WeightedGameNode (for decision trees) and ProbabilisticGameNode (for non-deterministic outcomes) out of the box</para></listItem>
+          <listItem><para>
+            The ITreeActionWalker<superscript>
+              <link xlink:href="#cmnt13">[m]</link>
+            </superscript> interface lets you build a game tree automatically from game actions
+          </para></listItem>
+          <listItem><para>The game state equivalence tools allow duplicate nodes to be pruned rapidly</para></listItem>
+          <listItem><para>The built-in RandomOutcomeSearch tree builder allows you to fetch all the possible game states for a non-determinstic play - together with their probabilities - with a single line of code</para></listItem>
+        </list>
+
+        <para>NOTE: Game trees allow duplicate game states by default. You must prune duplicates yourself if desired.</para>
+
+        <para>IMPORTANT: If you are adding nodes to a tree from multiple threads, you must enable the ParallelClone setting.</para>
+        <para><legacyBold>Node types</legacyBold></para>
+        <list class="bullet">
+          <listItem><para>GameNode is a basic node which just contains a Game and references to its parent and children.</para></listItem>
+          <listItem><para>WeightedGameNode additionally stores a weighting in the Weight property from 0.0-1.0. This can be used for any purpose you wish, and can be interpreted as a weight on the edge from the parent to the node, or on the node itself. Typically used for decision trees.</para></listItem>
+          <listItem><para>ProbabilisticGameNode is a WeightedGameNode which additionally stores a probability of occurrence in the Probability property from 0.0-1.0. This is automatically populated as the Probability of the parent node multiplied by the Weight of the current node. Therefore, when creating non-deterministic trees, the Weights of all the direct children of a node specify the probability of that game state occurring assuming the parent game state occurs, while the Probability of any node in the tree gives the probability of reaching that node from the root node. Typically used for determining the likelihood of random outcomes.</para></listItem>
+          <listItem><para>You can also derive your own node types. The implementation must include a constructor which forwards all of the base class's constructor arguments.</para></listItem>
+        </list>
+        <para><legacyBold>Working with trees</legacyBold></para>
+        <list class="bullet">
+          <listItem><para>The static helper function GameTree.From(Game) returns a GameTree using GameNodes, creating a root node using the specified game</para></listItem>
+          <listItem><para>To create GameTrees using other node types, use new GameTree&lt;NodeType&gt;(new NodeType(Game, ...)) - NodeType must derive from GameNode</para></listItem>
+          <listItem><para>RootNode (property) returns the root node of the tree</para></listItem>
+          <listItem><para>NodeCount (property) returns the total number of nodes in the tree</para></listItem>
+          <listItem><para>LeafNodeCount (property) returns the total number of leaf nodes in the tree</para></listItem>
+        </list>
+
+        <para>By default, each node in the tree tracks its child nodes. This can be expensive performance-wise. If you do not require traversal via child nodes, disable child tracking by setting the TrackChildren property of the root node to false when creating the tree as follows:</para>
+
+        <para>var tree = new GameTree&lt;NodeType&gt;(new NodeType(Game, TrackChildren: false, ...));</para>
+        <para><legacyBold>Working with nodes</legacyBold></para>
+        <para>There are several ways to add nodes to the tree:</para>
+
+        <list class="bullet">
+          <listItem><para>GameNode node.Branch() clones the game in node and creates a new child node from it</para></listItem>
+          <listItem><para>IEnumerable&lt;GameNode&gt; node.Branch(quantity) clones the game in node the specified number of times and creates the corresponding number of new child nodes</para></listItem>
+          <listItem><para>void node.AddChild(GameNode) adds a new child node from an existing node</para></listItem>
+          <listItem><para>GameNode node.AddChild(Game) creates a new child node containing Game and returns it</para></listItem>
+          <listItem><para>HashSet&lt;GameNode&gt; node.AddChildren(IEnumerable&lt;Game&gt; Children) creates a set of new child nodes from the specified games and returns the nodes</para></listItem>
+          <listItem><para>void AddChildren(IEnumerable&lt;GameNode&gt; Children) adds the specified existing nodes as child nodes</para></listItem>
+        </list>
+
+        <para>WeightedGameNode and ProbabilisticGameNode provide additional overloads allowing you to specify the Weight(s) of the child nodes.</para>
+
+        <list class="bullet">
+          <listItem><para>Game (property) returns the Game encapsulated by the node</para></listItem>
+          <listItem><para>Parent (property) returns the parent node (or null if it is the root node)</para></listItem>
+          <listItem><para>Children (property) returns a HashSet of all the direct child nodes if child tracking is enabled (otherwise null)</para></listItem>
+        </list>
+        <para><legacyBold>Working with random outcomes</legacyBold></para>
+        <para>The RandomOutcomeSearch GameTree-derived class leverages game trees, action queue events and replacement together with cloning and equivalence tests to produce a probability set of all the possible outcomes given a starting game state and an action with a non-deterministic result.</para>
+        <h3 class="c4" id="h.2t4y76wdo6ny">Game state probability maps</h3>
+        <para>For example, to get all the possible outcomes from playing Arcane Missiles (which we will assume we hold a reference to in ArcaneMissiles):</para>
+
+        <para>var outcomes = RandomOutcomeSearch.Find(game, () =&gt; ArcaneMissiles.Play());</para>
+
+        <para>This function returns a Dictionary&lt;Game, double&gt; of fuzzy unique game states and their corresponding chance of occurring.</para>
+
+        <para>If you are using a GameTree&lt;ProbabilisticGameNode&gt; or a derived node thereof as your game tree, you can use an overload in ProbabilisticGameNode to easily add these results to your tree with the correct weightings:</para>
+
+        <para>var childNodes = myNode.AddChildren(outcomes);</para>
+
+        <para>IMPORTANT: The lambda expression in the call to RandomOutcomeSearch is run with the action queue paused, therefore you cannot rely on previous action results from within the expression itself. For best practice, use code which only generates one action in the expression.</para>
+        <h3 class="c4" id="h.kta37x1l1b7t">Inspecting the generated tree</h3>
+        <para>To inspect the constructed tree, use Build instead of Find. This will return the resulting tree instead of a list of games. To fetch the fuzzy, unique games from the tree call GetUniqueGames() on the returned tree object.</para>
+
+        <para>NOTE: Child tracking is disabled on trees generated by RandomOutcomeSearch for performance reasons.</para>
+        <h3 class="c4" id="h.a3hlcc3wigh0">Sequential vs parallel tree builds and algorithms</h3>
+        <para>By default, RandomOutcomeSearch builds game trees in parallel using breadth-first search (BFS). This default is suitable for most applications but there are some scenarios in which you may wish to use sequential (single-threaded) builds - for example if the tree is expected to be very small - or you may wish to use your own algorithm.</para>
+
+        <para>For full control, create a RandomOutcomeSearch using the following constructor arguments:</para>
+
+        <list class="bullet">
+          <listItem><para>Game - the starting game state</para></listItem>
+          <listItem><para>SearchMode - an ITreeActionWalker specifying the build and pruning algorithm. Defaults to BreadthFirstActionWalker. Built-in alternatives are DepthFirstActionWalker and NaiveActionWalker. You can also specify your own implementation.</para></listItem>
+          <listItem><para>Parallel - if not specified, uses the application-wide default in Settings.ParallelTreeSearch. Otherwise, specify true to enable parallel search and false to disable it.</para></listItem>
+        </list>
+
+        <para>To build the tree, call Run(action) on the created object.</para>
+
+        <para>For BreadthFirstActionWalker, you can also select the maximum number of processor cores to use and the minimum number of nodes required at the tree depth being processed before the work is split into parallel operations. This is because starting parallel work has a small overhead associated with it. By default the search will use all but one CPU core, and will not parallelize unless there are at least 100 nodes at the current depth. To change this, set the following properties on BreadthFirstActionWalker before you pass it to the RandomOutcomeSearch constructor:</para>
+
+        <list class="bullet">
+          <listItem><para>MaxDegreesOfParallelism - the number of CPU cores to use</para></listItem>
+          <listItem><para>MinNodesToParallelize - the minimum number of nodes required at a particular depth before that depth is parallelized</para></listItem>
+        </list>
+
+        <para>IMPORTANT: If you enable parallel tree search, you must enable parallel cloning with Settings.ParallelClone as well.</para>
+
+        <para>NOTE: NaiveActionWalker is extremely slow and should only be used for debugging purposes as it is (virtually) guaranteed to give the correct results every time.</para>
+
+        <para>NOTE: At the present time, BreadthFirstTreeWalker is optimized to prune duplicate nodes (fuzzy game states) after processing each tree depth, and is therefore a magnitude faster than DepthFirstTreeWalker. Do not change the default search algorithm unless you have a good reason to.</para>
+        <h3 class="c4" id="h.w8it9vkargh0">Search performance</h3>
+        <para>The following graph shows the performance of playing Arcane Missiles with the number of missiles adjusted from 1-10, on a board consisting of 5 Bloodfen Raptors and 2 Boom Bots per side, using BreadthFirstTreeWalker. The Boom Bots are modified to only attack minions in this test, for historical reasons. The Boom Bots are all positioned on the far right of each side of the board.</para>
+
+        <para>Test machine: Core i7-2600K, 16GB DDR3-1600 RAM, Windows 10, Brimstone Release build against AnyCPU architecture</para>
+
+        <mediaLink>
+          <caption>Tree Search Performance</caption>
+          <image xlink:href="TreeSearchPerformance"/>
+        </mediaLink>
+
+        <para>Both sequential and parallel BFS times scale approximately linearly with the number of fuzzy unique game states produced. Notice that that parallel version only gives a small performance improvement compared to the sequential algorithm. This is due to the fact that each depth must be searched completely before the next depth can begin in order to facilitate same-depth node pruning, and because game cloning in a parallel environment must be thread-safe, which introduces synchronization locks.</para>
+        <para>The speed-up from depth-first parallel vs sequential search is vast, however even the 2-missile search takes longer than the 10-missile search using BFS.</para>
+
+        <para>Nonetheless, we believe this to be by far the fastest Hearthstone tree search implemented to date. The 10-missile test generates 104,715 clones, processes the ActionQueue on each clone - pruning 86,752 of them in fuzzy equivalence testing - and returns 2,170 unique game states all in just 3.3 seconds.</para>
+      </content>
+    </section>
+    <section>
+      <title>Asynchronous (non-blocking) API</title>
+      <content>
+        <para>Brimstone includes an API for running computationally expensive operations as background tasks. Instead of running sequentially, you can use the asynchronous API to request a placeholder value - or promise object - in place of the actual result for a task, and do other work while you wait for the task to complete. In C#, promises are implemented as Task&lt;T&gt; objects.</para>
+
+        <para>All of the methods in Brimstone which return promises have the same names as the regular methods, suffixed with Async. Each returns a Task&lt;T&gt; where T is the type that the regular method call would return.</para>
+
+        <para>IMPORTANT: Brimstone's asynchronous API is based on the async/await pattern (TPL). To avoid deadlocks, you must design your application to use async/await "all the way down". Don't mix regular and asynchronous API calls to Brimstone in the same application if it can be avoided.</para>
+        <para><legacyBold>Supported methods</legacyBold></para>
+
+        <para>ActionQueue</para>
+        <list class="bullet">
+          <listItem><para>ProcessAllAsync(...)</para></listItem>
+          <listItem><para>ProcessOneAsync(...)</para></listItem>
+        </list>
+
+        <para>RandomOutcomeSearch</para>
+        <list class="bullet">
+          <listItem><para>RunAsync(...)</para></listItem>
+          <listItem><para>BuildAsync(...)</para></listItem>
+          <listItem><para>FindAsync(...)</para></listItem>
+        </list>
+
+        <para>Game</para>
+        <list class="bullet">
+          <listItem><para>
+            GetClonesAsync(...)<superscript>
+              <link xlink:href="#cmnt14">[n]</link>
+            </superscript>
+          </para></listItem>
+        </list>
+        <para><legacyBold>Usage</legacyBold></para>
+        <para>To run a task and relinquish control to the caller until the task completes:</para>
+
+        <para>await methodAsync(...);</para>
+
+        <para>(must be in a function denoted as async)</para>
+
+        <para>To start a task and continue (non-blocking execution):</para>
+
+        <para>var task = methodAsync(....);</para>
+
+        <para>To check if a task is completed:</para>
+
+        <para>task.IsCompleted</para>
+
+        <para>To wait for the task to complete:</para>
+
+        <para>await task;</para>
+
+        <para>To get the result of the task (type T):</para>
+
+        <para>task.Result</para>
+      </content>
+    </section>
+    <section>
+      <title>Additional Tools</title>
+      <content>
+        <para><legacyBold>Pretty game state output</legacyBold></para>
+        <para>Game implements IFormattable so that you can display the game state in more convenient ways. The format specifiers are as follows:</para>
+
+        <list class="bullet">
+          <listItem><para>G (General) - displays the game hash, board and hand state for each player with full card names and tags on a single line with no formatting, and the complete PowerHistory log (one line per item)</para></listItem>
+          <listItem><para>S (Short) - displays the game hash, board state for each player using only the first letter of each word in each card, damage in brackets and no other tags (one player per line), plus the last 20 entries in the PowerHistory log</para></listItem>
+          <listItem><para>s (super-short) - displays the same information as S but without the PowerHistory log</para></listItem>
+        </list>
+        <para><legacyBold>Customizable benchmarks</legacyBold></para>
+        <para>Brimstone includes the Benchmarks project which allows you to define and run benchmarks with selected filters. New benchmarks can be defined in BenchmarkDefinitions.cs in the project.</para>
+
+        <para>When the benchmarks have completed, the output is written to benchmarks.csv in the working directory and can be imported into any spreadsheet application.</para>
+
+        <para>IMPORTANT: Benchmarks should be run at the command-line and compiled in Release mode to ensure accurate results. The application will warn you when running in Debug mode.</para>
+        <h3 class="c4" id="h.3rykvu3m2fke">Output</h3>
+        <para>Each benchmark produces 4 time-to-complete results (7 in extended mode - see below):</para>
+
+        <list class="bullet">
+          <listItem><para>All optimizations enabled</para></listItem>
+          <listItem><para>Parallel tree search disabled</para></listItem>
+          <listItem><para>Copy-on-write cloning disabled</para></listItem>
+          <listItem><para>Zone caching disabled</para></listItem>
+          <listItem><para>Entity and game fuzzy hash caching disabled</para></listItem>
+          <listItem><para>Hash-for-equivalence testing disabled (uses PowerHistory log instead)</para></listItem>
+          <listItem><para>All optimizations disabled</para></listItem>
+        </list>
+
+        <para>Parallel cloning is always enabled unless specifically disabled in the benchmark test.</para>
+        <h3 class="c4" id="h.gje51iko6vw4">Command-line options</h3>
+        <list class="bullet">
+          <listItem><para>--filter=X - only run tests whose short name contains X</para></listItem>
+          <listItem><para>--timeout=X - stop tests which take longer than X milliseconds to run (note: having a timer for this creates a small performance penalty in the results; do not use if you need very accurate benchmarks)</para></listItem>
+          <listItem><para>--extended - run all 7 tests per benchmark (very slow)</para></listItem>
+        </list>
+        <para><legacyBold>Brimstone Visualizer</legacyBold></para>
+        <para>Brimstone comes with a Visualizer tool to help you trace the flow of game scripts you have written for testing purposes. This can include any hard-coded game or AI client using the Brimstone API that you like. The visualizer allows you to step through all changes to the ActionQueue, ResultStack and PowerHistory one at a time, essentially acting as a step-through debugger for your game code.</para>
+        <mediaLink>
+          <caption>Brimstone Visualizer</caption>
+          <image xlink:href="BrimstoneVisualizer"/>
+        </mediaLink>
+
+        <para>The script files are simply a compiled C# class saved as a DLL. To create a game script, use the following steps:</para>
+
+        <list class="ordered">
+          <listItem><para>Create a new C# Class Library project</para></listItem>
+          <listItem><para>Add References to Brimstone and BrimstoneVisualizer</para></listItem>
+          <listItem><para>Add the following skeleton code:</para></listItem>
+        </list>
+
+        <para>using Brimstone;</para>
+        <para>using BrimstoneVisualizer;</para>
+
+        <para>namespace BrimstoneGameScript</para>
+        <para>{</para>
+        <para>    public class BrimstoneGame : IBrimstoneGame</para>
+        <para>        {</para>
+        <para>                public Game SetupGame() {</para>
+        <para>                        var game = new Game(HeroClass.Hunter, HeroClass.Warlock, PowerHistory: true);</para>
+
+        <para>                        // Your game setup code...</para>
+
+        <para>                        return game;</para>
+        <para>                }</para>
+
+        <para>                public void PlayGame(Game Game) {</para>
+        <para>                        // Your gameplay code...</para>
+        <para>                }</para>
+        <para>        }</para>
+        <para>}</para>
+
+        <para>4. Add game setup and gameplay code as desired</para>
+        <para>5. Compile</para>
+
+        <para>You can then load the output DLL into BrimstoneVisualizer and step through the game.</para>
+      </content>
+    </section>
+    <section>
+      <content>
+        <para>---</para>
+        <para>First draft: June 27th 2016</para>
+        <para>Update 1: July 27th 2016</para>
+        <para>Update 2: August 23rd 2016</para>
+        <para>Written by Katy Coe</para>
+
+        <para>
+          <link xlink:href="#cmnt_ref1">[a]</link>Hero powers are not yet implemented
+        </para>
+        <para>
+          <link xlink:href="#cmnt_ref2">[b]</link>Work in progress
+        </para>
+        <para>
+          <link xlink:href="#cmnt_ref3">[c]</link>Not implemented yet
+        </para>
+        <para>
+          <link xlink:href="#cmnt_ref4">[d]</link>The way entities are selected has been changed. This section will be updated when the rules are finalized.
+        </para>
+        <para>
+          <link xlink:href="#cmnt_ref5">[e]</link>Not yet implemented
+        </para>
+        <para>
+          <link xlink:href="#cmnt_ref6">[f]</link>Not yet implemented
+        </para>
+        <para>
+          <link xlink:href="#cmnt_ref7">[g]</link>This is going to be simplified soon
+        </para>
+        <para>
+          <link xlink:href="#cmnt_ref8">[h]</link>Helper functions will be added to simplify this
+        </para>
+        <para>
+          <link xlink:href="#cmnt_ref9">[i]</link>DEPRECATED - This is still possible but is no longer the recommended way to modify arguments. Modify QueueActionEventArgs.Args in OnActionStarting before the action executes instead.
+        </para>
+        <para>
+          <link xlink:href="#cmnt_ref10">[j]</link>Implement
+        </para>
+        <para>
+          <link xlink:href="#cmnt_ref11">[k]</link>Weapons are not yet implemented
+        </para>
+        <para>
+          <link xlink:href="#cmnt_ref12">[l]</link>Not implemented yet
+        </para>
+        <para>
+          <link xlink:href="#cmnt_ref13">[m]</link>This API is implemented but the surface not finalized yet
+        </para>
+        <para>
+          <link xlink:href="#cmnt_ref14">[n]</link>Not yet implemented
+        </para>
+
+      </content>
+    </section>
+    <relatedTopics>
+    </relatedTopics>
+
+  </developerConceptualDocument>
+</topic>

@@ -6,7 +6,13 @@ namespace Brimstone
 {
 	public partial class Minion : Character<Minion>
 	{
-		public Minion(Minion cloneFrom) : base(cloneFrom) { }
+		internal Minion(Minion cloneFrom) : base(cloneFrom) { }
+		/// <summary>
+		/// Create a new orphaned minion
+		/// </summary>
+		/// <remarks>The minion is orphaned by default. To attach the minion to a game, set its <see cref="Minion.Zone"/> property.</remarks>
+		/// <param name="card">The card on which to base the entity</param>
+		/// <param name="tags">Tags to set upon creation</param>
 		public Minion(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
 
 		// Checks if it is currently possible to play this minion with a target. Does not check if a suitable target is available

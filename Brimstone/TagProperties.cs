@@ -347,6 +347,13 @@ namespace Brimstone
 	{
 		int AttackDamage { get; set; }
 		bool CantBeTargetedByOpponents { get; set; }
+		/// <summary>
+		/// The current number of points of damage this character has taken.
+		/// </summary>
+		/// <remarks>This figure is the difference between the current maximum health of this character and its
+		/// current health. If the character is healed, this figure will go down. If the character's maximum health
+		/// is changed in such a way that the damage is reset (for example, the Equality spell), this figure will
+		/// change to zero.</remarks>
 		int Damage { get; set; }
 		int Health { get; set; }
 		bool ToBeDestroyed { get; set; }
@@ -373,6 +380,7 @@ namespace Brimstone
 			set { this[GameTag.CANT_BE_TARGETED_BY_OPPONENTS] = value ? 1 : 0; }
 		}
 
+		/// <inheritdoc />
 		public int Damage {
 			get { return this[GameTag.DAMAGE]; }
 			set { this[GameTag.DAMAGE] = value; }
