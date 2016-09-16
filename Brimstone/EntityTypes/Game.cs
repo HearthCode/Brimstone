@@ -27,16 +27,17 @@ namespace Brimstone
 		// Game settings
 		public int MaxMinionsOnBoard { get; set; } = 7;
 
-		public EntityController Entities;
-		public TriggerManager ActiveTriggers;
-		public Environment Environment;
+		// TODO: Replace internal set with a static factory which creates a game from an EntityController
+		public EntityController Entities { get; internal set; }
+		public TriggerManager ActiveTriggers { get; private set; }
+		public Environment Environment { get; private set; }
 
-		public Player[] Players { get; private set; } = new Player[2];
+		public Player[] Players { get; } = new Player[2];
 		public Player Player1 {
 			get {
 				return Players[0];
 			}
-			set {
+			private set {
 				Players[0] = value;
 			}
 		}
@@ -44,7 +45,7 @@ namespace Brimstone
 			get {
 				return Players[1];
 			}
-			set {
+			private set {
 				Players[1] = value;
 			}
 		}
@@ -64,8 +65,8 @@ namespace Brimstone
 
 		public Zones Zones { get; }
 
-		public PowerHistory PowerHistory;
-		public ActionQueue ActionQueue;
+		public PowerHistory PowerHistory { get; private set; }
+		public ActionQueue ActionQueue { get; private set; }
 
 		// Game events (used for triggers and packet transmission)
 		public delegate void EntityCreateEventDelegate(Game Game, IEntity Entity);
@@ -80,7 +81,7 @@ namespace Brimstone
 		public int Depth { get; } = 0;
 
 		// Required by IEntity
-		public Game(Game cloneFrom) : base(cloneFrom) {
+		internal Game(Game cloneFrom) : base(cloneFrom) {
 			// Settings
 			FirstPlayerNum = cloneFrom.FirstPlayerNum;
 			SkipMulligan = cloneFrom.SkipMulligan;
@@ -233,11 +234,11 @@ namespace Brimstone
 			return (await ActionQueue.ProcessBlockAsync())?.FirstOrDefault() ?? ActionResult.None;
 		}
 
-		public void OnBlockEmpty(BlockStart Block) {
+		internal void OnBlockEmpty(BlockStart Block) {
 			OnBlockEmptyAsync(Block).Wait();
 		}
 
-		public async Task OnBlockEmptyAsync(BlockStart Block) {
+		internal async Task OnBlockEmptyAsync(BlockStart Block) {
 #if _GAME_DEBUG
 			DebugLog.WriteLine("Game " + GameId + ": Action block " + Block.Type + " for " + Entities[Block.Source].ShortDescription + " resolved");
 #endif
@@ -252,7 +253,7 @@ namespace Brimstone
 		}
 
 		private readonly HashSet<int> _deathCheckQueue;
-		public void OnQueueEmpty() {
+		internal void OnQueueEmpty() {
 #if _GAME_DEBUG
 			DebugLog.WriteLine("Game " + GameId + ": Action queue resolved");
 #endif
@@ -285,7 +286,7 @@ namespace Brimstone
 		}
 
 		// Death checking phase
-		public void RunDeathCreationStepIfNeeded() {
+		internal void RunDeathCreationStepIfNeeded() {
 #if _GAME_DEBUG
 			DebugLog.WriteLine("Game " + GameId + ": Checking for death creation step");
 #endif
@@ -388,7 +389,7 @@ namespace Brimstone
 			ActionQueue.ProcessAll();
 		}
 
-		public void GameWon() {
+		internal void GameWon() {
 			foreach (var p in Players) {
 				if (p.PlayState != PlayState.LOSING) continue;
 
@@ -398,7 +399,7 @@ namespace Brimstone
 			}
 		}
 
-		public void End() {
+		internal void End() {
 			NextStep = Step.FINAL_WRAPUP;
 			Step = Step.FINAL_WRAPUP;
 			NextStep = Step.FINAL_GAMEOVER;
@@ -408,16 +409,16 @@ namespace Brimstone
 			// TODO: Gold reward state
 		}
 
-		public void EntityCreated(IEntity entity) {
+		internal void EntityCreated(IEntity entity) {
 			OnEntityCreated?.Invoke(this, entity);
 		}
 
-		public void EntityChanging(IEntity entity, GameTag tag, int oldValue, int newValue, int previousHash) {
+		internal void EntityChanging(IEntity entity, GameTag tag, int oldValue, int newValue, int previousHash) {
 			if (Settings.GameHashCaching)
 				_changed = true;
 		}
 
-		public void EntityChanged(IEntity entity, GameTag tag, int oldValue, int newValue) {
+		internal void EntityChanged(IEntity entity, GameTag tag, int oldValue, int newValue) {
 			if ((tag == GameTag.DAMAGE && ((ICharacter)entity).Health <= 0) || (tag == GameTag.TO_BE_DESTROYED && newValue == 1))
 				_deathCheckQueue.Add(entity.Id);
 			// TODO: Minions who reach 0 current Health because their maximum Health becomes 0 (such as due to Confuse) also need to be added to _deathCheckQueue
