@@ -6,69 +6,7 @@
 
     <introduction>
       <para>Brimstone aims to be a high-performance, high-parity simulator for Hearthstone and other CCGs, with software developers, game designers and artificial intelligence academics as the target audience. We have drawn on our experience of the two existing major simulators - Fireplace and Metastone, and their peripheral projects - to craft a new simulator which solves the design problems inherent in the existing projects.</para>
-      <para>We have the following design goals for Brimstone:</para>
-      <list class="bullet">
-        <listItem>
-          <para>
-            <link xlink:href="#highperf">High performance</link>
-          </para>
-        </listItem>
-        <listItem>
-          <para>
-            <link xlink:href="#parity">High level of parity with actual Hearthstone behaviour</link>
-          </para>
-        </listItem>
-        <listItem>
-          <para>
-            <link xlink:href="#tickbased">Tag-driven, tick-based design with flexible hooks and infinite undo</link>
-          </para>
-        </listItem>
-        <listItem>
-          <para>
-            <link xlink:href="#cloning">Extremely fast state cloning</link>
-          </para>
-        </listItem>
-        <listItem>
-          <para>
-            <link xlink:href="#import">Multi-source game state importing</link>
-          </para>
-        </listItem>
-        <listItem>
-          <para>
-            <link xlink:href="#gametree">Game tree creation and traversal</link>
-          </para>
-        </listItem>
-        <listItem>
-          <para>
-            <link xlink:href="#probabilistic">Probabilistic state outcome generation</link>
-          </para>
-        </listItem>
-        <listItem>
-          <para>
-            <link xlink:href="#carddef">Declarative card definition language and easy-to-use API</link>
-          </para>
-        </listItem>
-        <listItem>
-          <para>
-            <link xlink:href="#connectors">Connectors for CNTK/TensorFlow neural network packages</link>
-          </para>
-        </listItem>
-        <listItem>
-          <para>
-            <link xlink:href="#extensible">Extensibility features for other collectible card games</link>
-          </para>
-        </listItem>
-        <listItem>
-          <para>
-            <link xlink:href="#easyuse">Easy black box installation and usage</link>
-          </para>
-        </listItem>
-        <listItem>
-          <para>
-            <link xlink:href="#docs">Great documentation</link>
-          </para>
-        </listItem>
-      </list>
+      <autoOutline lead="We have the following design goals for Brimstone:"/>
       <para>To understand some of the items below, it may help to familiarize yourself with Brimstone's [TODO: Tags and Entities Model].</para>
     </introduction>
 
@@ -281,7 +219,7 @@
     </section>
 
     <section address="docs">
-      <title>Great Documentation</title>
+      <title>Great documentation</title>
       <content>
         <para>Many users struggle with writing new card definitions or gameplay scripts with other simulators due to poor documentation API documentation and a lack of examples and tutorials. We try to ensure excellent documentation and tutorials so that a community can grow around Brimstone.</para>
         <para>Our API documentation is automatically generated from XML code comments using Sandcastle and updated on GitHub Pages automatically with every commit. Contributors are required to provide XML documentation for every public type, method and property they contribute.</para>
@@ -292,8 +230,8 @@
       </content>
     </section>
 
-    <section>
-      <title>Not yet implemented</title>
+    <section address="#future">
+      <title>Future developments</title>
       <content>
         <para address="import">
           <legacyBold>Multi-source game state importing</legacyBold>

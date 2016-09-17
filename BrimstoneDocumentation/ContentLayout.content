@@ -1,8 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Topics>
   <Topic id="bbd3d95b-45e3-46e9-bd51-35ee4749d7b6" visible="True" isDefault="true" isExpanded="true" title="Brimstone Developer Documentation">
-    <Topic id="7493ffc4-7c29-4d5e-b98f-b05779501025" visible="True" isSelected="true" title="Design Goals" />
-    <Topic id="aaa823e4-abc6-4151-9199-88f331bb4254" visible="True" title="Behavioural Model" />
+    <Topic id="7493ffc4-7c29-4d5e-b98f-b05779501025" visible="True" title="Design Goals" />
+    <Topic id="18642f79-254c-41de-b114-830086f71262" visible="True" title="Project Structure" />
+    <Topic id="35eb8d99-3f98-4a9b-8a05-46ad393bfd39" visible="True" noFile="true" isExpanded="true" title="Basic Concepts">
+      <Topic id="aaa823e4-abc6-4151-9199-88f331bb4254" visible="True" title="Game Structure: Cards, Entities and Tags" />
+    </Topic>
+    <Topic id="b1874693-0246-4c90-a611-b3354483dd73" visible="True" noFile="true" isExpanded="true" title="Benchmarks and Profiling">
+      <Topic id="f230a982-28b6-4fd1-b0ce-c3decd883ab4" visible="True" title="Walkthrough: Benchmarking a single build" />
+      <Topic id="4b0b00d6-f9a1-4eae-b880-892eb0d513fb" visible="True" title="Walkthrough: Benchmarking a series of builds" />
+      <Topic id="8d25a5f6-350d-4ebb-9a3b-1cb6a60cf573" visible="True" title="Walkthrough: Code profiling in Visual Studio" />
+    </Topic>
+    <Topic id="8409d776-e34a-419c-ba67-1806ba9b985d" visible="True" isExpanded="true" title="Contributor Guide">
+      <Topic id="cfbf62f4-cb3b-4697-8f98-221c39cd3232" visible="True" title="Contributing Code" />
+      <Topic id="64f4468c-70df-4827-b028-66d547ce7952" visible="True" isSelected="true" title="Contributing Documentation" />
+    </Topic>
     <Topic id="cfbc1e9f-a4cf-4463-8007-491c7ac285fc" visible="True" isExpanded="true" apiParentMode="InsertBefore" title="Version History">
       <Topic id="c1506970-e752-4aa2-9c66-98de53657db6" visible="True" title="Pre-alpha Update 3" />
     </Topic>

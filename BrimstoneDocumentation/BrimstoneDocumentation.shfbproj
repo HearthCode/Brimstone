@@ -81,8 +81,8 @@
     <FooterText>&amp;lt%3ba href=&amp;quot%3bhttp://discord.me/hearthstoneworkinggroup&amp;quot%3b&amp;gt%3bJoin us on Discord&amp;lt%3b/a&amp;gt%3b&amp;lt%3bbr /&amp;gt%3b</FooterText>
     <ApiFilter>
       <Filter entryType="Namespace" fullName="" isExposed="False" xmlns="">
-  <Filter entryType="Structure" fullName="Variant" isExposed="True" />
-</Filter>
+        <Filter entryType="Structure" fullName="Variant" isExposed="True" />
+      </Filter>
     </ApiFilter>
   </PropertyGroup>
   <!-- There are no properties for these groups.  AnyCPU needs to appear in order for Visual Studio to perform
@@ -110,10 +110,17 @@
     <Folder Include="media" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Content\Benchmarking.aml" />
     <None Include="Content\BrimstoneBehaviouralModel.aml" />
+    <None Include="Content\ContributeCode.aml" />
+    <None Include="Content\ContributeDocs.aml" />
+    <None Include="Content\ContributorGuide.aml" />
     <None Include="Content\DesignGoals.aml" />
+    <None Include="Content\MultiBuildBenchmark.aml" />
+    <None Include="Content\ProjectLayout.aml" />
     <None Include="Content\VersionHistory\PreAlphaUpdate3.aml" />
     <None Include="Content\VersionHistory\VersionHistory.aml" />
+    <None Include="Content\VSProfiling.aml" />
     <None Include="Content\Welcome.aml" />
   </ItemGroup>
   <ItemGroup>
@@ -133,6 +140,10 @@
     <Image Include="media\TreeSearchPerformance.png">
       <ImageId>TreeSearchPerformance</ImageId>
       <AlternateText>Tree Search Performance</AlternateText>
+    </Image>
+    <Image Include="media\VisualStudioFormattingOptions.png">
+      <ImageId>VisualStudioFormattingOptions</ImageId>
+      <AlternateText>Visual Studio Formatting Options</AlternateText>
     </Image>
   </ItemGroup>
   <!-- Import the SHFB build targets -->

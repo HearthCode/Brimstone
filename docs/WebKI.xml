@@ -2500,10 +2500,10 @@
   <HelpKINode Title="PLAYER field">
     <HelpKINode Title="Concede.PLAYER Field" Url="html/ec5582be-c290-6a13-dbae-252b596e95ec.htm" />
     <HelpKINode Title="CreateChoice.PLAYER Field" Url="html/2d7a9e6f-6b58-d3ef-45af-6e82afb171d8.htm" />
+    <HelpKINode Title="Draw.PLAYER Field" Url="html/41efdbd9-5c39-9644-0805-88ea080e43bf.htm" />
     <HelpKINode Title="GainMana.PLAYER Field" Url="html/ed24d6fa-5871-45fe-8cf9-289871a6daaa.htm" />
     <HelpKINode Title="Give.PLAYER Field" Url="html/9bcdcc60-2fe0-7666-7ae8-32ec412652e1.htm" />
     <HelpKINode Title="Summon.PLAYER Field" Url="html/3ef5ab3b-6829-de3d-b3eb-30843098506a.htm" />
-    <HelpKINode Title="Draw.PLAYER Field" Url="html/41efdbd9-5c39-9644-0805-88ea080e43bf.htm" />
   </HelpKINode>
   <HelpKINode Title="Player field" Url="html/16701a94-2e2f-1f53-ff85-955f7b9476c0.htm" />
   <HelpKINode Title="Player.BaseMana property" Url="html/c314baf5-5972-ccb2-4ed1-9fb09a25546d.htm" />
@@ -2644,8 +2644,8 @@
   </HelpKINode>
   <HelpKINode Title="PREHEALING enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="PREMIUM enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
-  <HelpKINode Title="PRIEST enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Priest enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
+  <HelpKINode Title="PRIEST enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Priest field" Url="html/46d2405a-f490-bfac-62b7-fc65b46866d0.htm" />
   <HelpKINode Title="ProbabilisticGameNode class">
     <HelpKINode Title="ProbabilisticGameNode Class" Url="html/5fe2c9bd-95c9-52a1-f339-387688a1ec36.htm" />
@@ -2944,8 +2944,8 @@
     <HelpKINode Title="methods" Url="html/411b5455-3b41-7a26-1472-811dd06755c2.htm" />
   </HelpKINode>
   <HelpKINode Title="RNG&lt;T&gt;.Choose method" Url="html/de999927-ad63-e17a-8ad1-0d79dcb29d58.htm" />
-  <HelpKINode Title="Rogue enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
   <HelpKINode Title="ROGUE enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
+  <HelpKINode Title="Rogue enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
   <HelpKINode Title="Rogue field" Url="html/f7b182d7-ac21-0f42-3cd1-890066c98435.htm" />
   <HelpKINode Title="RootNode property" Url="html/37ffcba0-2d7e-ee1e-8472-96484b8f905d.htm" />
   <HelpKINode Title="Run method">
@@ -3243,15 +3243,15 @@
   </HelpKINode>
   <HelpKINode Title="TargetingException.TargetingException constructor" Url="html/49f96c89-19a5-2532-9478-a89169808b25.htm" />
   <HelpKINode Title="TARGETING_ARROW_TEXT enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
-  <HelpKINode Title="Targets field" Url="html/588c2a22-5f27-b403-9b7a-18d6359bf3a4.htm" />
   <HelpKINode Title="TARGETS field">
-    <HelpKINode Title="Bounce.TARGETS Field" Url="html/ae567682-0f4f-9625-cc5f-9ca2bc2f5055.htm" />
     <HelpKINode Title="Damage.TARGETS Field" Url="html/7a8a256b-744c-3289-6d10-fe54d779a64f.htm" />
-    <HelpKINode Title="Destroy.TARGETS Field" Url="html/876202eb-51a4-9f0a-ecf7-e3381c0583e9.htm" />
     <HelpKINode Title="Discard.TARGETS Field" Url="html/82c2f08d-7e47-a837-bdc1-e777509d6f0f.htm" />
     <HelpKINode Title="Heal.TARGETS Field" Url="html/b977f1a4-714b-24cd-8e98-c51ce3f0dd4f.htm" />
     <HelpKINode Title="Silence.TARGETS Field" Url="html/3c69129c-8a42-b8b1-bba9-1a96cbba1564.htm" />
+    <HelpKINode Title="Bounce.TARGETS Field" Url="html/ae567682-0f4f-9625-cc5f-9ca2bc2f5055.htm" />
+    <HelpKINode Title="Destroy.TARGETS Field" Url="html/876202eb-51a4-9f0a-ecf7-e3381c0583e9.htm" />
   </HelpKINode>
+  <HelpKINode Title="Targets field" Url="html/588c2a22-5f27-b403-9b7a-18d6359bf3a4.htm" />
   <HelpKINode Title="TAUNT enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="TAUNT_READY enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="TAUREN enumeration member" Url="html/13f175ee-1818-86f5-b4bb-db843b2cc81c.htm" />

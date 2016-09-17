@@ -1,0 +1,372 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="cfbf62f4-cb3b-4697-8f98-221c39cd3232" revisionNumber="1">
+  <developerConceptualDocument
+    xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+
+    <summary>
+      <para>Everything you need to know in order to submit code to Brimstone.</para>
+    </summary>
+    <introduction>
+      <autoOutline lead="In this section:"/>
+    </introduction>
+
+    <section address="naming">
+      <title>Code naming conventions</title>
+      <content>
+        <para>
+          <codeInline>Public</codeInline>, <codeInline>internal</codeInline> and <codeInline>protected</codeInline> classes and members should use <legacyBold>UpperCamelCase</legacyBold>.
+        </para>
+        <para>
+          <codeInline>Private</codeInline> members should use <legacyBold>_underscoreCamelCase</legacyBold>.
+        </para>
+        <para>
+          Local variables should use <legacyBold>camelCase</legacyBold>.
+        </para>
+        <para>
+          <codeInline>Interface</codeInline> definitions should start with the letter <codeInline>I</codeInline>.
+        </para>
+        <para>
+          Filenames should generally be named after the primary class they define.
+        </para>
+      </content>
+    </section>
+
+    <section address="formatting">
+      <title>Code formatting conventions</title>
+      <content>
+        <para>
+          Each indent level should use a single tab, not spaces. We use 4-character width tabs by default.
+        </para>
+        <para>
+          Lines should end in a single linefeed (LF) with no preceding carriage return (CR).
+        </para>
+        <para>
+          There should be no double-newlines, every file should end in a single newline, and there should be newlines between class and method definitions. Fields and properties which are related can be placed with no newlines between them if desired. There should be no trailing whitespace at the end of lines. For example:
+        </para>
+        <code language="cs">
+          class Foo
+          {
+            private int _myProperty;
+            public int MyProperty ...
+
+            public int RelatedProperty1 ...
+            public int RelatedProperty2 ...
+
+            public int AnUnrelatedProperty ...
+
+            public void MyMethod() {
+              ...
+            }
+
+            public void AnotherMethod() {
+              ...
+            }
+          }
+        </code>
+        <para>
+          <codeInline>using</codeInline> declarations should be in alphabetical order starting with .NET Framework namespaces then any 3rd party namespaces, then Brimstone namespaces. Unnecessary <codeInline>using</codeInline>s should be removed.
+        </para>
+        <para>
+          <codeInline>namespace</codeInline>s and <codeInline>class</codeInline>es should use opening and closing curly braces on separate lines after the definition line, ie.
+        </para>
+        <code language="cs">
+          class Foo
+          {
+            // Code
+          }
+        </code>
+        <para>
+          Everything except namespace and class definitions should use the K&amp;R style: opening curly brace at the end of the definition line with one space before it, and the closing brace on a separate line. For example:
+        </para>
+        <code language="cs">
+          public int MyMethod(int x) {
+            return x * 2;
+          }
+        </code>
+        <para>
+          Control blocks with a single statement may have their curly braces ommitted.
+        </para>
+        <para>
+          Pre-processor directives such as <codeInline>#define</codeInline> should always go at the start of the line with no leading whitespace.
+        </para>
+        <para>
+          Comments at the start of files should go before any <codeInline>using</codeInline> directives.
+        </para>
+        <para>
+          Properties should not use a private backing field unless required.
+        </para>
+        <para>
+          No <codeInline>public</codeInline> members of any class should be fields. Always use properties instead.
+        </para>
+        <para>
+          <codeInline>get</codeInline>-only properties should use expression bodies where possible, for example:
+        </para>
+        <code language="cs">
+          public bool SomeProperty => true;
+        </code>
+        <para>
+          All public members should have XML comments with one blank line above the start of the comments and no blank lines between the end of the comments and the start of the member. Comments should be triple-slashed (<codeInline>///</codeInline>). XML comments should include at least a <codeInline>&lt;summaary></codeInline>, <codeInline>&lt;param></codeInline> list (where appropriate) and a <codeInline>&lt;returns></codeInline> block where appropriate. Place any longer description or special notes in a <codeInline>&lt;remarks></codeInline> block.
+        </para>
+        <para>
+          The order in which <codeInline>class</codeInline> members should appear is as follows:
+        </para>
+        <list class="ordered">
+          <listItem>
+            <para>Private constants</para>
+          </listItem>
+          <listItem>
+            <para>Public constants</para>
+          </listItem>
+          <listItem>
+            <para>Public properties</para>
+          </listItem>
+          <listItem>
+            <para>Private and internal properties</para>
+          </listItem>
+          <listItem>
+            <para>Protected properties</para>
+          </listItem>
+          <listItem>
+            <para>Public, private and internal methods can be in mixed order and should be grouped together according to relevance, for example a protected implementation override for a public method should be defined immediately above the public method</para>
+          </listItem>
+          <listItem>
+            <para>
+              When used, system-defined interface implementations in the order: <legacyBold>IEnumerable</legacyBold> (GetEnumerator), <legacyBold>System.Object</legacyBold> (Equals, GetHashCode and ToString), <legacyBold>IFormatProvider</legacyBold> (ToString), <legacyBold>IDisposable</legacyBold> (Dispose), <legacyBold>ICloneable</legacyBold> (Clone)
+            </para>
+          </listItem>
+          <listItem>
+            <para>Explicit interface instantiations should go immediately above the non-explicit implementation</para>
+          </listItem>
+        </list>
+        <para>
+          Use the <codeInline>null</codeInline> ternary operator rather than <codeInline>if</codeInline> statements, for example:
+        </para>
+        <code language="cs">
+          // Bad
+          var foo = (bar != null? bar : 123);
+
+          // Good
+          var foo = bar ?? 123;
+        </code>
+        <para>
+          Use <codeInline>null</codeInline> propagation rather than <codeInline>if</codeInline> statements, for example:
+        </para>
+        <code language="cs">
+          // Bad
+          if (foo != null)
+            foo.Method();
+          var arrayItem = (myArray == null? null : myArray[3]);
+          if (myEvent != null)
+            myEvent();
+
+          // Good
+          foo?.Method();
+          var arrayItem = myArray?[3];
+          myEvent?.Invoke();
+        </code>
+      </content>
+    </section>
+
+    <section address="patterns">
+      <title>Brimstone design patterns</title>
+      <content>
+        <para>
+          <legacyBold>Actions and the action queue</legacyBold>
+        </para>
+        <para>
+          Never run an action immediately except when writing a method on an entity type used directly as an API call, for example <codeEntityReference qualifyHint="false">M:Brimstone.Playable`1.Play(Brimstone.ICharacter)</codeEntityReference>, in which case the action should always run immediately. Actions generated from within other actions <legacyBold>MUST</legacyBold> be queued otherwise the code will deadlock. If you need to add more behaviour that runs after the queued item, queue a continuation function using <codeEntityReference qualifyHint="false">T:Brimstone.Actions.Func</codeEntityReference>.
+        </para>
+        <para>
+          Always use <codeEntityReference qualifyHint="true" autoUpgrade="true">M:Brimstone.Game.Action(Brimstone.IEntity,Brimstone.ActionGraph)</codeEntityReference> or <codeEntityReference qualifyHint="true" autoUpgrade="true">M:Brimstone.Game.Queue(Brimstone.IEntity,Brimstone.ActionGraph)</codeEntityReference> to add items to the action queue.
+        </para>
+        <para>
+          When creating new actions, never include fields or properties which are not value types as this will break cloning.
+        </para>
+        <para>
+          When creating new actions, always name each argument index with an all-caps <codeInline>public static int</codeInline> declaration. Follow the naming conventions used in other defined Actions.
+        </para>
+
+        <para>
+          <legacyBold>Entities and tag manipulation</legacyBold>
+        </para>
+        <para>
+          Always prefer to use the various entity interface types than concrete entity types where possible when working with entities. This helps to reduce the number of casts end-users need to make.
+        </para>
+        <para>
+          Never store entity references (to <codeEntityReference>T:Brimstone.IEntity</codeEntityReference>) directly as it complicates cloning. Instead, store the entity's ID as an integer instead (<codeEntityReference qualifyHint="true">P:Brimstone.IEntity.Id</codeEntityReference>) and use the <codeEntityReference qualifyHint="true">P:Brimstone.Game.Entities</codeEntityReference> indexer to locate the entity when you need to resolve the reference. This counts only for objects which need to be cloned. For non-cloneable objects, feel free to use entity references directly.
+        </para>
+        <para>Never read or set tags directly in non-core code with the entity indexer. Always use the tag properties instead to ensure proper type conversion and trigger execution.</para>
+        <para>In core code (for example, zone management) where you may want to alter an entity's tags without firing triggers, set the tag via the entity's indexer.</para>
+
+        <para>
+          <legacyBold>Behaviours</legacyBold>
+        </para>
+        <para>
+          Always use the static methods and properties in <codeEntityReference qualifyHint="true">T:Brimstone.Behaviours</codeEntityReference> to create actions. Never create <codeEntityReference qualifyHint="true">T:Brimstone.QueueAction</codeEntityReference> objects directly.
+        </para>
+        <para>
+          When creation actions with some arguments missing, always use the named argument syntax to specify the particular arguments you are supplying. Failure to do this will make the action queue crash.
+        </para>
+        <para>
+          Never fill in missing arguments when defining new behaviours. Always make every argument optional, with a default value of <codeInline>null</codeInline>.
+        </para>
+
+        <para>
+          <legacyBold>XML documentation</legacyBold>
+        </para>
+        <para>
+          Never copy &amp; paste XML documentation from a base class or interface to a derived class or implementation. Instead use, the Sandcastle custom XML tag <codeInline>&lt;inheritdoc /></codeInline> as the only XML comment. This will cause the base documentation to be automatically inherited.
+        </para>
+        <para>
+          <legacyBold>General</legacyBold>
+        </para>
+        <para>
+          Never throw generic exceptions. Always throw an exception derived from <codeEntityReference qualifyHint="true">T:Brimstone.BrimstoneException</codeEntityReference>. The exception is <codeEntityReference>T:System.NotImplementedException</codeEntityReference> which may be used in stub code that has not been fully implemented yet.
+        </para>
+        <para>
+          When creating collections that may require cloning, always use collection classes from <codeEntityReference qualifyHint="true">N:System.Collections.Immutable</codeEntityReference>.
+        </para>
+        <para>
+          Always prefer Linq statements over <codeInline>foreach</codeInline> loops. Always prefer to return an <codeEntityReference>T:System.Collections.Generic.IEnumerable`1</codeEntityReference> over a concrete collection. Always prefer <codeInline>yield return</codeInline> over sequential iteration. Always use the Linq <codeEntityReference qualifyHint="false" autoUpgrade="true">M:System.Linq.Enumerable.Any``1(System.Collections.Generic.IEnumerable{``0})</codeEntityReference> method instead of <codeEntityReference qualifyHint="false" autoUpgrade="true">M:System.Linq.Enumerable.Count``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Boolean})</codeEntityReference> on non-concrete collections. Use the regular <codeEntityReference qualifyHint="false">P:System.Collections.Generic.List`1.Count</codeEntityReference> property on concrete collections. These patterns improve the performance of Brimstone for cases where not every item in a collection will be iterated. Linq also uses lazy evaluation such that the expression is only evaluated when iteration starts, and only for the iterated elements.
+        </para>
+        <para>
+          When implementing <codeEntityReference autoUpgrade="true" qualifyHint="true">T:System.ICloneable</codeEntityReference>, the <codeEntityReference qualifyHint="false">M:System.ICloneable.Clone</codeEntityReference> method should merely call the a class copy constructor which takes the existing object as its only argument and clones it.
+        </para>
+      </content>
+    </section>
+
+    <section address="unittest">
+      <title>Running unit tests</title>
+      <content>
+        <para>
+          Brimstone's unit tests are written using the NUnit Fremework. To run the tests in Visual Studio, you must install the <legacyBold>NUnit Test Adapter</legacyBold> from the <legacyBold>Tools -> Extensions and Updates...</legacyBold> window. Once you have done this, build the solution and open <legacyBold>Test Explorer</legacyBold>  via the <legacyBold>Test -> Windows -> Test Explorer</legacyBold> menu option. Click <legacyBold>Run All</legacyBold> to run the tests.
+        </para>
+        <alert class="important">
+          <para>Always run unit tests in Release build configuration. Do not submit pull requests with failing tests without prior approval.</para>
+        </alert>
+        <para>
+          If you need to debug one of your tests, switch to Debug build configuration, set a breakpoint in the code, right-click your failing test and choose <legacyBold>Debug Selected Tests</legacyBold>.
+        </para>
+      </content>
+    </section>
+
+    <section address="profiling">
+      <title>Benchmarking and profiling</title>
+      <content>
+        <para>
+          You must benchmark your code if it may have a detrimental performance impact. Please see <link xlink:href="f230a982-28b6-4fd1-b0ce-c3decd883ab4" /> for information on how to benchmark and profile your code changes.
+        </para>
+      </content>
+    </section>
+
+    <section address="codetools">
+      <title>Tools for Brimstone code contributors</title>
+      <content>
+        <para>There are a number of tools that can be used to help you meet the style and documentation guidelines with minimal effort:</para>
+        <list class="bullet">
+          <listItem>
+            <para>
+              <legacyBold>Git Diff Margin</legacyBold> is a free Visual Studio extension that shows adds, changes and deletions to each uncommitted file in the text editor scrollbar margin. It can be installed from the <legacyBold>Tools -> Extensions and Updates...</legacyBold> window and requires no additional setup.
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <legacyBold>ReSharper</legacyBold> is a commercial tool that lets you specify automatically applied naming formatting rules and can also automatically apply basic code optimizations for you. It will also show you a colour-coded summary of any problems in your code in the scrollbar margin.
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <legacyBold>Visual Studio's text editor settings</legacyBold> also allow you to specify formatting rules. They can be accessed via the <legacyBold>Tools -> Options -> Text Editor -> C# -> Formatting</legacyBold> dialog.
+            </para>
+            <mediaLink>
+              <caption>Visual Studio Formatting Options</caption>
+              <image xlink:href="VisualStudioFormattingOptions"/>
+            </mediaLink>
+          </listItem>
+          <listItem>
+            <para>
+              <legacyBold>End of The Line</legacyBold> is a free Visual Studio extension that shows LF and CRLF line endings in your code. It can be installed from the <legacyBold>Tools -> Extensions and Updates...</legacyBold> window. Line endings should be commited as LF only. End of The Line adds the menu option <legacyBold>Edit -> Advanced -> Make Line Endings LF</legacyBold> to ensure that any files you modify have the correct line endings.
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              The <legacyBold>NUnit Test Project Template</legacyBold> and <legacyBold>Test Generator NUnit Extension</legacyBold> are free Visual Studio extensions which allow you to create new NUnit test classes easily. They add project templates to Visual Studio's <legacyBold>File -> New Project...</legacyBold> dialog.
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <legacyBold>GhostDoc</legacyBold> is a free Visual Studio extension which automatically generates XML documentation for you. You can download it       <externalLink>
+                <linkText>here</linkText>
+                <linkUri>http://submain.com/products/ghostdoc.aspx</linkUri>
+                <linkTarget>_blank</linkTarget>
+              </externalLink>.
+            </para>
+          </listItem>
+        </list>
+      </content>
+    </section>
+
+    <section address="codetips">
+      <title>Tips for Brimstone code contributors</title>
+      <content>
+        <para>The following keyboard shortcuts can save you lots of time:</para>
+        <list class="bullet">
+          <listItem>
+            <para>
+              <legacyBold>Ctrl+.</legacyBold> - show quick fixes for the code under the cursor. This allows you to quickly insert missing <codeInline>using</codeInline> statements and so on. If you have ReSharper installed, it can also simplify statements by using null propagation, expression bodies, merge Linq queries, and fix casting issues.
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <legacyBold>Ctrl+R, Ctrl+R</legacyBold> - renames all occurrences of a code element. If you have ReSharper installed, it can also rename overloads and update comments.
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <legacyBold>Ctrl+K, Ctrl+D</legacyBold> - if you have code formatting set up correctly, this will format the entire document to match the style guidelines automatically.
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <legacyBold>F7</legacyBold> - rebuilds the solution
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <legacyBold>Ctrl+F5</legacyBold> - builds the current startup project and any dependencies and runs it
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <legacyBold>F5</legacyBold> - starts the current startup project in the debugger (use F10 to step over a statement and F11 to step into a statement)
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <legacyBold>Ctrl+Shift+F9</legacyBold> - deletes all breakpoints
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <legacyBold>Alt+F2, Enter</legacyBold> - starts the performance profiler for the current startup project
+            </para>
+          </listItem>
+        </list>
+      </content>
+    </section>
+
+    <relatedTopics>
+      <externalLink>
+        <linkText>GhostDoc download</linkText>
+        <linkUri>http://submain.com/products/ghostdoc.aspx</linkUri>
+        <linkTarget>_blank</linkTarget>
+      </externalLink>
+      <externalLink>
+        <linkText>ReSharper download (trial version)</linkText>
+        <linkUri>https://www.jetbrains.com/resharper</linkUri>
+        <linkTarget>_blank</linkTarget>
+      </externalLink>
+    </relatedTopics>
+  </developerConceptualDocument>
+</topic>

@@ -51,6 +51,11 @@
           </listItem>
         </list>
 
+        <alert class="important">
+          <para>Brimstone uses git submodules. To ensure you clone the complete codebase, ensure you clone using the command: <codeInline>git clone --recursive https://github.com/HearthSim/Brimstone</codeInline> or tick the <legacyBold>Recursively Clone Submodules</legacyBold> box in Visual Studio's <legacyBold>Team Explorer</legacyBold> when cloning.
+        </para>
+        </alert>
+
         <definitionTable>
           <definedTerm>Building with Visual Studio</definedTerm>
           <definition>
