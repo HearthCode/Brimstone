@@ -232,47 +232,50 @@
 
     <section address="#future">
       <title>Future developments</title>
-      <content>
-        <para address="import">
-          <legacyBold>Multi-source game state importing</legacyBold>
-        </para>
-        <para>Other simulators have no simple way of importing game states from either completed games or those in progress, either from their output or from actual Hearthstone games or replay logs. We aim to create an import interface which users can implement to create their own imports, as well as providing out-of-the-box import functionality for common sources.</para>
+      <content></content>
+      <sections>
+        <section address="import">
+          <title>Multi-source game state importing</title>
+          <content>
+            <para>Other simulators have no simple way of importing game states from either completed games or those in progress, either from their output or from actual Hearthstone games or replay logs. We aim to create an import interface which users can implement to create their own imports, as well as providing out-of-the-box import functionality for common sources.</para>
 
-        <list class="bullet">
-          <listItem>
-            <para>
-              Import from an <legacyItalic>entity.log</legacyItalic> from DeepLog
-            </para>
-          </listItem>
-          <listItem>
-            <para>Import from the PowerHistory log or a partial PowerHistory log from another Game object</para>
-          </listItem>
-          <listItem>
-            <para>Import from an <legacyItalic>hsreplay</legacyItalic> XML file</para>
-          </listItem>
-          <listItem>
-            <para>Import from a Hearthstone Power.log file</para>
-          </listItem>
-        </list>
-
-        <para>This allows us to take real games, analyse them, and check our code for bugs as well.</para>
-        <para>To achieve these goals, we have designed game entity objects to be self-describing, such that a new game can be initialized simply by passing it a list of entities and allowing it to configure itself.</para>
-        <para>The PowerHistory log currently supports producing a crunched version of itself with only the current tags of each entity. Importers should create PowerHistory logs from their import sources, retrieve the crunched log then initialize each game entity using the current tag set for each corresponding entity in the log.</para>
-
-        <para address="connectors">
-          <legacyBold>Connectors for CNTK/TensorFlow neural network packages</legacyBold>
-        </para>
-
-        <para>Brimstone is optimized for AI performance and ML use. Microsoft's CNTK has C++ and C# APIs while Google's TensorFlow has a Python API and limited C++ API. In the future we would like to be able to evaluate models created from graphs in these ML APIs with the Brimstone simulator. It must also be easy for two ML AIs to play against each other.</para>
-
-        <para address="extensible">
-          <legacyBold>Extensibility features for other collectible card games</legacyBold>
-        </para>
-
-        <para>Preliminary work has been done here, but we would like to fully separate out all of the card definitions, actions, rulesets and FSM behaviour of Hearthstone into a modular system such that it can be replaced, allowing new card games to be developed using Hearthstone's core tag and entity-based engine. This would allow Brimstone to function as a generic card game engine that could be used as a basis to create or simulate arbitrary new or existing card games.</para>
-      </content>
+            <list class="bullet">
+              <listItem>
+                <para>
+                  Import from an <legacyItalic>entity.log</legacyItalic> from DeepLog
+                </para>
+              </listItem>
+              <listItem>
+                <para>Import from the PowerHistory log or a partial PowerHistory log from another Game object</para>
+              </listItem>
+              <listItem>
+                <para>
+                  Import from an <legacyItalic>hsreplay</legacyItalic> XML file
+                </para>
+              </listItem>
+              <listItem>
+                <para>Import from a Hearthstone Power.log file</para>
+              </listItem>
+            </list>
+            <para>This allows us to take real games, analyse them, and check our code for bugs as well.</para>
+            <para>To achieve these goals, we have designed game entity objects to be self-describing, such that a new game can be initialized simply by passing it a list of entities and allowing it to configure itself.</para>
+            <para>The PowerHistory log currently supports producing a crunched version of itself with only the current tags of each entity. Importers should create PowerHistory logs from their import sources, retrieve the crunched log then initialize each game entity using the current tag set for each corresponding entity in the log.</para>
+          </content>
+        </section>
+        <section address="connectors">
+          <title>Connectors for CNTK/TensorFlow neural network packages</title>
+          <content>
+            <para>Brimstone is optimized for AI performance and ML use. Microsoft's CNTK has C++ and C# APIs while Google's TensorFlow has a Python API and limited C++ API. In the future we would like to be able to evaluate models created from graphs in these ML APIs with the Brimstone simulator. It must also be easy for two ML AIs to play against each other.</para>
+          </content>
+        </section>
+        <section address="extensible">
+          <title>Extensibility features for other collectible card games</title>
+          <content>
+            <para>Preliminary work has been done here, but we would like to fully separate out all of the card definitions, actions, rulesets and FSM behaviour of Hearthstone into a modular system such that it can be replaced, allowing new card games to be developed using Hearthstone's core tag and entity-based engine. This would allow Brimstone to function as a generic card game engine that could be used as a basis to create or simulate arbitrary new or existing card games.</para>
+          </content>
+        </section>
+      </sections>
     </section>
-
     <relatedTopics>
     </relatedTopics>
 

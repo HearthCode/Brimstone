@@ -170,70 +170,78 @@
 
     <section address="patterns">
       <title>Brimstone design patterns</title>
-      <content>
-        <para>
-          <legacyBold>Actions and the action queue</legacyBold>
-        </para>
-        <para>
-          Never run an action immediately except when writing a method on an entity type used directly as an API call, for example <codeEntityReference qualifyHint="false">M:Brimstone.Playable`1.Play(Brimstone.ICharacter)</codeEntityReference>, in which case the action should always run immediately. Actions generated from within other actions <legacyBold>MUST</legacyBold> be queued otherwise the code will deadlock. If you need to add more behaviour that runs after the queued item, queue a continuation function using <codeEntityReference qualifyHint="false">T:Brimstone.Actions.Func</codeEntityReference>.
-        </para>
-        <para>
-          Always use <codeEntityReference qualifyHint="true" autoUpgrade="true">M:Brimstone.Game.Action(Brimstone.IEntity,Brimstone.ActionGraph)</codeEntityReference> or <codeEntityReference qualifyHint="true" autoUpgrade="true">M:Brimstone.Game.Queue(Brimstone.IEntity,Brimstone.ActionGraph)</codeEntityReference> to add items to the action queue.
-        </para>
-        <para>
-          When creating new actions, never include fields or properties which are not value types as this will break cloning.
-        </para>
-        <para>
-          When creating new actions, always name each argument index with an all-caps <codeInline>public static int</codeInline> declaration. Follow the naming conventions used in other defined Actions.
-        </para>
-
-        <para>
-          <legacyBold>Entities and tag manipulation</legacyBold>
-        </para>
-        <para>
-          Always prefer to use the various entity interface types than concrete entity types where possible when working with entities. This helps to reduce the number of casts end-users need to make.
-        </para>
-        <para>
-          Never store entity references (to <codeEntityReference>T:Brimstone.IEntity</codeEntityReference>) directly as it complicates cloning. Instead, store the entity's ID as an integer instead (<codeEntityReference qualifyHint="true">P:Brimstone.IEntity.Id</codeEntityReference>) and use the <codeEntityReference qualifyHint="true">P:Brimstone.Game.Entities</codeEntityReference> indexer to locate the entity when you need to resolve the reference. This counts only for objects which need to be cloned. For non-cloneable objects, feel free to use entity references directly.
-        </para>
-        <para>Never read or set tags directly in non-core code with the entity indexer. Always use the tag properties instead to ensure proper type conversion and trigger execution.</para>
-        <para>In core code (for example, zone management) where you may want to alter an entity's tags without firing triggers, set the tag via the entity's indexer.</para>
-
-        <para>
-          <legacyBold>Behaviours</legacyBold>
-        </para>
-        <para>
-          Always use the static methods and properties in <codeEntityReference qualifyHint="true">T:Brimstone.Behaviours</codeEntityReference> to create actions. Never create <codeEntityReference qualifyHint="true">T:Brimstone.QueueAction</codeEntityReference> objects directly.
-        </para>
-        <para>
-          When creation actions with some arguments missing, always use the named argument syntax to specify the particular arguments you are supplying. Failure to do this will make the action queue crash.
-        </para>
-        <para>
-          Never fill in missing arguments when defining new behaviours. Always make every argument optional, with a default value of <codeInline>null</codeInline>.
-        </para>
-
-        <para>
-          <legacyBold>XML documentation</legacyBold>
-        </para>
-        <para>
-          Never copy &amp; paste XML documentation from a base class or interface to a derived class or implementation. Instead use, the Sandcastle custom XML tag <codeInline>&lt;inheritdoc /></codeInline> as the only XML comment. This will cause the base documentation to be automatically inherited.
-        </para>
-        <para>
-          <legacyBold>General</legacyBold>
-        </para>
-        <para>
-          Never throw generic exceptions. Always throw an exception derived from <codeEntityReference qualifyHint="true">T:Brimstone.BrimstoneException</codeEntityReference>. The exception is <codeEntityReference>T:System.NotImplementedException</codeEntityReference> which may be used in stub code that has not been fully implemented yet.
-        </para>
-        <para>
-          When creating collections that may require cloning, always use collection classes from <codeEntityReference qualifyHint="true">N:System.Collections.Immutable</codeEntityReference>.
-        </para>
-        <para>
-          Always prefer Linq statements over <codeInline>foreach</codeInline> loops. Always prefer to return an <codeEntityReference>T:System.Collections.Generic.IEnumerable`1</codeEntityReference> over a concrete collection. Always prefer <codeInline>yield return</codeInline> over sequential iteration. Always use the Linq <codeEntityReference qualifyHint="false" autoUpgrade="true">M:System.Linq.Enumerable.Any``1(System.Collections.Generic.IEnumerable{``0})</codeEntityReference> method instead of <codeEntityReference qualifyHint="false" autoUpgrade="true">M:System.Linq.Enumerable.Count``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Boolean})</codeEntityReference> on non-concrete collections. Use the regular <codeEntityReference qualifyHint="false">P:System.Collections.Generic.List`1.Count</codeEntityReference> property on concrete collections. These patterns improve the performance of Brimstone for cases where not every item in a collection will be iterated. Linq also uses lazy evaluation such that the expression is only evaluated when iteration starts, and only for the iterated elements.
-        </para>
-        <para>
-          When implementing <codeEntityReference autoUpgrade="true" qualifyHint="true">T:System.ICloneable</codeEntityReference>, the <codeEntityReference qualifyHint="false">M:System.ICloneable.Clone</codeEntityReference> method should merely call the a class copy constructor which takes the existing object as its only argument and clones it.
-        </para>
-      </content>
+      <content></content>
+      <sections>
+        <section>
+          <title>Actions and the action queue</title>
+          <content>
+            <para>
+              Never run an action immediately except when writing a method on an entity type used directly as an API call, for example <codeEntityReference qualifyHint="false">M:Brimstone.Playable`1.Play(Brimstone.ICharacter)</codeEntityReference>, in which case the action should always run immediately. Actions generated from within other actions <legacyBold>MUST</legacyBold> be queued otherwise the code will deadlock. If you need to add more behaviour that runs after the queued item, queue a continuation function using <codeEntityReference qualifyHint="false">T:Brimstone.Actions.Func</codeEntityReference>.
+            </para>
+            <para>
+              Always use <codeEntityReference qualifyHint="true" autoUpgrade="true">M:Brimstone.Game.Action(Brimstone.IEntity,Brimstone.ActionGraph)</codeEntityReference> or <codeEntityReference qualifyHint="true" autoUpgrade="true">M:Brimstone.Game.Queue(Brimstone.IEntity,Brimstone.ActionGraph)</codeEntityReference> to add items to the action queue.
+            </para>
+            <para>
+              When creating new actions, never include fields or properties which are not value types as this will break cloning.
+            </para>
+            <para>
+              When creating new actions, always name each argument index with an all-caps <codeInline>public static int</codeInline> declaration. Follow the naming conventions used in other defined Actions.
+            </para>
+          </content>
+        </section>
+        <section>
+          <title>Entities and tag manipulation</title>
+          <content>
+            <para>
+              Always prefer to use the various entity interface types than concrete entity types where possible when working with entities. This helps to reduce the number of casts end-users need to make.
+            </para>
+            <para>
+              Never store entity references (to <codeEntityReference>T:Brimstone.IEntity</codeEntityReference>) directly as it complicates cloning. Instead, store the entity's ID as an integer instead (<codeEntityReference qualifyHint="true">P:Brimstone.IEntity.Id</codeEntityReference>) and use the <codeEntityReference qualifyHint="true">P:Brimstone.Game.Entities</codeEntityReference> indexer to locate the entity when you need to resolve the reference. This counts only for objects which need to be cloned. For non-cloneable objects, feel free to use entity references directly.
+            </para>
+            <para>Never read or set tags directly in non-core code with the entity indexer. Always use the tag properties instead to ensure proper type conversion and trigger execution.</para>
+            <para>In core code (for example, zone management) where you may want to alter an entity's tags without firing triggers, set the tag via the entity's indexer.</para>
+          </content>
+        </section>
+        <section>
+          <title>Behaviours</title>
+          <content>
+            <para>
+              Always use the static methods and properties in <codeEntityReference qualifyHint="true">T:Brimstone.Behaviours</codeEntityReference> to create actions. Never create <codeEntityReference qualifyHint="true">T:Brimstone.QueueAction</codeEntityReference> objects directly.
+            </para>
+            <para>
+              When creation actions with some arguments missing, always use the named argument syntax to specify the particular arguments you are supplying. Failure to do this will make the action queue crash.
+            </para>
+            <para>
+              Never fill in missing arguments when defining new behaviours. Always make every argument optional, with a default value of <codeInline>null</codeInline>.
+            </para>
+          </content>
+        </section>
+        <section>
+          <title>XML documentation</title>
+          <content>
+            <para>
+              Never copy &amp; paste XML documentation from a base class or interface to a derived class or implementation. Instead use, the Sandcastle custom XML tag <codeInline>&lt;inheritdoc /></codeInline> as the only XML comment. This will cause the base documentation to be automatically inherited.
+            </para>
+          </content>
+        </section>
+        <section>
+          <title>General</title>
+          <content>
+            <para>
+              Never throw generic exceptions. Always throw an exception derived from <codeEntityReference qualifyHint="true">T:Brimstone.BrimstoneException</codeEntityReference>. The exception is <codeEntityReference>T:System.NotImplementedException</codeEntityReference> which may be used in stub code that has not been fully implemented yet.
+            </para>
+            <para>
+              When creating collections that may require cloning, always use collection classes from <codeEntityReference qualifyHint="true">N:System.Collections.Immutable</codeEntityReference>.
+            </para>
+            <para>
+              Always prefer Linq statements over <codeInline>foreach</codeInline> loops. Always prefer to return an <codeEntityReference>T:System.Collections.Generic.IEnumerable`1</codeEntityReference> over a concrete collection. Always prefer <codeInline>yield return</codeInline> over sequential iteration. Always use the Linq <codeEntityReference qualifyHint="false" autoUpgrade="true">M:System.Linq.Enumerable.Any``1(System.Collections.Generic.IEnumerable{``0})</codeEntityReference> method instead of <codeEntityReference qualifyHint="false" autoUpgrade="true">M:System.Linq.Enumerable.Count``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Boolean})</codeEntityReference> on non-concrete collections. Use the regular <codeEntityReference qualifyHint="false">P:System.Collections.Generic.List`1.Count</codeEntityReference> property on concrete collections. These patterns improve the performance of Brimstone for cases where not every item in a collection will be iterated. Linq also uses lazy evaluation such that the expression is only evaluated when iteration starts, and only for the iterated elements.
+            </para>
+            <para>
+              When implementing <codeEntityReference autoUpgrade="true" qualifyHint="true">T:System.ICloneable</codeEntityReference>, the <codeEntityReference qualifyHint="false">M:System.ICloneable.Clone</codeEntityReference> method should merely call the a class copy constructor which takes the existing object as its only argument and clones it.
+            </para>
+          </content>
+        </section>
+      </sections>
     </section>
 
     <section address="unittest">

@@ -62,9 +62,19 @@
           As many paragraphs as you like...
         <span class="highlight-xml-bracket">&lt;/</span><span class="highlight-xml-tag">para</span><span class="highlight-xml-bracket">&gt;</span>
         <span class="highlight-xml-bracket">&lt;</span><span class="highlight-xml-tag">para</span><span class="highlight-xml-bracket">&gt;</span>
-          <span class="highlight-xml-bracket">&lt;</span><span class="highlight-xml-tag">legacyBold</span><span class="highlight-xml-bracket">&gt;</span>Make sub-headings using the legacyBold tag and place them in their own paragraph like this<span class="highlight-xml-bracket">&lt;/</span><span class="highlight-xml-tag">legacyBold</span><span class="highlight-xml-bracket">&gt;</span>
-        <span class="highlight-xml-bracket">&lt;/</span><span class="highlight-xml-tag">para</span><span class="highlight-xml-bracket">&gt;</span>
+        <span class="highlight-xml-comment">&lt;!-- If your section has sub-sections, you can use &lt;autoOutline /&gt; to generate a list of sub-section links here --&gt;</span>
       <span class="highlight-xml-bracket">&lt;/</span><span class="highlight-xml-tag">content</span><span class="highlight-xml-bracket">&gt;</span>
+      <span class="highlight-xml-bracket">&lt;</span><span class="highlight-xml-tag">sections</span><span class="highlight-xml-bracket">&gt;</span>
+        <span class="highlight-xml-bracket">&lt;</span><span class="highlight-xml-tag">section</span><span class="highlight-xml-bracket">&gt;</span>
+          <span class="highlight-xml-bracket">&lt;</span><span class="highlight-xml-tag">title</span><span class="highlight-xml-bracket">&gt;</span>Place sub-sections in a sections tag like this<span class="highlight-xml-bracket">&lt;/</span><span class="highlight-xml-tag">legacyBold</span><span class="highlight-xml-bracket">&gt;</span>
+          <span class="highlight-xml-bracket">&lt;</span><span class="highlight-xml-tag">content</span><span class="highlight-xml-bracket">&gt;</span>
+            <span class="highlight-xml-bracket">&lt;</span><span class="highlight-xml-tag">para</span><span class="highlight-xml-bracket">&gt;</span>Sub-section text. Sub-sections are not collapsible.<span class="highlight-xml-bracket">&lt;/</span><span class="highlight-xml-tag">para</span><span class="highlight-xml-bracket">&gt;</span>
+          <span class="highlight-xml-bracket">&lt;/</span><span class="highlight-xml-tag">content</span><span class="highlight-xml-bracket">&gt;</span>
+        <span class="highlight-xml-bracket">&lt;/</span><span class="highlight-xml-tag">section</span><span class="highlight-xml-bracket">&gt;</span>
+        <span class="highlight-xml-bracket">&lt;</span><span class="highlight-xml-tag">section</span><span class="highlight-xml-bracket">&gt;</span>
+          <span class="highlight-xml-comment">&lt;!-- As many sub-sections as you like --&gt;</span>
+        <span class="highlight-xml-bracket">&lt;/</span><span class="highlight-xml-tag">section</span><span class="highlight-xml-bracket">&gt;</span>
+      <span class="highlight-xml-bracket">&lt;/</span><span class="highlight-xml-tag">sections</span><span class="highlight-xml-bracket">&gt;</span>
     <span class="highlight-xml-bracket">&lt;/</span><span class="highlight-xml-tag">section</span><span class="highlight-xml-bracket">&gt;</span>
 
     <span class="highlight-xml-bracket">&lt;</span><span class="highlight-xml-tag">section</span> <span class="highlight-xml-attribute-name">address</span><span class="highlight-xml-attribute-equal">=</span><span class="highlight-xml-attribute-value">"secondsection"</span><span class="highlight-xml-bracket">&gt;</span>
@@ -113,8 +123,14 @@
             </p></li><li><p>
               Drag the node of the image you wish to include into your MAML document. The image code will be inserted at the cursor position.
             </p></li></ol></div><div class="collapsibleAreaRegion" id="style"><span class="collapsibleRegionTitle" onclick="SectionExpandCollapse('ID11RB')" onkeypress="SectionExpandCollapse_CheckKey('ID11RB', event)" tabindex="0"><img id="ID11RBToggle" class="collapseToggle" src="../icons/SectionExpanded.png" />Documentation style guidelines</span></div><div id="ID11RBSection" class="collapsibleSection"><p>New documentation must follow the standards of the existing documentation for consistency. Bear in mind the following points as you write:</p><ul><li><p>
-              Place sub-headings within each section in their own paragraph in bold type like this:
-              <div class="codeSnippetContainer"><div class="codeSnippetContainerCodeContainer"><div class="codeSnippetToolBar"><div class="codeSnippetToolBarText"><a id="ID2EAAALAACAAA_copyCode" href="#" onclick="javascript:CopyToClipboard('ID2EAAALAACAAA');return false;" title="Copy">Copy</a></div></div><div id="ID2EAAALAACAAA_code_Div1" class="codeSnippetContainerCode" style="display: block"><pre xml:space="preserve"><span class="highlight-xml-bracket">&lt;</span><span class="highlight-xml-tag">para</span><span class="highlight-xml-bracket">&gt;</span><span class="highlight-xml-bracket">&lt;</span><span class="highlight-xml-tag">legacyBold</span><span class="highlight-xml-bracket">&gt;</span>My sub-heading<span class="highlight-xml-bracket">&lt;/</span><span class="highlight-xml-tag">legacyBold</span><span class="highlight-xml-bracket">&gt;</span><span class="highlight-xml-bracket">&lt;/</span><span class="highlight-xml-tag">para</span><span class="highlight-xml-bracket">&gt;</span></pre></div></div></div><script type="text/javascript">AddLanguageTabSet("ID2EAAALAACAAA");</script></p></li><li><p>
+              Place sub-sections inside a <span class="code">&lt;sections&gt;</span> element after the closing <span class="code">&lt;/content&gt;</span> tag section of the parent section like this:
+              <div class="codeSnippetContainer"><div class="codeSnippetContainerCodeContainer"><div class="codeSnippetToolBar"><div class="codeSnippetToolBarText"><a id="ID2EAAALAACAAA_copyCode" href="#" onclick="javascript:CopyToClipboard('ID2EAAALAACAAA');return false;" title="Copy">Copy</a></div></div><div id="ID2EAAALAACAAA_code_Div1" class="codeSnippetContainerCode" style="display: block"><pre xml:space="preserve"><span class="highlight-xml-bracket">&lt;</span><span class="highlight-xml-tag">sections</span><span class="highlight-xml-bracket">&gt;</span>
+  <span class="highlight-xml-bracket">&lt;</span><span class="highlight-xml-tag">section</span><span class="highlight-xml-bracket">&gt;</span>
+    <span class="highlight-xml-bracket">&lt;</span><span class="highlight-xml-tag">title</span><span class="highlight-xml-bracket">&gt;</span>First sub-section<span class="highlight-xml-bracket">&lt;/</span><span class="highlight-xml-tag">title</span><span class="highlight-xml-bracket">&gt;</span>
+    <span class="highlight-xml-bracket">&lt;</span><span class="highlight-xml-tag">content</span><span class="highlight-xml-bracket">&gt;</span> ... <span class="highlight-xml-bracket">&lt;/</span><span class="highlight-xml-tag">content</span><span class="highlight-xml-bracket">&gt;</span>
+  <span class="highlight-xml-bracket">&lt;/</span><span class="highlight-xml-tag">section</span><span class="highlight-xml-bracket">&gt;</span>
+  <span class="highlight-xml-comment">&lt;!-- Repeat for as many sub-sections as desired --&gt;</span>
+<span class="highlight-xml-bracket">&lt;/</span><span class="highlight-xml-tag">sections</span><span class="highlight-xml-bracket">&gt;</span></pre></div></div></div><script type="text/javascript">AddLanguageTabSet("ID2EAAALAACAAA");</script></p></li><li><p>
               When using the names of repositories, projects, menu items, window titles, folders and filenames, or emphasizing a word or phrase, surround them in <span class="code">&lt;legacyBold&gt;</span> tags.
             </p></li><li><p>
               When introducing new concepts and terminology, surround them in <span class="code">&lt;legacyItalic&gt;</span> tags the first time they are used.
@@ -123,11 +139,11 @@
             </p></li><li><p>
               Use ordered lists when listing a sequence of items that are performed in order using <span class="code">&lt;list class="ordered"&gt;</span>.
             </p></li><li><p>
-              Sub-section headings should only use a capital letter for the first character (except for proper pronouns such as Hearthstone).
+              Sub-section titles should only use a capital letter for the first character (except for proper pronouns such as Hearthstone).
             </p></li><li><p>
               Reference pages and sections that have not been written yet with <span class="code">[TODO: Some topic]</span> so that they are easy to find and create a reference for later in the MAML code.
             </p></li><li><p>
-              Pages with multiple sections should always include a section outline at the top (you can use the <span class="code">&lt;autoOutline lead="In this section:"/&gt;</span> tag to include this automatically at the end of your introduction.
+              Pages with multiple sections should always include a section outline at the top (you can use the <span class="code">&lt;autoOutline lead="In this section:"/&gt;</span> tag to include this automatically at the end of your introduction. Sub-section outlines are optional.
             </p></li><li><p>
               Place tips, notes and warnings immediately under the corresponding paragraph using <span class="code">&lt;alert class="tip/note/warning/caution/important"&gt;</span>.
             </p></li><li><p>

@@ -138,9 +138,19 @@
           As many paragraphs as you like...
         </para>
         <para>
-          <legacyBold>Make sub-headings using the legacyBold tag and place them in their own paragraph like this</legacyBold>
-        </para>
+        <!-- If your section has sub-sections, you can use <autoOutline /> to generate a list of sub-section links here -->
       </content>
+      <sections>
+        <section>
+          <title>Place sub-sections in a sections tag like this</legacyBold>
+          <content>
+            <para>Sub-section text. Sub-sections are not collapsible.</para>
+          </content>
+        </section>
+        <section>
+          <!-- As many sub-sections as you like -->
+        </section>
+      </sections>
     </section>
     
     <section address="secondsection">
@@ -331,9 +341,15 @@
         <list class="bullet">
           <listItem>
             <para>
-              Place sub-headings within each section in their own paragraph in bold type like this:
+              Place sub-sections inside a <codeInline>&lt;sections></codeInline> element after the closing <codeInline>&lt;/content></codeInline> tag section of the parent section like this:
               <code language="xml"><![CDATA[
-<para><legacyBold>My sub-heading</legacyBold></para>
+<sections>
+  <section>
+    <title>First sub-section</title>
+    <content> ... </content>
+  </section>
+  <!-- Repeat for as many sub-sections as desired -->
+</sections>
 ]]></code>
             </para>
           </listItem>
@@ -359,7 +375,7 @@
           </listItem>
           <listItem>
             <para>
-              Sub-section headings should only use a capital letter for the first character (except for proper pronouns such as Hearthstone).
+              Sub-section titles should only use a capital letter for the first character (except for proper pronouns such as Hearthstone).
             </para>
           </listItem>
           <listItem>
@@ -369,7 +385,7 @@
           </listItem>
           <listItem>
             <para>
-              Pages with multiple sections should always include a section outline at the top (you can use the <codeInline>&lt;autoOutline lead="In this section:"/></codeInline> tag to include this automatically at the end of your introduction.
+              Pages with multiple sections should always include a section outline at the top (you can use the <codeInline>&lt;autoOutline lead="In this section:"/></codeInline> tag to include this automatically at the end of your introduction. Sub-section outlines are optional.
             </para>
           </listItem>
           <listItem>
