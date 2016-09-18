@@ -190,27 +190,6 @@
       </content>
     </section>
 
-    <section address="preview">
-      <title>How to preview a topic</title>
-      <content>
-        <para>
-          You do not need to re-compile the entire documentation to view your changes. Simply open the <legacyBold>Topic Previewer</legacyBold> via the <legacyBold>View -> Other Windows -> Topic Previewer Window</legacyBold> option. When you save your document, click the Refresh icon or press F5 in the Topic Previewer to see a preview of the document. Note that some formatting may be different and links to .NET elements and the API Reference will render in bold text rather than as a link.
-        </para>
-        <para>
-          If you wish to preview the entire documentation, build the solution (press F7) in Documentation build configuration. This may take several minutes to complete. Once the compilation is finished, click <legacyBold>View Help File</legacyBold> on the SHFB Toolbar, accessible via the <legacyBold>View -> Toolbars -> Sandcastle Help File Builder</legacyBold> menu option. This will allow you to view the documentation in a web browser.
-        </para>
-        <alert class="tip">
-          <para>
-            By default, compiling the documentation will start an IIS Express server hosting the documentation web site with the homepage at <externalLink>
-              <linkText>http://localhost:12345/SHFBOutput_1572097774/index.html</linkText>
-              <linkUri>http://localhost:12345/SHFBOutput_1572097774/index.html</linkUri>
-              <linkTarget>_blank</linkTarget>
-            </externalLink>.
-          </para>
-        </alert>
-      </content>
-    </section>
-
     <section address="movetopic">
       <title>How to move a topic in the documentation tree</title>
       <content>
@@ -224,6 +203,32 @@
             <legacyBold>To move a topic to another level in the tree:</legacyBold> Right-click the topic, select <legacyBold>Cut</legacyBold>, click on the topic you wish to be the new topic parent, right-click and choose <legacyBold>Paste as Child</legacyBold>.
           </para>
         </listItem>
+        </list>
+      </content>
+    </section>
+
+    <section address="topiclink">
+      <title>How to insert a link to another topic</title>
+      <content>
+        <para>
+          You do not need to work with topic GUIDs directly. To insert a link to another topic page:
+        </para>
+        <list class="ordered">
+          <listItem>
+            <para>
+              Open the <legacyBold>Entity References</legacyBold> window via the <legacyBold>View -> Other Windows -> Entity References Window</legacyBold> menu option.
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              Choose <legacyBold>Table of Contents</legacyBold> from the drop-down box to show the documentation tree.
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              Drag the node of the topic you wish to include into your MAML document. The link tag will be inserted at the cursor position.
+            </para>
+          </listItem>
         </list>
       </content>
     </section>
@@ -342,7 +347,8 @@
           <listItem>
             <para>
               Place sub-sections inside a <codeInline>&lt;sections></codeInline> element after the closing <codeInline>&lt;/content></codeInline> tag section of the parent section like this:
-              <code language="xml"><![CDATA[
+            </para>
+            <code language="xml"><![CDATA[
 <sections>
   <section>
     <title>First sub-section</title>
@@ -351,7 +357,6 @@
   <!-- Repeat for as many sub-sections as desired -->
 </sections>
 ]]></code>
-            </para>
           </listItem>
           <listItem>
             <para>

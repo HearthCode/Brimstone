@@ -1222,8 +1222,8 @@
   <HelpKINode Title="Draw.PLAYER field" Url="html/41efdbd9-5c39-9644-0805-88ea080e43bf.htm" />
   <HelpKINode Title="Draw.Run method" Url="html/1f167bc0-078a-2907-981a-f7947d89a510.htm" />
   <HelpKINode Title="DREAM enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
-  <HelpKINode Title="Druid enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
   <HelpKINode Title="DRUID enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
+  <HelpKINode Title="Druid enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
   <HelpKINode Title="Druid field" Url="html/b663432d-607b-9f27-72ef-7d21ca73e403.htm" />
   <HelpKINode Title="DS1h_292 field" Url="html/a7540493-5f25-7116-b3a8-80f738ccd4bd.htm" />
   <HelpKINode Title="DS1_055 field" Url="html/d21b3fb4-4d64-ad07-5979-1129a43ab2e8.htm" />
@@ -1855,8 +1855,8 @@
   <HelpKINode Title="HOW_TO_EARN enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="HOW_TO_EARN_GOLDEN enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="HUMAN enumeration member" Url="html/13f175ee-1818-86f5-b4bb-db843b2cc81c.htm" />
-  <HelpKINode Title="HUNTER enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Hunter enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
+  <HelpKINode Title="HUNTER enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Hunter field" Url="html/228d8c5f-65cc-c536-d872-538d7f50b1a3.htm" />
   <HelpKINode Title="ICanTarget interface">
     <HelpKINode Title="ICanTarget Interface" Url="html/2dabbfa3-7e3b-3062-4bdd-e58a574feb93.htm" />
@@ -2417,8 +2417,8 @@
   <HelpKINode Title="OVER_CAIS enumeration member" Url="html/4d6892bd-7580-ec4f-6332-7a8704c8fe5d.htm" />
   <HelpKINode Title="OWNER enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="Owner property" Url="html/1fa174ee-82a7-87e8-8f1d-f2807dbd0977.htm" />
-  <HelpKINode Title="PALADIN enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Paladin enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
+  <HelpKINode Title="PALADIN enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Paladin field" Url="html/9d124537-fa3f-adca-fc06-926ad886dfca.htm" />
   <HelpKINode Title="Parallel property" Url="html/4af15388-07d5-ed2a-bbc3-06c272c6ed9c.htm" />
   <HelpKINode Title="ParallelClone field" Url="html/71b1864d-2acf-cee1-62ee-1df81cb058d7.htm" />
@@ -2498,12 +2498,12 @@
   </HelpKINode>
   <HelpKINode Title="PLAYER enumeration member" Url="html/008de63d-7fc0-adc3-a3c2-3e4888724eea.htm" />
   <HelpKINode Title="PLAYER field">
-    <HelpKINode Title="Draw.PLAYER Field" Url="html/41efdbd9-5c39-9644-0805-88ea080e43bf.htm" />
+    <HelpKINode Title="Summon.PLAYER Field" Url="html/3ef5ab3b-6829-de3d-b3eb-30843098506a.htm" />
     <HelpKINode Title="Concede.PLAYER Field" Url="html/ec5582be-c290-6a13-dbae-252b596e95ec.htm" />
     <HelpKINode Title="CreateChoice.PLAYER Field" Url="html/2d7a9e6f-6b58-d3ef-45af-6e82afb171d8.htm" />
+    <HelpKINode Title="Draw.PLAYER Field" Url="html/41efdbd9-5c39-9644-0805-88ea080e43bf.htm" />
     <HelpKINode Title="GainMana.PLAYER Field" Url="html/ed24d6fa-5871-45fe-8cf9-289871a6daaa.htm" />
     <HelpKINode Title="Give.PLAYER Field" Url="html/9bcdcc60-2fe0-7666-7ae8-32ec412652e1.htm" />
-    <HelpKINode Title="Summon.PLAYER Field" Url="html/3ef5ab3b-6829-de3d-b3eb-30843098506a.htm" />
   </HelpKINode>
   <HelpKINode Title="Player field" Url="html/16701a94-2e2f-1f53-ff85-955f7b9476c0.htm" />
   <HelpKINode Title="Player.BaseMana property" Url="html/c314baf5-5972-ccb2-4ed1-9fb09a25546d.htm" />
@@ -2644,8 +2644,8 @@
   </HelpKINode>
   <HelpKINode Title="PREHEALING enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="PREMIUM enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
-  <HelpKINode Title="PRIEST enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Priest enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
+  <HelpKINode Title="PRIEST enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Priest field" Url="html/46d2405a-f490-bfac-62b7-fc65b46866d0.htm" />
   <HelpKINode Title="ProbabilisticGameNode class">
     <HelpKINode Title="ProbabilisticGameNode Class" Url="html/5fe2c9bd-95c9-52a1-f339-387688a1ec36.htm" />
@@ -3246,10 +3246,10 @@
   <HelpKINode Title="TARGETS field">
     <HelpKINode Title="Bounce.TARGETS Field" Url="html/ae567682-0f4f-9625-cc5f-9ca2bc2f5055.htm" />
     <HelpKINode Title="Damage.TARGETS Field" Url="html/7a8a256b-744c-3289-6d10-fe54d779a64f.htm" />
+    <HelpKINode Title="Silence.TARGETS Field" Url="html/3c69129c-8a42-b8b1-bba9-1a96cbba1564.htm" />
     <HelpKINode Title="Destroy.TARGETS Field" Url="html/876202eb-51a4-9f0a-ecf7-e3381c0583e9.htm" />
     <HelpKINode Title="Discard.TARGETS Field" Url="html/82c2f08d-7e47-a837-bdc1-e777509d6f0f.htm" />
     <HelpKINode Title="Heal.TARGETS Field" Url="html/b977f1a4-714b-24cd-8e98-c51ce3f0dd4f.htm" />
-    <HelpKINode Title="Silence.TARGETS Field" Url="html/3c69129c-8a42-b8b1-bba9-1a96cbba1564.htm" />
   </HelpKINode>
   <HelpKINode Title="Targets field" Url="html/588c2a22-5f27-b403-9b7a-18d6359bf3a4.htm" />
   <HelpKINode Title="TAUNT enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
@@ -3448,11 +3448,11 @@
   <HelpKINode Title="WaitForMulliganComplete.Run method" Url="html/7328295a-5c84-c536-1479-26777e6f7a5a.htm" />
   <HelpKINode Title="WaitForMulliganComplete.WaitForMulliganComplete constructor" Url="html/e4e8a715-a305-915d-7682-b9dbc8e9614a.htm" />
   <HelpKINode Title="WAITING enumeration member" Url="html/54fb9d84-82b1-0960-98b5-a1dc75d0207d.htm" />
-  <HelpKINode Title="WARLOCK enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Warlock enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
+  <HelpKINode Title="WARLOCK enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Warlock field" Url="html/8688b644-df80-ec50-0502-a91612124d00.htm" />
-  <HelpKINode Title="Warrior enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
   <HelpKINode Title="WARRIOR enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
+  <HelpKINode Title="Warrior enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
   <HelpKINode Title="Warrior field" Url="html/b29f12dc-edb7-d07f-30fc-4e0df7fcd029.htm" />
   <HelpKINode Title="WEAPON enumeration member">
     <HelpKINode Title="CardType Enumeration" Url="html/008de63d-7fc0-adc3-a3c2-3e4888724eea.htm" />
