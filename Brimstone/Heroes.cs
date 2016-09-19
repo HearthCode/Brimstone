@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿// TODO: Separate Hearthstone and common
+
+using System.Collections.Generic;
 
 namespace Brimstone
 {

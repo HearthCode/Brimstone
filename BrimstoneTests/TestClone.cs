@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using NUnit.Framework;
 using Brimstone;
+using Brimstone.Entities;
 using static Brimstone.Behaviours;
 
 namespace BrimstoneTests
@@ -124,16 +124,16 @@ namespace BrimstoneTests
 				Assert.AreNotSame(i1, i2);
 			}
 #endif
-
+			/*
 			if (copyOnWrite)
 				// All proxies must point to original entities
 				foreach (Entity e in game.Entities)
-					Assert.AreSame(e.BaseEntityData, clone.Entities[e.Id].BaseEntityData);
+					Assert.AreSame(e.Tags, clone.Entities[e.Id].Tags);
 			else
 				// All proxies must point to new entities
 				foreach (Entity e in game.Entities)
-					Assert.AreNotSame(e.BaseEntityData, clone.Entities[e.Id].BaseEntityData);
-
+					Assert.AreNotSame(e.Tags, clone.Entities[e.Id].Tags);
+					*/
 			if (copyOnWrite) {
 				// All reference counts must be 2
 				foreach (Entity e in game.Entities)

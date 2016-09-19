@@ -3,6 +3,8 @@ using System.Linq;
 using NUnit.Framework;
 using Brimstone;
 using Brimstone.Actions;
+using Brimstone.Entities;
+using Brimstone.PowerActions;
 
 namespace BrimstoneTests
 {

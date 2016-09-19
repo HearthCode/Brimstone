@@ -1,4 +1,4 @@
-﻿using Brimstone;
+﻿using Brimstone.Entities;
 
 namespace BrimstoneVisualizer
 {

@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using Brimstone;
 using Brimstone.Actions;
+using Brimstone.Entities;
 using static Brimstone.Behaviours;
 using static Brimstone.TriggerType;
 

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Diagnostics;
 using NUnit.Framework;
 using Brimstone;
-using Brimstone.Actions;
+using Brimstone.Entities;
+using Brimstone.Tree;
 using static Brimstone.Behaviours;
 
 namespace BrimstoneTests

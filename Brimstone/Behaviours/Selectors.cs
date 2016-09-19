@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Brimstone.Actions;
-using static Brimstone.Behaviours;
+using Brimstone.Entities;
 
 namespace Brimstone
 {
@@ -83,5 +84,16 @@ namespace Brimstone
 		public static ActionGraph RandomHealthyCharacter => Random(AllHealthyCharacters);
 		public static ActionGraph RandomFriendlyHealthyCharacter => Random(FriendlyHealthyCharacters);
 		public static ActionGraph RandomOpponentHealthyCharacter => Random(OpponentHealthyCharacters);
+
+		// Selector for start-of-game mulligans
+		public static ActionGraph MulliganSelector => Select(e => ((Player)e).Hand.Slice(((Player)e).NumCardsDrawnThisTurn));
+
+		// Custom selectors taking any lambda expression
+		public static Selector Select(Func<IEntity, IEntity> selector) {
+			return new Selector { Lambda = e => new List<IEntity> { selector(e) } };
+		}
+		public static Selector Select(Func<IEntity, IEnumerable<IEntity>> selector) {
+			return new Selector { Lambda = selector };
+		}
 	}
 }

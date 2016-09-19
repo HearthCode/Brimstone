@@ -1,3 +1,5 @@
+// TODO: Separate into Hearthstone and common
+
 namespace Brimstone
 {
 	public enum GameTag

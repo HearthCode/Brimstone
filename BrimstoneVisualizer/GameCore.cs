@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Windows;
 using Brimstone;
+using Brimstone.Entities;
 
 namespace BrimstoneVisualizer
 {

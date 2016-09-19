@@ -1,28 +1,15 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using Brimstone.Entities;
 
 namespace Brimstone
 {
-	public interface IZoneController : IEntity
-	{
-		Zones Zones { get; }
-
-		Deck Deck { get; set; }
-		Zone<IPlayable> Hand { get; }
-		Zone<Minion> Board { get; }
-		Zone<ICharacter> Graveyard { get; }
-		// TODO: Change to Secret later
-		Zone<Spell> Secrets { get; }
-		Zone<IPlayable> Setaside { get; }
-	}
-
 	public class Zones : IEnumerable<IZone>
 	{
 		public Game Game { get; }
 		public IZoneController Controller { get; }
 
-		private IZone[] _zones = new IZone[(int)Zone._COUNT];
+		private IZone[] _zones = new IZone[(int) Zone._COUNT];
 
 		public Zones(Game game, IZoneController controller) {
 			Game = game;
@@ -31,7 +18,7 @@ namespace Brimstone
 
 		public IZone this[Zone z] {
 			get {
-				if (_zones[(int)z] == null) {
+				if (_zones[(int) z] == null) {
 					IZone newZone;
 
 					switch (z) {
@@ -56,18 +43,16 @@ namespace Brimstone
 						default:
 							throw new ZoneException("No such zone type when creating zone: " + z);
 					}
-					_zones[(int)z] = newZone;
+					_zones[(int) z] = newZone;
 				}
-				return _zones[(int)z];
+				return _zones[(int) z];
 			}
 			// For decks
-			set {
-				_zones[(int)z] = value;
-			}
+			set { _zones[(int) z] = value; }
 		}
 
 		public IEnumerator<IZone> GetEnumerator() {
-			return ((IEnumerable<IZone>)_zones).GetEnumerator();
+			return ((IEnumerable<IZone>) _zones).GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() {

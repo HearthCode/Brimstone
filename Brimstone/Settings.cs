@@ -15,5 +15,6 @@ namespace Brimstone
 		public static bool UseGameHashForEquality = true;
 		public static bool ParallelTreeSearch = true;
 		public static bool ParallelClone = true;
+		public static string Game = "Hearthstone";
 	}
 }

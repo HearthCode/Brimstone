@@ -7,6 +7,8 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Brimstone.Actions;
+using Brimstone.Entities;
+using Brimstone.PowerActions;
 
 namespace Brimstone
 {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Brimstone.Actions;
+using Brimstone.Entities;
 
 namespace Brimstone
 {

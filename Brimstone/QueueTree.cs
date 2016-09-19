@@ -1,10 +1,12 @@
-﻿using System;
+﻿/* IMPORTANT: This code is not currently working and should be ignored */
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using Brimstone.Entities;
 
 namespace Brimstone
 {
-	public class QueueNode
+	internal class QueueNode
 	{
 		public Game Owner { get; }
 		public QueueActionEventArgs Data { get; }
@@ -21,7 +23,7 @@ namespace Brimstone
 		}
 	}
 
-	public class QueueTree : ICloneable
+	internal class QueueTree : ICloneable
 	{
 		private QueueNode RootNode;
 		private QueueNode CurrentInsertionPoint;

@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using Brimstone;
+using Brimstone.Entities;
+using Brimstone.Tree;
 using static Brimstone.Behaviours;
 
 namespace BrimstoneTests

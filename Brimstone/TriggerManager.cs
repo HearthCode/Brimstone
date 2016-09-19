@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using Brimstone.Entities;
 using static Brimstone.TriggerType;
 
 namespace Brimstone
