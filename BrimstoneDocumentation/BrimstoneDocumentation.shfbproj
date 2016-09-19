@@ -39,7 +39,7 @@
     <KeepLogFile>False</KeepLogFile>
     <DisableCodeBlockComponent>False</DisableCodeBlockComponent>
     <CleanIntermediates>True</CleanIntermediates>
-    <HelpFileVersion>1.0.0.0</HelpFileVersion>
+    <HelpFileVersion>0.0.2.0</HelpFileVersion>
     <MaximumGroupParts>2</MaximumGroupParts>
     <NamespaceGrouping>True</NamespaceGrouping>
     <SyntaxFilters>C#, Visual Basic, Managed C++</SyntaxFilters>
@@ -51,7 +51,7 @@
     <HelpTitle>Hearthstone Working Group</HelpTitle>
     <CopyrightText>Hearthstone Working Group 2016 - Part of HearthSim.info</CopyrightText>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
-    <VisibleItems>InheritedMembers, InheritedFrameworkMembers, Protected</VisibleItems>
+    <VisibleItems>InheritedMembers, Protected</VisibleItems>
     <PlugInConfigurations />
     <ComponentConfigurations>
       <ComponentConfig id="API Token Resolution" enabled="True" xmlns="">
@@ -80,10 +80,8 @@
     <RootNamespaceTitle>API Reference</RootNamespaceTitle>
     <FooterText>&amp;lt%3ba href=&amp;quot%3bhttp://discord.me/hearthstoneworkinggroup&amp;quot%3b&amp;gt%3bJoin us on Discord&amp;lt%3b/a&amp;gt%3b&amp;lt%3bbr /&amp;gt%3b</FooterText>
     <ApiFilter>
-      <Filter entryType="Namespace" fullName="" isExposed="False" xmlns="">
-        <Filter entryType="Structure" fullName="Variant" isExposed="True" />
-      </Filter>
     </ApiFilter>
+    <MissingTags>Summary, Parameter, Returns, AutoDocumentCtors, Namespace, TypeParameter, AutoDocumentDispose</MissingTags>
   </PropertyGroup>
   <!-- There are no properties for these groups.  AnyCPU needs to appear in order for Visual Studio to perform
 			 the build.  The others are optional common platform types that may appear. -->
