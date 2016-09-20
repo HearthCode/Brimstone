@@ -135,6 +135,10 @@
       <ImageId>BrimstoneVisualizer</ImageId>
       <AlternateText>Brimstone Visualizer</AlternateText>
     </Image>
+    <Image Include="media\RepoStructure.png">
+      <ImageId>RepoStructure</ImageId>
+      <AlternateText>Repo Structure</AlternateText>
+    </Image>
     <Image Include="media\TreeSearchPerformance.png">
       <ImageId>TreeSearchPerformance</ImageId>
       <AlternateText>Tree Search Performance</AlternateText>
