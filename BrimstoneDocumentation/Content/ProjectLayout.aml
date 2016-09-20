@@ -34,7 +34,6 @@
       <title>Brimstone directory layout</title>
       <content>
         <mediaLink>
-          <caption>Repo Structure</caption>
           <image xlink:href="RepoStructure"/>
         </mediaLink>
         <list class="bullet">

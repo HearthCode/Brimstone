@@ -1556,8 +1556,8 @@
   <HelpKINode Title="HOW_TO_EARN enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="HOW_TO_EARN_GOLDEN enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="HUMAN enumeration member" Url="html/13f175ee-1818-86f5-b4bb-db843b2cc81c.htm" />
-  <HelpKINode Title="Hunter enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
   <HelpKINode Title="HUNTER enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
+  <HelpKINode Title="Hunter enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
   <HelpKINode Title="Hunter field" Url="html/228d8c5f-65cc-c536-d872-538d7f50b1a3.htm" />
   <HelpKINode Title="ICanTarget interface">
     <HelpKINode Title="ICanTarget Interface" Url="html/687235dc-106d-d002-0ffa-37517f9c0700.htm" />
@@ -2590,8 +2590,8 @@
   <HelpKINode Title="Settings.UseGameHashForEquality field" Url="html/9cac5774-edd5-db21-f854-9385ee9e0816.htm" />
   <HelpKINode Title="Settings.ZoneCaching field" Url="html/045705d0-4a6e-3a96-06d2-b831fc3a4127.htm" />
   <HelpKINode Title="SHADOWFORM enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
-  <HelpKINode Title="SHAMAN enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Shaman enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
+  <HelpKINode Title="SHAMAN enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Shaman field" Url="html/30ad36ed-860f-7bcb-d800-9620ec914810.htm" />
   <HelpKINode Title="SHIFTING enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="ShortDescription property">
@@ -2941,8 +2941,8 @@
   <HelpKINode Title="WaitForMulliganComplete method" Url="html/662b7968-aa1a-84d5-c41b-b12f392c67bd.htm" />
   <HelpKINode Title="WaitForMulliganComplete.WaitForMulliganComplete constructor" Url="html/ce94e722-6672-cccf-e187-b21de168441a.htm" />
   <HelpKINode Title="WAITING enumeration member" Url="html/54fb9d84-82b1-0960-98b5-a1dc75d0207d.htm" />
-  <HelpKINode Title="Warlock enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
   <HelpKINode Title="WARLOCK enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
+  <HelpKINode Title="Warlock enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
   <HelpKINode Title="Warlock field" Url="html/8688b644-df80-ec50-0502-a91612124d00.htm" />
   <HelpKINode Title="WARRIOR enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Warrior enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />

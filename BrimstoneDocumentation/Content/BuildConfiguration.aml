@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="18633e34-91bc-4489-81c5-b585be242b85" revisionNumber="1">
+  <developerConceptualDocument
+    xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+
+    <summary>
+      <para>This page summarizes the various build configurations and build flags available in Brimstone.</para>
+    </summary>
+
+    <introduction>
+      <autoOutline lead="In this section:"/>
+    </introduction>
+
+    <section address="buildconfig">
+      <title>Build configurations</title>
+      <content>
+        <para>The available build configurations are:</para>
+        <list class="bullet">
+          <listItem>
+            <para>
+              <legacyBold>Debug</legacyBold> - in this configuration, compiler-level code optimizations are disabled, Brimstone's default application-level optimizations are enabled and logging is enabled and will be shown in the console output, or Visual Studio's <legacyBold>Debug Output</legacyBold> window if your application is started with the debugger.
+            </para>
+            <para>
+              To enable or disable specific log items, use the <link xlink:href="#buildflags">Build flags</link> below. By default, all of the log output build flags are enabled except for <codeInline>_TREE_DEBUG</codeInline>.
+            </para>
+            <para>
+              Brimstone runs very slowly in Debug configuration, so should not be used except for testing and debugging purposes. Debug mode is very useful if you wish to follow the flow of a game in a human-friendly readable format.
+            </para>
+            <para>
+              Unit tests in <legacyBold>BrimstoneTests</legacyBold> should not be executed in Debug mode as they will take several hours to complete or longer. Benchmarking with <legacyBold>BrimstoneProfiler</legacyBold> and Visual Studio Code Analysis profiling should not be performed in Debug mode as the results will be inaccurate.
+            </para>
+            <para>
+              Documentation is not built in Debug mode.
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <legacyBold>Release</legacyBold> - in this configuration, compiler-level code optimizations are enabled, Brimstone's default application-level optimizations are enabled and logging is disabled. Setting log-related build flags will slow down execution but generate no output, therefore you should not use log-related build flags in this configuration.
+            </para>
+            <para>
+              Brimstone runs at full speed in Release configuration and is the build mode you should use for finished applications or for speed testing.
+            </para>
+            <para>
+              Unit tests in <legacyBold>BrimstoneTests</legacyBold> should be run in this mode and will complete in under 1 minute. Benchmarking with <legacyBold>BrimstoneProfiler</legacyBold> and Visual Studio Code Analysis profiling should be performed in this mode for accurate results.
+            </para>
+            <para>
+              Documentation is not built in Release mode.
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <legacyBold>Documentation</legacyBold> - this configuration is based on the Release configuration and all of the notes for Release builds apply, except that a Documentation build will also build the <legacyBold>BrimstoneDocumentation</legacyBold> project and generate a local copy of the documentation web site in <codeInline>/docs</codeInline>.
+            </para>
+            <para>
+              Brimstone takes a long time to build and generates thousands of files in Documentation configuration, so this build mode should only be used for building the documentation web site.
+            </para>
+          </listItem>
+        </list>
+      </content>
+    </section>
+
+    <section address="buildflags">
+      <title>Build flags</title>
+      <content>
+        <para>The following symbols can be defined when building:</para>
+        <list class="bullet">
+          <listItem>
+            <para>
+              <codeInline>_ACTIONS_DEBUG</codeInline> - log standard game actions, eg. playing a card, drawing, attacking, death and so on. Use for debugging the game flow of your scripts
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <codeInline>_DECK_DEBUG</codeInline> - log pre-game insertion, fill and shuffle operations on a player's deck
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <codeInline>_GAME_DEBUG</codeInline> - log the creation and resolution of game action blocks, queue underruns, death creation step checks, game step advances and when a game is cloned
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <codeInline>_QUEUE_DEBUG</codeInline> - log enqueue, dequeue and queue stacking and unwinding actions. Use for debugging the behaviour of the action queue
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <codeInline>_TREE_DEBUG</codeInline> - log tree search depth, discovery of unique and duplicate game states, search space size and parallelization data
+            </para>
+            <alert class="note">
+              <para>This option creates a very large amount of output.</para>
+            </alert>
+          </listItem>
+          <listItem>
+            <para>
+              <codeInline>_TRIGGER_DEBUG</codeInline> - log game trigger associations, checks, fires, ignores, enqueues and forced runs
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <codeInline>_USE_QUEUE</codeInline> - use the standard "stack-of-queues" model for tracking in-game actions. This is the default
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <codeInline>_USE_TREE</codeInline> - <legacyBold>EXPERIMENTAL</legacyBold> - use a mutable forward-only linked list tree to represent the game queue for improved performance
+            </para>
+            <alert class="important">
+              <para>The queue tree does not currently support parallel game execution, for example in parallelized tree searches.</para>
+            </alert>
+            <alert class="warning">
+              <para>The queue tree is experimental and does not compile correctly in the current version of Brimstone.</para>
+            </alert>
+            <alert class="important">
+              <para>
+                Only define one of <codeInline>_USE_QUEUE</codeInline> or <codeInline>_USE_TREE</codeInline>. Setting both or neither will result in undefined behaviour.
+              </para>
+            </alert>
+          </listItem>
+          <listItem>
+            <para>
+              <codeInline>_ZONE_DEBUG</codeInline> - log all additions and removals of entities to or from a zone
+            </para>
+          </listItem>
+        </list>
+      </content>
+    </section>
+    <relatedTopics>
+    </relatedTopics>
+  </developerConceptualDocument>
+</topic>

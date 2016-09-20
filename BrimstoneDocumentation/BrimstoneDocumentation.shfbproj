@@ -110,6 +110,7 @@
   <ItemGroup>
     <None Include="Content\Benchmarking.aml" />
     <None Include="Content\BrimstoneBehaviouralModel.aml" />
+    <None Include="Content\BuildConfiguration.aml" />
     <None Include="Content\ContributeCode.aml" />
     <None Include="Content\ContributeDocs.aml" />
     <None Include="Content\ContributorGuide.aml" />

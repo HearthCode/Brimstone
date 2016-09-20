@@ -4,7 +4,9 @@
     <introduction>
       <para>Brimstone is a high-performance Hearthstone simulator written in C#, designed to make it simple and fast for developers to experiment with AI, Machine Learning, game formats, card balance and new cards and mechanics.</para>
       <alert class="warning">
-        Brimstone is currnetly in pre-alpha and is not a finished product. Significant aspects of gameplay are missing or incomplete, and there may be bugs. Please help contribute (see the [TODO: Contributing section]) if you'd like to help out!
+        <para>
+          Brimstone is currently in pre-alpha and is not a finished product. Significant aspects of gameplay are missing or incomplete, and there may be bugs. Please help contribute (see the <link xlink:href="8409d776-e34a-419c-ba67-1806ba9b985d" />) if you'd like to help out!
+        </para>
       </alert>
     </introduction>
 
@@ -52,7 +54,7 @@
         </list>
 
         <alert class="important">
-          <para>Brimstone uses git submodules. To ensure you clone the complete codebase, ensure you clone using the command: <codeInline>git clone --recursive https://github.com/HearthSim/Brimstone</codeInline> or tick the <legacyBold>Recursively Clone Submodules</legacyBold> box in Visual Studio's <legacyBold>Team Explorer</legacyBold> when cloning.
+          <para>Brimstone uses git submodules. To ensure you clone the complete codebase, clone using the command: <codeInline>git clone --recursive https://github.com/HearthSim/Brimstone</codeInline> or tick the <legacyBold>Recursively Clone Submodules</legacyBold> box in Visual Studio's <legacyBold>Team Explorer</legacyBold> when cloning.
         </para>
         </alert>
 
@@ -70,5 +72,6 @@
         <para>Note that Brimstone is merely a black box API providing simulation capabilities and does nothing on its own. [TODO: Link to tutorials]</para>
       </content>
     </section>
+    <relatedTopics/>
   </developerConceptualDocument>
 </topic>
