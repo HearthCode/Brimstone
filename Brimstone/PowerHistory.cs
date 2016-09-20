@@ -60,7 +60,7 @@ namespace Brimstone
 
 		// Crunch changes to get only latest changed tags for each changed entity
 		public HashSet<TagChange> CrunchedDelta(IEnumerable<PowerAction> delta) {
-			var collapsedDelta = new HashSet<TagChange>(new CompareEntityAndTagName());
+			var collapsedDelta = new HashSet<TagChange>(new EntityAndTagNameComparer());
 			foreach (var entry in delta.Reverse()) {
 				// TODO: All the other PowerAction types
 				// Ignore BlockStart and BlockEnd

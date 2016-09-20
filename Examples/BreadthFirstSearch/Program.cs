@@ -6,7 +6,7 @@ using System.Linq;
 using Brimstone;
 using Brimstone.Entities;
 using Brimstone.Tree;
-using static Brimstone.Behaviours;
+using static Brimstone.Actions;
 
 namespace Test1
 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Brimstone.Entities;
 
-namespace Brimstone
+namespace Brimstone.QueueActions
 {
 	// Standard QueueAction, placed into queue and processed normally
 	// QueueActions can take zero or more ActionGraph arguments and have access to Game, Source and Args in Run()

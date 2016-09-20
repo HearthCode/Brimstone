@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using static Brimstone.Behaviours;
+using Brimstone.Exceptions;
 
 namespace Brimstone.Entities
 {
@@ -48,11 +48,11 @@ namespace Brimstone.Entities
 				throw new ChoiceException();
 
 			Target = target;
-			return (ICanTarget) (Entity) Game.RunActionBlock(BlockType.ATTACK, this, Behaviours.Attack(this, (Entity) target), target);
+			return (ICanTarget) (Entity) Game.RunActionBlock(BlockType.ATTACK, this, Actions.Attack(this, (Entity) target), target);
 		}
 
 		public void Hit(int amount) {
-			Game.ActiveTriggers.ForceRun(this, Damage(this, amount), this);
+			Game.ActiveTriggers.ForceRun(this, Actions.Damage(this, amount), this);
 		}
 	}
 }

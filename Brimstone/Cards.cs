@@ -84,17 +84,17 @@ namespace Brimstone
 			});
 
 			// Compile card behaviours
-			var behavioursType = Type.GetType(gameNamespace + ".CardDefinitions");
+			var behavioursType = Type.GetType(gameNamespace + ".Cards");
 			foreach (var c in Cards.Values)
 			{
 				// Get behaviour script and compile ActionGraph for cards with behaviours
 				// TODO: Allow fetch from card name as well as ID
 				var b = behavioursType.GetField(c.Id, BindingFlags.Static | BindingFlags.Public);
 				if (b != null) {
-					var script = b.GetValue(null) as Behaviour;
-					c.Behaviour = CompiledBehaviour.Compile(script);
+					var script = b.GetValue(null) as CardBehaviourGraph;
+					c.Behaviour = CardBehaviour.FromGraph(script);
 				} else
-					c.Behaviour = new CompiledBehaviour();
+					c.Behaviour = new CardBehaviour();
 			}
 		}
 

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Brimstone.Actions;
+using Brimstone.QueueActions;
 using Brimstone.Entities;
 
 namespace Brimstone.Tree

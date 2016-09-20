@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using Brimstone.Actions;
+using Brimstone.QueueActions;
 using Brimstone.Entities;
 using Brimstone.PowerActions;
 

@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace Brimstone
+namespace Brimstone.Exceptions
 {
 	public abstract class BrimstoneException : Exception
 	{
-		public BrimstoneException() { }
-		public BrimstoneException(string message) : base(message) { }
-		public BrimstoneException(string message, Exception inner) : base(message, inner) { }
+		protected BrimstoneException() { }
+		protected BrimstoneException(string message) : base(message) { }
+		protected BrimstoneException(string message, Exception inner) : base(message, inner) { }
 	}
 
 	public class ChoiceException : BrimstoneException

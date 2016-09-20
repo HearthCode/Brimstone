@@ -32,7 +32,7 @@ namespace Brimstone
 		}
 	}
 
-	public class CompareEntityAndTagName : IEqualityComparer<TagChange>
+	public class EntityAndTagNameComparer : IEqualityComparer<TagChange>
 	{
 		// Used when adding to and fetching from HashSet, and testing for equality
 		public bool Equals(TagChange x, TagChange y) {

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Brimstone.Actions;
+using Brimstone.QueueActions;
 using Brimstone.Entities;
 
 namespace Brimstone
@@ -71,15 +71,6 @@ namespace Brimstone
 			throw new NotImplementedException();
 		}
 
-		// Add the graph to the game's action queue
-		public void Queue(IEntity source, ActionQueue queue) {
-			foreach (var action in Graph) {
-				foreach (var arg in action.Args)
-					arg.Queue(source, queue);
-				queue.EnqueueDeferred(source, action);
-			}
-		}
-
 		public List<QueueAction> Unravel(ActionGraph g = null) {
 			if (g == null)
 				g = this;
@@ -106,7 +97,7 @@ namespace Brimstone
 		}
 	}
 
-	public static class QueueActionListExtensions
+	internal static class QueueActionListExtensions
 	{
 		public static List<QueueAction> Then(this List<QueueAction> ql, ActionGraph act) {
 			ql.AddRange(act.Unravel());

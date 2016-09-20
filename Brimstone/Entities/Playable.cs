@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Brimstone.Exceptions;
 
 namespace Brimstone.Entities
 {
@@ -57,7 +58,7 @@ namespace Brimstone.Entities
 			// TODO: Check card is in player's hand
 			Target = target;
 			try {
-				return (T) Game.RunActionBlock(BlockType.PLAY, this, Behaviours.Play(this), Target);
+				return (T) Game.RunActionBlock(BlockType.PLAY, this, Actions.Play(this), Target);
 			}
 			// Action was probably cancelled causing an uninitialized ActionResult to be returned
 			catch (NullReferenceException) {

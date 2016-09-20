@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using static Brimstone.Behaviours;
+using Brimstone.Exceptions;
 
 namespace Brimstone.Entities
 {
@@ -96,32 +96,32 @@ namespace Brimstone.Entities
 		}
 
 		public void StartMulligan() {
-			Game.Action(this, MulliganChoice(this));
+			Game.Action(this, Actions.MulliganChoice(this));
 		}
 			
 		public IPlayable Give(Card card) {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
 				throw new ChoiceException();
 
-			return (IPlayable)(Entity) Game.Action(Game, Behaviours.Give(this, card));
+			return (IPlayable)(Entity) Game.Action(Game, Actions.Give(this, card));
 		}
 
 		public T Draw<T>() where T : Entity {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
 				throw new ChoiceException();
 
-			return (T) Game.Action(Game, Behaviours.Draw(this));
+			return (T) Game.Action(Game, Actions.Draw(this));
 		}
 
 		public void Draw(ActionGraph qty) {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
 				throw new ChoiceException();
 
-			Game.Action(this, Behaviours.Draw(this) * qty);
+			Game.Action(this, Actions.Draw(this) * qty);
 		}
 
 		public void Concede() {
-			Game.Action(this, Behaviours.Concede(this));
+			Game.Action(this, Actions.Concede(this));
 		}
 
 		// For internal use only (by Actions)

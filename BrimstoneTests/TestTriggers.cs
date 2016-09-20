@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Brimstone;
-using Brimstone.Actions;
+using Brimstone.QueueActions;
 using Brimstone.Entities;
-using static Brimstone.Behaviours;
+using static Brimstone.Actions;
 using static Brimstone.TriggerType;
 
 namespace BrimstoneTests

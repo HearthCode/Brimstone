@@ -515,6 +515,19 @@ namespace Brimstone
 		REQ_DRAG_TO_PLAY
 	}
 
+	public enum HeroClass
+	{
+		Druid = CardClass.DRUID,
+		Hunter = CardClass.HUNTER,
+		Mage = CardClass.MAGE,
+		Paladin = CardClass.PALADIN,
+		Priest = CardClass.PRIEST,
+		Rogue = CardClass.ROGUE,
+		Shaman = CardClass.SHAMAN,
+		Warlock = CardClass.WARLOCK,
+		Warrior = CardClass.WARRIOR
+	}
+
 	public enum BlockType
 	{
 		INVALID = 0,

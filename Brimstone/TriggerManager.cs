@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+#if _TRIGGER_DEBUG
 using System.Linq;
+#endif
 using Brimstone.Entities;
 using static Brimstone.TriggerType;
 

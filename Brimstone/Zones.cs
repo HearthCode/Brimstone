@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Brimstone.Entities;
+using Brimstone.Exceptions;
 
 namespace Brimstone
 {

@@ -1,13 +1,14 @@
 ﻿using Brimstone.Entities;
-using static Brimstone.Behaviours;
+using static Brimstone.Actions;
 using static Brimstone.TriggerType;
+using Behaviour = Brimstone.CardBehaviourGraph;
 
 namespace Brimstone.Games.Hearthstone
 {
-	public partial class CardDefinitions
+	internal partial class Cards
 	{
 		// Game
-		public static Behaviour Game = new Behaviour {
+		internal static Behaviour Game = new Behaviour {
 			Triggers =
 			{
 				[OnGameStart]			= StartGame(),
@@ -17,7 +18,7 @@ namespace Brimstone.Games.Hearthstone
 		};
 
 		// Player
-		public static Behaviour Player = new Behaviour {
+		internal static Behaviour Player = new Behaviour {
 			Triggers = {
 				[OnDealMulligan]		= IsSelf > PerformMulligan(),
 				[OnMulliganWaiting]		= IsSelf > WaitForMulliganComplete(),

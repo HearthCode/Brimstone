@@ -2,7 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Brimstone;
-using Brimstone.Actions;
+using Brimstone.QueueActions;
 using Brimstone.Entities;
 using Brimstone.PowerActions;
 

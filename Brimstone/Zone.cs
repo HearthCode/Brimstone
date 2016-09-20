@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Brimstone.Entities;
+using Brimstone.Exceptions;
 
 namespace Brimstone
 {
@@ -17,9 +18,9 @@ namespace Brimstone
 		bool IsFull { get; }
 		IEntity this[int ZonePosition] { get; set; }
 		IEnumerable<IEntity> Slice(int? Start, int? End);
-		IEntity Add(IEntity Entity, int ZonePosition);
-		IEntity Remove(IEntity Entity, bool ClearZone);
-		IEntity MoveTo(IEntity Entity, int ZonePosition);
+		IEntity Add(IEntity Entity, int ZonePosition = -1);
+		IEntity Remove(IEntity Entity, bool ClearZone = true);
+		IEntity MoveTo(IEntity Entity, int ZonePosition = -1);
 		void Swap(IEntity Old, IEntity New);
 		void SetDirty();
 	}
@@ -123,19 +124,19 @@ namespace Brimstone
 			return (IEnumerable<IEntity>) Slice(Start, End);
 		}
 
-		IEntity IZone.Add(IEntity Entity, int ZonePosition = -1)
+		IEntity IZone.Add(IEntity Entity, int ZonePosition)
 		{
 			Add(Entity, ZonePosition);
 			return Entity;
 		}
 
-		IEntity IZone.Remove(IEntity Entity, bool ClearZone = true)
+		IEntity IZone.Remove(IEntity Entity, bool ClearZone)
 		{
 			Remove(Entity, ClearZone);
 			return Entity;
 		}
 
-		IEntity IZone.MoveTo(IEntity Entity, int ZonePosition = -1)
+		IEntity IZone.MoveTo(IEntity Entity, int ZonePosition)
 		{
 			MoveTo(Entity, ZonePosition);
 			return Entity;

@@ -1,6 +1,7 @@
 ﻿ using System;
 using System.Collections.Generic;
 using System.Linq;
+ using Brimstone.Exceptions;
 
 namespace Brimstone.Entities
 {
@@ -24,7 +25,7 @@ namespace Brimstone.Entities
 
 			Target = target;
 			try {
-				return (HeroPower)Game.RunActionBlock(BlockType.PLAY, this, Behaviours.UseHeroPower(this), Target);
+				return (HeroPower)Game.RunActionBlock(BlockType.PLAY, this, Actions.UseHeroPower(this), Target);
 			}
 			// Action was probably cancelled causing an uninitialized ActionResult to be returned
 			catch (NullReferenceException) {

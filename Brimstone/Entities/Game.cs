@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Brimstone.Exceptions;
 using Brimstone.PowerActions;
+using Brimstone.QueueActions;
 
 namespace Brimstone.Entities
 {
@@ -192,7 +194,7 @@ namespace Brimstone.Entities
 #endif
 			int index = Index != -2 ? Index : (Type == BlockType.POWER || Type == BlockType.ATTACK ? -1 : 0);
 			var block = new BlockStart(Type, Source, Target, index);
-			Queue(Source, new Actions.GameBlock(block, Actions));
+			Queue(Source, new QueueActions.GameBlock(block, Actions));
 		}
 
 		public ActionResult RunActionBlock(BlockType Type, IEntity Source, ActionGraph Actions, IEntity Target = null, int Index = -2) {
@@ -222,7 +224,9 @@ namespace Brimstone.Entities
 			OnBlockEmptyAsync(Block).Wait();
 		}
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 		internal async Task OnBlockEmptyAsync(BlockStart Block) {
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 #if _GAME_DEBUG
 			DebugLog.WriteLine("Game " + GameId + ": Action block " + Block.Type + " for " + Entities[Block.Source].ShortDescription + " resolved");
 #endif

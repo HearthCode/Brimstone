@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Brimstone;
 using Brimstone.Entities;
-using static Brimstone.Behaviours;
+using static Brimstone.Actions;
 
 namespace BrimstoneTests
 {

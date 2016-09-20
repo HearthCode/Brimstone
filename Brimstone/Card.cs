@@ -15,7 +15,7 @@ namespace Brimstone
 		public string Name { get; set; }
 		public Dictionary<GameTag, int> Tags { get; set; }
 		public Dictionary<PlayRequirements, int> Requirements { get; set; }
-		public CompiledBehaviour Behaviour { get; set; }
+		public CardBehaviour Behaviour { get; set; }
 
 		public int this[GameTag t] {
 			get {
