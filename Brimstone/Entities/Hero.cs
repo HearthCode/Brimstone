@@ -7,7 +7,7 @@ namespace Brimstone.Entities
 	{
 		public Hero(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
 
-		public Hero(Hero cloneFrom) : base(cloneFrom) {
+		internal Hero(Hero cloneFrom) : base(cloneFrom) {
 			_heroPowerId = cloneFrom._heroPowerId;
 		}
 

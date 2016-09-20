@@ -7,9 +7,9 @@ namespace Brimstone
 	public struct Tag : IEquatable<Tag>
 	{
 		public GameTag Name { get;}
-		public Variant Value { get; }
+		public TagValue Value { get; }
 
-		public Tag(GameTag Name, Variant Value) {
+		public Tag(GameTag Name, TagValue Value) {
 			this.Name = Name;
 			this.Value = Value;
 		}

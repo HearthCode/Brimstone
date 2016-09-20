@@ -124,6 +124,7 @@ namespace BrimstoneTests
 				Assert.AreNotSame(i1, i2);
 			}
 #endif
+			// NOTE: These tests are not possible without exposing Entity._data.Tags
 			/*
 			if (copyOnWrite)
 				// All proxies must point to original entities
@@ -133,7 +134,7 @@ namespace BrimstoneTests
 				// All proxies must point to new entities
 				foreach (Entity e in game.Entities)
 					Assert.AreNotSame(e.Tags, clone.Entities[e.Id].Tags);
-					*/
+			*/
 			if (copyOnWrite) {
 				// All reference counts must be 2
 				foreach (Entity e in game.Entities)

@@ -55,11 +55,8 @@ namespace Brimstone.Entities
 		public ActionQueue ActionQueue { get; private set; }
 
 		// Game events (used for triggers and packet transmission)
-		public delegate void EntityCreateEventDelegate(Game Game, IEntity Entity);
-		public delegate void EntityChangeEventDelegate(Game Game, IEntity Entity, GameTag Tag, int OldValue, int NewValue);
-
-		public event EntityCreateEventDelegate OnEntityCreated;
-		public event EntityChangeEventDelegate OnEntityChanged;
+		public event Action<Game, IEntity> OnEntityCreated;
+		public event Action<Game, IEntity, GameTag, int, int> OnEntityChanged;
 
 		// Game clones n-tree traversal
 		private static int SequenceNumber { get; set; }

@@ -9,7 +9,7 @@ namespace Brimstone.QueueActions
 {
 	public class Empty : PreCompiledQueueAction
 	{
-		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
+		internal override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			return ActionResult.Empty;
 		}
 	}
@@ -18,7 +18,7 @@ namespace Brimstone.QueueActions
 	{
 		public int Num { get; set; }
 
-		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
+		internal override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			return Num;
 		}
 	}
@@ -27,7 +27,7 @@ namespace Brimstone.QueueActions
 	{
 		public Card Card { get; set; }
 
-		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
+		internal override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			return Card;
 		}
 	}
@@ -36,7 +36,7 @@ namespace Brimstone.QueueActions
 	{
 		public int EntityId { get; set; }
 
-		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
+		internal override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			return (Entity)game.Entities[EntityId];
 		}
 
@@ -49,7 +49,7 @@ namespace Brimstone.QueueActions
 	{
 		public Func<IEntity, IEnumerable<IEntity>> Lambda { get; set; }
 
-		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
+		internal override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			return Lambda(source)?.ToList() ?? new List<IEntity>();
 		}
 
@@ -109,7 +109,7 @@ namespace Brimstone.QueueActions
 	{
 		public Action<IEntity> F { get; set; }
 
-		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
+		internal override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			F(source);
 			return ActionResult.None;
 		}
@@ -125,7 +125,7 @@ namespace Brimstone.QueueActions
 			this.Actions = Actions;
 		}
 
-		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
+		internal override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			game.PowerHistory?.Add(Block);
 			game.ActionQueue.StartBlock(source, Actions, Block);
 			return ActionResult.None;
@@ -144,7 +144,7 @@ namespace Brimstone.QueueActions
 	{
 		public const int ENTITIES = 0;
 
-		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
+		internal override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			var entities = (List<IEntity>)args[ENTITIES];
 			if (entities.Count == 0)
 				return new List<IEntity>();
@@ -158,7 +158,7 @@ namespace Brimstone.QueueActions
 		public const int MIN = 0;
 		public const int MAX = 1;
 
-		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
+		internal override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			return RNG.Between(args[MIN], args[MAX]);
 		}
 	}
@@ -169,7 +169,7 @@ namespace Brimstone.QueueActions
 
 		public const int AMOUNT = 0;
 
-		public override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
+		internal override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			for (int i = 0; i < args[AMOUNT]; i++)
 				game.Queue(source, Actions);
 			return ActionResult.None;

@@ -7,7 +7,6 @@ namespace Brimstone.Entities
 {
 	public partial class Minion : Character<Minion>
 	{
-		internal Minion(Minion cloneFrom) : base(cloneFrom) { }
 		/// <summary>
 		/// Create a new orphaned minion
 		/// </summary>
@@ -15,9 +14,10 @@ namespace Brimstone.Entities
 		/// <param name="card">The card on which to base the entity</param>
 		/// <param name="tags">Tags to set upon creation</param>
 		public Minion(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
+		internal Minion(Minion cloneFrom) : base(cloneFrom) { }
 
 		// Checks if it is currently possible to play this minion with a target. Does not check if a suitable target is available
-		protected override bool NeedsTargetList() {
+		protected internal override bool NeedsTargetList() {
 			if (Card.RequiresTarget || Card.RequiresTargetIfAvailable)
 				return true;
 

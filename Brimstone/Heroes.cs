@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Brimstone
 {
 	public static class DefaultHero {
-		private static Dictionary<HeroClass, Card> cards = new Dictionary<HeroClass, Card>() {
+		private static readonly Dictionary<HeroClass, Card> cards = new Dictionary<HeroClass, Card>() {
 			{ HeroClass.Druid, Cards.FromId("HERO_06") },
 			{ HeroClass.Hunter, Cards.FromId("HERO_05") },
 			{ HeroClass.Mage, Cards.FromId("HERO_08") },

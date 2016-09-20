@@ -21,7 +21,7 @@ namespace Brimstone.Entities
 
 		public Choice Choice { get; set; }
 
-		public Player(Player cloneFrom) : base(cloneFrom) {
+		internal Player(Player cloneFrom) : base(cloneFrom) {
 			FriendlyName = cloneFrom.FriendlyName;
 			HeroClass = cloneFrom.HeroClass;
 			MaxHandSize = cloneFrom.MaxHandSize;

@@ -17,12 +17,12 @@ namespace Brimstone.Entities
 	{
 		public ICharacter Target { get; set; }
 
-		protected CanTarget(CanTarget cloneFrom) : base(cloneFrom) {}
+		protected internal CanTarget(CanTarget cloneFrom) : base(cloneFrom) {}
 		protected CanTarget(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) {}
 
 		// Checks if target entity meets the targeting requirements that are shared by spells and battlecries
 		// Note that additional targeting requirements for spells, battlecries and hero powers are not checked here
-		protected virtual bool MeetsGenericTargetingRequirements(ICharacter target) {
+		protected internal virtual bool MeetsGenericTargetingRequirements(ICharacter target) {
 			Minion minion = target as Minion;
 
 			// Can't target your opponent's stealth minions
@@ -103,12 +103,12 @@ namespace Brimstone.Entities
 		}
 
 		// Default definition of whether the entity currently requires a target list to be calculated before use
-		protected virtual bool NeedsTargetList() {
+		protected internal virtual bool NeedsTargetList() {
 			return Card.RequiresTarget || Card.RequiresTargetIfAvailable;
 		}
 
 		// Default targeting for spells and hero powers
-		protected virtual IEnumerable<ICharacter> GetValidAbilityTargets() {
+		protected internal virtual IEnumerable<ICharacter> GetValidAbilityTargets() {
 			// If this is an untargeted card, return an empty list
 			if (!NeedsTargetList())
 				return new List<ICharacter>();

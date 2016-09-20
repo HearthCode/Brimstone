@@ -51,7 +51,7 @@
     <HelpTitle>Hearthstone Working Group</HelpTitle>
     <CopyrightText>Hearthstone Working Group 2016 - Part of HearthSim.info</CopyrightText>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
-    <VisibleItems>InheritedMembers, Protected</VisibleItems>
+    <VisibleItems>InheritedMembers</VisibleItems>
     <PlugInConfigurations />
     <ComponentConfigurations>
       <ComponentConfig id="API Token Resolution" enabled="True" xmlns="">

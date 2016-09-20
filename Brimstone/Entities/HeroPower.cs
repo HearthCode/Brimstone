@@ -8,11 +8,11 @@ namespace Brimstone.Entities
 	public class HeroPower : CanTarget
 	{
 		public HeroPower(HeroPower cloneFrom) : base(cloneFrom) { }
-		public HeroPower(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
+		internal HeroPower(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
 
 		public override IEnumerable<ICharacter> ValidTargets => GetValidAbilityTargets();
 
-		protected override bool MeetsGenericTargetingRequirements(ICharacter target) {
+		protected internal override bool MeetsGenericTargetingRequirements(ICharacter target) {
 			Minion minion = target as Minion;
 
 			// Spells and hero powers can't target CantBeTargetedByAbilities minions

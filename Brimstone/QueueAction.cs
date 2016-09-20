@@ -8,13 +8,16 @@ namespace Brimstone.QueueActions
 	// QueueActions can take zero or more ActionGraph arguments and have access to Game, Source and Args in Run()
 	public abstract class QueueAction : ICloneable
 	{
-		public List<ActionGraph> Args { get; } = new List<ActionGraph>();
-		public QueueAction[] EagerArgs { get; set; }
-		public ActionResult[] CompiledArgs { get; set; }
+		// Prevent instantiation from outside the Brimstone class library
+		internal QueueAction() { }
 
-		public abstract ActionResult Run(Game game, IEntity source, ActionResult[] args);
+		internal List<ActionGraph> Args { get; } = new List<ActionGraph>();
+		internal QueueAction[] EagerArgs { get; set; }
+		internal ActionResult[] CompiledArgs { get; set; }
 
-		public ActionGraph Then(ActionGraph g) {
+		internal abstract ActionResult Run(Game game, IEntity source, ActionResult[] args);
+
+		internal ActionGraph Then(ActionGraph g) {
 			return ((ActionGraph) this).Then(g);
 		}
 

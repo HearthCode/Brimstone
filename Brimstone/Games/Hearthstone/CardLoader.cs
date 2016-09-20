@@ -27,12 +27,12 @@ namespace Brimstone.Games.Hearthstone
 						select new Tag(
 							Name: (GameTag) Enum.Parse(typeof(GameTag), tag.Attribute("enumID").Value),
 							Value: (tag.Attribute("value") != null
-								? (Variant) int.Parse(tag.Attribute("value").Value)
+								? (TagValue) int.Parse(tag.Attribute("value").Value)
 								: (tag.Attribute("type").Value == "String"
-									? (Variant) tag.Value
+									? (TagValue) tag.Value
 									: (tag.Attribute("type").Value == "LocString"
-										? (Variant) tag.Element("enUS").Value
-										: (Variant) 0)))
+										? (TagValue) tag.Element("enUS").Value
+										: (TagValue) 0)))
 							)).ToList(),
 
 					Requirements = (from req in r.Descendants("PlayRequirement")

@@ -18,7 +18,7 @@ namespace Brimstone.Entities
 	public abstract partial class Character<T> : Playable<T>, ICharacter where T : Entity
 	{
 		protected Character(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
-		protected Character(Character<T> cloneFrom) : base(cloneFrom) { }
+		protected internal Character(Character<T> cloneFrom) : base(cloneFrom) { }
 
 		public bool CanAttack => !IsExhausted && AttackDamage > 0 && ValidTargets.Any();
 

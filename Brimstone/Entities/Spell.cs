@@ -6,12 +6,12 @@ namespace Brimstone.Entities
 {
 	public class Spell : Playable<Spell>, ICanTarget
 	{
-		public Spell(Spell cloneFrom) : base(cloneFrom) { }
+		internal Spell(Spell cloneFrom) : base(cloneFrom) { }
 		public Spell(Card card, Dictionary<GameTag, int> tags = null) : base(card, tags) { }
 
 		public override IEnumerable<ICharacter> ValidTargets => GetValidAbilityTargets();
 
-		protected override bool MeetsGenericTargetingRequirements(ICharacter target) {
+		protected internal override bool MeetsGenericTargetingRequirements(ICharacter target) {
 			Minion minion = target as Minion;
 
 			// Spells and hero powers can't target CantBeTargetedByAbilities minions
