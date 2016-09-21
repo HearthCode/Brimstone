@@ -1,6 +1,4 @@
-﻿//#define _TREE_DEBUG
-
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Brimstone.QueueActions;
 using Brimstone.Entities;
+using Brimstone.Exceptions;
 
 namespace Brimstone.Tree
 {

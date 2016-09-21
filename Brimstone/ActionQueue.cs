@@ -1,5 +1,4 @@
 ﻿#define _USE_QUEUE
-//#define _USE_TREE
 
 using System;
 using System.Collections.Generic;
