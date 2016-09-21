@@ -338,7 +338,7 @@ namespace Brimstone.Tree
 	public class BreadthFirstActionWalker : TreeActionWalker
 	{
 		// The maximum number of task threads to split the search queue up into
-		public int MaxDegreesOfParallelism { get; set; } = System.Environment.ProcessorCount - 1;
+		public int MaxDegreesOfParallelism { get; set; } = 0;
 
 		// The minimum number of game nodes that have to be in the queue in order to activate parallelization
 		// for a particular depth
@@ -441,7 +441,7 @@ namespace Brimstone.Tree
 				searchQueue.Clear();
 
 				// Only parallelize if there are sufficient nodes to do so
-				if (nextQueue.Count >= MinNodesToParallelize && ((RandomOutcomeSearch)t).Parallel) {
+				if (nextQueue.Count >= MinNodesToParallelize && ((RandomOutcomeSearch)t).Parallel && MaxDegreesOfParallelism > 1) {
 					// Process each game's action queue until it is interrupted by OnAction above
 					await Task.WhenAll(
 						// Split search queue into MaxDegreesOfParallelism partitions
@@ -450,7 +450,7 @@ namespace Brimstone.Tree
 						select Task.Run(async delegate {
 #if _TREE_DEBUG
 							var count = 0;
-							DebugLog.WriteLine("Start partition run");
+							DebugLog.WriteLine("Start partition run with " + MaxDegreesOfParallelism + " degrees of parallelism");
 #endif
 							using (partition)
 								while (partition.MoveNext()) {
