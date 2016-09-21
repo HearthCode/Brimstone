@@ -338,7 +338,7 @@ namespace Brimstone.Tree
 	public class BreadthFirstActionWalker : TreeActionWalker
 	{
 		// The maximum number of task threads to split the search queue up into
-		public int MaxDegreesOfParallelism { get; set; } = 0;
+		public int MaxDegreesOfParallelism { get; set; } = System.Environment.ProcessorCount;
 
 		// The minimum number of game nodes that have to be in the queue in order to activate parallelization
 		// for a particular depth
