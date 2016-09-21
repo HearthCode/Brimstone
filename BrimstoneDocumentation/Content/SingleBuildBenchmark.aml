@@ -10,19 +10,44 @@
 
     <introduction>
       <para>These instructions are for Visual Studio on Windows but can be adapted for Mono/Linux.</para>
-      <autoOutline lead="Also in this section:"/>
+      <autoOutline lead="In this section:"/>
     </introduction>
 
     <prerequisites>
       <content>
         <para>
-          Ensure you have built <legacyBold>BrimstoneProfiler</legacyBold> as explained in <link xlink:href="3867a7e4-21e2-4e3b-934b-c1c4ae15efa9" /> before you begin.
+          The <legacyBold>BrimstoneProfiler</legacyBold> repository contains the tools required to benchmark Brimstone applications. You must have a clone of this repository present on your local machine to run benchmarks.
         </para>
       </content>
     </prerequisites>
+
+    <!-- One or more procedure or section with procedure -->
     <procedure>
       <title>To benchmark a single build of Brimstone</title>
       <steps class="ordered">
+        <step>
+          <content>
+            <para>
+              Clone the <externalLink>
+              <linkText>BrimstoneProfiler</linkText>
+              <linkUri>https://github.com/HearthSim/BrimstoneProfiler</linkUri>
+              <linkTarget>_blank</linkTarget>
+            </externalLink> repository.
+            </para>
+          </content>
+        </step>
+        <step>
+          <content>
+            <para>
+              In the <legacyBold>References</legacyBold> section of the <legacyBold>Benchmarks</legacyBold> project, modify the Brimstone reference to point to the build of Brimstone you wish to benchmark. Once you have done this, build the solution.
+            </para>
+            <alert class="important">
+              <para>
+                Always build the solution in Release configuration and always reference a Release build of Brimstone.dll.
+              </para>
+            </alert>
+          </content>
+        </step>
         <step>
           <content>
             <para>
@@ -133,31 +158,27 @@
         </alert>
         <list class="ordered">
           <listItem>
-            <para>
-              Open Excel and drag <codeInline>benchmarks.csv</codeInline> into it.
-            </para>
+            <para>Open Excel and drag <codeInline>benchmarks.csv</codeInline> into it.
+          </para>
           </listItem>
           <listItem>
-            <para>
-              Drag a box around the table including the header but excluding the build line, and press <legacyBold>CTRL+T</legacyBold> or choose <legacyBold>Insert -> Table</legacyBold> from the ribbon bar. Tick <legacyBold>My table has headers</legacyBold> and click OK.
-            </para>
+            <para>Drag a box around the table including the header but excluding the build line, and press <legacyBold>CTRL+T</legacyBold> or choose <legacyBold>Insert -> Table</legacyBold> from the ribbon bar. Tick <legacyBold>My table has headers</legacyBold> and click OK.
+          </para>
             <mediaLink>
-              <caption>Excel Benchmarks Insert Table</caption>
-              <image xlink:href="ExcelBenchmarksInsertTable"/>
-            </mediaLink>
+<caption>Excel Benchmarks Insert Table</caption>
+<image xlink:href="ExcelBenchmarksInsertTable"/>
+</mediaLink>
           </listItem>
           <listItem>
-            <para>
-              Click <legacyBold>Insert -> Recommended Charts</legacyBold> from the ribbon bar and choose the desired chart type. For unrelated benchmarks, <legacyBold>Clustered Column</legacyBold> is generally the best option. If the benchmarks are related, a <legacyBold>Line</legacyBold> chart shows performance improvement and degradation across each test.
-            </para>
+            <para>Click <legacyBold>Insert -> Recommended Charts</legacyBold> from the ribbon bar and choose the desired chart type. For unrelated benchmarks, <legacyBold>Clustered Column</legacyBold> is generally the best option. If the benchmarks are related, a <legacyBold>Line</legacyBold> chart shows performance improvement and degradation across each test.
+          </para>
             <mediaLink>
-              <caption>Excel Benchmarks Insert Chart</caption>
-              <image xlink:href="ExcelBenchmarksInsertChart"/>
-            </mediaLink>
+<caption>Excel Benchmarks Insert Chart</caption>
+<image xlink:href="ExcelBenchmarksInsertChart"/>
+</mediaLink>
             <alert class="tip">
-              <para>
-                You can easily style the chart by selecting <legacyBold>Design</legacyBold> from the ribbon and clicking on one of the pre-defined chart styles.
-              </para>
+              <para>You can easily style the chart by selecting <legacyBold>Design</legacyBold> from the ribbon and clicking on one of the pre-defined chart styles.
+            </para>
             </alert>
             <mediaLink>
               <caption>Excel Benchmarks Style Chart</caption>
@@ -165,6 +186,12 @@
             </mediaLink>
           </listItem>
         </list>
+      </content>
+    </section>
+
+    <section address="new">
+      <title>To create new benchmarks</title>
+      <content>
       </content>
     </section>
 

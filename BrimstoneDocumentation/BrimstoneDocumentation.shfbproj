@@ -108,7 +108,9 @@
     <Folder Include="media" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Content\Benchmarking.aml" />
+    <None Include="Content\CreateBenchmarks.aml" />
+    <None Include="Content\SingleBuildBenchmark.aml" />
+    <None Include="Content\BenchmarkingAndProfiling.aml" />
     <None Include="Content\BrimstoneBehaviouralModel.aml" />
     <None Include="Content\BuildConfiguration.aml" />
     <None Include="Content\ContributeCode.aml" />
@@ -135,6 +137,18 @@
     <Image Include="media\BrimstoneVisualizer.png">
       <ImageId>BrimstoneVisualizer</ImageId>
       <AlternateText>Brimstone Visualizer</AlternateText>
+    </Image>
+    <Image Include="media\ExcelBenchmarksInsertChart.png">
+      <ImageId>ExcelBenchmarksInsertChart</ImageId>
+      <AlternateText>Excel Benchmarks Insert Chart</AlternateText>
+    </Image>
+    <Image Include="media\ExcelBenchmarksInsertTable.png">
+      <ImageId>ExcelBenchmarksInsertTable</ImageId>
+      <AlternateText>Excel Benchmarks Insert Table</AlternateText>
+    </Image>
+    <Image Include="media\ExcelBenchmarksStyleChart.png">
+      <ImageId>ExcelBenchmarksStyleChart</ImageId>
+      <AlternateText>Excel Benchmarks Style Chart</AlternateText>
     </Image>
     <Image Include="media\RepoStructure.png">
       <ImageId>RepoStructure</ImageId>

@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="3867a7e4-21e2-4e3b-934b-c1c4ae15efa9" revisionNumber="1">
+  <developerOrientationDocument
+    xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+
+    <summary>
+      <para>This section explains how to use the benchmarking tools for Brimstone, how to profile Brimstone code in Visual Studio, and how to write your own benchmarks.</para>
+    </summary>
+    <introduction>
+      <para>
+        The <externalLink>
+          <linkText>BrimstoneProfiler</linkText>
+          <linkUri>https://github.com/HearthSim/BrimstoneProfiler</linkUri>
+          <linkTarget>_blank</linkTarget>
+        </externalLink> repository contains the tools required to benchmark Brimstone applications. You must have a clone of this repository present on the machine used to build Brimstone in order to run benchmarks. The repository is <legacyItalic>not</legacyItalic> necessary for Visual Studio profiling.
+      </para>
+      <para>
+        In the <legacyBold>References</legacyBold> section of the <legacyBold>Benchmarks</legacyBold> project, you must modify the Brimstone assembly reference to point to the build of Brimstone you wish to benchmark. Once you have done this, build the solution.
+      </para>
+      <alert class="important">
+        <para>
+          Always build the solution in Release configuration and always reference a Release build of <codeInline>Brimstone.dll</codeInline>.
+        </para>
+      </alert>
+    </introduction>
+    <inThisSection>
+      <content>
+        <para>
+          <link xlink:href="f230a982-28b6-4fd1-b0ce-c3decd883ab4" />
+        </para>
+        <para>
+          <link xlink:href="4b0b00d6-f9a1-4eae-b880-892eb0d513fb" />
+        </para>
+        <para>
+          <link xlink:href="8d25a5f6-350d-4ebb-9a3b-1cb6a60cf573" />
+        </para>
+      </content>
+    </inThisSection>
+    <relatedTopics>
+      <externalLink>
+        <linkText>BrimstoneProfiler</linkText>
+        <linkUri>https://github.com/HearthSim/BrimstoneProfiler</linkUri>
+        <linkTarget>_blank</linkTarget>
+      </externalLink>
+    </relatedTopics>
+  </developerOrientationDocument>
+</topic>
