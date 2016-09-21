@@ -146,6 +146,22 @@
       <ImageId>ExcelBenchmarksInsertTable</ImageId>
       <AlternateText>Excel Benchmarks Insert Table</AlternateText>
     </Image>
+    <Image Include="media\ExcelBenchmarksMultiInsertChart.png">
+      <ImageId>ExcelBenchmarksMultiInsertChart</ImageId>
+      <AlternateText>Excel Benchmarks Multi Insert Chart</AlternateText>
+    </Image>
+    <Image Include="media\ExcelBenchmarksMultiInsertTable.png">
+      <ImageId>ExcelBenchmarksMultiInsertTable</ImageId>
+      <AlternateText>Excel Benchmarks Multi Insert Table</AlternateText>
+    </Image>
+    <Image Include="media\ExcelBenchmarksMultiSingleInsertChart.png">
+      <ImageId>ExcelBenchmarksMultiSingleInsertChart</ImageId>
+      <AlternateText>Excel Benchmarks Multi Single Insert Chart</AlternateText>
+    </Image>
+    <Image Include="media\ExcelBenchmarksMultiStyleChart.png">
+      <ImageId>ExcelBenchmarksMultiStyleChart</ImageId>
+      <AlternateText>Excel Benchmarks Multi Style Chart</AlternateText>
+    </Image>
     <Image Include="media\ExcelBenchmarksStyleChart.png">
       <ImageId>ExcelBenchmarksStyleChart</ImageId>
       <AlternateText>Excel Benchmarks Style Chart</AlternateText>

@@ -9,7 +9,6 @@
     </summary>
 
     <introduction>
-      <para>These instructions are for Visual Studio on Windows but can be adapted for Mono/Linux.</para>
       <autoOutline lead="Also in this section:"/>
     </introduction>
 
@@ -30,7 +29,7 @@
             </para>
             <alert class="important">
               <para>
-                Always run <codeInline>benchmarks.exe</codeInline> from the command prompt to ensure accurate results. Running via Visual Studio - even with debugging disabled - starts a host process for the application which will affect the results.
+                Visual Studio users: always run <codeInline>benchmarks.exe</codeInline> from the command prompt to ensure accurate results. Running via Visual Studio - even with debugging disabled - starts a host process for the application which will affect the results.
               </para>
             </alert>
           </content>
@@ -42,7 +41,7 @@
             </para>
             <alert class="important">
               <para>
-                Always run benchmarks on a machine with low CPU utilization. Use <legacyBold>Task Manager</legacyBold> to check the current CPU usage on your machine before running benchmarks.
+                Always run benchmarks on a machine with low CPU utilization. Use <legacyBold>Task Manager</legacyBold> (Windows) to check the current CPU usage on your machine before running benchmarks.
               </para>
               <para>
                 Brimstone's published test results are performed with 6-8% background CPU utilization.
@@ -142,7 +141,6 @@
               Drag a box around the table including the header but excluding the build line, and press <legacyBold>CTRL+T</legacyBold> or choose <legacyBold>Insert -> Table</legacyBold> from the ribbon bar. Tick <legacyBold>My table has headers</legacyBold> and click OK.
             </para>
             <mediaLink>
-              <caption>Excel Benchmarks Insert Table</caption>
               <image xlink:href="ExcelBenchmarksInsertTable"/>
             </mediaLink>
           </listItem>
@@ -151,7 +149,6 @@
               Click <legacyBold>Insert -> Recommended Charts</legacyBold> from the ribbon bar and choose the desired chart type. For unrelated benchmarks, <legacyBold>Clustered Column</legacyBold> is generally the best option. If the benchmarks are related, a <legacyBold>Line</legacyBold> chart shows performance improvement and degradation across each test.
             </para>
             <mediaLink>
-              <caption>Excel Benchmarks Insert Chart</caption>
               <image xlink:href="ExcelBenchmarksInsertChart"/>
             </mediaLink>
             <alert class="tip">
@@ -160,7 +157,6 @@
               </para>
             </alert>
             <mediaLink>
-              <caption>Excel Benchmarks Style Chart</caption>
               <image xlink:href="ExcelBenchmarksStyleChart"/>
             </mediaLink>
           </listItem>
@@ -169,6 +165,7 @@
     </section>
 
     <relatedTopics>
+      <link xlink:href="3867a7e4-21e2-4e3b-934b-c1c4ae15efa9" />
       <link xlink:href="4b0b00d6-f9a1-4eae-b880-892eb0d513fb" />
       <link xlink:href="8d25a5f6-350d-4ebb-9a3b-1cb6a60cf573" />
       <codeEntityReference qualifyHint="true">T:Brimstone.Settings</codeEntityReference>

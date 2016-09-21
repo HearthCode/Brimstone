@@ -9,6 +9,21 @@
     </summary>
     <introduction>
       <para>
+        <legacyItalic>Benchmarking</legacyItalic> is the process of running a series of fixed performance tests on code in a controlled environment and measuring the amount of time the tests take to run. Benchmarks could include the number of games run per second, the number of games cloned per second or the time to perform a complicated game state tree search.
+      </para>
+      <para>
+        Our benchmarking strategy involves using the <legacyBold>BrimstoneProfiler.Benchmarks</legacyBold> test harness to run pre-defined tests in a semi-controlled environment. New benchmarks can be added by end users and benchmark times can be automatically compared across multiple builds of Brimstone.
+      </para>
+      <para>
+        <legacyItalic>Profiling</legacyItalic> is the process of measuring the amount of time spent in each section or line of code to identify bottlenecks for optimization. We can use profiling to see what percentage of the total run-time each line of code takes to execute.
+      </para>
+      <para>
+        You can use any profiling tool you wish but we provide tutorials for using the <legacyBold>Visual Studio Code Analysis</legacyBold> profiler which is included with Visual Studio.
+      </para>
+      <para>
+        Benchmarks are a measure of how fast Brimstone performs. To improve performance, you can use profiling to identify and optimize slow portions of code relevant to the benchmarks, thereby improving the benchmark results.
+      </para>
+      <para>
         The <externalLink>
           <linkText>BrimstoneProfiler</linkText>
           <linkUri>https://github.com/HearthSim/BrimstoneProfiler</linkUri>
@@ -31,6 +46,9 @@
         </para>
         <para>
           <link xlink:href="4b0b00d6-f9a1-4eae-b880-892eb0d513fb" />
+        </para>
+        <para>
+          <link xlink:href="c5beb99b-5b2f-4287-b2e8-c787a10399eb" />
         </para>
         <para>
           <link xlink:href="8d25a5f6-350d-4ebb-9a3b-1cb6a60cf573" />

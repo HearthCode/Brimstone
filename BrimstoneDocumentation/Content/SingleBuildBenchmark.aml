@@ -29,10 +29,10 @@
           <content>
             <para>
               Clone the <externalLink>
-              <linkText>BrimstoneProfiler</linkText>
-              <linkUri>https://github.com/HearthSim/BrimstoneProfiler</linkUri>
-              <linkTarget>_blank</linkTarget>
-            </externalLink> repository.
+                <linkText>BrimstoneProfiler</linkText>
+                <linkUri>https://github.com/HearthSim/BrimstoneProfiler</linkUri>
+                <linkTarget>_blank</linkTarget>
+              </externalLink> repository.
             </para>
           </content>
         </step>
@@ -158,27 +158,31 @@
         </alert>
         <list class="ordered">
           <listItem>
-            <para>Open Excel and drag <codeInline>benchmarks.csv</codeInline> into it.
-          </para>
-          </listItem>
-          <listItem>
-            <para>Drag a box around the table including the header but excluding the build line, and press <legacyBold>CTRL+T</legacyBold> or choose <legacyBold>Insert -> Table</legacyBold> from the ribbon bar. Tick <legacyBold>My table has headers</legacyBold> and click OK.
-          </para>
-            <mediaLink>
-<caption>Excel Benchmarks Insert Table</caption>
-<image xlink:href="ExcelBenchmarksInsertTable"/>
-</mediaLink>
-          </listItem>
-          <listItem>
-            <para>Click <legacyBold>Insert -> Recommended Charts</legacyBold> from the ribbon bar and choose the desired chart type. For unrelated benchmarks, <legacyBold>Clustered Column</legacyBold> is generally the best option. If the benchmarks are related, a <legacyBold>Line</legacyBold> chart shows performance improvement and degradation across each test.
-          </para>
-            <mediaLink>
-<caption>Excel Benchmarks Insert Chart</caption>
-<image xlink:href="ExcelBenchmarksInsertChart"/>
-</mediaLink>
-            <alert class="tip">
-              <para>You can easily style the chart by selecting <legacyBold>Design</legacyBold> from the ribbon and clicking on one of the pre-defined chart styles.
+            <para>
+              Open Excel and drag <codeInline>benchmarks.csv</codeInline> into it.
             </para>
+          </listItem>
+          <listItem>
+            <para>
+              Drag a box around the table including the header but excluding the build line, and press <legacyBold>CTRL+T</legacyBold> or choose <legacyBold>Insert -> Table</legacyBold> from the ribbon bar. Tick <legacyBold>My table has headers</legacyBold> and click OK.
+            </para>
+            <mediaLink>
+              <caption>Excel Benchmarks Insert Table</caption>
+              <image xlink:href="ExcelBenchmarksInsertTable"/>
+            </mediaLink>
+          </listItem>
+          <listItem>
+            <para>
+              Click <legacyBold>Insert -> Recommended Charts</legacyBold> from the ribbon bar and choose the desired chart type. For unrelated benchmarks, <legacyBold>Clustered Column</legacyBold> is generally the best option. If the benchmarks are related, a <legacyBold>Line</legacyBold> chart shows performance improvement and degradation across each test.
+            </para>
+            <mediaLink>
+              <caption>Excel Benchmarks Insert Chart</caption>
+              <image xlink:href="ExcelBenchmarksInsertChart"/>
+            </mediaLink>
+            <alert class="tip">
+              <para>
+                You can easily style the chart by selecting <legacyBold>Design</legacyBold> from the ribbon and clicking on one of the pre-defined chart styles.
+              </para>
             </alert>
             <mediaLink>
               <caption>Excel Benchmarks Style Chart</caption>
@@ -197,6 +201,7 @@
 
     <relatedTopics>
       <link xlink:href="4b0b00d6-f9a1-4eae-b880-892eb0d513fb" />
+      <link xlink:href="c5beb99b-5b2f-4287-b2e8-c787a10399eb" />
       <link xlink:href="8d25a5f6-350d-4ebb-9a3b-1cb6a60cf573" />
       <codeEntityReference qualifyHint="true">T:Brimstone.Settings</codeEntityReference>
       <externalLink>
