@@ -183,7 +183,7 @@ namespace Brimstone
 #endif
 
 #if _USE_QUEUE
-		private async Task EndBlockAsync() {
+		private void EndBlock() {
 			if (Depth > 0) {
 #if _QUEUE_DEBUG
 				System.Diagnostics.Debug.Assert(IsBlockEmpty);
@@ -192,7 +192,7 @@ namespace Brimstone
 				Queue = QueueStack.Pop();
 				var gameBlock = BlockStack.Pop();
 				if (gameBlock != null)
-					await Game.OnBlockEmptyAsync(gameBlock);
+					Game.OnBlockEmpty(gameBlock);
 			}
 			// When the queue is empty, notify the game - it may refill it with new actions
 			if (IsEmpty)
@@ -318,9 +318,111 @@ namespace Brimstone
 			return ProcessAllAsync(UserData, MaxUnwindDepth).Result;
 		}
 
-		public async Task<IEnumerable<ActionResult>> ProcessAllAsync(object UserData = null, int MaxUnwindDepth = 0) {
-			while (await ProcessOneAsync(UserData, MaxUnwindDepth))
-				;
+		public async Task<IEnumerable<ActionResult>> ProcessAllAsync(object UserData = null, int MaxUnwindDepth = 0, bool one = false) {
+			LastActionCancelled = false;
+			bool DoneOne = false;
+			while (!Paused && !IsBlockEmpty && !LastActionCancelled && !DoneOne) {
+				if (one)
+					DoneOne = true;
+				// Get next action and make sure it's up to date if cloned from another game
+#if _USE_TREE
+				var action = Tree.Current();
+#endif
+#if _USE_QUEUE
+				var action = Queue.RemoveFront();
+#endif
+				action.Game = Game;
+				if (action.Source.Game.GameId != Game.GameId)
+					action.Source = Game.Entities[action.Source.Id];
+#if _QUEUE_DEBUG
+				DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Dequeued action " + action + " for " + action.Source.ShortDescription + " at depth " + Depth);
+#endif
+				// Get needed arguments for action from stack
+				action.Args = new ActionResult[action.Action.Args.Count];
+				for (int i = action.Action.Args.Count - 1; i >= 0; i--) {
+					// Prefer PreCompiledQueueAction items as arguments
+					var arg = action.Action.CompiledArgs[i];
+					if (!arg.HasResult) {
+						// Otherwise prefer EagerQueueAction items as arguments
+						if (action.Action.EagerArgs[i] != null) {
+							arg = action.Action.EagerArgs[i].Run(Game, action.Source, null);
+						} else {
+							// Otherwise use the ResultStack to get regular QueueAction items as arguments
+							// In this round, only pop arguments for which ActionGraph parameters were supplied
+							// to the QueueAction as these will be at the top of the stack
+							if (action.Action.Args[i] != null) {
+								arg = StackPop();
+								List<IEntity> eList = arg;
+								if (eList != null && eList.Count > 0 && eList[0].Game != Game)
+									arg = new List<IEntity>(eList.Select(e => Game.Entities[e.Id]));
+							}
+						}
+					}
+					action.Args[i] = arg;
+				}
+				// Now go through all of the arguments that weren't supplied as ActionGraphs and pop them off the stack
+				for (int i = action.Action.Args.Count - 1; i >= 0; i--) {
+					if (action.Action.Args[i] == null) {
+						var arg = StackPop();
+						List<IEntity> eList = arg;
+						if (eList != null && eList.Count > 0 && eList[0].Game != Game)
+							arg = new List<IEntity>(eList.Select(e => Game.Entities[e.Id]));
+						action.Args[i] = arg;
+					}
+				}
+
+				// Replace current UserData with new UserData if supplied
+				if (UserData != null)
+					this.UserData = UserData;
+				action.UserData = this.UserData;
+
+				if (OnActionStarting != null) {
+					OnActionStarting(this, action);
+					if (action.Cancel) {
+#if _USE_TREE
+						Tree.MoveNext();
+#endif
+						LastActionCancelled = true;
+						continue;
+					}
+				}
+				var actionType = action.Action.GetType();
+				if (ReplacedActions.ContainsKey(actionType)) {
+					await ReplacedActions[actionType](this, action);
+					// action.Cancel implied when action is replaced
+					LastActionCancelled = true;
+#if _USE_TREE
+					Tree.MoveNext();
+#endif
+					continue;
+				}
+				if (HasHistory)
+					AddItem(action);
+
+				// Run action and push results onto stack
+#if _QUEUE_DEBUG
+				DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Running action " + action + " for " + action.Source.ShortDescription + " at depth " + Depth);
+#endif
+				var result = action.Action.Run(action.Game, action.Source, action.Args);
+				if (result.HasResult)
+					StackPush(result);
+#if _USE_TREE
+				Tree.MoveNext();
+				Tree.Unwind(MaxUnwindDepth);
+#endif
+#if _USE_QUEUE
+				// The >= allows the current block to unwind for ProcessBlock()
+				while (IsBlockEmpty && Depth >= MaxUnwindDepth) {
+					EndBlock();
+					if (IsEmpty)
+						break;
+				}
+#endif
+				OnAction?.Invoke(this, action);
+
+				// Propagate cancellation up the chain by only changing it if not already set
+				LastActionCancelled = action.Cancel;
+			}
 			// Return whatever is left on the stack
 			if (LastActionCancelled)
 				return null;
@@ -330,123 +432,8 @@ namespace Brimstone
 			return stack.Reverse();
 		}
 
-		public bool ProcessOne(object UserData = null, int MaxUnwindDepth = 0) {
-			return ProcessOneAsync(UserData, MaxUnwindDepth).Result;
-		}
-
-		public async Task<bool> ProcessOneAsync(object UserData = null, int MaxUnwindDepth = 0) {
-			if (Paused)
-				return false;
-
-			// Exit if the current branch is empty
-			if (IsBlockEmpty)
-				return false;
-
-			LastActionCancelled = false;
-
-			// Get next action and make sure it's up to date if cloned from another game
-#if _USE_TREE
-			var action = Tree.Current();
-#endif
-#if _USE_QUEUE
-			var action = Queue.RemoveFront();
-#endif
-			action.Game = Game;
-			if (action.Source.Game.GameId != Game.GameId)
-				action.Source = Game.Entities[action.Source.Id];
-
-#if _QUEUE_DEBUG
-			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Dequeued action " + action + " for " + action.Source.ShortDescription + " at depth " + Depth);
-#endif
-			// Get needed arguments for action from stack
-			action.Args = new ActionResult[action.Action.Args.Count];
-			for (int i = action.Action.Args.Count - 1; i >= 0; i--) {
-				// Prefer PreCompiledQueueAction items as arguments
-				var arg = action.Action.CompiledArgs[i];
-				if (!arg.HasResult) {
-					// Otherwise prefer EagerQueueAction items as arguments
-					if (action.Action.EagerArgs[i] != null) {
-						arg = action.Action.EagerArgs[i].Run(Game, action.Source, null);
-					} else {
-						// Otherwise use the ResultStack to get regular QueueAction items as arguments
-						// In this round, only pop arguments for which ActionGraph parameters were supplied
-						// to the QueueAction as these will be at the top of the stack
-						if (action.Action.Args[i] != null) {
-							arg = StackPop();
-							List<IEntity> eList = arg;
-							if (eList != null && eList.Count > 0 && eList[0].Game != Game)
-								arg = new List<IEntity>(eList.Select(e => Game.Entities[e.Id]));
-						}
-					}
-				}
-				action.Args[i] = arg;
-			}
-			// Now go through all of the arguments that weren't supplied as ActionGraphs and pop them off the stack
-			for (int i = action.Action.Args.Count - 1; i >= 0; i--) {
-				if (action.Action.Args[i] == null) {
-					var arg = StackPop();
-					List<IEntity> eList = arg;
-					if (eList != null && eList.Count > 0 && eList[0].Game != Game)
-						arg = new List<IEntity>(eList.Select(e => Game.Entities[e.Id]));
-					action.Args[i] = arg;
-				}
-			}
-
-			// Replace current UserData with new UserData if supplied
-			if (UserData != null)
-				this.UserData = UserData;
-			action.UserData = this.UserData;
-
-			if (OnActionStarting != null) {
-				OnActionStarting(this, action);
-				if (action.Cancel) {
-#if _USE_TREE
-					Tree.MoveNext();
-#endif
-					LastActionCancelled = true;
-					return false;
-				}
-			}
-			var actionType = action.Action.GetType();
-			if (ReplacedActions.ContainsKey(actionType)) {
-				await ReplacedActions[actionType](this, action);
-				// action.Cancel implied when action is replaced
-				LastActionCancelled = true;
-#if _USE_TREE
-				Tree.MoveNext();
-#endif
-				return false;
-			}
-			if (HasHistory)
-				AddItem(action);
-
-			// Run action and push results onto stack
-#if _QUEUE_DEBUG
-			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Running action " + action + " for " + action.Source.ShortDescription + " at depth " + Depth);
-#endif
-			var result = action.Action.Run(action.Game, action.Source, action.Args);
-			if (result.HasResult)
-				StackPush(result);
-
-#if _USE_TREE
-			Tree.MoveNext();
-			Tree.Unwind(MaxUnwindDepth);
-#endif
-#if _USE_QUEUE
-			// The >= allows the current block to unwind for ProcessBlock()
-			while (IsBlockEmpty && Depth >= MaxUnwindDepth) {
-				await EndBlockAsync();
-				if (IsEmpty)
-					break;
-			}
-#endif
-			OnAction?.Invoke(this, action);
-
-			// Propagate cancellation up the chain by only changing it if not already set
-			if (!LastActionCancelled)
-				LastActionCancelled = action.Cancel;
-
-			return !LastActionCancelled;
+		public IEnumerable<ActionResult> ProcessOne(object UserData = null, int MaxUnwindDepth = 0) {
+			return ProcessAllAsync(UserData, MaxUnwindDepth, true).Result;
 		}
 
 		// Skip over an item (used when cloning mid-action to avoid an infinite loop)

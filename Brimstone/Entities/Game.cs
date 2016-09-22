@@ -218,12 +218,6 @@ namespace Brimstone.Entities
 		}
 
 		internal void OnBlockEmpty(BlockStart Block) {
-			OnBlockEmptyAsync(Block).Wait();
-		}
-
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-		internal async Task OnBlockEmptyAsync(BlockStart Block) {
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 #if _GAME_DEBUG
 			DebugLog.WriteLine("Game " + GameId + ": Action block " + Block.Type + " for " + Entities[Block.Source].ShortDescription + " resolved");
 #endif
