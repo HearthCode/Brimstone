@@ -443,6 +443,7 @@ namespace Brimstone.Games.Hearthstone
 		};
 
 		// Illidan Stormrage
+		// TODO: This is triggering in hand!
 		internal static Behaviour EX1_614 = new Behaviour {
 			Triggers = {
 				[OnPlay] = IsFriendly > Summon(Controller, "EX1_614t")

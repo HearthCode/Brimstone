@@ -20,7 +20,15 @@ namespace Brimstone
 					return Card[t];
 				return 0;
 			}
-			set { Tags[t] = value; }
+			set {
+				if (Settings.ParallelClone)
+					lock (Tags) {
+						Tags[t] = value;
+					}
+				else {
+					Tags[t] = value;
+				}
+			}
 		}
 
 		internal EntityData(Card card, Dictionary<GameTag, int> tags = null) {
@@ -35,7 +43,11 @@ namespace Brimstone
 		internal EntityData(EntityData cloneFrom) {
 			Id = cloneFrom.Id;
 			Card = cloneFrom.Card;
-			Tags = new Dictionary<GameTag, int>(cloneFrom.Tags);
+			if (Settings.ParallelClone)
+				lock (cloneFrom.Tags)
+					Tags = new Dictionary<GameTag, int>(cloneFrom.Tags);
+			else
+				Tags = new Dictionary<GameTag, int>(cloneFrom.Tags);
 		}
 
 		public string ShortDescription => Card.Name + " [" + Id + "]";
