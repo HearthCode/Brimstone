@@ -106,11 +106,11 @@ namespace Brimstone.Entities
 			return (IPlayable)(Entity) Game.Action(Game, Actions.Give(this, card));
 		}
 
-		public T Draw<T>() where T : Entity {
+		public IPlayable Draw() {
 			if (Game.Player1.Choice != null || Game.Player2.Choice != null)
 				throw new ChoiceException();
 
-			return (T) Game.Action(Game, Actions.Draw(this));
+			return (IPlayable) (Entity) Game.Action(Game, Actions.Draw(this));
 		}
 
 		public void Draw(ActionGraph qty) {
