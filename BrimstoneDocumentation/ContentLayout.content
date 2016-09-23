@@ -14,11 +14,14 @@
     </Topic>
     <Topic id="8409d776-e34a-419c-ba67-1806ba9b985d" visible="True" isExpanded="true" title="Contributor Guide">
       <Topic id="cfbf62f4-cb3b-4697-8f98-221c39cd3232" visible="True" title="Contributing Code" />
-      <Topic id="64f4468c-70df-4827-b028-66d547ce7952" visible="True" isSelected="true" title="Contributing Documentation" />
+      <Topic id="64f4468c-70df-4827-b028-66d547ce7952" visible="True" title="Contributing Documentation" />
     </Topic>
     <Topic id="18633e34-91bc-4489-81c5-b585be242b85" visible="True" apiParentMode="InsertBefore" title="Build Configurations and Flags" />
     <Topic id="cfbc1e9f-a4cf-4463-8007-491c7ac285fc" visible="True" isExpanded="true" title="Version History">
       <Topic id="c1506970-e752-4aa2-9c66-98de53657db6" visible="True" title="Pre-alpha Update 3" />
+      <Topic id="a5450975-e864-4e04-8aa0-2e0c357d25ce" visible="True" title="Pre-alpha Update 2" />
+      <Topic id="f90a3d45-3e01-4ee4-9832-99a9cc7a7e79" visible="True" title="Pre-alpha Update 1" />
+      <Topic id="a12535f2-8913-47ac-9595-ac3a70b3b6f2" visible="True" isSelected="true" title="Initial Prototype" />
     </Topic>
   </Topic>
 </Topics>

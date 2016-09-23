@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="a12535f2-8913-47ac-9595-ac3a70b3b6f2" revisionNumber="1">
+  <developerConceptualDocument
+    xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+
+    <introduction>
+      <para>
+        The initial prototype was created on June 12th 2016 and completed on June 27th 2016
+      </para>
+    </introduction>
+
+    <section>
+      <title>Changes in This Release</title>
+      <content>
+
+        <list class="bullet">
+          <listItem>
+            <para>Entity structure</para>
+          </listItem>
+          <listItem>
+            <para>PowerHistory</para>
+          </listItem>
+          <listItem>
+            <para>Copy-on-write cloning</para>
+          </listItem>
+          <listItem>
+            <para>BrimstoneVisualizer</para>
+          </listItem>
+          <listItem>
+            <para>ActionGraph/ActionResult paradigm</para>
+          </listItem>
+          <listItem>
+            <para>ActionQueue with ability to pause</para>
+          </listItem>
+          <listItem>
+            <para>Import all Hearthstone cards via XML</para>
+          </listItem>
+          <listItem>
+            <para>Deck class for special deck-zone handling</para>
+          </listItem>
+          <listItem>
+            <para>Handling of game start, mulligan, The Coin</para>
+          </listItem>
+          <listItem>
+            <para>Prototype event trigger logic</para>
+          </listItem>
+          <listItem>
+            <para>Unit test suite using NUnit Framework</para>
+          </listItem>
+        </list>
+
+      </content>
+    </section>
+
+    <relatedTopics>
+      <link xlink:href="cfbc1e9f-a4cf-4463-8007-491c7ac285fc" />
+    </relatedTopics>
+
+  </developerConceptualDocument>
+</topic>

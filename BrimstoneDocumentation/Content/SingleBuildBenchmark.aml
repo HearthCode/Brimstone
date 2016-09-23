@@ -193,13 +193,8 @@
       </content>
     </section>
 
-    <section address="new">
-      <title>To create new benchmarks</title>
-      <content>
-      </content>
-    </section>
-
     <relatedTopics>
+      <link xlink:href="3867a7e4-21e2-4e3b-934b-c1c4ae15efa9" />
       <link xlink:href="4b0b00d6-f9a1-4eae-b880-892eb0d513fb" />
       <link xlink:href="c5beb99b-5b2f-4287-b2e8-c787a10399eb" />
       <link xlink:href="8d25a5f6-350d-4ebb-9a3b-1cb6a60cf573" />

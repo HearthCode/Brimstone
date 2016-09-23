@@ -119,7 +119,10 @@
     <None Include="Content\DesignGoals.aml" />
     <None Include="Content\MultiBuildBenchmark.aml" />
     <None Include="Content\ProjectLayout.aml" />
+    <None Include="Content\VersionHistory\PreAlphaUpdate1.aml" />
+    <None Include="Content\VersionHistory\PreAlphaUpdate2.aml" />
     <None Include="Content\VersionHistory\PreAlphaUpdate3.aml" />
+    <None Include="Content\VersionHistory\Prototype.aml" />
     <None Include="Content\VersionHistory\VersionHistory.aml" />
     <None Include="Content\VSProfiling.aml" />
     <None Include="Content\Welcome.aml" />
@@ -177,6 +180,26 @@
     <Image Include="media\VisualStudioFormattingOptions.png">
       <ImageId>VisualStudioFormattingOptions</ImageId>
       <AlternateText>Visual Studio Formatting Options</AlternateText>
+    </Image>
+    <Image Include="media\VSFunctionDetails1.png">
+      <ImageId>VSFunctionDetails1</ImageId>
+      <AlternateText>VSFunction Details 1</AlternateText>
+    </Image>
+    <Image Include="media\VSFunctionDetails2.png">
+      <ImageId>VSFunctionDetails2</ImageId>
+      <AlternateText>VSFunction Details 2</AlternateText>
+    </Image>
+    <Image Include="media\VSProfileDiagnostics.png">
+      <ImageId>VSProfileDiagnostics</ImageId>
+      <AlternateText>VSProfile Diagnostics</AlternateText>
+    </Image>
+    <Image Include="media\VSProfileFunctions.png">
+      <ImageId>VSProfileFunctions</ImageId>
+      <AlternateText>VSProfile Functions</AlternateText>
+    </Image>
+    <Image Include="media\VSProfileSampleReport.png">
+      <ImageId>VSProfileSampleReport</ImageId>
+      <AlternateText>VSProfile Sample Report</AlternateText>
     </Image>
   </ItemGroup>
   <!-- Import the SHFB build targets -->
