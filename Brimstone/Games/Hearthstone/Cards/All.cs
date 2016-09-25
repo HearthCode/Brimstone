@@ -468,5 +468,23 @@ namespace Brimstone.Games.Hearthstone
 		internal static Behaviour OG_179 = new Behaviour {
 			Deathrattle = Damage(RandomOpponentHealthyCharacter, 1)
 		};
+
+		// Cursed!
+		internal static Behaviour LOE_007t = new Behaviour {
+			TriggersByZone = {
+				[Zone.HAND] = {
+					[OnBeginTurn] = IsFriendly > Damage(FriendlyHero, 2)
+				}
+			}
+		};
+
+		// Gnomish Inventor
+		// Arcane Intellect
+		// Twilight Flamecaller
+		// Anomalus
+		// Runic Egg
+		// Stonetusk Boar
+		// North Sea Kraken
+
 	}
 }
