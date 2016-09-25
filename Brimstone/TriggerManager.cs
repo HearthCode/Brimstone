@@ -153,6 +153,9 @@ namespace Brimstone
 #endif
 			foreach (var entityId in Triggers[type]) {
 				var owningEntity = Game.Entities[entityId];
+				// OnPlay triggers should be ignored for Self when entering Play zone
+				if (type == OnPlay && owningEntity == source)
+					continue;
 				// Ignore entity if not in an active zone
 				Trigger trigger;
 				owningEntity.Card.Behaviour.TriggersByZone[owningEntity.Zone.Type].TryGetValue(type, out trigger);
