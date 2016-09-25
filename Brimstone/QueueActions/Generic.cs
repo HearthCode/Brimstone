@@ -138,6 +138,7 @@ namespace Brimstone.QueueActions
 	{
 		internal override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			// Draw a card then reset all relevant flags
+			// TODO: Current queueing semantics will cause FATIGUE block to run after flag reset Func action; should be other way around
 			game.Queue(game.CurrentPlayer, Actions.Draw(game.CurrentPlayer).Then((Action<IEntity>)(_ => {
 				game.CurrentPlayer.NumMinionsPlayerKilledThisTurn = 0;
 				game.CurrentOpponent.NumMinionsPlayerKilledThisTurn = 0;
@@ -224,14 +225,17 @@ namespace Brimstone.QueueActions
 
 			if (!player.Deck.IsEmpty) {
 				var entity = player.Deck[1];
+
+				// Normal draw
+				if (!player.Hand.IsFull) {
 #if _ACTIONS_DEBUG
 				DebugLog.WriteLine("Game {0}: {1} draws {2}", game.GameId, player.FriendlyName, entity.ShortDescription);
 #endif
-				if (!player.Hand.IsFull) {
 					// TODO: Show to drawing player
 					entity.Zone = player.Hand;
 					player.NumCardsDrawnThisTurn++;
 				}
+				// Overdraw
 				else {
 #if _ACTIONS_DEBUG
 					DebugLog.WriteLine("Game {0}: {1}'s hand is full - overdrawing", game.GameId, player.FriendlyName);
@@ -245,6 +249,7 @@ namespace Brimstone.QueueActions
 #if _ACTIONS_DEBUG
 			DebugLog.WriteLine("Game {0}: {1} tries to draw but their deck is empty", game.GameId, player.FriendlyName);
 #endif
+			game.QueueActionBlock(BlockType.FATIGUE, player.Hero, Actions.Damage(player.Hero, player.Fatigue + 1));
 			return ActionResult.None;
 		}
 	}
@@ -343,27 +348,39 @@ namespace Brimstone.QueueActions
 		public const int DAMAGE = 1;
 
 		internal override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
-			if (args[TARGETS].HasResult)
+			if (args[TARGETS].HasResult) {
+				int damage = args[DAMAGE];
+
 				// TODO: PowerHistory meta TARGET tag (contains all target IDs)
 				foreach (ICharacter e in args[TARGETS]) {
 #if _ACTIONS_DEBUG
-					DebugLog.WriteLine("Game {0}: {1} is getting hit for {2} points of damage", game.GameId, e.ShortDescription, args[DAMAGE]);
+					DebugLog.WriteLine("Game {0}: {1} is getting hit for {2} points of damage", game.GameId, e.ShortDescription, damage);
 #endif
-					e.PreDamage = args[DAMAGE];
+					// A hero damaging itself can only occur due to fatigue damage
+					bool fatigue = e == source && e is Hero;
+
+					if (fatigue)
+						e.Controller.Fatigue = damage;
+					e.PreDamage = damage;
 					e.PreDamage = 0;
 
 					// TODO: PowerHistory meta DAMAGE tag (contains defender ID and damage amount in Data)
 
 					if ((e as Minion)?.HasDivineShield ?? false) {
 						((Minion) e).HasDivineShield = false;
-					} else {
-						e.LastAffectedBy = source;
+					}
+					else {
+						// Fatigue sets LAST_AFFECTED_BY = 0
+						e.LastAffectedBy = fatigue ? null : source;
 						game.Environment.LastDamaged = e;
-						e.Damage += args[DAMAGE];
+
+						// TODO: Decrease armor instead of increasing damage if damage target has armor
+						e.Damage += damage;
 					}
 
 					// TODO: Handle Spell Damage +1, Prophet Velen, Fallen Hero, Predamage, on-damage triggers and more, full specification here https://hearthstone.gamepedia.com/Advanced_rulebook#Damage_and_Healing
 				}
+			}
 			return ActionResult.None;
 		}
 	}

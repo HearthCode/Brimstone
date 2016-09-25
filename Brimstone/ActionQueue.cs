@@ -418,6 +418,9 @@ namespace Brimstone
 						break;
 				}
 #endif
+#if _QUEUE_DEBUG
+				DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Finished action " + action + " for " + action.Source.ShortDescription + " at depth " + Depth);
+#endif
 				OnAction?.Invoke(this, action);
 
 				// Propagate cancellation up the chain by only changing it if not already set

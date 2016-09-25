@@ -141,11 +141,7 @@ namespace Brimstone.Entities
 			}
 		}
 
-		public Player Opponent {
-			get {
-				return Game.Player1 == this ? Game.Player2 : Game.Player1;
-			}
-		}
+		public Player Opponent => Game.Player1 == this ? Game.Player2 : Game.Player1;
 
 		public PlayState PlayState {
 			get { return (PlayState)this[GameTag.PLAYSTATE]; }
@@ -265,6 +261,11 @@ namespace Brimstone.Entities
 			set {
 				this[GameTag.LAST_CARD_PLAYED] = value?.Id ?? 0;;
 			}
+		}
+
+		public int Fatigue {
+			get { return this[GameTag.FATIGUE]; }
+			set { this[GameTag.FATIGUE] = value; }
 		}
 	}
 
