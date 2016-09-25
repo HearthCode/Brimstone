@@ -479,12 +479,33 @@ namespace Brimstone.Games.Hearthstone
 		};
 
 		// Gnomish Inventor
-		// Arcane Intellect
-		// Twilight Flamecaller
-		// Anomalus
-		// Runic Egg
-		// Stonetusk Boar
-		// North Sea Kraken
+		internal static Behaviour CS2_147 = new Behaviour {
+			Battlecry = Draw(Controller)
+		};
 
+		// Arcane Intellect
+		internal static Behaviour CS2_023 = new Behaviour {
+			Battlecry = Draw(Controller)*2
+		};
+
+		// Twilight Flamecaller
+		internal static Behaviour OG_083 = new Behaviour {
+			Battlecry = Damage(OpponentMinions, 1)
+		};
+
+		// Anomalus
+		internal static Behaviour OG_120 = new Behaviour {
+			Deathrattle = Damage(AllMinions, 8)
+		};
+
+		// Runic Egg
+		internal static Behaviour KAR_029 = new Behaviour {
+			Deathrattle = Draw(Controller)
+		};
+
+		// North Sea Kraken
+		internal static Behaviour AT_103 = new Behaviour {
+			Battlecry = Damage(Target, 4)
+		};
 	}
 }
