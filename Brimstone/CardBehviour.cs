@@ -7,7 +7,12 @@ namespace Brimstone
 	{
 		public List<QueueAction> Battlecry;
 		public List<QueueAction> Deathrattle;
-		public Dictionary<TriggerType, Trigger> Triggers;
+		public Dictionary<Zone, Dictionary<TriggerType, Trigger>> TriggersByZone;
+
+		public Dictionary<TriggerType, Trigger> Triggers {
+			get { return TriggersByZone[Zone.PLAY]; }
+			set { TriggersByZone[Zone.PLAY] = value; }
+		}
 
 		// Compile all the ActionGraph fields in a Behaviour into lists of QueueActions
 		internal static CardBehaviour FromGraph(CardBehaviourGraph b) {
@@ -31,7 +36,7 @@ namespace Brimstone
 			}
 
 			// Copy event triggers
-			compiled.Triggers = b.Triggers;
+			compiled.TriggersByZone = b.TriggersByZone;
 
 			return compiled;
 		}

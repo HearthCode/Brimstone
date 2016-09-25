@@ -57,9 +57,10 @@ namespace Brimstone
 		}
 
 		public void Add(IEntity entity) {
-			if (entity.Card.Behaviour?.Triggers != null)
-				foreach (var t in entity.Card.Behaviour.Triggers)
-					Add(entity, t.Key, t.Value);
+			if (entity.Card.Behaviour?.TriggersByZone != null)
+				foreach (var z in entity.Card.Behaviour.TriggersByZone)
+					foreach (var t in z.Value)
+						Add(entity, t.Key, t.Value);
 		}
 
 		private void Add(IEntity entity, TriggerType type, Trigger trigger) {
@@ -153,11 +154,12 @@ namespace Brimstone
 			foreach (var entityId in Triggers[type]) {
 				var owningEntity = Game.Entities[entityId];
 				// Ignore entity if not in an active zone
-				if (owningEntity.Zone.Type == Zone.PLAY || owningEntity.Zone.Type == Zone.HAND) {
+				Trigger trigger;
+				owningEntity.Card.Behaviour.TriggersByZone[owningEntity.Zone.Type].TryGetValue(type, out trigger);
+				if (trigger != null) {
 #if _TRIGGER_DEBUG
 					DebugLog.WriteLine("Game " + Game.GameId + ": Checking trigger conditions for " + owningEntity.ShortDescription);
 #endif
-					var trigger = owningEntity.Card.Behaviour.Triggers[type];
 					// Test trigger condition
 					if (trigger.Condition?.Eval(owningEntity, source) ?? true) {
 #if _TRIGGER_DEBUG
@@ -171,11 +173,11 @@ namespace Brimstone
 						QueuedTriggersCount++;
 					}
 				}
-				else {
 #if _TRIGGER_DEBUG
+				else {
 					DebugLog.WriteLine("Game " + Game.GameId + ": Ignoring triggers for " + owningEntity.ShortDescription + " because it wasn't in an active zone");
-#endif
 				}
+#endif
 			}
 		}
 
