@@ -94,7 +94,7 @@ namespace BrimstoneTests
 			Assert.AreEqual(4, p1.Board.Count);
 			Assert.That(p1.Board[3] == wisp2);
 			Assert.AreEqual("Flame of Azzinoth", p1.Board[4].Card.Name);
-			// TODO: Add board full tests, graveyeard test etc.
+			// TODO: Add board full tests, graveyard test etc.
 		}
 
 		// Patashu's Timing Gym. Are you Advanced Rulebook Compliant (tm)?

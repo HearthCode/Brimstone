@@ -12,6 +12,8 @@ namespace BrimstoneTests
 		[Test]
 		public void TestAcolyteOfPain() {
 			var game = new Game(HeroClass.Priest, HeroClass.Priest);
+			game.Player1.Deck.Fill();
+			game.Player2.Deck.Fill();
 			game.Start(SkipMulligan: true);
 
 			var p1 = game.CurrentPlayer;
@@ -53,6 +55,8 @@ namespace BrimstoneTests
 		[Test]
 		public void TestExplosiveSheep() {
 			var game = new Game(HeroClass.Priest, HeroClass.Priest);
+			game.Player1.Deck.Fill();
+			game.Player2.Deck.Fill();
 			game.Start(SkipMulligan: true);
 
 			var p1 = game.CurrentPlayer;
@@ -92,6 +96,8 @@ namespace BrimstoneTests
 		[Test]
 		public void TestInjuredBlademaster() {
 			var game = new Game(HeroClass.Priest, HeroClass.Priest);
+			game.Player1.Deck.Fill();
+			game.Player2.Deck.Fill();
 			game.Start(SkipMulligan: true);
 
 			var p1 = game.CurrentPlayer;
@@ -107,6 +113,8 @@ namespace BrimstoneTests
 		[Test]
 		public void TestVoodooDoctor() {
 			var game = new Game(HeroClass.Priest, HeroClass.Priest);
+			game.Player1.Deck.Fill();
+			game.Player2.Deck.Fill();
 			game.Start(SkipMulligan: true);
 
 			var p1 = game.CurrentPlayer;
@@ -130,6 +138,8 @@ namespace BrimstoneTests
 		[Test]
 		public void TestMadBomber() {
 			var game = new Game(HeroClass.Priest, HeroClass.Priest);
+			game.Player1.Deck.Fill();
+			game.Player2.Deck.Fill();
 			game.Start(SkipMulligan: true);
 
 			var p1 = game.CurrentPlayer;
@@ -149,6 +159,8 @@ namespace BrimstoneTests
 		[Test]
 		public void TestDemolisher() {
 			var game = new Game(HeroClass.Priest, HeroClass.Priest);
+			game.Player1.Deck.Fill();
+			game.Player2.Deck.Fill();
 			game.Start(SkipMulligan: true);
 
 			var p1 = game.CurrentPlayer;
@@ -173,6 +185,8 @@ namespace BrimstoneTests
 		[Test]
 		public void TestLeperGnome() {
 			var game = new Game(HeroClass.Priest, HeroClass.Priest);
+			game.Player1.Deck.Fill();
+			game.Player2.Deck.Fill();
 			game.Start(SkipMulligan: true);
 
 			var p1 = game.CurrentPlayer;
@@ -201,6 +215,8 @@ namespace BrimstoneTests
 		[Test]
 		public void TestBaronGeddon() {
 			var game = new Game(HeroClass.Priest, HeroClass.Priest);
+			game.Player1.Deck.Fill();
+			game.Player2.Deck.Fill();
 			game.Start(SkipMulligan: true);
 
 			var p1 = game.CurrentPlayer;
@@ -255,6 +271,8 @@ namespace BrimstoneTests
 		[Test]
 		public void TestWildPyromancer() {
 			var game = new Game(HeroClass.Priest, HeroClass.Priest);
+			game.Player1.Deck.Fill();
+			game.Player2.Deck.Fill();
 			game.Start(SkipMulligan: true);
 
 			var p1 = game.CurrentPlayer;
