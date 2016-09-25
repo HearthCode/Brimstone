@@ -403,7 +403,10 @@ namespace Brimstone
 #if _QUEUE_DEBUG
 				DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Running action " + action + " for " + action.Source.ShortDescription + " at depth " + Depth);
 #endif
-				var result = action.Action.Run(action.Game, action.Source, action.Args);
+				var @async = action.Action as QueueActionAsync;
+				var result = (@async != null
+					? await @async.RunAsync(action.Game, action.Source, action.Args)
+					: action.Action.Run(action.Game, action.Source, action.Args));
 				if (result.HasResult)
 					StackPush(result);
 #if _USE_TREE

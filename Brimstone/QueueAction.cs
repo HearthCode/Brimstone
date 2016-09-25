@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Brimstone.Entities;
 
 namespace Brimstone.QueueActions
@@ -15,7 +16,9 @@ namespace Brimstone.QueueActions
 		internal QueueAction[] EagerArgs { get; set; }
 		internal ActionResult[] CompiledArgs { get; set; }
 
-		internal abstract ActionResult Run(Game game, IEntity source, ActionResult[] args);
+		internal virtual ActionResult Run(Game game, IEntity source, ActionResult[] args) {
+			return ActionResult.None;
+		}
 
 		internal ActionGraph Then(ActionGraph g) {
 			return ((ActionGraph) this).Then(g);
@@ -45,6 +48,11 @@ namespace Brimstone.QueueActions
 			// except for Args which is immutable
 			return MemberwiseClone();
 		}
+	}
+
+	public abstract class QueueActionAsync : QueueAction
+	{
+		internal abstract Task<ActionResult> RunAsync(Game game, IEntity source, ActionResult[] args);
 	}
 
 	// QueueActions that will be evaluated when they are unravelled in an ActionGraph, if they are arguments to another QueueAction
