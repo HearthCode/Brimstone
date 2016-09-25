@@ -272,9 +272,13 @@ namespace Brimstone.QueueActions
 
 			entity.JustPlayed = true;
 			player.LastCardPlayed = entity;
+
+			// TODO: OnPlay triggers should execute here (they are currently attached to JustPlayed) - find a way to avoid all the queueing below
+
 #if _ACTIONS_DEBUG
 			DebugLog.WriteLine("Game {0}: {1} is playing {2}", game.GameId, player.FriendlyName, entity.ShortDescription);
 #endif
+			// TODO: CARD_TARGET should be set after triggers execute, and should be set for minions
 			if (entity is Spell && entity.Target != null)
 				entity[GameTag.CARD_TARGET] = entity.Target.Id;
 

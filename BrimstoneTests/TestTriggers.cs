@@ -54,6 +54,49 @@ namespace BrimstoneTests
 			Assert.That(cardsInHand == p1.Hand.Count);
 		}
 
+		[Test]
+		public void TestTriggerZones() {
+			// Arrange
+			var game = new Game(HeroClass.Hunter, HeroClass.Warlock, PowerHistory: true);
+			var p1 = game.Player1;
+			var p2 = game.Player2;
+			var illidan = new Minion("Illidan Stormrage") {Zone = p1.Deck};
+			var wisp1 = new Minion("Wisp") {Zone = p1.Deck};
+			var wisp2 = new Minion("Wisp") {Zone = p1.Deck};
+			var wisp3 = new Minion("Wisp") {Zone = p1.Deck};
+			p1.Deck.Fill();
+			p2.Deck.Fill();
+			game.Start(1, SkipMulligan: true, Shuffle: false);
+
+			Assert.That(p1.Hand[1] == illidan);
+			Assert.That(p1.Hand[2] == wisp1);
+			Assert.That(p1.Hand[3] == wisp2);
+			p1.Draw();
+			Assert.That(p1.Hand[4] == wisp3);
+			Assert.AreEqual(0, p1.Board.Count);
+
+			// Act
+			wisp1.Play();
+
+			// Assert: Illidan Stormrage should not trigger in HAND zone
+			Assert.AreEqual(1, p1.Board.Count);
+
+			// Act
+			illidan.Play();
+
+			// Assert: Illidan Stormrage should not trigger as it is moving to PLAY
+			Assert.AreEqual(2, p1.Board.Count);
+
+			// Act
+			wisp2.Play();
+
+			// Assert: Illidan Stormrage should trigger in PLAY zone
+			Assert.AreEqual(4, p1.Board.Count);
+			Assert.That(p1.Board[3] == wisp2);
+			Assert.AreEqual("Flame of Azzinoth", p1.Board[4].Card.Name);
+			// TODO: Add board full tests, graveyeard test etc.
+		}
+
 		// Patashu's Timing Gym. Are you Advanced Rulebook Compliant (tm)?
 
 		// 1) events are processed in timestamp order
