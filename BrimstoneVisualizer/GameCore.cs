@@ -27,7 +27,7 @@ namespace BrimstoneVisualizer
 			Game.ActionQueue.OnQueued += (s, e) => {
 					QueueRead.WaitOne();
 			};
-			Game.ActionQueue.OnAction += (s, e) => {
+			Game.ActionQueue.OnActionStarting += (s, e) => {
 				if (Game.State != GameState.COMPLETE)
 					QueueRead.WaitOne();
 			};
