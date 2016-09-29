@@ -280,17 +280,16 @@ namespace Brimstone.QueueActions
 			entity.JustPlayed = true;
 			player.LastCardPlayed = entity;
 
-			// TODO: OnPlay triggers should execute here (they are currently attached to JustPlayed) - find a way to avoid all the queueing below
+			// TODO: OnPlay triggers execute here (they are currently attached to JustPlayed) - find a way to avoid all the queueing below
 
 #if _ACTIONS_DEBUG
 			DebugLog.WriteLine("Game {0}: {1} is playing {2}", game.GameId, player.FriendlyName, entity.ShortDescription);
 #endif
-			// TODO: CARD_TARGET should be set after triggers execute, and should be set for minions
-			if (entity is Spell && entity.Target != null)
-				entity[GameTag.CARD_TARGET] = entity.Target.Id;
+			if (entity.Target != null)
+				game.Queue(source, (Action<IEntity>)(_ => entity[GameTag.CARD_TARGET] = entity.Target.Id));
 
 			game.QueueActionBlock(BlockType.POWER, source, entity.Card.Behaviour.Battlecry, entity.Target);
-			game.Queue(source, new Action<IEntity>(e =>
+			game.Queue(source, (Action<IEntity>)(e =>
 			{
 				// Spells go to the graveyard after they are played
 				if (e is Spell)
@@ -327,7 +326,7 @@ namespace Brimstone.QueueActions
 				heroPower[GameTag.CARD_TARGET] = heroPower.Target.Id;
 
 			game.QueueActionBlock(BlockType.POWER, source, source.Card.Behaviour.Battlecry, heroPower.Target);
-			game.Queue(source, new Action<IEntity>(e => {
+			game.Queue(source, (Action<IEntity>)(e => {
 				player.HeroPowerActivationsThisTurn++;
 				// TODO: Hero power windfury etc.
 				heroPower.IsExhausted = true;
@@ -336,7 +335,7 @@ namespace Brimstone.QueueActions
 				e.Game.RunDeathCreationStepIfNeeded();
 				// TODO: Attach OnHeroPower to a tag change; this is probably in the wrong place (Inspire)
 				e.Game.ActiveTriggers.Queue(TriggerType.OnHeroPower, e);
-				e.Game.Queue(e.Controller, new Action<IEntity>(p => {
+				e.Game.Queue(e.Controller, (Action<IEntity>)(p => {
 					((Player)p).NumOptionsPlayedThisTurn++;
 				}));
 			}));
@@ -561,7 +560,7 @@ namespace Brimstone.QueueActions
 			if (defAttack > 0)
 				game.Queue(defender, Actions.Damage((Entity)attacker, defAttack));
 
-			game.Queue(source, new Action<IEntity>(_ =>
+			game.Queue(source, (Action<IEntity>)(_ =>
 			{
 				attacker.NumAttacksThisTurn++;
 				// TODO: Use EXTRA_ATTACKS_THIS_TURN?
