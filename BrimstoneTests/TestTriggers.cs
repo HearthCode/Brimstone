@@ -14,7 +14,7 @@ namespace BrimstoneTests
 	{
 		[Test]
 		public void TestTriggerAttachment() {
-			var game = new Game(HeroClass.Hunter, HeroClass.Warlock, PowerHistory: true);
+			var game = new Game(HeroClass.Hunter, HeroClass.Warlock, PowerHistory: true, ActionHistory: true);
 			var p1 = game.Player1;
 			var p2 = game.Player2;
 			IPlayable acolyte = p1.Deck.Add(new Minion("Acolyte of Pain"));
@@ -60,10 +60,10 @@ namespace BrimstoneTests
 			var game = new Game(HeroClass.Hunter, HeroClass.Warlock, PowerHistory: true);
 			var p1 = game.Player1;
 			var p2 = game.Player2;
-			var illidan = new Minion("Illidan Stormrage") {Zone = p1.Deck};
-			var wisp1 = new Minion("Wisp") {Zone = p1.Deck};
-			var wisp2 = new Minion("Wisp") {Zone = p1.Deck};
-			var wisp3 = new Minion("Wisp") {Zone = p1.Deck};
+			var illidan = new Minion("Illidan Stormrage") { Zone = p1.Deck };
+			var wisp1 = new Minion("Wisp") { Zone = p1.Deck };
+			var wisp2 = new Minion("Wisp") { Zone = p1.Deck };
+			var wisp3 = new Minion("Wisp") { Zone = p1.Deck };
 			p1.Deck.Fill();
 			p2.Deck.Fill();
 			game.Start(1, SkipMulligan: true, Shuffle: false);
@@ -136,6 +136,7 @@ namespace BrimstoneTests
 			p1.Choice.Keep(x => x.Cost <= 2);
 			p2.Choice.Keep(x => x.Cost <= 2);
 
+			var originalBehaviour = Cards.FromId("EX1_556").Behaviour.Deathrattle;
 			Cards.FromId("EX1_556").Behaviour.Deathrattle = Summon(Controller, "Cult Master");
 
 			var hg = new Minion("EX1_556").GiveTo(p1); // Harvest Golem modified (Deathrattle: Summon a Cult Master)
@@ -147,6 +148,9 @@ namespace BrimstoneTests
 
 			// Because each queue resolves before the next queue is populated, the Cult Master should be in play soon enough to trigger on the Wisp's death and draw a card.
 			new Spell("Flamestrike").GiveTo(p2).Play();
+
+			Cards.FromId("EX1_556").Behaviour.Deathrattle = originalBehaviour;
+
 			Assert.AreEqual(cardsInHand + 1, p1.Hand.Count);
 		}
 

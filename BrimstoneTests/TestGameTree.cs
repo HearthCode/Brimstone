@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using Brimstone;
 using Brimstone.Entities;
+using Brimstone.QueueActions;
 using Brimstone.Tree;
 using static Brimstone.Actions;
 
@@ -69,6 +70,21 @@ namespace BrimstoneTests
 													.Select(x => x.Value).ToList();
 			foreach (var p in friendlyRCDamaged)
 				Assert.AreEqual(1.0 / 48.0, p, 0.0000001);
+		}
+
+		private List<QueueAction> originalBoomBot;
+		private List<QueueAction> originalMissiles;
+
+		[SetUp]
+		public void Setup() {
+			originalBoomBot = Cards.FromId("GVG_110t").Behaviour.Deathrattle;
+			originalMissiles = Cards.FromName("Arcane Missiles").Behaviour.Battlecry;
+		}
+
+		[TearDown]
+		public void Teardown() {
+			Cards.FromId("GVG_110t").Behaviour.Deathrattle = originalBoomBot;
+			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = originalMissiles;
 		}
 
 		// NOTE: Naive tree searching is too slow for this test so we omit it
