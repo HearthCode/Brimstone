@@ -1,0 +1,10 @@
+#!/bin/sh
+
+PROJECTDIR=$1
+
+if [ ! -f "$PROJECTDIR"Games/Hearthstone/Data/CardDefs.xml ]; then
+    mkdir -p "$PROJECTDIR"Games/Hearthstone/Data
+    git clone https://github.com/HearthSim/hs-data
+    cp hs-data/CardDefs.xml hs-data/DBF/CARD.xml "$PROJECTDIR"Games/Hearthstone/Data
+    rm -rf hs-data
+fi
