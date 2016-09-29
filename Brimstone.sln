@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deque", "submodules\Deque\s
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{3387413D-2669-4B77-A1CA-35578C9A099E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameDemoEndTurn", "GameDemoEndTurn\GameDemoEndTurn.csproj", "{1FBCF875-F548-4591-B4F5-10B60E2E9685}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -92,6 +94,12 @@ Global
 		{709ADC4D-6A3A-4E91-B008-1CDC0B2DB060}.Documentation|Any CPU.Build.0 = Debug|Any CPU
 		{709ADC4D-6A3A-4E91-B008-1CDC0B2DB060}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{709ADC4D-6A3A-4E91-B008-1CDC0B2DB060}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FBCF875-F548-4591-B4F5-10B60E2E9685}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FBCF875-F548-4591-B4F5-10B60E2E9685}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FBCF875-F548-4591-B4F5-10B60E2E9685}.Documentation|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FBCF875-F548-4591-B4F5-10B60E2E9685}.Documentation|Any CPU.Build.0 = Debug|Any CPU
+		{1FBCF875-F548-4591-B4F5-10B60E2E9685}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FBCF875-F548-4591-B4F5-10B60E2E9685}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -103,5 +111,6 @@ Global
 		{B372392B-9FCA-4504-9AF0-92C31552E14C} = {54428178-5816-4B2E-B62F-07D40D57758A}
 		{38762091-774B-4D85-ABAA-BFA8BEF2EC19} = {07A49179-CD03-45F3-9D34-3A9C1E426590}
 		{709ADC4D-6A3A-4E91-B008-1CDC0B2DB060} = {3387413D-2669-4B77-A1CA-35578C9A099E}
+		{1FBCF875-F548-4591-B4F5-10B60E2E9685} = {54428178-5816-4B2E-B62F-07D40D57758A}
 	EndGlobalSection
 EndGlobal

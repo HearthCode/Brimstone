@@ -140,6 +140,7 @@ namespace Brimstone.QueueActions
 			// Draw a card then reset all relevant flags
 			// This is a bit funky, we have to make a new block for Draw in case of fatigue and triggers,
 			// but queue the flag resets into the current block first
+			// TODO: Find a better way (stack-based queue?)
 			game.Queue(game.CurrentPlayer, (Action<IEntity>)(_ => {
 				game.CurrentPlayer.NumMinionsPlayerKilledThisTurn = 0;
 				game.CurrentOpponent.NumMinionsPlayerKilledThisTurn = 0;
