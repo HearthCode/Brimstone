@@ -214,7 +214,7 @@ namespace Brimstone.Entities
 			var block = new BlockStart(Type, Source, Target, index);
 			PowerHistory?.Add(block);
 			ActionQueue.StartBlock(Source, Actions, block);
-			return (await ActionQueue.ProcessBlockAsync())?.FirstOrDefault() ?? ActionResult.None;
+			return await ActionQueue.ProcessBlockAsync();
 		}
 
 		internal void OnBlockEmpty(BlockStart Block) {

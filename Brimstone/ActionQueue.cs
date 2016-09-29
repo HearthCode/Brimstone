@@ -205,21 +205,6 @@ namespace Brimstone
 			return new QueueActionEventArgs(Game, source, qa);
 		}
 
-		public IEnumerable<ActionResult> RunMultiResult(IEntity source, List<QueueAction> qa) {
-			if (qa == null)
-				return new List<ActionResult>();
-			StartBlock(source, qa);
-			return ProcessBlock();
-		}
-
-		public IEnumerable<ActionResult> RunMultiResult(IEntity source, ActionGraph g) {
-			return g != null ? RunMultiResult(source, g.Unravel()) : new List<ActionResult>();
-		}
-
-		public IEnumerable<ActionResult> RunMultiResult(IEntity source, QueueAction a) {
-			return a != null ? RunMultiResult(source, new List<QueueAction> {a}) : new List<ActionResult>();
-		}
-
 		public ActionResult Run(IEntity source, List<QueueAction> qa) {
 			return RunAsync(source, qa).Result;
 		}
@@ -229,7 +214,7 @@ namespace Brimstone
 				return ActionResult.None;
 			// TODO: If qa.Count == 1 and qa[0] is GameBlock then find a shortcut to avoid double-nesting
 			StartBlock(source, qa);
-			return (await ProcessBlockAsync())?.FirstOrDefault() ?? ActionResult.None;
+			return await ProcessBlockAsync();
 		}
 
 		public ActionResult Run(IEntity source, ActionGraph g) {
@@ -296,11 +281,11 @@ namespace Brimstone
 			Paused = false;
 		}
 
-		public IEnumerable<ActionResult> ProcessBlock(object UserData = null) {
+		public ActionResult ProcessBlock(object UserData = null) {
 			return ProcessBlockAsync(UserData).Result;
 		}
 
-		public async Task<IEnumerable<ActionResult>> ProcessBlockAsync(object UserData = null) {
+		public async Task<ActionResult> ProcessBlockAsync(object UserData = null) {
 #if _QUEUE_DEBUG
 			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Start processing current block");
 			var depth = Depth;
@@ -314,11 +299,11 @@ namespace Brimstone
 			return result;
 		}
 
-		public IEnumerable<ActionResult> ProcessAll(object UserData = null, int MaxUnwindDepth = 0) {
+		public ActionResult ProcessAll(object UserData = null, int MaxUnwindDepth = 0) {
 			return ProcessAllAsync(UserData, MaxUnwindDepth).Result;
 		}
 
-		public async Task<IEnumerable<ActionResult>> ProcessAllAsync(object UserData = null, int MaxUnwindDepth = 0, bool one = false) {
+		public async Task<ActionResult> ProcessAllAsync(object UserData = null, int MaxUnwindDepth = 0, bool one = false) {
 			LastActionCancelled = false;
 			bool DoneOne = false;
 			while (!Paused && !IsBlockEmpty && !LastActionCancelled && !DoneOne) {
@@ -427,18 +412,18 @@ namespace Brimstone
 				OnAction?.Invoke(this, action);
 
 				// Propagate cancellation up the chain by only changing it if not already set
-				LastActionCancelled = action.Cancel;
+					LastActionCancelled = action.Cancel;
 			}
 			// Return whatever is left on the stack
 			if (LastActionCancelled)
-				return null;
-			var stack = ResultStack;
+				return ActionResult.None;
+			var finalResult = ResultStack.Reverse().FirstOrDefault();
 			if (!Paused && IsEmpty)
 				StackClear();
-			return stack.Reverse();
+			return finalResult;
 		}
 
-		public IEnumerable<ActionResult> ProcessOne(object UserData = null, int MaxUnwindDepth = 0) {
+		public ActionResult ProcessOne(object UserData = null, int MaxUnwindDepth = 0) {
 			return ProcessAllAsync(UserData, MaxUnwindDepth, true).Result;
 		}
 
