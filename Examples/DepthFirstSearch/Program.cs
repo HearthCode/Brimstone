@@ -43,12 +43,12 @@ namespace Test1
 
 			var ArcaneMissiles = game.CurrentPlayer.Give("Arcane Missiles");
 
+			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Damage(RandomOpponentHealthyCharacter, 1) * 3;
+			Cards.FromId("GVG_110t").Behaviour.Deathrattle = Damage(RandomOpponentHealthyMinion, RandomAmount(1, 4));
+
 			// Start timing
 			var sw = new Stopwatch();
 			sw.Start();
-
-			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Damage(RandomOpponentHealthyCharacter, 1) * 2;
-			Cards.FromId("GVG_110t").Behaviour.Deathrattle = Damage(RandomOpponentHealthyMinion, RandomAmount(1, 4));
 
 			// Start the search going on another thread and retrieve its task handle
 			var treeTask = RandomOutcomeSearch.BuildAsync(
