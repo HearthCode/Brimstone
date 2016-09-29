@@ -209,28 +209,28 @@ namespace Brimstone
 			return RunAsync(source, qa).Result;
 		}
 
-		public async Task<ActionResult> RunAsync(IEntity source, List<QueueAction> qa) {
+		public Task<ActionResult> RunAsync(IEntity source, List<QueueAction> qa) {
 			if (qa == null)
-				return ActionResult.None;
+				return Task.FromResult(ActionResult.None);
 			// TODO: If qa.Count == 1 and qa[0] is GameBlock then find a shortcut to avoid double-nesting
 			StartBlock(source, qa);
-			return await ProcessBlockAsync();
+			return ProcessBlockAsync();
 		}
 
 		public ActionResult Run(IEntity source, ActionGraph g) {
 			return RunAsync(source, g).Result;
 		}
 
-		public async Task<ActionResult> RunAsync(IEntity source, ActionGraph g) {
-			return g != null ? await RunAsync(source, g.Unravel()) : ActionResult.None;
+		public Task<ActionResult> RunAsync(IEntity source, ActionGraph g) {
+			return g != null ? RunAsync(source, g.Unravel()) : Task.FromResult(ActionResult.None);
 		}
 
 		public ActionResult Run(IEntity source, QueueAction a) {
 			return RunAsync(source, a).Result;
 		}
 
-		public async Task<ActionResult> RunAsync(IEntity source, QueueAction a) {
-			return a != null ? await RunAsync(source, new List<QueueAction> { a }) : ActionResult.None;
+		public Task<ActionResult> RunAsync(IEntity source, QueueAction a) {
+			return a != null ? RunAsync(source, new List<QueueAction> { a }) : Task.FromResult(ActionResult.None);
 		}
 
 		public void EnqueueDeferred(IEntity source, List<QueueAction> qa) {
@@ -285,16 +285,20 @@ namespace Brimstone
 			return ProcessBlockAsync(UserData).Result;
 		}
 
-		public async Task<ActionResult> ProcessBlockAsync(object UserData = null) {
+		public Task<ActionResult> ProcessBlockAsync(object UserData = null) {
 #if _QUEUE_DEBUG
 			DebugLog.WriteLine("Queue (Game " + Game.GameId + "): Start processing current block");
 			var depth = Depth;
 #endif
-			var result = await ProcessAllAsync(UserData, Depth);
 #if _QUEUE_DEBUG
 			// Block might not be finished if queue was cancelled
-			if (!LastActionCancelled)
-				DebugLog.WriteLine("Queue (Game " + Game.GameId + "): End processing current block");
+			var result = ProcessAllAsync(UserData, Depth).ContinueWith(x => {
+				if (!LastActionCancelled)
+					DebugLog.WriteLine("Queue (Game " + Game.GameId + "): End processing current block");
+				return x.Result;
+			});
+#else
+			var result = ProcessAllAsync(UserData, Depth);
 #endif
 			return result;
 		}

@@ -132,16 +132,16 @@ namespace Brimstone.Entities
 			return null;
 		}
 
-		public async Task<ActionResult> ActionAsync(IEntity source, ActionGraph g) {
-			return await ActionQueue.RunAsync(source, g);
+		public Task<ActionResult> ActionAsync(IEntity source, ActionGraph g) {
+			return ActionQueue.RunAsync(source, g);
 		}
 
-		public async Task<ActionResult> ActionAsync(IEntity source, List<QueueAction> l) {
-			return await ActionQueue.RunAsync(source, l);
+		public Task<ActionResult> ActionAsync(IEntity source, List<QueueAction> l) {
+			return ActionQueue.RunAsync(source, l);
 		}
 
-		public async Task<ActionResult> ActionAsync(IEntity source, QueueAction a) {
-			return await ActionQueue.RunAsync(source, a);
+		public Task<ActionResult> ActionAsync(IEntity source, QueueAction a) {
+			return ActionQueue.RunAsync(source, a);
 		}
 
 		public ActionResult Action(IEntity source, ActionGraph g) {
@@ -202,11 +202,11 @@ namespace Brimstone.Entities
 			return RunActionBlockAsync(Type, Source, Actions, Target, Index).Result;
 		}
 
-		public async Task<ActionResult> RunActionBlockAsync(BlockType Type, IEntity Source, ActionGraph Actions, IEntity Target = null, int Index = -2) {
-			return await RunActionBlockAsync(Type, Source, Actions.Unravel(), Target, Index);
+		public Task<ActionResult> RunActionBlockAsync(BlockType Type, IEntity Source, ActionGraph Actions, IEntity Target = null, int Index = -2) {
+			return RunActionBlockAsync(Type, Source, Actions.Unravel(), Target, Index);
 		}
 
-		public async Task<ActionResult> RunActionBlockAsync(BlockType Type, IEntity Source, List<QueueAction> Actions, IEntity Target = null, int Index = -2) {
+		public Task<ActionResult> RunActionBlockAsync(BlockType Type, IEntity Source, List<QueueAction> Actions, IEntity Target = null, int Index = -2) {
 #if _GAME_DEBUG
 			DebugLog.WriteLine("Game " + GameId + ": Running " + Type + " for " + Source.ShortDescription + " => " + (Target?.ShortDescription ?? "no target"));
 #endif
@@ -214,7 +214,7 @@ namespace Brimstone.Entities
 			var block = new BlockStart(Type, Source, Target, index);
 			PowerHistory?.Add(block);
 			ActionQueue.StartBlock(Source, Actions, block);
-			return await ActionQueue.ProcessBlockAsync();
+			return ActionQueue.ProcessBlockAsync();
 		}
 
 		internal void OnBlockEmpty(BlockStart Block) {
