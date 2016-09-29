@@ -12,6 +12,7 @@ using System.Linq;
 using Brimstone;
 using Brimstone.Entities;
 using Brimstone.Tree;
+using static Brimstone.Actions;
 
 namespace Test1
 {
@@ -21,8 +22,8 @@ namespace Test1
 		public const int MaxMinions = 3;
 		public const int NumBoomBots = 1;
 		public const string FillMinion = "River Crocolisk";
-		public static bool BoomBotTest = true;
-		public static bool ArcaneMissilesTest = false;
+		public static bool BoomBotTest = false;
+		public static bool ArcaneMissilesTest = true;
 
 		static void Main(string[] args) {
 			// Create initial game state
@@ -42,6 +43,9 @@ namespace Test1
 				game.CurrentPlayer.Give(FillMinion).Play();
 			for (int i = 0; i < NumBoomBots; i++)
 				game.CurrentPlayer.Give("GVG_110t").Play();
+
+			Cards.FromName("Arcane Missiles").Behaviour.Battlecry = Damage(RandomOpponentHealthyCharacter, 1) * 2;
+			Cards.FromId("GVG_110t").Behaviour.Deathrattle = Damage(RandomOpponentHealthyMinion, RandomAmount(1, 4));
 
 			// Start timing
 			var sw = new Stopwatch();
