@@ -138,15 +138,17 @@ namespace Brimstone.QueueActions
 	{
 		internal override ActionResult Run(Game game, IEntity source, ActionResult[] args) {
 			// Draw a card then reset all relevant flags
-			// TODO: Current queueing semantics will cause FATIGUE block to run after flag reset Func action; should be other way around
-			game.Queue(game.CurrentPlayer, Actions.Draw(game.CurrentPlayer).Then((Action<IEntity>)(_ => {
+			// This is a bit funky, we have to make a new block for Draw in case of fatigue and triggers,
+			// but queue the flag resets into the current block first
+			game.Queue(game.CurrentPlayer, (Action<IEntity>)(_ => {
 				game.CurrentPlayer.NumMinionsPlayerKilledThisTurn = 0;
 				game.CurrentOpponent.NumMinionsPlayerKilledThisTurn = 0;
 				game.CurrentPlayer.NumFriendlyMinionsThatAttackedThisTurn = 0;
 				game.NumMinionsKilledThisTurn = 0;
 				game.CurrentPlayer.HeroPowerActivationsThisTurn = 0;
 				game.NextStep = Step.MAIN_ACTION;
-			})));
+			}));
+			game.ActionQueue.StartBlock(game.CurrentPlayer, Actions.Draw(game.CurrentPlayer));
 			return ActionResult.None;
 		}
 	}
