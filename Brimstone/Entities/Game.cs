@@ -77,7 +77,8 @@ namespace Brimstone.Entities
 			Depth = cloneFrom.Depth + 1;
 			// Fuzzy hashing
 			_gameHash = cloneFrom._gameHash;
-			Changed = cloneFrom.Changed;
+			_markedHash = cloneFrom._markedHash;
+			_changed = cloneFrom._changed;
 		}
 
 		/// <summary>
@@ -393,8 +394,7 @@ namespace Brimstone.Entities
 		}
 
 		internal void EntityChanging(IEntity entity, GameTag tag, int oldValue, int newValue, int previousHash) {
-			if (Settings.GameHashCaching)
-				_changed = true;
+			_changed = true;
 		}
 
 		internal void EntityChanged(IEntity entity, GameTag tag, int oldValue, int newValue) {
@@ -404,18 +404,13 @@ namespace Brimstone.Entities
 			OnEntityChanged?.Invoke(this, entity, tag, oldValue, newValue);
 		}
 
-		private int _gameHash = 0;
-		private bool _changed = false;
+		private int _gameHash;
+		private int _markedHash;
+		private bool _changed;
 
 		public bool Changed {
-			get { return _changed; }
-			set {
-				int dummy;
-				if (!value)
-					dummy = FuzzyGameHash;
-				else
-					_changed = true;
-			}
+			get { return _markedHash != FuzzyGameHash; }
+			set { _markedHash = (value? 0 : FuzzyGameHash); }
 		}
 
 		// Calculate a fuzzy hash for the whole game state

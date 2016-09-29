@@ -365,6 +365,8 @@ namespace Brimstone.Tree
 			// This game will be on the same thread as the calling task in parallel mode if it hasn't been cloned
 			// If it has been cloned, it may be on a different thread
 			if (e.Game.Changed) {
+				e.Game.Changed = false;
+
 				// If the action queue is empty, we have reached a leaf node game state
 				// so compare it for equality with other final game states
 				if (e.Game.ActionQueue.IsEmpty) {
