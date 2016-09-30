@@ -109,6 +109,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Content\CreateBenchmarks.aml" />
+    <None Include="Content\ReleaseNotes.aml" />
     <None Include="Content\SingleBuildBenchmark.aml" />
     <None Include="Content\BenchmarkingAndProfiling.aml" />
     <None Include="Content\BrimstoneBehaviouralModel.aml" />

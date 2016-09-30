@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Topics>
   <Topic id="bbd3d95b-45e3-46e9-bd51-35ee4749d7b6" visible="True" isDefault="true" isExpanded="true" title="Brimstone Developer Documentation">
+    <Topic id="a1fa23b4-bdc3-4d31-8857-d3696f25d7d2" visible="True" isSelected="true" title="Brimstone Pre-alpha Update 3 Release Notes" />
     <Topic id="7493ffc4-7c29-4d5e-b98f-b05779501025" visible="True" title="Design Goals" />
     <Topic id="18642f79-254c-41de-b114-830086f71262" visible="True" title="Project Structure" />
     <Topic id="35eb8d99-3f98-4a9b-8a05-46ad393bfd39" visible="True" noFile="true" isExpanded="true" title="Basic Concepts">
@@ -21,7 +22,7 @@
       <Topic id="c1506970-e752-4aa2-9c66-98de53657db6" visible="True" title="Pre-alpha Update 3" />
       <Topic id="a5450975-e864-4e04-8aa0-2e0c357d25ce" visible="True" title="Pre-alpha Update 2" />
       <Topic id="f90a3d45-3e01-4ee4-9832-99a9cc7a7e79" visible="True" title="Pre-alpha Update 1" />
-      <Topic id="a12535f2-8913-47ac-9595-ac3a70b3b6f2" visible="True" isSelected="true" title="Initial Prototype" />
+      <Topic id="a12535f2-8913-47ac-9595-ac3a70b3b6f2" visible="True" title="Initial Prototype" />
     </Topic>
   </Topic>
 </Topics>

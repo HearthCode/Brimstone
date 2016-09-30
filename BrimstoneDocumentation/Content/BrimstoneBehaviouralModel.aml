@@ -10,7 +10,7 @@
         <para>This document is a work in progress and will be updated with each release. Items without annotations are complete, implemented and working.</para>
       </alert>
       <alert class="caution">
-        <para>This is a port of the Brimstone Behavioural Model document from Google Docs for Brimstone pre-alpha Update 2. It has not yet been fully formatted or sectioned. Elements of this document will be split up into a conceptual overview and a developer guide for Update 3.</para>
+        <para>This is a port of the Brimstone Behavioural Model document from Google Docs for Brimstone pre-alpha Update 2. It has not yet been fully formatted or sectioned. Portions of this document are now out of date with the release of pre-alpha Update 3. We will try to update the documentation as soon as possible.</para>
       </alert>
     </introduction>
 
