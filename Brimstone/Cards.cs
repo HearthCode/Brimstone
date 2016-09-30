@@ -24,6 +24,12 @@ namespace Brimstone
 			// Set as card definitions
 			data = new CardDefinitions();
 			data.Load(cards, gameNamespace);
+
+			// Common sets
+			// TODO: Add Standard sets
+			foreach (var heroClass in Enum.GetValues(typeof(HeroClass)).Cast<HeroClass>())
+				Wild.Add(heroClass, All.Where(
+					c => c.Collectible && (c.Class == (CardClass)heroClass || c.Class == CardClass.NEUTRAL) && c.Type != CardType.HERO).ToList());
 		}
 
 		public static Card FromId(string cardId) {
@@ -41,6 +47,8 @@ namespace Brimstone
 		}
 
 		public static IEnumerable<Card> All => data.Cards.Values;
+
+		public static Dictionary<HeroClass, List<Card>> Wild { get; } = new Dictionary<HeroClass, List<Card>>();
 
 		public static int Count => data.Cards.Count;
 	}
