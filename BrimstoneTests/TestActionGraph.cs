@@ -94,7 +94,6 @@ namespace BrimstoneTests
 					foreach (var entity in e.Args[RandomChoice.ENTITIES]) {
 						clones++;
 						Game cloned = e.Game.CloneState();
-						cloned.ActionQueue.MoveNext();
 						cloned.ActionQueue.StackPush((Entity)cloned.Entities[entity.Id]);
 						cloned.ActionQueue.ProcessAll();
 						if (!cloned.ActionQueue.LastActionCancelled)
@@ -107,7 +106,6 @@ namespace BrimstoneTests
 					i <= e.Args[Brimstone.QueueActions.RandomAmount.MAX]; i++) {
 						clones++;
 						Game cloned = e.Game.CloneState();
-						cloned.ActionQueue.MoveNext();
 						cloned.ActionQueue.StackPush(i);
 						cloned.ActionQueue.ProcessAll();
 						if (!cloned.ActionQueue.LastActionCancelled)

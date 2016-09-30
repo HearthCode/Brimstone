@@ -113,7 +113,6 @@
     <Compile Include="PowerHistory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueueAction.cs" />
-    <Compile Include="QueueTree.cs" />
     <Compile Include="Tree\RandomOutcomeSearch.cs" />
     <Compile Include="ReferenceCount.cs" />
     <Compile Include="Settings.cs" />
