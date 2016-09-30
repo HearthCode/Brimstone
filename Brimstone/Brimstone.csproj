@@ -129,6 +129,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Games\Hearthstone\configure" />
     <None Include="Games\Hearthstone\configure.bat" />
     <None Include="packages.config" />
   </ItemGroup>
