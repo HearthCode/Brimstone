@@ -34,7 +34,7 @@ namespace Brimstone
 		private IEnumerable<T> _cachedEntities;
 		private List<T> _cachedEntitiesAsList;
 
-		private IEnumerable<T> Entities
+		protected IEnumerable<T> Entities
 		{
 			get
 			{
@@ -61,7 +61,7 @@ namespace Brimstone
 			_cachedEntitiesAsList = null;
 		}
 
-		private List<T> asList
+		protected List<T> asList
 		{
 			get
 			{

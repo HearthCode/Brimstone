@@ -30,10 +30,10 @@ namespace Brimstone
 #if _DECK_DEBUG
 				DebugLog.WriteLine("Game " + Game.GameId + ": Adding " + card.Name + " to " + Controller.ShortDescription + "'s deck");
 #endif
-				Game.Add(Entity.FromCard(card, tags), (Player) Controller);
+				Game.Add(Entity.FromCard(card, tags), (Player)Controller);
 			}
 			// Force deck zone contents to update
-			Init();
+			SetDirty();
 		}
 
 		public void Shuffle() {
@@ -47,24 +47,26 @@ namespace Brimstone
 				c[GameTag.ZONE_POSITION] = possiblePositions[selIndex];
 				possiblePositions.RemoveAt(selIndex);
 			}
-			Init();
+			SetDirty();
 		}
 
 		public void Fill() {
-			// TODO: Add filter argument later
-			var cardsToAdd = StartingCards - Count;
-			var fillCards = new List<Card>(cardsToAdd);
-			var cardClass = (CardClass)HeroClass;
-			Func<Card, bool> filter =
-				c => c.Collectible && (c.Class == cardClass || c.Class == CardClass.NEUTRAL) && c.Type != CardType.HERO
-				     && fillCards.Count(f => f == c) < c.MaxAllowedInDeck;
-			var availableCards = Cards.All.Where(filter).ToList();
+			// TODO: Add filter/availableCards arguments later
+			var deck = Entities.Select(x => x.Card).ToList();
+			var cardsAlreadyInDeck = deck.Count;
+			var cardsToAdd = StartingCards - cardsAlreadyInDeck;
+			var availableCards = Cards.Wild[HeroClass];
 #if _DECK_DEBUG
 			DebugLog.WriteLine("Game " + Game.GameId + ": Adding " + cardsToAdd + " random cards to " + Controller.ShortDescription + "'s deck");
 #endif
-			while (fillCards.Count < cardsToAdd)
-					fillCards.Add(RNG<Card>.Choose(availableCards));
-			Add(fillCards);
+			while (cardsToAdd > 0) {
+				var card = RNG<Card>.Choose(availableCards);
+				if (deck.Count(c => c == card) < card.MaxAllowedInDeck) {
+					deck.Add(card);
+					cardsToAdd--;
+				}
+			}
+			Add(deck.Skip(cardsAlreadyInDeck).ToList());
 		}
 
 		public int Qty(Card card) {
