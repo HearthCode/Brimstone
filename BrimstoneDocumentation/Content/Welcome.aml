@@ -18,7 +18,7 @@
       </content>
     </section>
     <section>
-      <title>Installation</title>
+      <title>Download</title>
       <content>
         <para>To obtain Brimstone:</para>
 
@@ -63,13 +63,23 @@
           <definition>
             <para>Load <legacyBold>Brimstone.sln</legacyBold> and choose <legacyBold>Build Solution</legacyBold> from the Build menu</para>
           </definition>
-          <definedTerm>Building for Mono at the command line</definedTerm>
+          <definedTerm>Building with Mono at the command line</definedTerm>
           <definition>
-            <para>Type <codeInline>xbuild /p:Configuration=Release Brimstone.sln</codeInline></para>
+            <para>Move into the <legacyBold>Brimstone</legacyBold> folder and type <codeInline>xbuild /p:Configuration=ReleaseMono</codeInline></para>
+            <alert class="note">
+              <para>
+                Brimstone requires Mono 4.4 or later and NuGet. If your Linux distribution supports it, you can install them as follows:
+              </para>
+              <code>
+                sudo apt-get install mono-complete
+                sudo apt-get install nuget
+              </code>
+            </alert>
           </definition>
         </definitionTable>
 
-        <para>Note that Brimstone is merely a black box API providing simulation capabilities and does nothing on its own. [TODO: Link to tutorials]</para>
+        <para>Note that Brimstone is merely a black box API providing simulation capabilities and does nothing on its own. To try Brimstone out, check out the demos in the <legacyBold>Examples</legacyBold> folder.
+      </para>
       </content>
     </section>
     <relatedTopics/>
