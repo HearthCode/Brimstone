@@ -36,6 +36,11 @@
           </listItem>
           <listItem>
             <para>
+              <legacyBold>DebugMono</legacyBold> - this is identical to the <legacyBold>Debug</legacyBold> configuration but excludes projects which are not compatible with Mono, ie. Windows GUI projects like <legacyBold>BrimstoneVisualizer</legacyBold> which uses WPF. You should use this build configuration when you want a Debug build on Mono.
+            </para>
+          </listItem>
+            <listItem>
+            <para>
               <legacyBold>Release</legacyBold> - in this configuration, compiler-level code optimizations are enabled, Brimstone's default application-level optimizations are enabled and logging is disabled. Setting log-related build flags will slow down execution but generate no output, therefore you should not use log-related build flags in this configuration.
             </para>
             <para>
@@ -46,6 +51,11 @@
             </para>
             <para>
               Documentation is not built in Release mode.
+            </para>
+          </listItem>
+          <listItem>
+            <para>
+              <legacyBold>ReleaseMono</legacyBold> - this is identical to the <legacyBold>Release</legacyBold> configuration but excludes projects which are not compatible with Mono, ie. Windows GUI projects like <legacyBold>BrimstoneVisualizer</legacyBold> which uses WPF. You should use this build configuration when you want a Release build on Mono.
             </para>
           </listItem>
           <listItem>
@@ -97,27 +107,6 @@
             <para>
               <codeInline>_TRIGGER_DEBUG</codeInline> - log game trigger associations, checks, fires, ignores, enqueues and forced runs
             </para>
-          </listItem>
-          <listItem>
-            <para>
-              <codeInline>_USE_QUEUE</codeInline> - use the standard "stack-of-queues" model for tracking in-game actions. This is the default
-            </para>
-          </listItem>
-          <listItem>
-            <para>
-              <codeInline>_USE_TREE</codeInline> - <legacyBold>EXPERIMENTAL</legacyBold> - use a mutable forward-only linked list tree to represent the game queue for improved performance
-            </para>
-            <alert class="important">
-              <para>The queue tree does not currently support parallel game execution, for example in parallelized tree searches.</para>
-            </alert>
-            <alert class="warning">
-              <para>The queue tree is experimental and does not compile correctly in the current version of Brimstone.</para>
-            </alert>
-            <alert class="important">
-              <para>
-                Only define one of <codeInline>_USE_QUEUE</codeInline> or <codeInline>_USE_TREE</codeInline>. Setting both or neither will result in undefined behaviour.
-              </para>
-            </alert>
           </listItem>
           <listItem>
             <para>
