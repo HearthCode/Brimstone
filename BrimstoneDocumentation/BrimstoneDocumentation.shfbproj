@@ -39,7 +39,7 @@
     <KeepLogFile>False</KeepLogFile>
     <DisableCodeBlockComponent>False</DisableCodeBlockComponent>
     <CleanIntermediates>True</CleanIntermediates>
-    <HelpFileVersion>0.0.2.0</HelpFileVersion>
+    <HelpFileVersion>0.0.3.0</HelpFileVersion>
     <MaximumGroupParts>2</MaximumGroupParts>
     <NamespaceGrouping>True</NamespaceGrouping>
     <SyntaxFilters>C#, Visual Basic, Managed C++</SyntaxFilters>

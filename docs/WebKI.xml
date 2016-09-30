@@ -56,7 +56,6 @@
   <HelpKINode Title="ActionQueue.IsBlockEmpty property" Url="html/a4c1c43c-e436-71b6-194b-c0e19a211125.htm" />
   <HelpKINode Title="ActionQueue.IsEmpty property" Url="html/54d20d24-a03a-485e-f96e-33dd944c1c1d.htm" />
   <HelpKINode Title="ActionQueue.LastActionCancelled property" Url="html/5cfc91ea-4689-3cdb-e416-a2ee7bdec165.htm" />
-  <HelpKINode Title="ActionQueue.MoveNext method" Url="html/31ac1e96-ff70-d34c-ad1c-14c97b0b470a.htm" />
   <HelpKINode Title="ActionQueue.OnAction event" Url="html/8339a131-e1d7-b850-7df1-6b214f3d4249.htm" />
   <HelpKINode Title="ActionQueue.OnActionStarting event" Url="html/67868d53-201f-fd18-3112-f1008d69b119.htm" />
   <HelpKINode Title="ActionQueue.OnQueued event" Url="html/6b434278-2826-0b21-a881-43b01dbd5c52.htm" />
@@ -74,7 +73,6 @@
   <HelpKINode Title="ActionQueue.ResultStack field" Url="html/ae31085a-d361-91ba-21ad-ce2e8a91a98e.htm" />
   <HelpKINode Title="ActionQueue.Run method" Url="html/71bc63b9-c5ac-fcbd-7e6c-235d084f636a.htm" />
   <HelpKINode Title="ActionQueue.RunAsync method" Url="html/6933607a-7af0-e4b4-8765-4d2e4cb4cb31.htm" />
-  <HelpKINode Title="ActionQueue.RunMultiResult method" Url="html/95c068de-8ce2-ca7a-f77e-0e67e26bce7b.htm" />
   <HelpKINode Title="ActionQueue.StackClear method" Url="html/2c1fed5e-f1f6-a935-f623-0110132751a3.htm" />
   <HelpKINode Title="ActionQueue.StackPop method" Url="html/8695b382-39d1-57c3-73fc-867b13be3a30.htm" />
   <HelpKINode Title="ActionQueue.StackPush method" Url="html/38ff4923-e4ed-91a9-d5a8-b112a8ced6a0.htm" />
@@ -481,6 +479,7 @@
   <HelpKINode Title="Brimstone.QueueActions.Play class" Url="html/d3809d46-7a03-7a70-7f67-31a6b6ada8ee.htm" />
   <HelpKINode Title="Brimstone.QueueActions.PreCompiledQueueAction class" Url="html/c3286f25-ae74-a235-849a-e02538b15424.htm" />
   <HelpKINode Title="Brimstone.QueueActions.QueueAction class" Url="html/918eb365-5df4-2099-6fb8-ce6d33994bb5.htm" />
+  <HelpKINode Title="Brimstone.QueueActions.QueueActionAsync class" Url="html/a134476f-9ce9-79c5-f367-630e25fbb7c0.htm" />
   <HelpKINode Title="Brimstone.QueueActions.RandomAmount class" Url="html/e8b668bb-b0a6-5e79-4479-a10a8e377454.htm" />
   <HelpKINode Title="Brimstone.QueueActions.RandomChoice class" Url="html/8043b9b8-e827-5821-49a4-7f8c78e310d5.htm" />
   <HelpKINode Title="Brimstone.QueueActions.Repeat class" Url="html/087acede-16c5-c93d-36c1-bad1a7e5db65.htm" />
@@ -622,11 +621,13 @@
     <HelpKINode Title="about CardBehaviour class" Url="html/d7a230c8-a882-3b17-2b01-ddb010adf2ec.htm" />
     <HelpKINode Title="constructor" Url="html/45a6bee2-89e2-3133-5a84-dd3c9620254c.htm" />
     <HelpKINode Title="fields" Url="html/0b998d8f-7e6f-1b22-f412-0e18eaf141f0.htm" />
+    <HelpKINode Title="properties" Url="html/924ec1d4-4167-aceb-8e39-3aaef918b818.htm" />
   </HelpKINode>
   <HelpKINode Title="CardBehaviour.Battlecry field" Url="html/0c8d217b-34db-88cd-1dc7-08940469aa47.htm" />
   <HelpKINode Title="CardBehaviour.CardBehaviour constructor" Url="html/45a6bee2-89e2-3133-5a84-dd3c9620254c.htm" />
   <HelpKINode Title="CardBehaviour.Deathrattle field" Url="html/6520141c-a7d2-170c-7829-0d18379b08a9.htm" />
-  <HelpKINode Title="CardBehaviour.Triggers field" Url="html/d1c50af7-280e-5c5f-dafc-c84a75b7eb49.htm" />
+  <HelpKINode Title="CardBehaviour.Triggers property" Url="html/1505051b-2050-3414-1674-a0bba3e958b5.htm" />
+  <HelpKINode Title="CardBehaviour.TriggersByZone field" Url="html/7434a599-16a0-62d7-e96d-0f7ae38a75d0.htm" />
   <HelpKINode Title="CardClass enumeration" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="CARDNAME enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="CARDRACE enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
@@ -641,6 +642,7 @@
   <HelpKINode Title="Cards.FromAssetId method" Url="html/b8d4bdc0-cfb2-e581-261f-48e7f4744c9a.htm" />
   <HelpKINode Title="Cards.FromId method" Url="html/d693e1de-b9bb-1f78-799d-7beb86a4dfb3.htm" />
   <HelpKINode Title="Cards.FromName method" Url="html/18850a1b-6823-1723-ace3-dd7dd8c02902.htm" />
+  <HelpKINode Title="Cards.Wild property" Url="html/3ac85d7a-bd7d-badf-00c2-dd3aec511f3d.htm" />
   <HelpKINode Title="CardSet enumeration" Url="html/3a51b0aa-b329-a51d-5f3c-833473e921a7.htm" />
   <HelpKINode Title="CARDTEXT_INHAND enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="CardType enumeration" Url="html/008de63d-7fc0-adc3-a3c2-3e4888724eea.htm" />
@@ -967,6 +969,7 @@
   <HelpKINode Title="Destroy.Destroy constructor" Url="html/3abc163d-4af1-943f-31cf-734f8083165b.htm" />
   <HelpKINode Title="Destroy.TARGETS field" Url="html/87fa62cd-0ef3-bc2b-8fc9-9c3c4423234b.htm" />
   <HelpKINode Title="DEV_STATE enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
+  <HelpKINode Title="DisableFatigue property" Url="html/ef7efa72-bcc3-2f86-d2a4-baff2b8033d7.htm" />
   <HelpKINode Title="Discard class">
     <HelpKINode Title="Discard Class" Url="html/2cd34a8d-7caf-ec13-e5e7-601da9fcc50a.htm" />
     <HelpKINode Title="about Discard class" Url="html/2cd34a8d-7caf-ec13-e5e7-601da9fcc50a.htm" />
@@ -1176,6 +1179,7 @@
     <HelpKINode Title="BlockType Enumeration" Url="html/044ff8ff-8e97-22fa-c2c7-cbb7efe4577f.htm" />
     <HelpKINode Title="GameTag Enumeration" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   </HelpKINode>
+  <HelpKINode Title="Fatigue property" Url="html/59899e47-9dda-21a5-5e88-780a7c458b4c.htm" />
   <HelpKINode Title="Fill method" Url="html/a89caa0a-9724-5937-7ed6-d9f6c50015fc.htm" />
   <HelpKINode Title="Filtered method" Url="html/705c2e35-473f-126c-beee-3fc818dd1ad1.htm" />
   <HelpKINode Title="FINAL_GAMEOVER enumeration member" Url="html/e45bd562-d3b3-f23a-6aa5-d89bdccea0b3.htm" />
@@ -1844,8 +1848,8 @@
   <HelpKINode Title="LowestCommonAncestor method" Url="html/99ae3cb8-8c8b-1580-8416-96cd737268ab.htm" />
   <HelpKINode Title="LOW_HEALTH_THRESHOLD enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="LOYALTY enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
-  <HelpKINode Title="MAGE enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Mage enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
+  <HelpKINode Title="MAGE enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
   <HelpKINode Title="Mage field" Url="html/3e6551a3-7387-fa1c-0494-cefac9bf9299.htm" />
   <HelpKINode Title="MAGNET enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="MAIN_ACTION enumeration member" Url="html/e45bd562-d3b3-f23a-6aa5-d89bdccea0b3.htm" />
@@ -1897,7 +1901,6 @@
     <HelpKINode Title="Character(T).MortallyWounded Property " Url="html/3f2689f2-06d6-189b-c7a3-aa54f43cd502.htm" />
     <HelpKINode Title="ICharacter.MortallyWounded Property " Url="html/25a55373-0b5e-d160-5551-de2f7dab6f43.htm" />
   </HelpKINode>
-  <HelpKINode Title="MoveNext method" Url="html/31ac1e96-ff70-d34c-ad1c-14c97b0b470a.htm" />
   <HelpKINode Title="MoveTo method">
     <HelpKINode Title="IZone.MoveTo Method " Url="html/102f5041-efa6-25a2-6eab-4df7af79c553.htm" />
     <HelpKINode Title="Zone(T).MoveTo Method " Url="html/4265770b-ac8c-eab7-dc0f-88e699c3eec7.htm" />
@@ -2152,7 +2155,9 @@
   <HelpKINode Title="Player.Clone method" Url="html/179c6310-737d-dfc4-b349-586d6a2602a3.htm" />
   <HelpKINode Title="Player.Concede method" Url="html/d3ec3d50-5076-6dff-65d3-c9fd8534f02f.htm" />
   <HelpKINode Title="Player.Deck property" Url="html/b04c3ccf-63ed-f4ea-18bf-aa16a879fce7.htm" />
+  <HelpKINode Title="Player.DisableFatigue property" Url="html/ef7efa72-bcc3-2f86-d2a4-baff2b8033d7.htm" />
   <HelpKINode Title="Player.Draw method" Url="html/a4f04d25-1338-181b-6b2f-ac663ea4867c.htm" />
+  <HelpKINode Title="Player.Fatigue property" Url="html/59899e47-9dda-21a5-5e88-780a7c458b4c.htm" />
   <HelpKINode Title="Player.FriendlyName property" Url="html/1c30ca0d-a4a7-3706-20c2-c1b0e249f3bf.htm" />
   <HelpKINode Title="Player.Game property" Url="html/cc44fbb8-69ec-93c4-ad45-7d670bd78465.htm" />
   <HelpKINode Title="Player.Give method" Url="html/a6ba6753-1bf1-7b71-42b4-590a7300515a.htm" />
@@ -2277,8 +2282,8 @@
   </HelpKINode>
   <HelpKINode Title="PREHEALING enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="PREMIUM enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
-  <HelpKINode Title="Priest enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
   <HelpKINode Title="PRIEST enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
+  <HelpKINode Title="Priest enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
   <HelpKINode Title="Priest field" Url="html/46d2405a-f490-bfac-62b7-fc65b46866d0.htm" />
   <HelpKINode Title="ProbabilisticGameNode class">
     <HelpKINode Title="ProbabilisticGameNode Class" Url="html/8970813c-d2f0-c855-c2a2-fd781ca6b6bf.htm" />
@@ -2320,6 +2325,11 @@
   <HelpKINode Title="QueueAction to ActionGraph conversion" Url="html/032630cc-f956-a111-5976-5d0076a7f347.htm" />
   <HelpKINode Title="QueueAction.Clone method" Url="html/3e0bdd82-c3a4-36a0-b42a-553e58a8d433.htm" />
   <HelpKINode Title="QueueAction.ToString method" Url="html/5dcb9b39-5b39-e3d9-a2a5-b78c08f93ad2.htm" />
+  <HelpKINode Title="QueueActionAsync class">
+    <HelpKINode Title="QueueActionAsync Class" Url="html/a134476f-9ce9-79c5-f367-630e25fbb7c0.htm" />
+    <HelpKINode Title="about QueueActionAsync class" Url="html/a134476f-9ce9-79c5-f367-630e25fbb7c0.htm" />
+    <HelpKINode Title="methods" Url="html/41314afa-faff-a0a5-420a-0aa618604d5f.htm" />
+  </HelpKINode>
   <HelpKINode Title="QueueActionBlock method" Url="html/44d6757b-d3be-b5f9-feeb-6cab15be6ac5.htm" />
   <HelpKINode Title="QueueActionEventArgs class">
     <HelpKINode Title="QueueActionEventArgs Class" Url="html/0d785939-9e3a-b8d4-bacb-1a0be3611db6.htm" />
@@ -2512,8 +2522,8 @@
     <HelpKINode Title="methods" Url="html/411b5455-3b41-7a26-1472-811dd06755c2.htm" />
   </HelpKINode>
   <HelpKINode Title="RNG&lt;T&gt;.Choose method" Url="html/de999927-ad63-e17a-8ad1-0d79dcb29d58.htm" />
-  <HelpKINode Title="Rogue enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
   <HelpKINode Title="ROGUE enumeration member" Url="html/07677214-a122-ab35-f1d3-6b629abd2731.htm" />
+  <HelpKINode Title="Rogue enumeration member" Url="html/24c0aa02-efe2-9ef3-0e3a-ab078535044d.htm" />
   <HelpKINode Title="Rogue field" Url="html/f7b182d7-ac21-0f42-3cd1-890066c98435.htm" />
   <HelpKINode Title="RootNode property" Url="html/44e29f38-0be9-cf3f-a52a-49cf92361d23.htm" />
   <HelpKINode Title="Run method">
@@ -2526,7 +2536,6 @@
     <HelpKINode Title="ActionQueue.RunAsync Method " Url="html/6933607a-7af0-e4b4-8765-4d2e4cb4cb31.htm" />
     <HelpKINode Title="RandomOutcomeSearch.RunAsync Method " Url="html/b964d883-f510-327e-641f-1b7eeef47733.htm" />
   </HelpKINode>
-  <HelpKINode Title="RunMultiResult method" Url="html/95c068de-8ce2-ca7a-f77e-0e67e26bce7b.htm" />
   <HelpKINode Title="RUNNING enumeration member" Url="html/1dd0a882-69af-c2a6-1e10-94fe5552bd0c.htm" />
   <HelpKINode Title="SCOURGE enumeration member" Url="html/13f175ee-1818-86f5-b4bb-db843b2cc81c.htm" />
   <HelpKINode Title="SECRET enumeration member">
@@ -2778,12 +2787,12 @@
   <HelpKINode Title="TargetingException.TargetingException constructor" Url="html/6513284e-ef3a-49f7-dc06-61ea8bfd6308.htm" />
   <HelpKINode Title="TARGETING_ARROW_TEXT enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="TARGETS field">
-    <HelpKINode Title="Silence.TARGETS Field" Url="html/cf680765-2e0c-2ec1-ad46-c9c8cd7b5029.htm" />
     <HelpKINode Title="Bounce.TARGETS Field" Url="html/674c1734-bdcc-7f61-9572-cc91c7f20f4b.htm" />
     <HelpKINode Title="Damage.TARGETS Field" Url="html/b8e6dfe4-a876-ca48-6fa8-f7eb35237385.htm" />
     <HelpKINode Title="Destroy.TARGETS Field" Url="html/87fa62cd-0ef3-bc2b-8fc9-9c3c4423234b.htm" />
     <HelpKINode Title="Discard.TARGETS Field" Url="html/20dd061f-bf00-0754-5113-25f91af3e3d6.htm" />
     <HelpKINode Title="Heal.TARGETS Field" Url="html/1258a9ea-f4fd-4984-fd09-50dc3db76df3.htm" />
+    <HelpKINode Title="Silence.TARGETS Field" Url="html/cf680765-2e0c-2ec1-ad46-c9c8cd7b5029.htm" />
   </HelpKINode>
   <HelpKINode Title="Targets field" Url="html/588c2a22-5f27-b403-9b7a-18d6359bf3a4.htm" />
   <HelpKINode Title="TAUNT enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
@@ -2882,8 +2891,11 @@
   <HelpKINode Title="TriggerManager.TriggerResolved method" Url="html/42c8cbef-9afb-2257-afeb-0021d002b594.htm" />
   <HelpKINode Title="TriggerManager.Triggers property" Url="html/43d2b653-5ea4-08e2-30b6-0d47503601b6.htm" />
   <HelpKINode Title="TriggerResolved method" Url="html/42c8cbef-9afb-2257-afeb-0021d002b594.htm" />
-  <HelpKINode Title="Triggers field" Url="html/d1c50af7-280e-5c5f-dafc-c84a75b7eb49.htm" />
-  <HelpKINode Title="Triggers property" Url="html/43d2b653-5ea4-08e2-30b6-0d47503601b6.htm" />
+  <HelpKINode Title="Triggers property">
+    <HelpKINode Title="CardBehaviour.Triggers Property " Url="html/1505051b-2050-3414-1674-a0bba3e958b5.htm" />
+    <HelpKINode Title="TriggerManager.Triggers Property " Url="html/43d2b653-5ea4-08e2-30b6-0d47503601b6.htm" />
+  </HelpKINode>
+  <HelpKINode Title="TriggersByZone field" Url="html/7434a599-16a0-62d7-e96d-0f7ae38a75d0.htm" />
   <HelpKINode Title="TriggerType enumeration" Url="html/b778748c-8ced-db23-8145-8315f217b1df.htm" />
   <HelpKINode Title="TRIGGER_VISUAL enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="TROLL enumeration member" Url="html/13f175ee-1818-86f5-b4bb-db843b2cc81c.htm" />
@@ -2962,6 +2974,7 @@
   <HelpKINode Title="WeightedGameNode.Branch method" Url="html/a7683245-a1d4-28b7-c838-0959857e1f55.htm" />
   <HelpKINode Title="WeightedGameNode.Weight property" Url="html/2bb7477a-e227-3293-e6d8-a5fbffcb2c0d.htm" />
   <HelpKINode Title="WeightedGameNode.WeightedGameNode constructor" Url="html/df24da60-e9b7-bda4-aa7b-dfcc8f73f33b.htm" />
+  <HelpKINode Title="Wild property" Url="html/3ac85d7a-bd7d-badf-00c2-dd3aec511f3d.htm" />
   <HelpKINode Title="WINDFURY enumeration member" Url="html/b73d4e76-4680-a521-cd80-f17892eccb34.htm" />
   <HelpKINode Title="WINNING enumeration member" Url="html/8314f92c-6661-c4b7-5610-95537d9ed948.htm" />
   <HelpKINode Title="WON enumeration member" Url="html/8314f92c-6661-c4b7-5610-95537d9ed948.htm" />
