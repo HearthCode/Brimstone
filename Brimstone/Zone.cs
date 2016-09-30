@@ -57,7 +57,7 @@ namespace Brimstone
 		{
 			// Make sure that _cachedEntities[0] has ZONE_POSITION = 1 etc.
 			_cachedEntities = Game.Entities
-				.Where(e => e.Controller == Controller && e.Zone == this && e.ZonePosition > 0).Select(e => (T) e);
+				.Where(e => e.Zone == this && e.ZonePosition > 0).Select(e => (T) e);
 			_cachedEntitiesAsList = null;
 		}
 
