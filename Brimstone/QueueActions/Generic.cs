@@ -252,7 +252,8 @@ namespace Brimstone.QueueActions
 #if _ACTIONS_DEBUG
 			DebugLog.WriteLine("Game {0}: {1} tries to draw but their deck is empty", game.GameId, player.FriendlyName);
 #endif
-			game.QueueActionBlock(BlockType.FATIGUE, player.Hero, Actions.Damage(player.Hero, player.Fatigue + 1));
+			if (!player.DisableFatigue)
+				game.QueueActionBlock(BlockType.FATIGUE, player.Hero, Actions.Damage(player.Hero, player.Fatigue + 1));
 			return ActionResult.None;
 		}
 	}

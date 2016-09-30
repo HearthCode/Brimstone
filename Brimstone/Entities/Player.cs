@@ -18,6 +18,7 @@ namespace Brimstone.Entities
 		public HeroClass HeroClass { get; }
 
 		public int MaxHandSize { get; set; } = 10;
+		public bool DisableFatigue { get; set; }
 
 		public Choice Choice { get; set; }
 
@@ -25,6 +26,7 @@ namespace Brimstone.Entities
 			FriendlyName = cloneFrom.FriendlyName;
 			HeroClass = cloneFrom.HeroClass;
 			MaxHandSize = cloneFrom.MaxHandSize;
+			DisableFatigue = cloneFrom.DisableFatigue;
 			// TODO: Shallow clone choices
 			// TODO: Update choices to point to new game entities
 		}
