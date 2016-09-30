@@ -50,7 +50,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Brimstone\Brimstone.csproj">
+    <ProjectReference Include="..\..\Brimstone\Brimstone.csproj">
       <Project>{2aca22d8-ed17-4bb0-bd5b-e0a435d180b8}</Project>
       <Name>Brimstone</Name>
     </ProjectReference>

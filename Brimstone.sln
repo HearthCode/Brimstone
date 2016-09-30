@@ -35,7 +35,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deque", "submodules\Deque\s
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{3387413D-2669-4B77-A1CA-35578C9A099E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameDemoEndTurn", "GameDemoEndTurn\GameDemoEndTurn.csproj", "{1FBCF875-F548-4591-B4F5-10B60E2E9685}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameDemoEndTurn", "Examples\GameDemoEndTurn\GameDemoEndTurn.csproj", "{1FBCF875-F548-4591-B4F5-10B60E2E9685}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
