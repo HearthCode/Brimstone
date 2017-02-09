@@ -1,4 +1,23 @@
-﻿using Brimstone;
+﻿/*
+	Copyright 2016, 2017 Katy Coe
+
+	This file is part of Brimstone.
+
+	Brimstone is free software: you can redistribute it and/or modify
+	it under the terms of the GNU Lesser General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	Brimstone is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU Lesser General Public License for more details.
+
+	You should have received a copy of the GNU Lesser General Public License
+	along with Brimstone.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+using Brimstone;
 using Brimstone.Entities;
 using BrimstoneVisualizer;
 
@@ -9,18 +28,24 @@ using BrimstoneVisualizer;
 
 namespace BrimstoneGameScript
 {
-    public class BrimstoneGame : IBrimstoneGame
+	public class BrimstoneGame : IBrimstoneGame
 	{
 		public const int MaxMinions = 7;
-	    private IPlayable acolyte;
+		private IPlayable acolyte;
 
 		public Game SetupGame() {
 			var game = new Game(HeroClass.Hunter, HeroClass.Warlock, PowerHistory: true);
 			var p1 = game.Player1;
 			var p2 = game.Player2;
 			acolyte = p1.Deck.Add(new Minion("Acolyte of Pain"));
-			p1.Deck.Fill();
-			p2.Deck.Fill();
+			for (int i = 0; i < 4; i++) {
+				p1.Deck.Add("Wisp");
+				p2.Deck.Add("Wisp");
+			}
+			p1.DisableFatigue = true;
+			p2.DisableFatigue = true;
+			//p1.Deck.Fill();
+			//p2.Deck.Fill();
 
 			return game;
 		}
@@ -28,6 +53,9 @@ namespace BrimstoneGameScript
 		public void PlayGame(Game Game) {
 			Game.Player1.Choice.Keep(x => x.Cost <= 2);
 			Game.Player2.Choice.Keep(x => x.Cost <= 2);
+
+			for (int i = 0; i < 20; i++)
+				Game.EndTurn();
 
 			if (Game.CurrentPlayer != Game.Player1)
 				Game.EndTurn();

@@ -20,6 +20,8 @@ Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "BrimstoneDocumentation", "B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Base Items", "Base Items", "{AA25A167-294B-40DE-A65B-1B413A8E5FEC}"
 	ProjectSection(SolutionItems) = preProject
+		COPYING = COPYING
+		COPYING.LESSER = COPYING.LESSER
 		README.md = README.md
 	EndProjectSection
 EndProject
