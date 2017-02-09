@@ -1,5 +1,7 @@
 /*
 	Copyright 2016, 2017 Katy Coe
+	Copyright 2016 Leonard Dahlmann
+	Copyright 2016 Timothy Stiles
 
 	This file is part of Brimstone.
 
