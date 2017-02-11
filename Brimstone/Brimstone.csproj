@@ -142,9 +142,11 @@
     <EmbeddedResource Include="Games\Hearthstone\Data\Cards.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
+  <PropertyGroup Condition=" '$(OS)' == 'Unix' ">
+    <PreBuildEvent>cd ../../../; nuget restore; $(ProjectDir)Games/Hearthstone/configure "$(ProjectDir)"</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
     <PreBuildEvent>$(ProjectDir)Games/Hearthstone/configure "$(ProjectDir)"</PreBuildEvent>
-    <PreBuildEvent Condition=" '$(OS)' == 'Unix' ">cd ../../../; nuget restore</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
