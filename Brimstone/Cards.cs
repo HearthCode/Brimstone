@@ -27,7 +27,7 @@ namespace Brimstone
 {
 	interface ICardLoader
 	{
-		List<Card> Load();
+		IEnumerable<Card> Load();
 	}
 
 	public static class Cards

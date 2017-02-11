@@ -139,7 +139,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Games\Hearthstone\Data\Cards.xml" />
+    <EmbeddedResource Include="Games\Hearthstone\Data\Cards.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
