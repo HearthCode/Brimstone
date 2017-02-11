@@ -1,15 +1,15 @@
-#!/bin/sh
+#!/bin/bash
 
 PROJECTDIR=$1
 
 if [ ! -f "$PROJECTDIR"Games/Hearthstone/Data/Cards.xml ]; then
     mkdir -p "$PROJECTDIR"Games/Hearthstone/Data
     git clone https://gitlab.com/HearthCode/DataExtractor
-	pushd DataExtractor
-	chmod 755 build
-	./build
-	mono hs-data-extractor.exe
-    cp /y Cards.xml "$PROJECTDIR"Games/Hearthstone/Data
-	popd
+    pushd DataExtractor
+    chmod 755 build
+    ./build
+    mono hs-data-extractor.exe
+    cp -f Cards.xml "$PROJECTDIR"Games/Hearthstone/Data
+    popd
     rm -rf DataExtractor
 fi
