@@ -138,10 +138,8 @@
       <Name>Deque</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <EmbeddedResource Include="Games\Hearthstone\Data\CARD.xml" />
-    <EmbeddedResource Include="Games\Hearthstone\Data\CardDefs.xml" />
+    <Content Include="Games\Hearthstone\Data\Cards.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
