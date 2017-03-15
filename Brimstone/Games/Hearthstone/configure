@@ -4,12 +4,14 @@ PROJECTDIR=$1
 
 if [ ! -f "$PROJECTDIR"Games/Hearthstone/Data/Cards.xml ]; then
     mkdir -p "$PROJECTDIR"Games/Hearthstone/Data
-    git clone https://gitlab.com/HearthCode/DataExtractor
-    pushd DataExtractor
-    chmod 755 build
-    ./build
-    mono hs-data-extractor.exe
-    cp -f Cards.xml "$PROJECTDIR"Games/Hearthstone/Data
+    git clone https://gitlab.com/HearthCode/HearthData
+    pushd HearthData
+    dotnet restore
+    dotnet run --extract-card-data="$PROJECTDIR"Games/Hearthstone/Data/Cards.xml
     popd
-    rm -rf DataExtractor
+    rm -rf HearthData
+fi
+if [ ! -f "$PROJECTDIR"Games/Hearthstone/Data/Cards.xml ]; then
+    echo HearthData: error $?: Could not generate card metadata XML
+    exit 1
 fi
